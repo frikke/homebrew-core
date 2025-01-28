@@ -1,30 +1,25 @@
 class Libmatio < Formula
   desc "C library for reading and writing MATLAB MAT files"
   homepage "https://matio.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/matio/matio/1.5.23/matio-1.5.23.tar.gz"
-  sha256 "9f91eae661df46ea53c311a1b2dcff72051095b023c612d7cbfc09406c9f4d6e"
+  url "https://downloads.sourceforge.net/project/matio/matio/1.5.28/matio-1.5.28.tar.gz"
+  sha256 "9da698934a21569af058e6348564666f45029e6c2b0878ca0d8f9609bf77b8d8"
   license "BSD-2-Clause"
-  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "692ff91102a1882368444eaffb2b4134f25550f2792698d1fd36337f318e8465"
-    sha256 cellar: :any,                 arm64_monterey: "779a488063e24d4d9ab188be23f94f53155d5014a478d55500ef27c26fb2911b"
-    sha256 cellar: :any,                 arm64_big_sur:  "0a0c9260534dfe974fa4bd9ca28c26e321db5b2e36c53494c1e56a6f79c00ee4"
-    sha256 cellar: :any,                 ventura:        "7b6ded7eaa0c7e18c0e4a3835a0bcfde53878416ac82d816adba21a622911d61"
-    sha256 cellar: :any,                 monterey:       "e93c4b9479da91da21e25673bd9ca8f6d752cafd65c302fa37477e1ed6743465"
-    sha256 cellar: :any,                 big_sur:        "b0d10fef3792de609e10b14720f5c632e4c179273de51de3da07a13d2ae7ae3d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "93c7c6f5e6fff8637b9e7fd5467057e1662546e7e44a00db08743f12eab6b838"
+    sha256 cellar: :any,                 arm64_sequoia: "8548b3cb9b21fa982216451647db1a47b4c739312584234cd1985427b8d6b257"
+    sha256 cellar: :any,                 arm64_sonoma:  "80694bb2600a33e2628fd55db525539d5105d2fea1928cf161881b752d498d88"
+    sha256 cellar: :any,                 arm64_ventura: "54cce8262a21cca0d84f505bcc89393d9aa70df7cde6efc1e7732f563c8beee4"
+    sha256 cellar: :any,                 sonoma:        "8165133fb675edcc6db39d59e8c67bf3ea3b63bf22948d7acc638b3b9759a86b"
+    sha256 cellar: :any,                 ventura:       "00b4f5bdbec014ea1675de1c8f53b0d206f01bcfd31dbd61390e38ed6577648f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f29e5ed508bb8cf1acbe9e69829f7beb0971efb72fcc4cb3a5a9c1b9ad66c2c7"
   end
 
-  depends_on "pkg-config" => :test
+  depends_on "pkgconf" => :test
   depends_on "hdf5"
   uses_from_macos "zlib"
 
-  resource "homebrew-test_mat_file" do
-    url "https://web.uvic.ca/~monahana/eos225/poc_data.mat.sfx"
-    sha256 "a29df222605476dcfa660597a7805176d7cb6e6c60413a3e487b62b6dbf8e6fe"
-  end
+  # fix pkg-config linkage for hdf5 and zlib
+  patch :DATA
 
   def install
     args = %W[
@@ -34,13 +29,18 @@ class Libmatio < Formula
     ]
     args << "--with-zlib=#{Formula["zlib"].opt_prefix}" unless OS.mac?
 
-    system "./configure", *std_configure_args, *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
   test do
+    resource "homebrew-test_mat_file" do
+      url "https://web.uvic.ca/~monahana/eos225/poc_data.mat.sfx"
+      sha256 "a29df222605476dcfa660597a7805176d7cb6e6c60413a3e487b62b6dbf8e6fe"
+    end
+
     testpath.install resource("homebrew-test_mat_file")
-    (testpath/"mat.c").write <<~EOS
+    (testpath/"mat.c").write <<~C
       #include <stdlib.h>
       #include <matio.h>
 
@@ -67,10 +67,25 @@ class Libmatio < Formula
         mat = Mat_CreateVer("foo", NULL, MAT_FT_MAT73);
         return EXIT_SUCCESS;
       }
-    EOS
+    C
     system ENV.cc, "mat.c", "-o", "mat", "-I#{include}", "-L#{lib}", "-lmatio"
     system "./mat", "poc_data.mat.sfx"
 
-    refute_includes shell_output("pkg-config --cflags matio"), "-I/usr/include"
+    refute_includes "-I/usr/include", shell_output("pkgconf --cflags matio")
   end
 end
+
+__END__
+diff --git a/matio.pc.in b/matio.pc.in
+index 96d9402..139f11e 100644
+--- a/matio.pc.in
++++ b/matio.pc.in
+@@ -6,6 +6,5 @@ includedir=@includedir@
+ Name: MATIO
+ Description: MATIO Library
+ Version: @VERSION@
+-Libs: -L${libdir} -lmatio
+-Cflags: -I${includedir}
+-Requires.private: @HDF5_REQUIRES_PRIVATE@ @ZLIB_REQUIRES_PRIVATE@
++Libs: -L${libdir} -lmatio @HDF5_LIBS@ @ZLIB_LIBS@
++Cflags: -I${includedir} @HDF5_CFLAGS@ @ZLIB_CFLAGS@

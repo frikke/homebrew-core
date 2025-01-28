@@ -1,12 +1,12 @@
 class BashUnit < Formula
   desc "Bash unit testing enterprise edition framework for professionals"
   homepage "https://github.com/pgrange/bash_unit"
-  url "https://github.com/pgrange/bash_unit/archive/refs/tags/v2.1.0.tar.gz"
-  sha256 "51b2c9c906c414efb403b6fbf02cfb77d97b442043b29e39c1d6fddc8806972f"
+  url "https://github.com/pgrange/bash_unit/archive/refs/tags/v2.3.2.tar.gz"
+  sha256 "368d1712d4c265909a5039ea91180dba1db5b15b5a02cf24cfb3b7547c0e9150"
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "7b32bfdb5f5ec420b9186e4780075c2ff6c71122a0615b031c016090da668a0f"
+    sha256 cellar: :any_skip_relocation, all: "2d5f3bacff684950c7a12a1ba1eb01c63368461d46994f9cfd4209150b73bc8d"
   end
 
   uses_from_macos "bc" => :test
@@ -17,12 +17,12 @@ class BashUnit < Formula
   end
 
   test do
-    (testpath/"test.sh").write <<~EOS
+    (testpath/"test.sh").write <<~SHELL
       test_addition() {
         RES="$(echo 2+2 | bc)"
         assert_equals "${RES}" "4"
       }
-    EOS
+    SHELL
     assert "addition", shell_output("#{bin}/bash_unit test.sh")
   end
 end

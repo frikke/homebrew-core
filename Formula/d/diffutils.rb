@@ -1,12 +1,13 @@
 class Diffutils < Formula
   desc "File comparison utilities"
-  homepage "https://www.gnu.org/s/diffutils/"
+  homepage "https://www.gnu.org/software/diffutils/"
   url "https://ftp.gnu.org/gnu/diffutils/diffutils-3.10.tar.xz"
   mirror "https://ftpmirror.gnu.org/diffutils/diffutils-3.10.tar.xz"
   sha256 "90e5e93cc724e4ebe12ede80df1634063c7a855692685919bfe60b556c9bd09e"
   license "GPL-3.0-or-later"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "8f7c9ed3cb94e3c5fae9f3c047999d3c49ff977cd9f23523e4b81d3abed9477f"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "de3f22324953924f710369b160f3895b43423f91cc54b173abfb7f4566b1ff49"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "c660290591feea403a36b8fc29e77b7844bc1e99a1fb6c7d0110f42992c4e559"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "d6ac63f502b1c6eec4036cae5ed7eb304fae6d64e969a5105593af0205b7a3ec"

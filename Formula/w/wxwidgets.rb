@@ -1,30 +1,28 @@
 class Wxwidgets < Formula
   desc "Cross-platform C++ GUI toolkit"
   homepage "https://www.wxwidgets.org"
-  url "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.2.1/wxWidgets-3.2.2.1.tar.bz2"
-  sha256 "dffcb6be71296fff4b7f8840eb1b510178f57aa2eb236b20da41182009242c02"
+  url "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxWidgets-3.2.6.tar.bz2"
+  sha256 "939e5b77ddc5b6092d1d7d29491fe67010a2433cf9b9c0d841ee4d04acb9dce7"
   license "LGPL-2.0-or-later" => { with: "WxWindows-exception-3.1" }
-  revision 1
   head "https://github.com/wxWidgets/wxWidgets.git", branch: "master"
 
   livecheck do
     url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "081e9f12a189c8cd0504ad38f39f2b2e59ff073c74660c50c2132567175becad"
-    sha256 cellar: :any,                 arm64_ventura:  "f51d1012d079c411bee043c2126527e85b7b2a0e5b0273f36d7d9ed7b606a18f"
-    sha256 cellar: :any,                 arm64_monterey: "875b133fa4aae0a1b0fa72c3f972c1a2f22004e1331f5553811eb3124a43ee25"
-    sha256 cellar: :any,                 arm64_big_sur:  "049d670fbf92b640e97382159a2763fd1f14948d62cd131977fe08443a7eed6b"
-    sha256 cellar: :any,                 sonoma:         "5e18a809e1b72a50abf863140cbce45af1ee70f74c7ce11a8b11549d93b1d05b"
-    sha256 cellar: :any,                 ventura:        "6f415a469158fd5b3b6c1ce03d37c8bc04a79d5059902bf065b2d2efd8a1884e"
-    sha256 cellar: :any,                 monterey:       "5f8d9b117225aaa7006ec3b80713b1bb5931926294b1c3fa705bfc89d7e66db1"
-    sha256 cellar: :any,                 big_sur:        "82a319e267eeb62ebda44276cc856237aeebb57e83362eed35f33a487cfd1262"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ca8b1059a400171a8fcee66ddc9f4b008064afd0c993ebd016890362c7aaaa88"
+    sha256 cellar: :any,                 arm64_sequoia:  "477825cb9a317d0f99e16ba96a5288fd5495af9308ef2b67587833ea4c3434d6"
+    sha256 cellar: :any,                 arm64_sonoma:   "3e24e13b0986b99ad7db4b72f7235403cf2eac9a6f8d6a8aff5242880f79153a"
+    sha256 cellar: :any,                 arm64_ventura:  "3b409e2c9e174f7165a143a8891c0c4988901a1dffaea254c30744a47ed3606b"
+    sha256 cellar: :any,                 arm64_monterey: "9d6ec48436c89048893710d3974f52279a1077c4379795c14afb1bb160b64fd0"
+    sha256 cellar: :any,                 sonoma:         "38c049274c539fc0af3c2dcd2f94942b06c6f46f92e5dbdb0472a4950ef75146"
+    sha256 cellar: :any,                 ventura:        "829da67086e26ce6ce6f94de2c77e453892a0625f55d0babe2fed34e27b62106"
+    sha256 cellar: :any,                 monterey:       "54bd30c0fc5623a8cbf1f6c318934cc38644396f63c9d8abb7407b05076e7eac"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1b2caf603dfed363a25a93862bcecd9a006ac82fdb3154125ccf1ff860cc5f1a"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
@@ -34,18 +32,28 @@ class Wxwidgets < Formula
   uses_from_macos "zlib"
 
   on_linux do
+    depends_on "cairo"
+    depends_on "fontconfig"
+    depends_on "gdk-pixbuf"
+    depends_on "glib"
     depends_on "gtk+3"
     depends_on "libsm"
+    depends_on "libx11"
+    depends_on "libxkbcommon"
+    depends_on "libxtst"
+    depends_on "libxxf86vm"
+    depends_on "mesa"
     depends_on "mesa-glu"
+    depends_on "pango"
+    depends_on "wayland"
   end
 
   def install
     # Remove all bundled libraries excluding `nanosvg` which isn't available as formula
-    %w[catch pcre].each { |l| (buildpath/"3rdparty"/l).rmtree }
-    %w[expat jpeg png tiff zlib].each { |l| (buildpath/"src"/l).rmtree }
+    %w[catch pcre].each { |l| rm_r(buildpath/"3rdparty"/l) }
+    %w[expat jpeg png tiff zlib].each { |l| rm_r(buildpath/"src"/l) }
 
     args = [
-      "--prefix=#{prefix}",
       "--enable-clipboard",
       "--enable-controls",
       "--enable-dataviewctrl",
@@ -62,7 +70,6 @@ class Wxwidgets < Formula
       "--with-libtiff",
       "--with-opengl",
       "--with-zlib",
-      "--disable-dependency-tracking",
       "--disable-tests",
       "--disable-precomp-headers",
       # This is the default option, but be explicit
@@ -74,9 +81,13 @@ class Wxwidgets < Formula
       args << "--with-macosx-version-min=#{MacOS.version}"
       args << "--with-osx_cocoa"
       args << "--with-libiconv"
+
+      # Work around deprecated Carbon API, see
+      # https://github.com/wxWidgets/wxWidgets/issues/24724
+      inreplace "src/osx/carbon/dcscreen.cpp", "#if !wxOSX_USE_IPHONE", "#if 0" if MacOS.version >= :sequoia
     end
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
 
     # wx-config should reference the public prefix, not wxwidgets's keg

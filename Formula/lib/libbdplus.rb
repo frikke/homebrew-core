@@ -12,6 +12,7 @@ class Libbdplus < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "9cc87d2f97a8450b3757c16b409e1c13a562e2d0e52492ab9d9cb032c908d600"
     sha256 cellar: :any,                 arm64_sonoma:   "ea38d1a6e93c8fcf4d08039d40e2fdc5fc681a66f1e3377c8e9f56a4992136d2"
     sha256 cellar: :any,                 arm64_ventura:  "f47c8d29158db9c810a1f037d3335ba5cb5b8c8c3769c5435d516f07cef44c73"
     sha256 cellar: :any,                 arm64_monterey: "c5e53b35cf902a1b1bed758850dc351c5fa005f78147a39085e284b02ddded9f"
@@ -42,7 +43,7 @@ class Libbdplus < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libbdplus/bdplus.h>
       int main() {
         int major = -1;
@@ -51,7 +52,7 @@ class Libbdplus < Formula
         bdplus_get_version(&major, &minor, &micro);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-I#{include}", "-lbdplus", "-o", "test"
     system "./test"
   end

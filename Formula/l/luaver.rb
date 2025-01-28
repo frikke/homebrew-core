@@ -1,13 +1,14 @@
 class Luaver < Formula
   desc "Manage and switch between versions of Lua, LuaJIT, and Luarocks"
   homepage "https://github.com/DhavalKapil/luaver"
-  url "https://github.com/DhavalKapil/luaver/archive/v1.1.0.tar.gz"
+  url "https://github.com/DhavalKapil/luaver/archive/refs/tags/v1.1.0.tar.gz"
   sha256 "441b1b72818889593d15a035807c95321118ac34270da49cf8d5d64f5f2e486d"
   license "MIT"
   head "https://github.com/DhavalKapil/luaver.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "423d7c791335f69639c53e2eb5ccbfd0120deeb61984a2744a72d0ab635317af"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "9bf33058878e1a0fcbec847bf8b5ec06912eda98647f05ab96e08e4c1197f93a"
   end
 
   depends_on "wget"

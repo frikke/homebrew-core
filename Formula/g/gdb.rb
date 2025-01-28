@@ -1,34 +1,37 @@
 class Gdb < Formula
   desc "GNU debugger"
   homepage "https://www.gnu.org/software/gdb/"
-  url "https://ftp.gnu.org/gnu/gdb/gdb-13.2.tar.xz"
-  mirror "https://ftpmirror.gnu.org/gdb/gdb-13.2.tar.xz"
-  sha256 "fd5bebb7be1833abdb6e023c2f498a354498281df9d05523d8915babeb893f0a"
+  url "https://ftp.gnu.org/gnu/gdb/gdb-16.1.tar.xz"
+  mirror "https://ftpmirror.gnu.org/gdb/gdb-16.1.tar.xz"
+  sha256 "c2cc5ccca029b7a7c3879ce8a96528fdfd056b4d884f2b0511e8f7bc723355c6"
   license "GPL-3.0-or-later"
   head "https://sourceware.org/git/binutils-gdb.git", branch: "master"
 
   bottle do
-    sha256 ventura:      "3bdf74b4973ed42f7f3fc1620d7dc50b3834d883067882a74ea1ddf9c7cb92a5"
-    sha256 monterey:     "1d69dacbbccd725c1b30efcf381d0239785999c6b14dacfc7b10caefe2686ebd"
-    sha256 big_sur:      "fdede992bdd9289f728b721d6489c96e93a37299ab64d817fab2a025a61ff4d7"
-    sha256 x86_64_linux: "21e2853f8bb446b674fd50382799fab4257f067268fd2eab8858e18001920c77"
+    sha256 sonoma:       "5ee7e0844dc1e5e74e7936504e954b18b85bcff2856e301ddcbb6f171221f25c"
+    sha256 ventura:      "7b6cfecf7cc06a1e5408fb95ca06a3059eb3755662a9907a9c358a9a8d7d1b87"
+    sha256 x86_64_linux: "1e88e9c902f2d417c8aa7eb215f888d7e37cf6899b4f2c6521f98384d6824ab0"
   end
 
-  depends_on arch: :x86_64 # gdb is not supported on macOS ARM
   depends_on "gmp"
-  depends_on "python@3.11"
+  depends_on "mpfr"
+  depends_on "python@3.12"
   depends_on "xz" # required for lzma support
 
   uses_from_macos "expat"
   uses_from_macos "libxcrypt"
   uses_from_macos "ncurses"
 
+  on_macos do
+    depends_on arch: :x86_64 # gdb is not supported on macOS ARM
+  end
+
   on_system :linux, macos: :ventura_or_newer do
     depends_on "texinfo" => :build
   end
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "guile"
   end
 
@@ -40,21 +43,24 @@ class Gdb < Formula
     EOS
   end
 
-  fails_with gcc: "5"
+  # Fix build on Linux
+  # Ref: https://sourceware.org/bugzilla/show_bug.cgi?id=32578
+  patch :DATA
 
   def install
+    # Fix `error: use of undeclared identifier 'command_style'`
+    inreplace "gdb/darwin-nat.c", "#include \"cli/cli-cmds.h\"",
+                                  "#include \"cli/cli-cmds.h\"\n#include \"cli/cli-style.h\""
+
     args = %W[
       --enable-targets=all
-      --prefix=#{prefix}
-      --disable-debug
-      --disable-dependency-tracking
       --with-lzma
-      --with-python=#{Formula["python@3.11"].opt_bin}/python3.11
+      --with-python=#{Formula["python@3.12"].opt_bin}/python3.12
       --disable-binutils
     ]
 
     mkdir "build" do
-      system "../configure", *args
+      system "../configure", *args, *std_configure_args
       system "make"
 
       # Don't install bfd or opcodes, as they are provided by binutils
@@ -77,3 +83,31 @@ class Gdb < Formula
     system bin/"gdb", bin/"gdb", "-configuration"
   end
 end
+
+__END__
+diff --git a/bfd/Makefile.in b/bfd/Makefile.in
+index aec3717485a..ee674a36c5b 100644
+--- a/bfd/Makefile.in
++++ b/bfd/Makefile.in
+@@ -1318,7 +1318,7 @@ REGEN_TEXI = \
+ 	$(MKDOC) -f $(srcdir)/doc/doc.str < $< > $@.tmp; \
+ 	texi=$@; \
+ 	texi=$${texi%.stamp}.texi; \
+-	test -e $$texi || test ! -f $(srcdir)/$$texi || $(LN_S) $(srcdir)/$$texi $$texi; \
++	test -e $$texi || test ! -f $(srcdir)/$$texi || $(LN_S) $(abs_srcdir)/$$texi $$texi; \
+ 	$(SHELL) $(srcdir)/../move-if-change $@.tmp $$texi; \
+ 	touch $@; \
+ 	)
+diff --git a/bfd/doc/local.mk b/bfd/doc/local.mk
+index 97d658b5a48..9b75402387c 100644
+--- a/bfd/doc/local.mk
++++ b/bfd/doc/local.mk
+@@ -101,7 +101,7 @@ REGEN_TEXI = \
+ 	$(MKDOC) -f $(srcdir)/%D%/doc.str < $< > $@.tmp; \
+ 	texi=$@; \
+ 	texi=$${texi%.stamp}.texi; \
+-	test -e $$texi || test ! -f $(srcdir)/$$texi || $(LN_S) $(srcdir)/$$texi $$texi; \
++	test -e $$texi || test ! -f $(srcdir)/$$texi || $(LN_S) $(abs_srcdir)/$$texi $$texi; \
+ 	$(SHELL) $(srcdir)/../move-if-change $@.tmp $$texi; \
+ 	touch $@; \
+ 	)

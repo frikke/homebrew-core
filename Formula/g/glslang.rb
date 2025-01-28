@@ -1,10 +1,24 @@
 class Glslang < Formula
   desc "OpenGL and OpenGL ES reference compiler for shading languages"
   homepage "https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/"
-  url "https://github.com/KhronosGroup/glslang/archive/13.0.0.tar.gz"
-  sha256 "bcda732434f829aa74414ea0e06d329ec8ac28637c38a0de45e17c8fd25a4715"
   license all_of: ["BSD-3-Clause", "GPL-3.0-or-later", "MIT", "Apache-2.0"]
-  head "https://github.com/KhronosGroup/glslang.git", branch: "main"
+
+  stable do
+    url "https://github.com/KhronosGroup/glslang/archive/refs/tags/15.1.0.tar.gz"
+    sha256 "4bdcd8cdb330313f0d4deed7be527b0ac1c115ff272e492853a6e98add61b4bc"
+
+    resource "SPIRV-Tools" do
+      # in known_good.json
+      url "https://github.com/KhronosGroup/SPIRV-Tools.git",
+          revision: "4d2f0b40bfe290dea6c6904dafdf7fd8328ba346"
+    end
+
+    resource "SPIRV-Headers" do
+      # in known_good.json
+      url "https://github.com/KhronosGroup/SPIRV-Headers.git",
+          revision: "3f17b2af6784bfa2c5aa5dbb8e0e74a607dd8b3b"
+    end
+  end
 
   livecheck do
     url :stable
@@ -12,22 +26,43 @@ class Glslang < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "a232c95928f7290ca3e522767a4b78c8a82e987ce0e292b4048b26fc72f52a15"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0e2be96e21667fe8d9a8e460bfedc66ea987ae84ec6182f111fbf271f78575bc"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f4fee0fd697e72808ead1fa38c3bac431c3900e6abce3ba0f7d863472428ba29"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e6052182c9e6abd813c18a588ba7ef068a112644245046c8e0323a7563d7c466"
-    sha256 cellar: :any_skip_relocation, sonoma:         "a80c534eccc16d7131a9e9021492631976a61b63f8ac8b3b70baa3c20a73e4a5"
-    sha256 cellar: :any_skip_relocation, ventura:        "73766c5f491747e8370345a13aca133fe72fed695ee243dd0ca635d08f42c117"
-    sha256 cellar: :any_skip_relocation, monterey:       "1eb23999503d854e66c03ff5f286dc0b2bddd942cb7cb0f9e0b44be14f33666e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "792616dfb9a016c8d189796aa771b2cc0c88365229f03a23c1ff35e8c14b14d2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4dd35b0b9c3e7262dc23bd0836d28b989951d7e155138ac4c9c826fe69dca532"
+    sha256 cellar: :any,                 arm64_sequoia: "1718b3da09df665f37ca130d3d5c584fb174e29feacfcf72399a817fa2c9031e"
+    sha256 cellar: :any,                 arm64_sonoma:  "d643e9284edbc89b4e4906e70afd7d06bf3fd2e20ebb9978bceb06e0903a7a30"
+    sha256 cellar: :any,                 arm64_ventura: "d2f5ca41a945434e67d0ac6ac48ee1903f24ccb02febd5e2a6b215926fb97ec1"
+    sha256 cellar: :any,                 sonoma:        "12987fe9368dfd4a4cfbf9ec2d8be0292fbb199b23fd148260023e895ae54d16"
+    sha256 cellar: :any,                 ventura:       "24d32a6307452552ecdf9fcd21c6000b1bf16c3faf2c56370ea5e501496a0be3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3968014ff1d39cb6760dddb458c74b05c5d539c630db05ead07b2d2d23a7e284"
+  end
+
+  head do
+    url "https://github.com/KhronosGroup/glslang.git", branch: "main"
+
+    resource "SPIRV-Tools" do
+      url "https://github.com/KhronosGroup/SPIRV-Tools.git", branch: "main"
+    end
+
+    resource "SPIRV-Headers" do
+      url "https://github.com/KhronosGroup/SPIRV-Headers.git", branch: "main"
+    end
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.11" => :build
+  uses_from_macos "python" => :build
 
   def install
-    system "cmake", "-S", ".", "-B", "build", "-DBUILD_EXTERNAL=OFF", "-DENABLE_CTEST=OFF", *std_cmake_args
+    (buildpath/"External/spirv-tools").install resource("SPIRV-Tools")
+    (buildpath/"External/spirv-tools/external/spirv-headers").install resource("SPIRV-Headers")
+
+    args = %W[
+      -DBUILD_EXTERNAL=OFF
+      -DALLOW_EXTERNAL_SPIRV_TOOLS=ON
+      -DBUILD_SHARED_LIBS=ON
+      -DENABLE_CTEST=OFF
+      -DENABLE_OPT=ON
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
@@ -39,12 +74,14 @@ class Glslang < Formula
         gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
       }
     EOS
+
     (testpath/"test.vert").write <<~EOS
       #version 110
       void main() {
           gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
       }
     EOS
-    system "#{bin}/glslangValidator", "-i", testpath/"test.vert", testpath/"test.frag"
+
+    system bin/"glslangValidator", "-i", testpath/"test.vert", testpath/"test.frag"
   end
 end

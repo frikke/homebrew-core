@@ -1,10 +1,8 @@
-require "language/node"
-
 class Hsd < Formula
   desc "Handshake Daemon & Full Node"
   homepage "https://handshake.org"
-  url "https://github.com/handshake-org/hsd/archive/v6.1.0.tar.gz"
-  sha256 "5eae5d24e1bace863e7cc52e3b95af66613e179a2dcc896642a7a2ce69801abf"
+  url "https://github.com/handshake-org/hsd/archive/refs/tags/v7.0.1.tar.gz"
+  sha256 "b00b4250ccb56e42a0075263564bdc9a41b536d903b20af6cb2e87ca9a0e99a6"
   license "MIT"
 
   livecheck do
@@ -13,25 +11,24 @@ class Hsd < Formula
   end
 
   bottle do
-    sha256                               arm64_ventura:  "026ce9081c77b9a5aa26770abac7a6b18304bf382b0e4da6a030e0e11815048f"
-    sha256                               arm64_monterey: "2c00bde4691b91403be4535538ce60995b35721a7845af6abd8201c8455391c2"
-    sha256                               arm64_big_sur:  "d5be878d38892d7c3ac9dbc98538cec12629df3d82e27f43b88d82dff5fd13d8"
-    sha256                               ventura:        "74b2a8b7e621b2cfa1ea48d08643a1ec09738dac92160b0c17827dbe3e54e069"
-    sha256                               monterey:       "84e4ec6a4f64c8a4143214f9869f910854b342dedecd018255bae00eb21f00a6"
-    sha256                               big_sur:        "1efc758aef083883e82dca7b67f5a631922d8278cb87efa053a5958eefe2600e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3ee6a5e2349e7fdc3acfe28cf52aab45693aec37cff9c7963ceffb05c409844a"
+    sha256                               arm64_sequoia: "a64c6370b1e09f25dfef73cc662a4781b72b977bf4a27a55ac346701fc71d9e1"
+    sha256                               arm64_sonoma:  "93ece0122203241029f6aedb4817ee7f8a751fa9f7307c3b4bac5209eb096b15"
+    sha256                               arm64_ventura: "23eb2c7aa7efe1c0719de0cd083cbff53c2fc09ade911da47e66d5d75b5427fb"
+    sha256                               sonoma:        "01cd2eeaf3eb101e8d2f19cf7385168654053a875ca3ef071293918af1c52962"
+    sha256                               ventura:       "7df4707762756df9e7f918c4fd4003f1fb45d492f11ae75a3d619e9984a14e45"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "168fe038545e6dd92c6efaefc90aa7c8ffd6aa072e3be6c7a990f898a38c5b99"
   end
 
   depends_on "node"
   depends_on "unbound"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir[libexec/"bin/*"]
   end
 
   test do
-    (testpath/"script.js").write <<~EOS
+    (testpath/"script.js").write <<~JS
       const assert = require('assert');
       const hsd = require('#{libexec}/lib/node_modules/hsd');
       assert(hsd);
@@ -43,7 +40,7 @@ class Hsd < Formula
       (async () => {
         await node.ensure();
       })();
-    EOS
+    JS
     system Formula["node"].opt_bin/"node", testpath/"script.js"
     assert_predicate testpath/".hsd", :directory?
   end

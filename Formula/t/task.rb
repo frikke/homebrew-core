@@ -1,29 +1,28 @@
 class Task < Formula
   desc "Feature-rich console based todo list manager"
   homepage "https://taskwarrior.org/"
-  url "https://github.com/GothenburgBitFactory/taskwarrior/releases/download/v2.6.2/task-2.6.2.tar.gz"
-  sha256 "b1d3a7f000cd0fd60640670064e0e001613c9e1cb2242b9b3a9066c78862cfec"
+  url "https://github.com/GothenburgBitFactory/taskwarrior/releases/download/v3.3.0/task-3.3.0.tar.gz"
+  sha256 "7fd1e3571f673679758f001b5f44963eee59fd0d2cac887a5807cf2fd90856a1"
   license "MIT"
-  revision 1
   head "https://github.com/GothenburgBitFactory/taskwarrior.git", branch: "develop"
 
   livecheck do
     url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
+
   bottle do
-    rebuild 1
-    sha256                               arm64_ventura:  "11ca4562ebc4ea8273f0cab7ef18ec41980c83a373f4b6369b898ee19bea15eb"
-    sha256                               arm64_monterey: "2c1d0eb0f0522bbf4cdd0dea43c394afaceec873d58c609b211f6450cd09421d"
-    sha256                               arm64_big_sur:  "c2342e1543ea07eba65ab7bef36e25a0e463e6baeab6e562bbcb4a572faa89e7"
-    sha256                               ventura:        "ffde36684ca7b6ed1e01327fd2aeaadb588aeb06125065cd8781d4b5ea630374"
-    sha256                               monterey:       "72cc6c37f541104645ff0d7f952abc7e3acf80cf2e91dd32eceecb80502baf53"
-    sha256                               big_sur:        "7671bf2e4b715cffd7895b97ff049295bea6faee8f4028c7c8c78be2f4ab8c66"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "53cb397182b40cbad438aefbe4fb38e505f0eac4b2999dd38ffbb8aad3d12f86"
+    sha256                               arm64_sequoia: "1ef979eb7314c0a8ca74f96e7f935fba946b7128bd1614a1d7bf97d155901087"
+    sha256                               arm64_sonoma:  "cfb3f2ca6cb41ffba4fea6adb21d8549e2d893cccbb7b0d8ffc53d160bdc41e8"
+    sha256                               arm64_ventura: "7ccbcc8c40f100e4700f0926041946d45bafe6da725545fb9bf0be7be4392232"
+    sha256                               sonoma:        "fab3bdfd1bfc3c86525b6b00c67c4bb1dc0168d8605711d333b59ca3fdd6ad4f"
+    sha256                               ventura:       "b34afc2fc079048ff7f573e9b1509554171753dc511f6d71106eb1002d4d06ab"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6c7526a9f1bc1c91caed713777dc56860544fd67ecb78d40d7bfed24bc9d4763"
   end
 
   depends_on "cmake" => :build
-  depends_on "gnutls"
+  depends_on "corrosion" => :build
+  depends_on "rust" => :build
 
   on_linux do
     depends_on "linux-headers@5.15" => :build
@@ -33,11 +32,10 @@ class Task < Formula
 
   conflicts_with "go-task", because: "both install `task` binaries"
 
-  fails_with gcc: "5"
-
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
     bash_completion.install "scripts/bash/task.sh"
     zsh_completion.install "scripts/zsh/_task"
     fish_completion.install "scripts/fish/task.fish"
@@ -45,7 +43,7 @@ class Task < Formula
 
   test do
     touch testpath/".taskrc"
-    system "#{bin}/task", "add", "Write", "a", "test"
+    system bin/"task", "add", "Write", "a", "test"
     assert_match "Write a test", shell_output("#{bin}/task list")
   end
 end

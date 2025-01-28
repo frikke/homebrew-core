@@ -5,7 +5,7 @@ class Speedread < Formula
   head "https://github.com/pasky/speedread.git", branch: "master"
 
   stable do
-    url "https://github.com/pasky/speedread/archive/v1.0.tar.gz"
+    url "https://github.com/pasky/speedread/archive/refs/tags/v1.0.tar.gz"
     sha256 "a65f5bec427e66893663bcfc49a22e43169dd35976302eaed467eec2a5aafc1b"
 
     # Fix error with macOS 11 Perl: "The encoding pragma is no longer supported"
@@ -17,7 +17,8 @@ class Speedread < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "98128adedcde823bb5ac289120ae88f07d3d041b778cd5cf0c100eb87df303d2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "84a404d8c1cbdb6d69501b347a9e50f87a34cce2136ebb12f97d4ab9b117443a"
   end
 
   def install
@@ -25,6 +26,6 @@ class Speedread < Formula
   end
 
   test do
-    system "#{bin}/speedread", "-w 1000", "<(echo This is a test)"
+    system bin/"speedread", "-w 1000", "<(echo This is a test)"
   end
 end

@@ -3,37 +3,37 @@ class Virtualfish < Formula
 
   desc "Python virtual environment manager for the fish shell"
   homepage "https://virtualfish.readthedocs.io/en/latest/"
-  url "https://files.pythonhosted.org/packages/54/2f/a7800ae09a689843b62b3eb423d01a90175be5795b66ac675f6f45349ca9/virtualfish-2.5.5.tar.gz"
-  sha256 "6b654995f151af8fca62646d49a62b5bf646514250f1461df6d42147995a0db2"
+  url "https://files.pythonhosted.org/packages/1f/4e/343d044d61e80a44163d15ad2f6ca20eca0cb4fef4058caf8e5e55fc3dd9/virtualfish-2.5.9.tar.gz"
+  sha256 "9beada15b00c5b38c700ed8dfd76fe35ad0c716dec391536cc322ddd1bccf5e2"
   license "MIT"
+  revision 1
   head "https://github.com/justinmayer/virtualfish.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a0e0cc677febba260aab7df92b1c7dcb129c18a17fb456f1dda5042c334dc0a1"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "34627b7e4f36609c1f8d644bf50e1253d8c48e5051c3023cb619f46dfd36c1cc"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7702bc920a867e3b00c329ed4019f32537260f79698d93f699c2602fac1f6b1a"
-    sha256 cellar: :any_skip_relocation, ventura:        "4efedd58a9b4f7f5729d6a6f48c95caac465cce605f99f61320c8da8531b7c90"
-    sha256 cellar: :any_skip_relocation, monterey:       "ad8acef6081ca8056bff84170a35a1e34b0d120f5464081bda62c7ef77e593c0"
-    sha256 cellar: :any_skip_relocation, big_sur:        "7f0797f44a77c01d99676e37d6f5ecb9ac4ce2bdd05a433bcbf67fa0c00134a5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "62d85d58ec0c5c531c7222c0921bb14d60fd78be2e41c533247e79f228a51cea"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e6cf1777dd0185e244f54df799d2f8c123fc94485edb9d851119a8b349b863ba"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cf5cff6492eed180889df85b0bb7a7e54b0dbad81ee435d89f94170c5a5ea485"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "769c050176581f594b65834b43cb242d3433cf42fc79be0d23793deff75ea8eb"
+    sha256 cellar: :any_skip_relocation, sonoma:        "629d169987b81c46b5f14176687eab3c137d871910ef51170c41ef55f6e9f73e"
+    sha256 cellar: :any_skip_relocation, ventura:       "51c4076c4393b96bc98eef7421d1c6787a67df0cd3126e70cffffb6c33706bf9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "97d1cf122a7c4e7c0f5d7e5b2fc1518f88ced2d73cf303433f46b6a5367f3994"
   end
 
   depends_on "fish"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   resource "distlib" do
-    url "https://files.pythonhosted.org/packages/58/07/815476ae605bcc5f95c87a62b95e74a1bce0878bc7a3119bc2bf4178f175/distlib-0.3.6.tar.gz"
-    sha256 "14bad2d9b04d3a36127ac97f30b12a19268f211063d8f8ee4f47108896e11b46"
+    url "https://files.pythonhosted.org/packages/0d/dd/1bec4c5ddb504ca60fc29472f3d27e8d4da1257a854e1d96742f15c1d02d/distlib-0.3.9.tar.gz"
+    sha256 "a60f20dea646b8a33f3e7772f74dc0b2d0772d2837ee1342a00645c81edf9403"
   end
 
   resource "filelock" do
-    url "https://files.pythonhosted.org/packages/24/85/cf4df939cc0a037ebfe18353005e775916faec24dcdbc7a2f6539ad9d943/filelock-3.12.0.tar.gz"
-    sha256 "fc03ae43288c013d2ea83c8597001b1129db351aad9c57fe2409327916b8e718"
+    url "https://files.pythonhosted.org/packages/9d/db/3ef5bb276dae18d6ec2124224403d1d67bccdbefc17af4cc8f553e341ab1/filelock-3.16.1.tar.gz"
+    sha256 "c249fbfcd5db47e5e2d6d62198e565475ee65e4831e2561c8e313fa7eb961435"
   end
 
   resource "packaging" do
-    url "https://files.pythonhosted.org/packages/b9/6c/7c6658d258d7971c5eb0d9b69fa9265879ec9a9158031206d47800ae2213/packaging-23.1.tar.gz"
-    sha256 "a392980d2b6cffa644431898be54b0045151319d1e7ec34f0cfed48767dd334f"
+    url "https://files.pythonhosted.org/packages/d0/63/68dbb6eb2de9cb10ee4c9c14a0148804425e13c4fb20d61cce69f53106da/packaging-24.2.tar.gz"
+    sha256 "c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"
   end
 
   resource "pkgconfig" do
@@ -42,18 +42,18 @@ class Virtualfish < Formula
   end
 
   resource "platformdirs" do
-    url "https://files.pythonhosted.org/packages/91/17/3836ffe140abb245726d0e21c5b9b984e2569e7027c20d12e969ec69bd8a/platformdirs-3.5.0.tar.gz"
-    sha256 "7954a68d0ba23558d753f73437c55f89027cf8f5108c19844d4b82e5af396335"
+    url "https://files.pythonhosted.org/packages/13/fc/128cc9cb8f03208bdbf93d3aa862e16d376844a14f9a0ce5cf4507372de4/platformdirs-4.3.6.tar.gz"
+    sha256 "357fb2acbc885b0419afd3ce3ed34564c13c9b95c89360cd9563f73aa5e2b907"
   end
 
   resource "psutil" do
-    url "https://files.pythonhosted.org/packages/d6/0f/96b7309212a926c1448366e9ce69b081ea79d63265bde33f11cc9cfc2c07/psutil-5.9.5.tar.gz"
-    sha256 "5410638e4df39c54d957fc51ce03048acd8e6d60abc0f5107af51e5fb566eb3c"
+    url "https://files.pythonhosted.org/packages/1f/5a/07871137bb752428aa4b659f910b399ba6f291156bdea939be3e96cae7cb/psutil-6.1.1.tar.gz"
+    sha256 "cf8496728c18f2d0b45198f06895be52f36611711746b7f30c464b422b50e2f5"
   end
 
   resource "virtualenv" do
-    url "https://files.pythonhosted.org/packages/d6/37/3ff25b2ad0d51cfd752dc68ee0ad4387f058a5ceba4d89b47ac478de3f59/virtualenv-20.23.0.tar.gz"
-    sha256 "a85caa554ced0c0afbd0d638e7e2d7b5f92d23478d05d17a76daeac8f279f924"
+    url "https://files.pythonhosted.org/packages/50/39/689abee4adc85aad2af8174bb195a819d0be064bf55fcc73b49d2b28ae77/virtualenv-20.28.1.tar.gz"
+    sha256 "5d34ab240fdb5d21549b76f9e8ff3af28252f5499fb6d6f031adac4e5a8c5329"
   end
 
   def install
@@ -77,11 +77,11 @@ class Virtualfish < Formula
     assert_path_exists testpath/".config/fish/conf.d/virtualfish-loader.fish"
 
     # Add virtualenv to prompt so virtualfish doesn't link to prompt doc
-    (testpath/".config/fish/functions/fish_prompt.fish").write(<<~EOS)
+    (testpath/".config/fish/functions/fish_prompt.fish").write <<~FISH
       function fish_prompt --description 'Test prompt for virtualfish'
         echo -n -s (pwd) 'VIRTUAL_ENV=' (basename "$VIRTUAL_ENV") '>'
       end
-    EOS
+    FISH
 
     # Create a virtualenv 'new_virtualenv'
     refute_path_exists testpath/".virtualenvs/new_virtualenv/pyvenv.cfg"
@@ -90,6 +90,9 @@ class Virtualfish < Formula
 
     # The virtualenv is listed
     assert_match "new_virtualenv", shell_output('fish -c "vf ls"')
+
+    # cannot delete virtualenv on sequoia, upstream bug report, https://github.com/justinmayer/virtualfish/issues/250
+    return if OS.mac? && MacOS.version >= :sequoia
 
     # Delete the virtualenv
     system "fish", "-c", "vf rm new_virtualenv"

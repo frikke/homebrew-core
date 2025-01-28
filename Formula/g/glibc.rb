@@ -54,7 +54,8 @@ class Glibc < Formula
   end
 
   bottle do
-    sha256 x86_64_linux: "274dd06ae6ecaee3025d6bf21cf4c7641df9a1cc3973e162911a1f4a76000a24"
+    rebuild 1
+    sha256 x86_64_linux: "91e866deda35d20e5e5e7a288ae0902b7692ec4398d4267c74c84a6ebcc7cdd9"
   end
 
   keg_only "it can shadow system glibc if linked"
@@ -143,7 +144,6 @@ class Glibc < Formula
         "--disable-silent-rules",
         "--prefix=#{prefix}",
         "--sysconfdir=#{etc}",
-        "--enable-obsolete-rpc",
         "--without-gd",
         "--without-selinux",
         "--with-binutils=#{bootstrap_dir}/bin",
@@ -194,24 +194,24 @@ class Glibc < Formula
       include /etc/ld.so.conf
     EOS
 
-    rm_f etc/"ld.so.cache"
+    rm(etc/"ld.so.cache")
   ensure
     # Delete bootstrap binaries after build is finished.
-    rm_rf bootstrap_dir
+    rm_r(bootstrap_dir)
   end
 
   def post_install
     # Rebuild ldconfig cache
-    rm_f etc/"ld.so.cache"
+    rm(etc/"ld.so.cache") if (etc/"ld.so.cache").exist?
     system sbin/"ldconfig"
 
     # Compile locale definition files
     mkdir_p lib/"locale"
 
     # Get all extra installed locales from the system, except C locales
-    locales = ENV.map do |k, v|
+    locales = ENV.filter_map do |k, v|
       v if k[/^LANG$|^LC_/] && v != "C" && !v.start_with?("C.")
-    end.compact
+    end
 
     # en_US.UTF-8 is required by gawk make check
     locales = (locales + ["en_US.UTF-8"]).sort.uniq
@@ -258,8 +258,8 @@ class Glibc < Formula
 
   test do
     assert_match "Usage", shell_output("#{bin}/ld.so --help")
-    safe_system "#{lib}/libc.so.6", "--version"
-    safe_system "#{bin}/locale", "--version"
+    safe_system lib/"libc.so.6", "--version"
+    safe_system bin/"locale", "--version"
   end
 
   def ld_so_conf_d

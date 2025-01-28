@@ -1,8 +1,8 @@
 class Dtc < Formula
   desc "Device tree compiler"
   homepage "https://git.kernel.org/pub/scm/utils/dtc/dtc.git"
-  url "https://mirrors.edge.kernel.org/pub/software/utils/dtc/dtc-1.7.0.tar.xz"
-  sha256 "29edce3d302a15563d8663198bbc398c5a0554765c83830d0d4c0409d21a16c4"
+  url "https://mirrors.edge.kernel.org/pub/software/utils/dtc/dtc-1.7.2.tar.xz"
+  sha256 "92d8ca769805ae1f176204230438fe52808f4e1c7944053c9eec0e649b237539"
   license any_of: ["GPL-2.0-or-later", "BSD-2-Clause"]
   head "https://git.kernel.org/pub/scm/utils/dtc/dtc.git", branch: "master"
 
@@ -12,18 +12,15 @@ class Dtc < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "a37a3658ee16c9b0428449ef970b771161f3f36b8f223276401277ebb582af57"
-    sha256 cellar: :any,                 arm64_ventura:  "9ca326b92b46108692e2f27bf20e83877bf772650f0e6912be5ce3934df284a5"
-    sha256 cellar: :any,                 arm64_monterey: "c156365bf2807a0752ee136419436ab12158e10e302ba33074f7a339f35b8023"
-    sha256 cellar: :any,                 arm64_big_sur:  "12e2e120158a5aff71fbf0aa51f4b56634d57458182b9fc3f03f960f8051e49c"
-    sha256 cellar: :any,                 sonoma:         "2e9b17c2bbaf2b22b11ec76b5eeeb4f4ae1834d35a4a09c7d12b4783bbb3a11e"
-    sha256 cellar: :any,                 ventura:        "2272219303c0ed39def742cfbccfccf2c36f5d17387db9b6a49121d7c2aafef9"
-    sha256 cellar: :any,                 monterey:       "a319159e5002540c731072ab606432bfb116e2dc6606a3086be1b76c7bee0f68"
-    sha256 cellar: :any,                 big_sur:        "a30c0c5fa40f7786a727e4a0075cf76c4ec44564844c7730f2a594d83fbf2fe5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "383124731672d1c9ac6b80a024f5d2351a4661c9923b67d0c2aaae165f683422"
+    sha256 cellar: :any,                 arm64_sequoia: "4b99efbc9d6522d1237038a22fc3417fa282d979e94db58a783a4b0ef934a9bb"
+    sha256 cellar: :any,                 arm64_sonoma:  "20ee0f26c62898f07838b78489cad21b358d329f1dd3fa57bd63916e479db084"
+    sha256 cellar: :any,                 arm64_ventura: "0bc0e5c7f5681e49a92833da2abecfbd10d11d7c938cab0c668df1aedec703da"
+    sha256 cellar: :any,                 sonoma:        "e4eb4991109e9112f5edb62b92cec046239268ecedf2de275e21c9be7302016b"
+    sha256 cellar: :any,                 ventura:       "e3702ff36779cb65af9bf30d5ae6be3bf2a03320567edbf0821251abc66c4113"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a73d1c865cba2244acd9bb059eae7fa4377506b64438ce12608f8f87d01e6640"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
@@ -40,6 +37,6 @@ class Dtc < Formula
       / {
       };
     EOS
-    system "#{bin}/dtc", "test.dts"
+    system bin/"dtc", "test.dts"
   end
 end

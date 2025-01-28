@@ -1,26 +1,36 @@
 class Darcs < Formula
   desc "Distributed version control system that tracks changes, via Haskell"
   homepage "https://darcs.net/"
-  url "https://hackage.haskell.org/package/darcs-2.16.5/darcs-2.16.5.tar.gz"
-  sha256 "d63c6cd236e31e812e8ad84433d27059387606269fbd953f4c349c3cb3aa242b"
+  url "https://hackage.haskell.org/package/darcs-2.18.5/darcs-2.18.5.tar.gz"
+  sha256 "e310692989e313191824f532a26c5eae712217444214266503d5eb5867f951ab"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "9d03a37a9b8cb29eb9cd4ff21b169c63db57c681edb4761ea3004bdc15fa17f8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ad19b2f85d71c0fdfb32ee9e5d758a7491877dd99e854ec7759acdaf59f90ebe"
-    sha256 cellar: :any_skip_relocation, ventura:        "b605a25d9cba3a70288663d8849a6c47e2ae6a8f841df9c0597531992c5ecf47"
-    sha256 cellar: :any_skip_relocation, monterey:       "160b91bf58a6d87b60e85e62ad2f6124c0d952f921389d82f04114788bd6c0aa"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bedb352218c8ae7e6c209f3297dfd25df8bfbbbf2e99559c964133e81989209c"
-    sha256 cellar: :any_skip_relocation, catalina:       "2db034fcb43671e797cf5d6ea83359fabce3de8fd3653c6dfaef6d356b27ea1f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ee3f9ad7d74ba60c4f75fea414168304c2bd7d3dbe9c6ee0ca249a7d10703740"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "507dfc31c10438735098621aed6c75916d2b807bc7a72f957dbc0e808ff65916"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2772f85e77f266ccecd9f8c5dbabf09b965b789d92b1d7c202989317cb832e7e"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "22caed7f5b40475b198b0474c056c477f8d6b6cbbb980b14a813829d362d9261"
+    sha256 cellar: :any_skip_relocation, sonoma:        "d73fa876ba56773601ad0aba9d459a14bd08f9678a1c1ef412b099b2f10bb11f"
+    sha256 cellar: :any_skip_relocation, ventura:       "22ad293dec66d2b02d524e7f2b2f7a41d667af225130a832d26023cad73088a0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "caaab41754cacb2f6265623542eae257e1c2dfd5ef0d585632ca1dcad59cfc91"
   end
 
   depends_on "cabal-install" => :build
-  depends_on "ghc@8.10" => :build # GHC 9.2 open patch: http://bugs.darcs.net/patch2244
+  depends_on "ghc@9.10" => :build
   depends_on "gmp"
 
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
+
+  # Backport fixes for newer GHC[^1] and Cabal[^2]. Darcs uses a different
+  # patch file format and cannot be applied with the external patch DSL.
+  #
+  # * darcs diff --hash 32646b190e019de21a103e950c4eccdd66f7eadc
+  # * darcs diff --hash 50d9b0b402a896c83aa7929a50a0e0449838600f
+  # * darcs diff --hash 8da98f5de14034aa79a2860212fa34e99585e188
+  #
+  # [^1]: https://bugs.darcs.net/patch2422
+  # [^2]: https://bugs.darcs.net/patch2426
+  patch :DATA
 
   def install
     system "cabal", "v2-update"
@@ -30,13 +40,58 @@ class Darcs < Formula
   test do
     mkdir "my_repo" do
       system bin/"darcs", "init"
-      (Pathname.pwd/"foo").write "hello homebrew!"
+      Pathname("foo").write "hello homebrew!"
       system bin/"darcs", "add", "foo"
       system bin/"darcs", "record", "-am", "add foo", "--author=homebrew"
     end
     system bin/"darcs", "get", "my_repo", "my_repo_clone"
-    cd "my_repo_clone" do
-      assert_match "hello homebrew!", (Pathname.pwd/"foo").read
-    end
+    assert_equal "hello homebrew!", (testpath/"my_repo_clone/foo").read
   end
 end
+
+__END__
+diff -rN -u old-darcs.net/darcs.cabal new-darcs.net/darcs.cabal
+--- old-darcs.net/darcs.cabal	2025-01-05 10:09:26
++++ new-darcs.net/darcs.cabal	2025-01-05 10:09:26
+@@ -123,7 +123,7 @@
+ -- ----------------------------------------------------------------------
+
+ custom-setup
+-    setup-depends: base      >= 4.10 && < 4.20,
++    setup-depends: base      >= 4.10 && < 4.21,
+                    Cabal     >= 2.4 && < 3.11,
+                    process   >= 1.2.3.0 && < 1.7,
+                    filepath  >= 1.4.1 && < 1.5.0.0,
+@@ -412,7 +412,7 @@
+     else
+       build-depends:  unix >= 2.7.1.0 && < 2.9
+
+-    build-depends:    base              >= 4.10 && < 4.20,
++    build-depends:    base              >= 4.10 && < 4.21,
+                       safe              >= 0.3.20 && < 0.4,
+                       stm               >= 2.1 && < 2.6,
+                       binary            >= 0.5 && < 0.11,
+diff -rN -u old-darcs.net/Setup.hs new-darcs.net/Setup.hs
+--- old-darcs.net/Setup.hs	2025-01-05 10:24:34
++++ new-darcs.net/Setup.hs	2025-01-05 10:24:34
+@@ -8,7 +8,7 @@
+ import Distribution.Package ( packageVersion )
+ import Distribution.Version( Version )
+ import Distribution.Simple.LocalBuildInfo
+-         ( LocalBuildInfo(..), absoluteInstallDirs )
++         ( LocalBuildInfo(..), absoluteInstallDirs, buildDir )
+ import Distribution.Simple.InstallDirs (mandir, CopyDest (NoCopyDest))
+ import Distribution.Simple.Setup
+     (buildVerbosity, copyDest, copyVerbosity, fromFlag,
+diff -rN -u old-darcs.net/darcs.cabal new-darcs.net/darcs.cabal
+--- old-darcs.net/darcs.cabal	2025-01-05 10:24:34
++++ new-darcs.net/darcs.cabal	2025-01-05 10:24:34
+@@ -124,7 +124,7 @@
+
+ custom-setup
+     setup-depends: base      >= 4.10 && < 4.21,
+-                   Cabal     >= 2.4 && < 3.11,
++                   Cabal     >= 2.4 && < 3.13,
+                    process   >= 1.2.3.0 && < 1.7,
+                    filepath  >= 1.4.1 && < 1.5.0.0,
+                    directory >= 1.2.7 && < 1.4

@@ -3,21 +3,15 @@ class Djhtml < Formula
 
   desc "Django/Jinja template indenter"
   homepage "https://github.com/rtts/djhtml"
-  url "https://files.pythonhosted.org/packages/a0/03/aac9bfb7c9b03604a2c4b0d474af22731ef41cb662fad07f956ae7bf0f6b/djhtml-3.0.6.tar.gz"
-  sha256 "abfc4d7b4730432ca6a98322fbdf8ae9d6ba254ea57ba3759a10ecb293bc57de"
+  url "https://files.pythonhosted.org/packages/9f/e8/1919adec35e3a7e02ec874b7a95b811f03ad6dc9efcfe72d18e0a359f12a/djhtml-3.0.7.tar.gz"
+  sha256 "558c905b092a0c8afcbed27dea2f50aa6eb853a658b309e4e0f2bb378bdf6178"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "bdbeb839a0a9b284dc4c2eb9e3eecc74af5930ec4f9098db10c49511746e4d44"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0fb937a34da3f5e3a1252fa38b2d716a3868048f8cc18b1d9f00f3391450bca5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ff978720de6b56e295b274b126ecfc9f07689f7b39b72358e76abeb02196bf9d"
-    sha256 cellar: :any_skip_relocation, ventura:        "affec39a5174a4333fd6bb2c7f6ce36fb817c7032faa565ddc3ef505ef7512a4"
-    sha256 cellar: :any_skip_relocation, monterey:       "f8b66288fb9f60a09f0f284d64c7a4019eb0e66940a879101d5e20abc878540e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "84465d0a9bcc2ce550d35e359b490f98c2ae345076db1c0b28f8fce85c60ce9f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d6f36520350fa0d608c6ea74fb2949e62b9d3503e5dbbb923459d264a3e722e9"
+    sha256 cellar: :any_skip_relocation, all: "f04ac1e5d07cff0015fd4bdc56e8f96b67a16836f1a4c7f31392f1f92c93033f"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     virtualenv_install_with_resources
@@ -25,17 +19,17 @@ class Djhtml < Formula
 
   test do
     test_file = testpath/"test.html"
-    test_file.write <<~EOF
+    test_file.write <<~HTML
       <html>
       <p>Hello, World!</p>
       </html>
-    EOF
+    HTML
 
-    expected_output = <<~EOF
+    expected_output = <<~HTML
       <html>
         <p>Hello, World!</p>
       </html>
-    EOF
+    HTML
 
     system bin/"djhtml", "--tabwidth", "2", test_file
     assert_equal expected_output, test_file.read

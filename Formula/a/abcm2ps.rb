@@ -1,21 +1,24 @@
 class Abcm2ps < Formula
   desc "ABC music notation software"
   homepage "http://moinejf.free.fr"
-  url "https://github.com/leesavide/abcm2ps/archive/v8.14.14.tar.gz"
-  sha256 "5b39ca08cd5e0d1992071b0be9eb77304489823824570236c4df4dc0f8b33aab"
+  url "https://github.com/leesavide/abcm2ps/archive/refs/tags/v8.14.15.tar.gz"
+  sha256 "5f02ac6203c4226cfbc6206935dca715ed7c45328535ee23e776c9da0219c822"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "01a79191d06dbbe223a99a6a9bff533738f1be99c0a8619c272cced594e6fb61"
-    sha256 arm64_monterey: "45912b99f3a665a401131e9ca982ca285eba96e7b22e35b5740f222b46687637"
-    sha256 arm64_big_sur:  "b560ca5c750e672c8d1b257c827f362ddfbd0240c62a181737d4364d2ea3ebdd"
-    sha256 ventura:        "098977e79f1f16813d4a62ff7852430a6780c96a7727803ef5410030a9931d05"
-    sha256 monterey:       "59fa217929c0412dd51ad45601ee60b603277f4d42fd1e825191efe4843d8d64"
-    sha256 big_sur:        "a84c64865bd9fa68fea198f3d84ae4214e3d5fd310ea230e8c55ba72ecf15e19"
-    sha256 x86_64_linux:   "db401b9ff3506048d3a09a11fd9b59061f66cc94fc66904cd03bfcb301bf9e5c"
+    sha256 arm64_sequoia:  "ec8cb5380cfee0043e5454ea122ff004c6366c19b06268edabf8af5f9481399f"
+    sha256 arm64_sonoma:   "651079e5e1701bf7562d25ea288f60919cc4bc5389472bce8174a11460541dc7"
+    sha256 arm64_ventura:  "737514da3b1e0c0ac7a2f7f1b0fb83707a6abcc167728bb5bbb812578595f86f"
+    sha256 arm64_monterey: "e297a6005d7af043cd13bf9688e57c282a56ad9faede8f59c05adfddece2e6e7"
+    sha256 sonoma:         "b8e39b5f623d4fbe99ebaa17b1b0100489fd05488df720889e08ac70e8090b2f"
+    sha256 ventura:        "7d20976e8b6877400b712a6f341944c03920f498d781abfb009ad3d7cefba6f0"
+    sha256 monterey:       "faaf0e3188a69245c09d790d31241ef2f057dffd94ff48b33463e2860fa0072f"
+    sha256 x86_64_linux:   "cb486f3afb52ba110aa20878c5ac7b14bca9a1e4acd6b1a30fc4fd7741a55b93"
   end
 
-  depends_on "pkg-config" => :build
+  deprecate! date: "2025-01-10", because: :repo_archived
+
+  depends_on "pkgconf" => :build
 
   def install
     system "./configure", "--prefix=#{prefix}"
@@ -23,7 +26,7 @@ class Abcm2ps < Formula
   end
 
   test do
-    (testpath/"voices.abc").write <<~EOS
+    (testpath/"voices.abc").write <<~ABC
       X:7
       T:Qui Tolis (Trio)
       C:Andre Raison
@@ -42,9 +45,9 @@ class Abcm2ps < Formula
       V:Trompette
       %%MIDI program 56
       "Trompette"z3|z3 |z3 |z3 |:Mc>BA|PGA/G/F|PE>EF|PEF/E/D|C>CPB,|A,G,F,-|
-    EOS
+    ABC
 
-    system "#{bin}/abcm2ps", testpath/"voices"
+    system bin/"abcm2ps", testpath/"voices"
     assert_predicate testpath/"Out.ps", :exist?
   end
 end

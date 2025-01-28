@@ -1,8 +1,8 @@
 class Librsvg < Formula
   desc "Library to render SVG files using Cairo"
   homepage "https://wiki.gnome.org/Projects/LibRsvg"
-  url "https://download.gnome.org/sources/librsvg/2.56/librsvg-2.56.3.tar.xz"
-  sha256 "5a328048a02d014645cd27f61140f4e0b11280fb2c7f2a21864fe0c59ac1ce88"
+  url "https://download.gnome.org/sources/librsvg/2.58/librsvg-2.58.4.tar.xz"
+  sha256 "296e3760d2347d0767c3e291dec962ab36baecd25c4898c6e8150a731f967c7b"
   license "LGPL-2.1-or-later"
 
   # librsvg doesn't use GNOME's "even-numbered minor is stable" version scheme.
@@ -14,36 +14,43 @@ class Librsvg < Formula
   end
 
   bottle do
-    sha256                               arm64_sonoma:   "a7a4d0f4d535eee10f44ba8be7e052d7be390d61276cd8a5c8303e21a5bae877"
-    sha256                               arm64_ventura:  "bafd050c53a0a19b9b16c0dff5675c69592f2d770beb59e97420de693b90dcfe"
-    sha256                               arm64_monterey: "34e3f2263c4f9cb09c0c3c4d4741e2fcfe0cff1cc4f3a93055b20fd5f2debcbf"
-    sha256                               arm64_big_sur:  "b9ddb0c3cc845d11234d36cff3a1119bdb1847dad67760dc2e90bb3332122fee"
-    sha256                               sonoma:         "450122fca111ac446307bfc34940ecc75415fb03ddba76ebf5f8e06c360f96f5"
-    sha256                               ventura:        "be8b22a9eecab201f48f798f10e8f596a30c5062f1741cb036e6611b84a6a6e0"
-    sha256                               monterey:       "a28011978e585d72a99586e67d8ad18f27d789167b86f83e058649ee983a9c20"
-    sha256                               big_sur:        "18b6f95d693e37d0efee4a153e508b83f94ba95fcffe109625f75e22ebf90ae6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "36f56c1fc1c8a48d84f87608f0c9d2a93c5ff369997cc3ba2aef164f36cc6acc"
+    sha256                               arm64_sequoia:  "62c2bd6cd94b22a8231b423b1a1fc9084c8496e2ffd08fda39df2a11af3b668f"
+    sha256                               arm64_sonoma:   "12c692788acb39a1b01ab52ec3a9042a590449dc4c1ca3a37f6dfb8de1ade404"
+    sha256                               arm64_ventura:  "42eeef26afba840075b5a42b644a2ee369c280dbd955eff559edad4c5e310edd"
+    sha256                               arm64_monterey: "fcb9205a1cf574f392c5188e85f90f3a96d36d9bd65cbde98b3481ad02c23887"
+    sha256                               sonoma:         "593325eefc9b94aeb1c1b3186add9d4b980e195c617a7e736ee9498b177fae85"
+    sha256                               ventura:        "67f803506a82f16b08461005382dbabfce218ec9dca90f2159fa467e6e5cdaeb"
+    sha256                               monterey:       "eb49065b7846d1f7fa4a1cab3baa0048f689288eb8512e09ea7a5d64fbe47290"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2c71dffd85fd7b3553766305adf685a59fc00b87d3120f0e96b199f079ac0fda"
   end
 
   depends_on "gobject-introspection" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
   depends_on "cairo"
   depends_on "gdk-pixbuf"
   depends_on "glib"
   depends_on "pango"
 
+  uses_from_macos "libxml2"
+
+  on_macos do
+    depends_on "fontconfig"
+    depends_on "freetype"
+    depends_on "gettext"
+    depends_on "harfbuzz"
+    depends_on "libpng"
+  end
+
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
+    args = %w[
       --disable-Bsymbolic
       --enable-tools=yes
       --enable-pixbuf-loader=yes
       --enable-introspection=yes
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
 
     # disable updating gdk-pixbuf cache, we will do this manually in post_install
     # https://github.com/Homebrew/homebrew/issues/40833
@@ -64,14 +71,14 @@ class Librsvg < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <librsvg/rsvg.h>
 
       int main(int argc, char *argv[]) {
         RsvgHandle *handle = rsvg_handle_new();
         return 0;
       }
-    EOS
+    C
     cairo = Formula["cairo"]
     fontconfig = Formula["fontconfig"]
     freetype = Formula["freetype"]

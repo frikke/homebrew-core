@@ -3,21 +3,25 @@ class Pipdeptree < Formula
 
   desc "CLI to display dependency tree of the installed Python packages"
   homepage "https://github.com/tox-dev/pipdeptree"
-  url "https://files.pythonhosted.org/packages/6d/b4/42f9f41df0a00084904778cd52b0d400ee34317f67b071f68df48dec62d5/pipdeptree-2.13.0.tar.gz"
-  sha256 "ff71a48abd0b1ab810c23734b47de6ebd93270857d6665e21ed5ef6136fcba6e"
+  url "https://files.pythonhosted.org/packages/9b/e6/ccebfbb786e3804446ec35e336e5ebcb91e8f5a50e193e04eba8d74c11b2/pipdeptree-2.25.0.tar.gz"
+  sha256 "029bcdcbd2e0130ec33b222c7833b8b5e52f674760dcf2df40b4ae6ff007a74f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2e84f824be54564cc09fe56c7c198447a35ff85391de158d34432dff183dcd87"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2f7b325351b7153b7c8f88c92e4c5d470c8cc1a8f6393ca3b542e2d960627fce"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d76afea856091e47b805b4bfda708a12a4d6aee16d66dd72db2b0609675bd265"
-    sha256 cellar: :any_skip_relocation, ventura:        "7f1d9d978ef8069bb7923c1177e9a9855947b85ec619e662880c592b1b2dda59"
-    sha256 cellar: :any_skip_relocation, monterey:       "0ed03fc8e8036c41b63ce1ef934c3e6c76fcfa56fe626597ecf5553b62762fe1"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c251ba421de9451114ea03bc807f4cbef4e9de066993d201cfe4ae2409b5adce"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b5259fa298e6a857f95b7bbdc331fe3485e39111b7d194196cce9a11b5f4cdee"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "48f0ef115694b6916120a89ad2dc2cbffec26bb2ca104f64ac691c9c89c2d9a3"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "48f0ef115694b6916120a89ad2dc2cbffec26bb2ca104f64ac691c9c89c2d9a3"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "48f0ef115694b6916120a89ad2dc2cbffec26bb2ca104f64ac691c9c89c2d9a3"
+    sha256 cellar: :any_skip_relocation, sonoma:        "bb63199d2b749836e54b4bcc5ec8c97f827c22ca8ef32333f9a642b16ad3c55a"
+    sha256 cellar: :any_skip_relocation, ventura:       "bb63199d2b749836e54b4bcc5ec8c97f827c22ca8ef32333f9a642b16ad3c55a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "48f0ef115694b6916120a89ad2dc2cbffec26bb2ca104f64ac691c9c89c2d9a3"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  resource "packaging" do
+    url "https://files.pythonhosted.org/packages/d0/63/68dbb6eb2de9cb10ee4c9c14a0148804425e13c4fb20d61cce69f53106da/packaging-24.2.tar.gz"
+    sha256 "c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"
+  end
 
   def install
     virtualenv_install_with_resources

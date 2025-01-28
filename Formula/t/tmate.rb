@@ -5,7 +5,7 @@ class Tmate < Formula
   head "https://github.com/tmate-io/tmate.git", branch: "master"
 
   stable do
-    url "https://github.com/tmate-io/tmate/archive/2.4.0.tar.gz"
+    url "https://github.com/tmate-io/tmate/archive/refs/tags/2.4.0.tar.gz"
     sha256 "62b61eb12ab394012c861f6b48ba0bc04ac8765abca13bdde5a4d9105cb16138"
 
     # Fix finding `msgpack`
@@ -17,9 +17,12 @@ class Tmate < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "b27b6f267188c6bd851cf061dc7fabf97a127c7930a57070cb46caf0333ef71f"
+    sha256 cellar: :any,                 arm64_sonoma:   "1d2e440f793063b6f35862278723efe92afdbe5bab8a23bff6bf122b3f6a61f9"
     sha256 cellar: :any,                 arm64_ventura:  "8dd348850ee2dcc734eb9d148495406df82136ddec0d8e50ebef480128db3f10"
     sha256 cellar: :any,                 arm64_monterey: "0b067f5ce9b9019b93dccf8447cab6c7c6a3dac573ce914c9534079fea180d01"
     sha256 cellar: :any,                 arm64_big_sur:  "d92025cef2400ab0fcb0f8efa5866e180fff73486db2e73f4e77b5d1afba5d97"
+    sha256 cellar: :any,                 sonoma:         "2dd07e9beb1e9fbd1ccad386ddd78d13a0932349312580728090b9414c3e45a5"
     sha256 cellar: :any,                 ventura:        "00d387966abc3146d0cfb59e73b31802265573c3e0f7a74eaed39d0b76f5fa68"
     sha256 cellar: :any,                 monterey:       "b914a728ce6481c4379668b5cac0db712f78d37cc922f97786369fcb8be232fb"
     sha256 cellar: :any,                 big_sur:        "215c8724caffc137265dc5fa565bed563b5bd8d046b0e54addcf1628d60a9268"
@@ -32,7 +35,7 @@ class Tmate < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libevent"
   depends_on "libssh"
   depends_on "msgpack"
@@ -43,13 +46,11 @@ class Tmate < Formula
     system "sh", "autogen.sh"
 
     ENV.append "LDFLAGS", "-lresolv"
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}"
+    system "./configure", "--sysconfdir=#{etc}", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/tmate", "-V"
+    system bin/"tmate", "-V"
   end
 end

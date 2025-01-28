@@ -2,8 +2,8 @@ class Freeswitch < Formula
   desc "Telephony platform to route various communication protocols"
   homepage "https://freeswitch.org"
   url "https://github.com/signalwire/freeswitch.git",
-      tag:      "v1.10.10",
-      revision: "4cb05e7f4a23645ec387f3b5391194128be7d193"
+      tag:      "v1.10.12",
+      revision: "a88d069d6ffb74df797bcaf001f7e63181c07a09"
   license "MPL-1.1"
   head "https://github.com/signalwire/freeswitch.git", branch: "master"
 
@@ -13,31 +13,36 @@ class Freeswitch < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "188df30b2e5b0559226b8d6c36185ce207a3c345578df4bf50c3acf4f99d3071"
-    sha256 arm64_monterey: "41bc376f644e01d2c907b04af886b78b9eba6697615671bf1bb46af803262c24"
-    sha256 arm64_big_sur:  "90faf1e2987ae4f50e59130759ae8c8a3c07881c09afee88628b269864bec425"
-    sha256 ventura:        "9460206e602d15b653c581903be36302e66c7eefd3cabc67aa4d752017a9b3f5"
-    sha256 monterey:       "1d161324780b7f4d6ec1a2860121b9b7c1f328c5375b01a2992801bee80b2cf1"
-    sha256 big_sur:        "58d5cb82b74f1b352f4be6de30aeaf05838f9f7ca449d903798fddac5f6f0fd1"
-    sha256 x86_64_linux:   "10396295998cec74fd4c305098d7381bfbad58a83574809ef85a66964158589a"
+    sha256 arm64_sequoia:  "5a9ca5e1bc2d05522b017ffa794f0ccffad57f630ac53698c8c3f9d87e15796f"
+    sha256 arm64_sonoma:   "bbcdce3f0a109f97c2b9da437d29bde96c0b741adb3cc4bd97732284a77b16b3"
+    sha256 arm64_ventura:  "9edef7cc70acbf12e4e6c45efa1719ac74d502e2b1e037579e8ff8bf605520ae"
+    sha256 arm64_monterey: "cf3785436fc2aae43c7021a81787a6e65facdbacaf1b1cc3bac632f87239011b"
+    sha256 sonoma:         "4f0b9549fd10a4abcc75f44eedf35087aa575d32ba27b2a53bcd21fd5e6091db"
+    sha256 ventura:        "75144d1828662b7606bb74592e0a801899ceb1dd69eead41b3d548fce382ced2"
+    sha256 monterey:       "40e6068355e6a3c784fe719cf5a2a50d152e9533797ddf2f3872867aad58e9ee"
+    sha256 x86_64_linux:   "1f90051761c07c7017ae113a7ebd980dfeb8d5d549e0208c8e258425b41f3d43"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "cmake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "yasm" => :build
-  depends_on "ffmpeg@5"
+
+  depends_on "ffmpeg@5" # FFmpeg 6 issue: https://github.com/signalwire/freeswitch/issues/2202
+  depends_on "freetype"
   depends_on "jpeg-turbo"
   depends_on "ldns"
+  depends_on "libpng"
   depends_on "libpq"
   depends_on "libsndfile"
   depends_on "libtiff"
   depends_on "lua"
+  depends_on "opencore-amr"
   depends_on "openssl@3"
   depends_on "opus"
-  depends_on "pcre"
+  depends_on "pcre" # PCRE2 PR: https://github.com/signalwire/freeswitch/pull/2299
   depends_on "sofia-sip"
   depends_on "speex"
   depends_on "speexdsp"
@@ -114,8 +119,11 @@ class Freeswitch < Formula
 
   resource "libks" do
     url "https://github.com/signalwire/libks.git",
-        tag:      "v2.0.2",
-        revision: "423c68c92d1871e2c9cb83d974eac7830ddcdcf5"
+        tag:      "v2.0.6",
+        revision: "3bc8dd0524a865becdd98c3806735eb306fe0a73"
+
+    # Fix compile with newer Clang, https://github.com/signalwire/libks/issues/217
+    patch :DATA if DevelopmentTools.clang_build_version >= 1500
   end
 
   resource "signalwire-c" do
@@ -127,10 +135,7 @@ class Freeswitch < Formula
   def install
     resource("spandsp").stage do
       system "./bootstrap.sh"
-      system "./configure", "--disable-debug",
-                            "--disable-dependency-tracking",
-                            "--disable-silent-rules",
-                            "--prefix=#{libexec}/spandsp"
+      system "./configure", "--disable-silent-rules", *std_configure_args(prefix: libexec/"spandsp")
       system "make"
       ENV.deparallelize { system "make", "install" }
 
@@ -176,9 +181,11 @@ class Freeswitch < Formula
     args << "--disable-libvpx" if Hardware::CPU.arm?
 
     ENV.append_to_cflags "-D_ANSI_SOURCE" if OS.linux?
-    # Workaround for Xcode 14.3
+
+    # Fix compile with newer Clang
     ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
-    system "./configure", *std_configure_args, *args
+
+    system "./configure", *args, *std_configure_args
     system "make", "all"
     system "make", "install"
 
@@ -205,6 +212,28 @@ class Freeswitch < Formula
   end
 
   test do
-    system "#{bin}/freeswitch", "-version"
+    system bin/"freeswitch", "-version"
   end
 end
+
+__END__
+diff --git a/cmake/ksutil.cmake b/cmake/ksutil.cmake
+index a82c639..df04a70 100644
+--- a/cmake/ksutil.cmake
++++ b/cmake/ksutil.cmake
+@@ -103,6 +103,7 @@ macro(ksutil_setup_platform)
+ 		add_compile_options("$<$<CONFIG:Release>:-Wno-parentheses>")
+ 		add_compile_options("$<$<CONFIG:Release>:-Wno-pointer-sign>")
+ 		add_compile_options("$<$<CONFIG:Release>:-Wno-switch>")
++		add_compile_options("$<$<CONFIG:Release>:-Wno-int-conversion>")
+ 
+ 		add_compile_options("$<$<CONFIG:Debug>:-O0>")
+ 		add_compile_options("$<$<CONFIG:Debug>:-g>")
+@@ -110,6 +111,7 @@ macro(ksutil_setup_platform)
+ 		add_compile_options("$<$<CONFIG:Debug>:-Wno-parentheses>")
+ 		add_compile_options("$<$<CONFIG:Debug>:-Wno-pointer-sign>")
+ 		add_compile_options("$<$<CONFIG:Debug>:-Wno-switch>")
++		add_compile_options("$<$<CONFIG:Debug>:-Wno-int-conversion>")
+ 
+ 		set(CMAKE_POSITION_INDEPENDENT_CODE YES)
+ 		add_definitions("-DKS_PLAT_MAC=1")

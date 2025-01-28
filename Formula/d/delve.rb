@@ -1,24 +1,25 @@
 class Delve < Formula
   desc "Debugger for the Go programming language"
   homepage "https://github.com/go-delve/delve"
-  url "https://github.com/go-delve/delve/archive/v1.21.0.tar.gz"
-  sha256 "f00321e9333a61cb10c18141484c44ed55b1da1c4239a3f4faf2100b64613199"
+  url "https://github.com/go-delve/delve/archive/refs/tags/v1.24.0.tar.gz"
+  sha256 "940fc50d6338dfe515982ac5fcc3247616f23e2652048ac4f2b439ebd51741c1"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "19a2b76222edd3612ad6856679f1f9ad2112f177fa8767599d5521de7c88c951"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "19a2b76222edd3612ad6856679f1f9ad2112f177fa8767599d5521de7c88c951"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "19a2b76222edd3612ad6856679f1f9ad2112f177fa8767599d5521de7c88c951"
-    sha256 cellar: :any_skip_relocation, ventura:        "7107c64e1dad1ff8cae142972110788f7f23ac5156c8a8c416ee2a3608959960"
-    sha256 cellar: :any_skip_relocation, monterey:       "7107c64e1dad1ff8cae142972110788f7f23ac5156c8a8c416ee2a3608959960"
-    sha256 cellar: :any_skip_relocation, big_sur:        "7107c64e1dad1ff8cae142972110788f7f23ac5156c8a8c416ee2a3608959960"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7c5a9ba0399258dc573dffa099c9ebb7446e3b12cef0268c7068153eac58f5d9"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "40340281872fe91679ea33a22c4f1388d2400655ae42f0a3c740c3dc011042ee"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "40340281872fe91679ea33a22c4f1388d2400655ae42f0a3c740c3dc011042ee"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "40340281872fe91679ea33a22c4f1388d2400655ae42f0a3c740c3dc011042ee"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9c660327dcfd548d67dbe7bb62c0862fb96e702d703f39075215b0f7266cedf7"
+    sha256 cellar: :any_skip_relocation, ventura:       "9c660327dcfd548d67dbe7bb62c0862fb96e702d703f39075215b0f7266cedf7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ba5dbcf2d6e69c0cd0324bdc83e34e9783ea442508ca577c5abb6e508a7e304d"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args(output: bin/"dlv"), "./cmd/dlv"
+    system "go", "build", *std_go_args(ldflags: "-s -w", output: bin/"dlv"), "./cmd/dlv"
+
+    generate_completions_from_executable(bin/"dlv", "completion")
   end
 
   test do

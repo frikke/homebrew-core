@@ -1,8 +1,8 @@
 class Mx < Formula
   desc "Command-line tool used for the development of Graal projects"
   homepage "https://github.com/graalvm/mx"
-  url "https://github.com/graalvm/mx/archive/refs/tags/6.50.1.tar.gz"
-  sha256 "6eb865c363d2aab4ab7766c1bc3f33c7ea9f7ee8aeff39099b0d5798ba7b3be9"
+  url "https://github.com/graalvm/mx/archive/refs/tags/7.39.0.tar.gz"
+  sha256 "ff11ad1f9a5592ccb9b5a835c1d0efea4e134353f332e208b4cb03ebc40e1c93"
   license "GPL-2.0-only"
 
   livecheck do
@@ -11,22 +11,24 @@ class Mx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "874ea5c0873a9f4f30e9be37206aceb4065b3cbe1b980c9890ba0cec9c204dae"
+    sha256 cellar: :any_skip_relocation, all: "4baa3756880d632f9347f3d72ff550d0c89e7ef875ee7369cb3be670901237ce"
   end
 
   depends_on "openjdk" => :test
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     libexec.install Dir["*"]
-    (bin/"mx").write_env_script libexec/"mx", MX_PYTHON: "#{Formula["python@3.11"].opt_libexec}/bin/python"
+    (bin/"mx").write_env_script libexec/"mx", MX_PYTHON: "#{Formula["python@3.13"].opt_libexec}/bin/python"
     bash_completion.install libexec/"bash_completion/mx" => "mx"
   end
 
   def post_install
     # Run a simple `mx` command to create required empty directories inside libexec
     Dir.mktmpdir do |tmpdir|
-      system bin/"mx", "--user-home", tmpdir, "version"
+      with_env(HOME: tmpdir) do
+        system bin/"mx", "--user-home", tmpdir, "version"
+      end
     end
   end
 

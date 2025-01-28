@@ -1,11 +1,12 @@
 class LibbitcoinConsensus < Formula
   desc "Bitcoin Consensus Library (optional)"
   homepage "https://github.com/libbitcoin/libbitcoin-consensus"
-  url "https://github.com/libbitcoin/libbitcoin-consensus/archive/v3.8.0.tar.gz"
+  url "https://github.com/libbitcoin/libbitcoin-consensus/archive/refs/tags/v3.8.0.tar.gz"
   sha256 "3f63b233a25323ff81de71a6c96455a6f5141e21cb0678a2304b36b56e771ca2"
-  license "AGPL-3.0"
+  license "AGPL-3.0-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "0becb75eb0a0540a4cb6554887c3b345777278ec8ed8e5fafd76057722c755c6"
     sha256 cellar: :any,                 arm64_sonoma:   "12ab6ca60756919e7347031905778cf42151bc6d5294cf9826a7341a69c6b3dc"
     sha256 cellar: :any,                 arm64_ventura:  "495b1ee3bc1d01755b48ced48c019b2bf40f1361c529a1186c66449801f25708"
     sha256 cellar: :any,                 arm64_monterey: "82cdc41015f185c56a5c317ec125d1f6d74e298611afd8e0efb05135668c9a47"
@@ -21,10 +22,10 @@ class LibbitcoinConsensus < Formula
   depends_on "automake" => :build
   depends_on "boost" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   resource "secp256k1" do
-    url "https://github.com/libbitcoin/secp256k1/archive/v0.1.0.20.tar.gz"
+    url "https://github.com/libbitcoin/secp256k1/archive/refs/tags/v0.1.0.20.tar.gz"
     sha256 "61583939f1f25b92e6401e5b819e399da02562de663873df3056993b40148701"
   end
 
@@ -32,26 +33,24 @@ class LibbitcoinConsensus < Formula
     ENV.cxx11
     resource("secp256k1").stage do
       system "./autogen.sh"
-      system "./configure", "--disable-dependency-tracking",
-                            "--disable-silent-rules",
-                            "--prefix=#{libexec}",
+      system "./configure", "--disable-silent-rules",
                             "--enable-module-recovery",
-                            "--with-bignum=no"
+                            "--with-bignum=no",
+                            *std_configure_args(prefix: libexec)
       system "make", "install"
     end
 
     ENV.prepend_path "PKG_CONFIG_PATH", "#{libexec}/lib/pkgconfig"
 
     system "./autogen.sh"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--with-boost-libdir=#{Formula["boost"].opt_lib}"
+    system "./configure", "--disable-silent-rules",
+                          "--with-boost-libdir=#{Formula["boost"].opt_lib}",
+                          *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <string>
       #include <vector>
       #include <assert.h>
@@ -104,7 +103,7 @@ class LibbitcoinConsensus < Formula
         assert(result == libbitcoin::consensus::verify_result_tx_invalid);
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cpp",
                     "-I#{libexec}/include",
                     "-L#{lib}", "-L#{libexec}/lib",

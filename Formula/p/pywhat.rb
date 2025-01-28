@@ -10,18 +10,11 @@ class Pywhat < Formula
   head "https://github.com/bee-san/pyWhat.git", branch: "main"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4968c7ff6c37272afedb526e8bd71aa04c4cfe9539bb095082d65980680ab9c6"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "fbf27dd5fcbee4898510b45c5aa86297d46e3a53448dbea1f330113a64526cca"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "afc7dcf4f11bef07bc6d06c2195e9ac9acf641ea8a9455e586ee90a20be11b5a"
-    sha256 cellar: :any_skip_relocation, ventura:        "d24dfb3b8b8bb78a470907caf5a7014af1581bb796c0fec704bf73454735cd15"
-    sha256 cellar: :any_skip_relocation, monterey:       "33ae9b4c199197f328f6141e5900d946ab6d85712266b86200208372698bdf14"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c16b928e2087cf586005ac5f7ea5671c44d69521317b0b8db9f367581c87a5f2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f453b0de5fc318d9383a4afef920a6d3b989973b60a56be616e37f51827b2332"
+    rebuild 7
+    sha256 cellar: :any_skip_relocation, all: "eecfe7a731f32a7dfb75fb042843e4042df47df756abcabeb8fa9b5216cc3584"
   end
 
-  depends_on "pygments"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   resource "click" do
     url "https://files.pythonhosted.org/packages/27/6f/be940c8b1f1d69daceeb0032fee6c34d7bd70e3e649ccac0951500b4720e/click-7.1.2.tar.gz"
@@ -36,6 +29,11 @@ class Pywhat < Formula
   resource "commonmark" do
     url "https://files.pythonhosted.org/packages/60/48/a60f593447e8f0894ebb7f6e6c1f25dafc5e89c5879fdc9360ae93ff83f0/commonmark-0.9.1.tar.gz"
     sha256 "452f9dc859be7f06631ddcb328b6919c67984aca654e5fefb3914d54691aed60"
+  end
+
+  resource "pygments" do
+    url "https://files.pythonhosted.org/packages/8e/62/8336eff65bcbc8e4cb5d05b55faf041285951b6e80f33e2bff2024788f31/pygments-2.18.0.tar.gz"
+    sha256 "786ff802f32e91311bff3889f6e9a86e81505fe99f2735bb6d60ae0c5004f199"
   end
 
   resource "rich" do

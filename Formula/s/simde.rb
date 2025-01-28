@@ -1,13 +1,13 @@
 class Simde < Formula
   desc "Implementations of SIMD intrinsics for systems which don't natively support them"
   homepage "https://github.com/simd-everywhere/simde"
-  url "https://github.com/simd-everywhere/simde/archive/v0.7.6.tar.gz"
-  sha256 "c63e6c61392e324728da1c7e5de308cb31410908993a769594f5e21ff8de962b"
+  url "https://github.com/simd-everywhere/simde/archive/refs/tags/v0.8.2.tar.gz"
+  sha256 "ed2a3268658f2f2a9b5367628a85ccd4cf9516460ed8604eed369653d49b25fb"
   license "MIT"
   head "https://github.com/simd-everywhere/simde.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e236c17b7eb174dbefb648865412d7b59263447f4161fb92fe13fa383b42fbab"
+    sha256 cellar: :any_skip_relocation, all: "8ffb9243611a027320542a403fbcc1d2f7f45516484d44ec5a0fae570b2f7892"
   end
 
   depends_on "meson" => :build
@@ -20,7 +20,7 @@ class Simde < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <simde/arm/neon.h>
       #include <simde/x86/sse2.h>
@@ -34,7 +34,7 @@ class Simde < Formula
         assert(simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(v, z)) == 0xFFFF);
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-o", "test"
     system "./test"

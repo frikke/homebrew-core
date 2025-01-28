@@ -1,24 +1,27 @@
 class Sonobuoy < Formula
   desc "Kubernetes component that generates reports on cluster conformance"
   homepage "https://github.com/vmware-tanzu/sonobuoy"
-  url "https://github.com/vmware-tanzu/sonobuoy/archive/v0.56.17.tar.gz"
-  sha256 "6795a8fc3a04014cb9cdf42534940b2bb2858b814c765bfe09ca71a31babbc92"
+  url "https://github.com/vmware-tanzu/sonobuoy/archive/refs/tags/v0.57.2.tar.gz"
+  sha256 "8cc661fefbc959262991d4cc4076577e428d10b08aa0682ec32a5ff0bca56e07"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e3d235acf4a115a6fab26dda39765b885b182ed5782039e7337aca15bc021c30"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e3d235acf4a115a6fab26dda39765b885b182ed5782039e7337aca15bc021c30"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e3d235acf4a115a6fab26dda39765b885b182ed5782039e7337aca15bc021c30"
-    sha256 cellar: :any_skip_relocation, ventura:        "3b700866d19295f22ce03e53cf26381ce944da2b1db769e9cd024d94876260de"
-    sha256 cellar: :any_skip_relocation, monterey:       "3b700866d19295f22ce03e53cf26381ce944da2b1db769e9cd024d94876260de"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3b700866d19295f22ce03e53cf26381ce944da2b1db769e9cd024d94876260de"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "565b50a24bc8c908131ff342cd6424b37c5b49f1f17b75ab905b86ecc0a8e7ea"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "adcc616b8f507e2b0de352a29d4b1181811a972d32bfa076b5b12c00bab99b1f"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "adcc616b8f507e2b0de352a29d4b1181811a972d32bfa076b5b12c00bab99b1f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "adcc616b8f507e2b0de352a29d4b1181811a972d32bfa076b5b12c00bab99b1f"
+    sha256 cellar: :any_skip_relocation, sonoma:        "770e51d31207cb5b85d1e6980ed711e633fb92ef7c1a4084c625ea1334828dae"
+    sha256 cellar: :any_skip_relocation, ventura:       "770e51d31207cb5b85d1e6980ed711e633fb92ef7c1a4084c625ea1334828dae"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e913c9c7c07875859a46d3a0fc8033e1c6c47f31d89c1074af0a8dbc783055d2"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.Version=v#{version}")
+    ldflags = "-s -w -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.Version=v#{version}"
+    system "go", "build", *std_go_args(ldflags:)
+
+    generate_completions_from_executable(bin/"sonobuoy", "completion")
   end
 
   test do

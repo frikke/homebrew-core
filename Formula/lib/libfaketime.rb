@@ -1,12 +1,13 @@
 class Libfaketime < Formula
   desc "Report faked system time to programs"
   homepage "https://github.com/wolfcw/libfaketime"
-  url "https://github.com/wolfcw/libfaketime/archive/v0.9.10.tar.gz"
+  url "https://github.com/wolfcw/libfaketime/archive/refs/tags/v0.9.10.tar.gz"
   sha256 "729ad33b9c750a50d9c68e97b90499680a74afd1568d859c574c0fe56fe7947f"
   license "GPL-2.0-only"
   head "https://github.com/wolfcw/libfaketime.git", branch: "master"
 
   bottle do
+    sha256 arm64_sequoia:  "bfd710155f5264eb161cb1b25858b737bca3981693b1dbbe0cebfc7f75edd1c7"
     sha256 arm64_sonoma:   "1f61121e94582fee4405d79d0cea2216f9cc1f148b3b8a4b0a030eb23ee24c4b"
     sha256 arm64_ventura:  "7f785f03ad7e595192943ab0857be128021577226f265f59f1427812a844d160"
     sha256 arm64_monterey: "5e1401f985723d43a90e1789f6e765832245d1c9a70de598a978f0a4d06b4ea8"
@@ -32,7 +33,7 @@ class Libfaketime < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <time.h>
 
@@ -40,7 +41,7 @@ class Libfaketime < Formula
         printf("%d\\n",(int)time(NULL));
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-o", "test"
     assert_match "1230106542", shell_output("TZ=UTC #{bin}/faketime -f '2008-12-24 08:15:42' ./test").strip
   end

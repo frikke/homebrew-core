@@ -1,23 +1,27 @@
 class CargoWatch < Formula
   desc "Watches over your Cargo project's source"
   homepage "https://watchexec.github.io/#cargo-watch"
-  url "https://github.com/watchexec/cargo-watch/archive/v8.4.1.tar.gz"
-  sha256 "af1b649de787630144ccbb510b854d2e2a21b91df6cc7e0f420fd14518978572"
+  url "https://github.com/watchexec/cargo-watch/archive/refs/tags/v8.5.3.tar.gz"
+  sha256 "1884674d19492727d762da91b9aebc05d29bdb34cdb1903cde36d81edbcc6514"
   license "CC0-1.0"
   head "https://github.com/watchexec/cargo-watch.git", branch: "main"
 
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "68731e71cd0a425c94927e77db4c4db0b7ecb277657f4e628f4f76bfb9934a20"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f527865af1bafdfa3fe513ee67a2d8a17ed5265ab38b01252aad706a9375b961"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f8215440196c9fb03ceba5855a5aa5e11e34d4143c51ba6a257ef171bbeb0125"
-    sha256 cellar: :any_skip_relocation, ventura:        "ee77327792a8df29211b7aa76852f92da76d00dda669d595e2b54c311aa6beb5"
-    sha256 cellar: :any_skip_relocation, monterey:       "36dcd5778de148e8a6059143390583bf15d5e74a50833c21527f844c94b8a205"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c1f46ca93af6f011804a06e70835f923c8c138804ca95155eb799dafd247a50d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6774ed87cdf323a41020585d3cd20c6410327dc0d05858c1751333029149e900"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3e89525ad4d4dcff0e84930435fafab04934a7ed2cf2701e5747a9d953c9e9b3"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d767cc28d20886e772e0ba5ea5b32be862b609d79ddaf8f8dd7dfde4e1cbb8a6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "d4f823712d892ad4cea59e3a9efb158f2aa03966df7f0ac970b9c5656476e9f3"
+    sha256 cellar: :any_skip_relocation, sonoma:        "17bf2377ccc8158f7eee24184f71b4d655fd6257085aad7ee18a0afcec3354c4"
+    sha256 cellar: :any_skip_relocation, ventura:       "28a8bfc9784300c03deddccfde05dd22bb83d018c735275e2f2ea4df77a20faa"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9bc56bac3a510bfeb102997b3bdba25b01f83dddf771b116c46ef101dc8df988"
   end
 
   depends_on "rust" => :build
-  depends_on "rustup-init" => :test
+  depends_on "rustup" => :test
 
   def install
     system "cargo", "install", *std_cargo_args
@@ -26,10 +30,9 @@ class CargoWatch < Formula
   test do
     # Show that we can use a different toolchain than the one provided by the `rust` formula.
     # https://github.com/Homebrew/homebrew-core/pull/134074#pullrequestreview-1484979359
-    ENV["RUSTUP_INIT_SKIP_PATH_CHECK"] = "yes"
-    rustup_init = Formula["rustup-init"].bin/"rustup-init"
-    system rustup_init, "-y", "--profile", "minimal", "--default-toolchain", "beta", "--no-modify-path"
-    ENV.prepend_path "PATH", HOMEBREW_CACHE/"cargo_cache/bin"
+    ENV.prepend_path "PATH", Formula["rustup"].bin
+    system "rustup", "default", "beta"
+    system "rustup", "set", "profile", "minimal"
 
     output = shell_output("#{bin}/cargo-watch -x build 2>&1", 1)
     assert_match "error: project root does not exist", output

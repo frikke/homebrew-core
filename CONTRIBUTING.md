@@ -26,7 +26,7 @@ Thanks for contributing!
 
 * read [the Formula Cookbook](https://docs.brew.sh/Formula-Cookbook) or: `brew create $URL` and make edits
 * `HOMEBREW_NO_INSTALL_FROM_API=1 brew install --build-from-source foo`
-* `brew audit --new-formula foo`
+* `brew audit --new foo`
 * `git commit` with message formatted `foo 2.3.4 (new formula)`
 * [open a pull request](https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request) and fix any failing tests
 
@@ -60,7 +60,7 @@ about it from the introduction at
 https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request and then proceed as
 follows:
 
-* run `brew tap homebrew/core`, if you haven't done so previously
+* run `brew tap homebrew/core --force`, if you haven't done so previously
 * run `brew edit foo` and make edits
 * leave the section `bottle do ... end` unchanged
 * test your changes using the commands listed above

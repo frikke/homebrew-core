@@ -6,14 +6,13 @@ class Jo < Formula
   license all_of: ["GPL-2.0-or-later", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cff2c3168526423e589192b36bd2bef9dd123f5d960ce65e9ffbcae36bcbf898"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b07931afb2f5184b579fe97bedc3da888b4113632d42b30122aa9e877bce9e22"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "11d1fa55ba7cdf4228ddabd9441517f5e65eceeb5912e23aede7499059545504"
-    sha256 cellar: :any_skip_relocation, ventura:        "4bdc4df3521ec5cfc62cdb56fc252f8f3db8f1633002625059615de4a77ab0b9"
-    sha256 cellar: :any_skip_relocation, monterey:       "682e771556543d18f7bd82384a1a01690d5c8173b115dbeaa92ae62cea2bbe7b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8711cdb2d031d165a1967f68dbd2991a61515d35e35973c77547c26154000bd4"
-    sha256 cellar: :any_skip_relocation, catalina:       "2f0bfbd2e270b4e41c65dd46d627752103ba27a75ddf5ffe3cbb76b48a9d4109"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7635a8a7f0174e957d9600fa87e350bf245caa61bda573a19b69dca3c488bb9d"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "92ff2f6f6fb52d6ceb30e458a3a402eb49094671947f028a2abe78dc822ffd58"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cd76f20d3d909585dd3341f1776e8fd9869c4c52d06f67e7d8583a0e230846e4"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f76a57de3814c4a9b5fb87fb9e63e6d20cca457a94467783033b27d293229bc7"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9698e023bb10fc36d11eab06ef66d5abf087b0cb247c13ac363fd97afa2cdf6f"
+    sha256 cellar: :any_skip_relocation, ventura:       "c654746fff530ccfe66809a4eff3d15f0f29cee2fed75abf7e1296a4c539321f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dd4209b90b9732f0602cdbbaf598f1cc61676dcdb2fc7e0ee7c094a290555fad"
   end
 
   head do
@@ -24,14 +23,14 @@ class Jo < Formula
   end
 
   def install
-    system "autoreconf", "-i" if build.head?
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
 
-    system "./configure", "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
+    bash_completion.install bash_completion/"jo.bash" => "jo"
   end
 
   test do
-    assert_equal %Q({"success":true,"result":"pass"}\n), pipe_output("#{bin}/jo success=true result=pass")
+    assert_equal %Q({"success":true,"result":"pass"}\n), shell_output("#{bin}/jo success=true result=pass")
   end
 end

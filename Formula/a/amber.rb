@@ -4,26 +4,32 @@ class Amber < Formula
   url "https://github.com/amberframework/amber/archive/refs/tags/v1.4.1.tar.gz"
   sha256 "92664a859fb27699855dfa5d87dc9bf2e4a614d3e54844a8344196d2807e775c"
   license "MIT"
+  revision 2
 
   bottle do
-    sha256 arm64_ventura:  "9c3ad755b1bd22beae98dbc088df82b80180f04b1d541d3b708c1af29a502c41"
-    sha256 arm64_monterey: "c00f64c38a9edbcc84fcba1f7ac17674e5b9d48066e95bc838e31d495ae7035f"
-    sha256 arm64_big_sur:  "0474b1b3726aaec6f8ad34e7d7d1fbd7ea6d0ec1bfa627cd213ce5e50468f44d"
-    sha256 ventura:        "d529f79e1baff921927446fb6ad72469042e595720531334c164036a73b11c23"
-    sha256 monterey:       "584480426c743539cb3f70dfcb55625f6e27977248e2e747366e3dcd547039af"
-    sha256 big_sur:        "951253c81419f90acab9fa226d5b5ec4c858e4c6837b78c9490ae085b76fc008"
-    sha256 x86_64_linux:   "3f79958bab0aeb33079eaddd9f5481756d1803d55ef861d8f07b632229d4bcfc"
+    sha256 arm64_sequoia: "c8bb8c22fe777f8058380a9193fa2128127a80e5b4e5a695fdd5b3684db1cbc0"
+    sha256 arm64_sonoma:  "aedf640540270738aa662506e1a34e9853c4c7474310b2b7a5d4dc86d6c3a5c9"
+    sha256 arm64_ventura: "b48cb05e8b797ee829115cc6c60e89172169a0f68c4122fa8f9aaa07be7df8d0"
+    sha256 sonoma:        "d5632dc63a99120dcd4715a94f58d12dc9ea1ff69914bc6202c7fd0809bdcb29"
+    sha256 ventura:       "430d7db186ae038f2d9b5da2f1f96e1f32f3dcfeb5139fc94c1a5d7da705b48b"
+    sha256 x86_64_linux:  "459d2c3de122b8f9f0890270fd3b638180521f96976572ef59f31c5a8712bf65"
   end
 
+  depends_on "bdw-gc"
   depends_on "crystal"
+  depends_on "libevent"
+  depends_on "libyaml"
   depends_on "openssl@3"
-  uses_from_macos "sqlite"
+  depends_on "pcre2"
+  depends_on "sqlite"
+
+  uses_from_macos "zlib"
 
   # patch granite to fix db dependency resolution issue
   # upstream patch https://github.com/amberframework/amber/pull/1339
   patch do
-    url "https://github.com/amberframework/amber/commit/20f95cae1d8c934dcd97070daeaec0077b00d599.patch?full_index=1"
-    sha256 "ad8a303fe75611583ada10686fee300ab89f3ae37139b50f22eeabef04a48bdf"
+    url "https://github.com/amberframework/amber/commit/54b1de90cd3e395cd09326b1d43074e267c79695.patch?full_index=1"
+    sha256 "be0e30f08b8f7fcb71604eb01136d82d48b7e34afac9a1c846c74a7a7d2f8bd6"
   end
 
   def install
@@ -46,9 +52,8 @@ class Amber < Formula
     end
 
     cd "test_app" do
-      build_app = shell_output("shards build test_app")
-      assert_match "Building", build_app
-      assert_predicate testpath/"test_app/bin/test_app", :exist?
+      assert_match "Building", shell_output("#{Formula["crystal"].bin}/shards build test_app")
     end
+    assert_path_exists testpath/"test_app/bin/test_app"
   end
 end

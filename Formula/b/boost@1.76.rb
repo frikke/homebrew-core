@@ -4,26 +4,35 @@ class BoostAT176 < Formula
   url "https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2"
   sha256 "f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41"
   license "BSL-1.0"
-  revision 4
+  revision 6
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "eeafff189152118243504a54beb22ab68bddd258d6f307ef8c44158cc66757a7"
-    sha256 cellar: :any,                 arm64_ventura:  "960bbd424890c9d6a08104dd5714d620d215f144ad69e816154723423989040d"
-    sha256 cellar: :any,                 arm64_monterey: "26aa21aaa3142a4fed4e6432664eb50704d06a05e49fda44904a6be8401b67c9"
-    sha256 cellar: :any,                 arm64_big_sur:  "30cee145b99d61188734587a08e1bf21b669cf75dfcf4fa1032e76f23b6de51b"
-    sha256 cellar: :any,                 sonoma:         "bf4e91f0c9c34fdd260a16a3b885d7dc85917c9908ce50f1243b54685552681d"
-    sha256 cellar: :any,                 ventura:        "ae7b3d8a883abed1ea4f7bdd51dd26dd52c7c6dfb126ef819bcace472389b9a7"
-    sha256 cellar: :any,                 monterey:       "7458b977ef6a75dc3b873fac286cb3ba2330d06034228fc0ef76c86feaaa0f42"
-    sha256 cellar: :any,                 big_sur:        "0552835e6fa8401714d0571c2fb621416da9d78f21f3093d0b0e5a65f2da6812"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7f070d8d009e7b1c5380fb26ac8e1fec40dd805a90e6153193a75f5c84d6b867"
+    sha256 cellar: :any,                 arm64_sequoia: "5fa1820397b30bc594fc77f937a99af346f8e41340d532a13f59e31c7076f0ea"
+    sha256 cellar: :any,                 arm64_sonoma:  "bf2654e857a043032de6fe7fc6c8388a52ee86338dbbfdedc28617bac22f2df4"
+    sha256 cellar: :any,                 arm64_ventura: "3966bc23fe94abc372ddb6b2c1d07846ee9c1b2c99793a125c73f36c5f43d0af"
+    sha256 cellar: :any,                 sonoma:        "f570c9d3c4e1d1cef19a21761de8b2dc6748445da6dc067457d5e950c023dd1a"
+    sha256 cellar: :any,                 ventura:       "5879acd1c2d7f1067f365f9cb705ffd0aeb5dec9a8346ce3ec770e4220ddeb2c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c6c27b35876867779cfab02b6db3f56595494935da83e1b8c5a3bd4401c4aeae"
   end
 
   keg_only :versioned_formula
 
-  depends_on "icu4c"
+  disable! date: "2024-12-14", because: :versioned_formula
+
+  depends_on "icu4c@74"
 
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
+
+  # Backport fixes for newer Clang
+  patch :p2 do
+    url "https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a.patch?full_index=1"
+    sha256 "d96761257f7efc2edc8414f1a2522fc07a3d7d56bb55a51d14af9abd39e389c8"
+  end
+  patch :p2 do
+    url "https://github.com/boostorg/mpl/commit/b37b709cbdb6b2c285fb808dab985aa005786351.patch?full_index=1"
+    sha256 "b8013ad3e6b63698158319f5efc2fe1558a00c1d2e32193086f741e774acc3e4"
+  end
 
   def install
     # Force boost to compile with the desired compiler
@@ -36,7 +45,7 @@ class BoostAT176 < Formula
     end
 
     # libdir should be set by --prefix but isn't
-    icu4c_prefix = Formula["icu4c"].opt_prefix
+    icu4c_prefix = Formula["icu4c@74"].opt_prefix
     bootstrap_args = %W[
       --prefix=#{prefix}
       --libdir=#{lib}
@@ -78,7 +87,7 @@ class BoostAT176 < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <boost/algorithm/string.hpp>
       #include <string>
       #include <vector>
@@ -96,7 +105,7 @@ class BoostAT176 < Formula
         assert(strVec[1]=="b");
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-I#{Formula["boost@1.76"].opt_include}", "test.cpp", "-std=c++14", "-o", "test"
     system "./test"
   end

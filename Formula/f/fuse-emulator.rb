@@ -22,9 +22,9 @@ class FuseEmulator < Formula
     depends_on "libtool" => :build
   end
 
-  deprecate! date: "2023-02-14", because: :unmaintained
+  disable! date: "2024-02-12", because: :unmaintained
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libpng"
   depends_on "libspectrum"
   depends_on "sdl12-compat"
@@ -41,6 +41,6 @@ class FuseEmulator < Formula
   end
 
   test do
-    system "#{bin}/fuse", "--version"
+    system bin/"fuse", "--version"
   end
 end

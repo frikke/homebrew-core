@@ -3,28 +3,37 @@ class Rpmspectool < Formula
 
   desc "Utility for handling RPM spec files"
   homepage "https://github.com/nphilipp/rpmspectool"
-  url "https://files.pythonhosted.org/packages/0d/b9/723a043cca7407717238e7f5f9fd5df562aa4599204fdb1a76d652ebd281/rpmspectool-1.99.7.tar.gz"
-  sha256 "359ab2c743bfe19cde5758e27d798e276aff63e1b9c8bb1bd307e89c07200ed6"
+  url "https://files.pythonhosted.org/packages/7d/cc/53ef9a699df75f3f29f672d0bdf7aae162829e2c98f7b7b5f063fd5d3a46/rpmspectool-1.99.10.tar.gz"
+  sha256 "b79d59388ecba5f8b957c722a43a429b5a728435f5ed0992011e9482850e3583"
   license "GPL-3.0-or-later"
+  revision 2
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "ae788048a8d4a77be470b7fc6fefc1d70c2cb4073e2a3634cbf962c84430d60c"
-    sha256 cellar: :any_skip_relocation, ventura:       "964ebc4c8fad13b63affbbc5f800aba1551b4bcbbc7ad94556d87d791e156b67"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3b27e1de9b1da031214a7cfd84e39491faca0f84fa616f1f358b8602c7961bca"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "4c77cc55ad2dd5ef71b1f0e6f962181198567a56ce65828e3ed2c18cafed4cb6"
   end
 
-  depends_on "python-pycurl"
-  depends_on "python@3.11"
+  depends_on "curl"
+  depends_on :linux
+  depends_on "openssl@3"
+  depends_on "python@3.13"
   depends_on "rpm"
 
   resource "argcomplete" do
-    url "https://files.pythonhosted.org/packages/54/c9/41c4dfde7623e053cbc37ac8bc7ca03b28093748340871d4e7f1630780c4/argcomplete-3.1.1.tar.gz"
-    sha256 "6c4c563f14f01440aaffa3eae13441c5db2357b5eec639abe7c0b15334627dff"
+    url "https://files.pythonhosted.org/packages/7f/03/581b1c29d88fffaa08abbced2e628c34dd92d32f1adaed7e42fc416938b0/argcomplete-3.5.2.tar.gz"
+    sha256 "23146ed7ac4403b70bd6026402468942ceba34a6732255b9edf5b7354f68a6bb"
+  end
+
+  resource "pycurl" do
+    url "https://files.pythonhosted.org/packages/c9/5a/e68b8abbc1102113b7839e708ba04ef4c4b8b8a6da392832bb166d09ea72/pycurl-7.45.3.tar.gz"
+    sha256 "8c2471af9079ad798e1645ec0b0d3d4223db687379d17dd36a70637449f81d6b"
   end
 
   def install
     virtualenv_install_with_resources
+
+    generate_completions_from_executable(libexec/"bin/register-python-argcomplete", "rpmspectool",
+                                         shell_parameter_format: :arg)
   end
 
   test do
@@ -66,6 +75,6 @@ class Rpmspectool < Formula
       %_infodir/hello.info*
     EOS
     system bin/"rpmspectool", "get", testpath/"hello.spec"
-    assert_predicate testpath/"hello-2.12.1.tar.gz", :exist?
+    assert_path_exists testpath/"hello-2.12.1.tar.gz"
   end
 end

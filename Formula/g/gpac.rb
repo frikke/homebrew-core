@@ -9,28 +9,26 @@
 class Gpac < Formula
   desc "Multimedia framework for research and academic purposes"
   homepage "https://gpac.wp.mines-telecom.fr/"
-  url "https://github.com/gpac/gpac/archive/v2.2.1.tar.gz"
-  sha256 "8173ecc4143631d7f2c59f77e1144b429ccadb8de0d53a4e254389fb5948d8b8"
+  url "https://github.com/gpac/gpac/archive/refs/tags/v2.4.0.tar.gz"
+  sha256 "99c8c994d5364b963d18eff24af2576b38d38b3460df27d451248982ea16157a"
   license "LGPL-2.1-or-later"
-  revision 1
   head "https://github.com/gpac/gpac.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "a84de69ae0466a5dbd0ac4b72467f8c5b3c014f7f1dd28f7d0f92ebd0b9d5d08"
-    sha256 cellar: :any,                 arm64_monterey: "726e848f614718e84bdb1334a728bef9a3223a2988796f375fcac990c2984752"
-    sha256 cellar: :any,                 arm64_big_sur:  "6922542eff06034e5c339e3024d4dfe5b7777fe45b2974c8fc27933d8a53c3f1"
-    sha256 cellar: :any,                 ventura:        "39aad91d3b061ddfcfea25275ec4424b1ef7587c96d4d5b983dbde3432648ab9"
-    sha256 cellar: :any,                 monterey:       "2471afe10295b7c46c43f1d96cfb138ad0aafe151e434b15c429388ea996141f"
-    sha256 cellar: :any,                 big_sur:        "0ef3b2c3a0fcb8b1d6c0b180a1115258464b9c6117f5c047b5aca776244301b4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "16457bcbb191b392f7511ccacfa7cdb83499bbdaff5b1bd34fa68d9f28737d16"
+    sha256 cellar: :any,                 arm64_sequoia:  "5dd37f08f66d4cd6326954764aff8e02b44a534eb54ac5ebf336152153a1c65c"
+    sha256 cellar: :any,                 arm64_sonoma:   "0db848b31b7bda589b829bef38fd0d99575d1303691a04a915d66548b3dac128"
+    sha256 cellar: :any,                 arm64_ventura:  "e02c1581892fd72215874516724a24eb30fb7862a1e5d45ebd7cce0b840a3908"
+    sha256 cellar: :any,                 arm64_monterey: "b15f699737dc4e58fda9c8753ea2aa2f323baa0423b5424230852bdb0e35b258"
+    sha256 cellar: :any,                 sonoma:         "d689fcb607e52f1111fb9ddfb6bf107a40592e16c7f7f536bcbece0b76e69145"
+    sha256 cellar: :any,                 ventura:        "be9dbecc82418f0ff125b5838d56ff7e37c7818f64f090df2fc0e35fdec969b4"
+    sha256 cellar: :any,                 monterey:       "618101f402082ebc311574e2de377212b20386b346f1f12ab008ded4b647e5fa"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3fa932d0f671a1643b20f381bba3181328431e5ef9555444a8d25a983ace36e1"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "openssl@3"
 
   uses_from_macos "zlib"
-
-  conflicts_with "bento4", because: "both install `mp42ts` binaries"
 
   def install
     args = %W[
@@ -47,7 +45,7 @@ class Gpac < Formula
   end
 
   test do
-    system "#{bin}/MP4Box", "-add", test_fixtures("test.mp3"), "#{testpath}/out.mp4"
-    assert_predicate testpath/"out.mp4", :exist?
+    system bin/"MP4Box", "-add", test_fixtures("test.mp3"), testpath/"out.mp4"
+    assert_path_exists testpath/"out.mp4"
   end
 end

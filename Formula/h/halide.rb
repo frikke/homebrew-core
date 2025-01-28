@@ -1,8 +1,8 @@
 class Halide < Formula
   desc "Language for fast, portable data-parallel computation"
   homepage "https://halide-lang.org"
-  url "https://github.com/halide/Halide/archive/v16.0.0.tar.gz"
-  sha256 "a0cccee762681ea697124b8172dd65595856d0fa5bd4d1af7933046b4a085b04"
+  url "https://github.com/halide/Halide/archive/refs/tags/v19.0.0.tar.gz"
+  sha256 "83bae1f0e24dc44d9d85014d5cd0474df2dd03975680894ce3fafd6e97dffee2"
   license "MIT"
   head "https://github.com/halide/Halide.git", branch: "main"
 
@@ -12,38 +12,43 @@ class Halide < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "1dc8e72c88d4765ca1a4c4fa0aa587be9d4791c252cb570374e902a2f402086e"
-    sha256 cellar: :any,                 arm64_monterey: "d81f24d816d895b0f10755771bfee33a0c03ac895fc1e2a7399849c794eccb37"
-    sha256 cellar: :any,                 arm64_big_sur:  "f356585914ef921814333752a006d9e4033163372aa50c65929c6645a344431e"
-    sha256 cellar: :any,                 ventura:        "0f5126b08161572979ed23b87a1ce7623ee0971dd7a57f44acaebc76578936a0"
-    sha256 cellar: :any,                 monterey:       "95166cdc80500c57799c052f255065b7fb8499c25f5f7a732587c7b8da1563da"
-    sha256 cellar: :any,                 big_sur:        "727ee7167d0f2026de4f7ce5654a601e71485c56573cc766593a748b71849b70"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8ff3882c4b82e3a44a92670c8579b6817447ae304efb6d27c176684e04e9200b"
+    sha256 cellar: :any,                 arm64_sequoia: "63e0a77f37e9db89b85ee69af56a4c48af67f4131acc439d103c834c973b696e"
+    sha256 cellar: :any,                 arm64_sonoma:  "95a7b448f9ed4e23d48603ae2a63b92e5d0cf4729ee5e3bda4128234d3861baa"
+    sha256 cellar: :any,                 arm64_ventura: "57bae5cff5b521cc42a80f786411acf9cadc049ab5f7100d71e429c8986be6f4"
+    sha256 cellar: :any,                 sonoma:        "51ffd96b6e358f9e53ad81f0d3e9987c72d2ba2c19f85563fcd334baf0f25cf0"
+    sha256 cellar: :any,                 ventura:       "53888029c3c797b57577bb390dbcc34a4fe909b6aac219c81be9f55555764d3d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2a0bf8651e7a1c027c38776e0df09d4117156145efbacbc0fbbf00e0806cea21"
   end
 
   depends_on "cmake" => :build
   depends_on "pybind11" => :build
+  depends_on "flatbuffers"
   depends_on "jpeg-turbo"
   depends_on "libpng"
+  depends_on "lld"
   depends_on "llvm"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+  depends_on "wabt"
 
-  fails_with :gcc do
-    version "6"
-    cause "Requires C++17"
+  on_macos do
+    depends_on "openssl@3"
   end
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
-    system "cmake", "-S", ".", "-B", "build",
-                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
-                    "-DHalide_INSTALL_PYTHONDIR=#{prefix/Language::Python.site_packages(python3)}",
-                    "-DHalide_SHARED_LLVM=ON",
-                    "-DPYBIND11_USE_FETCHCONTENT=OFF",
-                    *std_cmake_args
+    site_packages = prefix/Language::Python.site_packages(python3)
+    rpaths = [rpath, rpath(source: site_packages/"halide")]
+    args = [
+      "-DCMAKE_INSTALL_RPATH=#{rpaths.join(";")}",
+      "-DHalide_INSTALL_PYTHONDIR=#{site_packages}/halide",
+      "-DHalide_LLVM_SHARED_LIBS=ON",
+      "-DHalide_USE_FETCHCONTENT=OFF",
+      "-DWITH_TESTS=NO",
+    ]
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end

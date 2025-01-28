@@ -1,32 +1,30 @@
 class LibpahoMqtt < Formula
   desc "Eclipse Paho C client library for MQTT"
-  homepage "https://eclipse.github.io/paho.mqtt.c/"
-  url "https://github.com/eclipse/paho.mqtt.c/archive/refs/tags/v1.3.12.tar.gz"
-  sha256 "6a70a664ed3bbcc1eafdc45a5dc11f3ad70c9bac12a54c2f8cef15c0e7d0a93b"
+  homepage "https://eclipse-paho.github.io/paho.mqtt.c/MQTTClient/html/"
+  url "https://github.com/eclipse-paho/paho.mqtt.c/archive/refs/tags/v1.3.14.tar.gz"
+  sha256 "7af7d906e60a696a80f1b7c2bd7d6eb164aaad908ff4c40c3332ac2006d07346"
   license "EPL-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "abf0f2143700a1bc96dfbdf9a2804309f7adbb564be8ff468273e27b688c90ec"
-    sha256 cellar: :any,                 arm64_ventura:  "1b1949c46f45c38beac0417ebc1d81c431a5ed725ca620eea6cfdc8a0c03990e"
-    sha256 cellar: :any,                 arm64_monterey: "617f7bd6f68f83473ffdb893623600f8206d8db03df74e8797ece00861de2d64"
-    sha256 cellar: :any,                 arm64_big_sur:  "b7fe29b30b2e02016aa06329badbd7953a80abe9c974c26658b1fb8b9b35ad6d"
-    sha256 cellar: :any,                 sonoma:         "05ca55fc1638a2f893c3df36f3870ffc2f2fd0fc097e8857abdb472cbc557697"
-    sha256 cellar: :any,                 ventura:        "f9ecee90f911fc2f3209ac17130f214e583e32a0a87268b485cc2ee5acfb174b"
-    sha256 cellar: :any,                 monterey:       "67f3cdaf51cb4c730facc65931f8245bb253bf560f8a444d83dfcbe976532973"
-    sha256 cellar: :any,                 big_sur:        "fa05a2643fe2956e4a838777f34df44f8ef72d096438229c9d6c49351c2e9c9a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1ea31b35020c2ce8c4a3257ee8a36fbe873649f1ee8d421d5eadd22c992e9702"
+    sha256 cellar: :any,                 arm64_sequoia: "d55229a93fe81c43dcde42d0e91a30560f59706fbcafaf498f89dd7fce239f90"
+    sha256 cellar: :any,                 arm64_sonoma:  "863dc484fc7e89fb897247383508a65671150dc19658c77a4d5ae845741ecdcd"
+    sha256 cellar: :any,                 arm64_ventura: "157eb3c732c87b9076c20ddf800a2a2f715411a1f740655efc12b62b00d17e33"
+    sha256 cellar: :any,                 sonoma:        "58a80e95499276f4aba24dbe00ea4db55488018d3d36a3a20b65f52b6df7e0e1"
+    sha256 cellar: :any,                 ventura:       "c21e0cee9e3dfe56df0fad42da8ec929b22bdccbc486ec234413b1af62642864"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "411c4aadc6df1cb439016386644145a4f2bd412282dda6b3ab4b52b111632f54"
   end
 
   depends_on "cmake" => :build
+  depends_on "openssl@3"
 
   def install
-    system "cmake", "-S", ".", "-B", "build", "-DBUILD_SHARED_LIBS=ON", *std_cmake_args
+    system "cmake", "-S", ".", "-B", "build", "-DBUILD_SHARED_LIBS=ON", "-DPAHO_WITH_SSL=ON", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOT
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdlib.h>
       #include <MQTTClient.h>
@@ -37,7 +35,7 @@ class LibpahoMqtt < Formula
 
           return 0;
       }
-    EOT
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lpaho-mqtt3a", "-o", "test"
     system "./test"
   end

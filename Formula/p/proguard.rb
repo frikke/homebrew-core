@@ -1,8 +1,8 @@
 class Proguard < Formula
   desc "Java class file shrinker, optimizer, and obfuscator"
   homepage "https://www.guardsquare.com/en/products/proguard"
-  url "https://github.com/Guardsquare/proguard/releases/download/v7.3.2/proguard-7.3.2.tar.gz"
-  sha256 "4cd07b31edc4af6218d09f5f3c421b65d931a6d530311efeeb822bb95e055a54"
+  url "https://github.com/Guardsquare/proguard/releases/download/v7.6.1/proguard-7.6.1.tar.gz"
+  sha256 "672ef62a3154474a6172cbfde9a2f09da1642a17a80e1c7b79a6cc58953fbe06"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Proguard < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "d7cc9a60851d78b8e3850ca31b8033885f0403601ec93c87afffbd6959c278be"
+    sha256 cellar: :any_skip_relocation, all: "358c58112336b1909bdf8c5f550caf781a584ea98514716ac80dd20f5f8f2ca8"
   end
 
   depends_on "openjdk"
@@ -30,7 +30,7 @@ class Proguard < Formula
       ProGuard, version #{version}
       Usage: java proguard.ProGuard [options ...]
     EOS
-    assert_equal expect, shell_output("#{bin}/proguard", 1)
+    assert_equal expect, shell_output(bin/"proguard", 1)
 
     expect = <<~EOS
       Picked up _JAVA_OPTIONS: #{ENV["_JAVA_OPTIONS"]}

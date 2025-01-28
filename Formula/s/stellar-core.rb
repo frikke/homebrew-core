@@ -2,19 +2,26 @@ class StellarCore < Formula
   desc "Backbone of the Stellar (XLM) network"
   homepage "https://www.stellar.org/"
   url "https://github.com/stellar/stellar-core.git",
-      tag:      "v19.13.0",
-      revision: "c2599d62274931c11ea7f36c5ee9255a202f5739"
+      tag:      "v22.0.0",
+      revision: "721fd0a654d5e82d38c748a91053e530a475193d"
   license "Apache-2.0"
   head "https://github.com/stellar/stellar-core.git", branch: "master"
 
+  # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
+  # labeled as "pre-release" on GitHub before the version is released, so it's
+  # necessary to use the `GithubLatest` strategy.
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c95bf4271d570003292b1e90a0efaaf76242411919e57dcfcccf2bc8a6f0f0f8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "1ecb18b76406b98dff88b73dbb5c85bb1af410b7f7f14c1404ee595471db80b9"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f192db5f9cff9cc26abeea9d3960045375aa08e0ccbb2b531d73c68f46b2002d"
-    sha256 cellar: :any_skip_relocation, ventura:        "e62e24348445995eec6eb836136178ae4d5edbbff6ee05723d18a32724383d77"
-    sha256 cellar: :any_skip_relocation, monterey:       "63e736ef959868f70edd80df0ca636471254751a43f18fdb5c513181e8384f63"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9246841664c152de198270a9c860edf9727249b3aca1d9568f5b59f4c4f07bde"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b75fc976adbd374040412ef315080f6f6c7eed796115a8f23cffac7f414203a7"
+    sha256 cellar: :any,                 arm64_sequoia: "c957356fe42af606a2ff611716c12cb5cd22661c7a4a4359a8fd353258044858"
+    sha256 cellar: :any,                 arm64_sonoma:  "5b1763530f2255bd30ec9f9dd6e55b9dc47c1071216b66af4a426da6b7b324f9"
+    sha256 cellar: :any,                 arm64_ventura: "cd41dd53666990a82bbce2c5103d033c0def90039df14e458714bf06f203ec41"
+    sha256 cellar: :any,                 sonoma:        "52e34cdd2d0c43cd942e5a3d3f67d0b219565fe0be16feb1b2ee6c6df7c2ba8b"
+    sha256 cellar: :any,                 ventura:       "adb33b8efc941647c6362489677824282e7a6365b80c0f665959bb63adb25a94"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ee7b47ae6a39d43b88ef02b8fd79aa9431fde22f3ebb9589413e2bd0b49000b7"
   end
 
   depends_on "autoconf" => :build
@@ -22,12 +29,18 @@ class StellarCore < Formula
   depends_on "bison" => :build # Bison 3.0.4+
   depends_on "libtool" => :build
   depends_on "pandoc" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "rust" => :build
   depends_on "libpq"
   depends_on "libpqxx"
   depends_on "libsodium"
   depends_on macos: :catalina # Requires C++17 filesystem
+
   uses_from_macos "flex" => :build
+
+  on_sonoma :or_older do
+    depends_on "coreutils" => :build # for sha256sum
+  end
 
   on_linux do
     depends_on "libunwind"
@@ -40,12 +53,13 @@ class StellarCore < Formula
   end
 
   def install
+    # remove toolchain selection
+    inreplace "src/Makefile.am", "cargo +$(RUST_TOOLCHAIN_CHANNEL)", "cargo"
+
     system "./autogen.sh"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--enable-postgres"
+    system "./configure", "--disable-silent-rules",
+                          "--enable-postgres",
+                          *std_configure_args
     system "make", "install"
   end
 
@@ -53,10 +67,10 @@ class StellarCore < Formula
     test_categories = %w[
       accountsubentriescount
       bucketlistconsistent
-      topology
-      upgrades
     ]
-    system "#{bin}/stellar-core", "test",
-      test_categories.map { |category| "[#{category}]" }.join(",")
+    # Reduce tests on Intel macOS as runner is too slow and times out
+    test_categories << "topology" if !OS.mac? || !Hardware::CPU.intel?
+
+    system bin/"stellar-core", "test", test_categories.map { |category| "[#{category}]" }.join(",")
   end
 end

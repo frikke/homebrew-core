@@ -1,20 +1,17 @@
 class Feedgnuplot < Formula
   desc "Tool to plot realtime and stored data from the command-line"
   homepage "https://github.com/dkogan/feedgnuplot"
-  url "https://github.com/dkogan/feedgnuplot/archive/v1.61.tar.gz"
-  sha256 "4239fe61a03232ea47909edd59af767b98481b205f58910b2e30d2d41f9caa80"
+  url "https://github.com/dkogan/feedgnuplot/archive/refs/tags/v1.62.tar.gz"
+  sha256 "7a3854c3620f7cc6bf5bf13546f5e8cbead2bb1afedd455b9ecabf367a6e78df"
   license any_of: ["GPL-1.0-or-later", "Artistic-1.0"]
-  revision 2
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1c84ee60a6faa933c43c270489c546de007e29530353ba4969b82d7f7692f3b5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "1c84ee60a6faa933c43c270489c546de007e29530353ba4969b82d7f7692f3b5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "26299cc2f7edb31454e3a484328033d1da600aedb585860698ae5e079710e528"
-    sha256 cellar: :any_skip_relocation, ventura:        "1c84ee60a6faa933c43c270489c546de007e29530353ba4969b82d7f7692f3b5"
-    sha256 cellar: :any_skip_relocation, monterey:       "1c84ee60a6faa933c43c270489c546de007e29530353ba4969b82d7f7692f3b5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "26299cc2f7edb31454e3a484328033d1da600aedb585860698ae5e079710e528"
-    sha256 cellar: :any_skip_relocation, catalina:       "dd94ae98b5eea50d2d2a6c5437089d27522bb2111092581a8bfca2cd4d7b9373"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0e60aa54281c6660afa1d69e2c9ba3070d042e29fc46eff704f15f218c3d6925"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7f6265ef15bfe79ba7eb98b7c726fddcf19819ffa4ee0f613af37df07d396c48"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "85639667a8f91888be75bf1f0fb1074b6f23adf6d3e2a4ec3048efaceed0d53e"
+    sha256 cellar: :any_skip_relocation, sonoma:        "7f6265ef15bfe79ba7eb98b7c726fddcf19819ffa4ee0f613af37df07d396c48"
+    sha256 cellar: :any_skip_relocation, ventura:       "85639667a8f91888be75bf1f0fb1074b6f23adf6d3e2a4ec3048efaceed0d53e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "40767525dd58b22625351aef13957ca8c923e7c7aff998f0c00a92a1bdcca51d"
   end
 
   depends_on "gnuplot"

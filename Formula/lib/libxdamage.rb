@@ -6,6 +6,7 @@ class Libxdamage < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "4378ada6b14fdbf06d82825d2d81465fb0be5d80684c0c46b73ec6bf8b1009e9"
     sha256 cellar: :any,                 arm64_sonoma:   "3c19b70d6cd2fd2720b9b52be6c21ba5032da5e94fd3584126a5b73c725e18ba"
     sha256 cellar: :any,                 arm64_ventura:  "f7ba5d6474c6d7be855f270e843c42d1e3b819d43e7d96c3b62789265f264a3b"
     sha256 cellar: :any,                 arm64_monterey: "1b820498fc3f7216bcf074f0c8165875a0250390e837d9db05a62bb9ada85d5b"
@@ -17,34 +18,32 @@ class Libxdamage < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "6d888f5feb3f6cbaf35ca9d4f6af015555e30be8295bb378594290081e74c29f"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libx11"
   depends_on "libxfixes"
   depends_on "xorgproto"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/extensions/Xdamage.h"
 
       int main(int argc, char* argv[]) {
         XDamageNotifyEvent event;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

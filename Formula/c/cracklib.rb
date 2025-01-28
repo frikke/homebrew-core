@@ -1,8 +1,8 @@
 class Cracklib < Formula
   desc "LibCrack password checking library"
   homepage "https://github.com/cracklib/cracklib"
-  url "https://github.com/cracklib/cracklib/releases/download/v2.9.11/cracklib-2.9.11.tar.bz2"
-  sha256 "ca8b049a3c2d3b2225a1e8d15d613798ebc748e3950388eda2694de507ba6020"
+  url "https://github.com/cracklib/cracklib/releases/download/v2.10.3/cracklib-2.10.3.tar.bz2"
+  sha256 "f3dcb54725d5604523f54a137b378c0427c1a0be3e91cfb8650281a485d10dae"
   license "LGPL-2.1-only"
 
   livecheck do
@@ -11,34 +11,42 @@ class Cracklib < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "6a3a072cf106fde02db24ad3024d75795afd6fcd8595a50e569f9eafa0b8f849"
-    sha256 arm64_monterey: "366eea9cce24cf4353676bfd54bef63596fd678992b138c81606e6083526f5fe"
-    sha256 arm64_big_sur:  "fa8e46c43b097175d54821836f5e41edff34dbad7b3a8f40e581141903111e67"
-    sha256 ventura:        "f7aed3f2bd1d5ff0c0da5f42e443b239fb126bd3f0ec72db65c581a30fb84bcc"
-    sha256 monterey:       "5b2918b1e6b0e356b3c1039498d7ff241f5d339a1a8e685bd63ae64aee4180da"
-    sha256 big_sur:        "ed0830783c21bfb87f7c9f3a3775806cc5be421ff34d5e82749ebc3e1c9e8af0"
-    sha256 x86_64_linux:   "c0c98e94bf0217fd21363d1543d51c13a86c83c56039e2f7ce128b30bbaed5a2"
+    sha256 arm64_sequoia: "9d98bf420b98834ad967baf58c7282e2e8e280c967dd1dc8b5e7ae878fe81666"
+    sha256 arm64_sonoma:  "9496d3be435158f297c9428e967289ec4fe41d442c02bf0ade3a432c91c05a36"
+    sha256 arm64_ventura: "5798b58bebd1cd635c356812c0aa23c606b78395c193669efcb0bc8691b9d5b6"
+    sha256 sonoma:        "106cf73076dbca2480f870e24c63057044b6c1bcebb4423ef74aae8c65dc154f"
+    sha256 ventura:       "766a21b910e679477f796177b5241589b2abb2fd834bc6b32144ba7d731a8dc0"
+    sha256 x86_64_linux:  "3032a4afab1d0877faa7b2e27740d11632a394b3478d5e7aeb690b6badef3cc6"
   end
 
-  depends_on "gettext"
+  head do
+    url "https://github.com/cracklib/cracklib.git", branch: "main"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
+
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   resource "cracklib-words" do
-    url "https://github.com/cracklib/cracklib/releases/download/v2.9.11/cracklib-words-2.9.11.bz2"
+    url "https://github.com/cracklib/cracklib/releases/download/v2.10.3/cracklib-words-2.10.3.bz2"
     sha256 "ec25ac4a474588c58d901715512d8902b276542b27b8dd197e9c2ad373739ec4"
   end
 
-  # Fix -flat_namespace being used on Big Sur and later.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
-    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
-  end
-
   def install
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules",
+    buildpath.install (buildpath/"src").children if build.head?
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+
+    system "./configure", "--disable-silent-rules",
                           "--sbindir=#{bin}",
                           "--without-python",
-                          "--with-default-dict=#{var}/cracklib/cracklib-words"
+                          "--with-default-dict=#{var}/cracklib/cracklib-words",
+                          *std_configure_args
     system "make", "install"
 
     share.install resource("cracklib-words")
@@ -46,11 +54,11 @@ class Cracklib < Formula
 
   def post_install
     (var/"cracklib").mkpath
-    cp share/"cracklib-words-#{version}", var/"cracklib/cracklib-words"
+    cp share/"cracklib-words-#{resource("cracklib-words").version}", var/"cracklib/cracklib-words"
     system "#{bin}/cracklib-packer < #{var}/cracklib/cracklib-words"
   end
 
   test do
-    assert_match "password: it is based on a dictionary word", pipe_output("#{bin}/cracklib-check", "password", 0)
+    assert_match "password: it is based on a dictionary word", pipe_output(bin/"cracklib-check", "password", 0)
   end
 end

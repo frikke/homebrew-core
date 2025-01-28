@@ -1,25 +1,29 @@
 class Gnumeric < Formula
   desc "GNOME Spreadsheet Application"
   homepage "https://projects.gnome.org/gnumeric/"
-  url "https://download.gnome.org/sources/gnumeric/1.12/gnumeric-1.12.55.tar.xz"
-  sha256 "c69a09cd190b622acca476bbc3d4c03d68d7ccf59bba61bf036ce60885f9fb65"
+  url "https://download.gnome.org/sources/gnumeric/1.12/gnumeric-1.12.57.tar.xz"
+  sha256 "aff50b1b62340c24fccf453d5fad3e7fb73f4bc4b34f7e34b6c3d2d9af6a1e4f"
   license any_of: ["GPL-3.0-only", "GPL-2.0-only"]
+  revision 1
 
   bottle do
-    sha256 arm64_ventura:  "488370521c3bff2b234422df1c6468b33dd562c1497ca4cd8cfcf1c88a1a9dde"
-    sha256 arm64_monterey: "b1398c8ebef228c9d6bf70ab7412245efd9e239a84c77a71cb1d26bf8906586e"
-    sha256 arm64_big_sur:  "3c638fb56a210bb76c33dc932f74c5640317e90b7f5a61b14ed8cbf76a09eb57"
-    sha256 ventura:        "5d5d4ae015519c7fb93b1e49c865e0cc24402b88628028e5d0b5840fdb2b9abe"
-    sha256 monterey:       "abf3df42402d276c0275fd20697f0a1d58e9242cab0b85a3a40257624cba83d2"
-    sha256 big_sur:        "233706512d8b3812b44d02048c91edd36976ff7a2a4f86706aba72a9d0ba66c4"
-    sha256 x86_64_linux:   "1626ab57af930045ffe261f807e1492580cc9d290835ec1c8b16b11d8bd012d8"
+    sha256                               arm64_sequoia: "8a7e1965742b9ea886076a57802002fa062ce77435d002015f0919e559ed1351"
+    sha256                               arm64_sonoma:  "6a82deed674c951c5c9f9c7938b9a9c2f1a9417fb1c4174bb6d06378c2bec735"
+    sha256                               arm64_ventura: "755f8dc344fe237adb34974cf2ad0b14ef86665be16a442f8160b408e32f5f67"
+    sha256                               sonoma:        "9898fe1f0c8e15a02ca97a2cb233434a1a74680efe2325d355ae5cc335b5ab1e"
+    sha256                               ventura:       "143e39f6cbb0705c3016db957c5d238a45333c1bfe7efccce9dba3b571555d84"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "89f3af98641cad01596d6f079d71a16d0bf120a21ec50381890946cf0a2354d6"
   end
 
   depends_on "gettext" => :build
   depends_on "intltool" => :build
   depends_on "itstool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "adwaita-icon-theme"
+  depends_on "at-spi2-core"
+  depends_on "cairo"
+  depends_on "gdk-pixbuf"
   depends_on "glib"
   depends_on "goffice"
   depends_on "gtk+3"
@@ -28,23 +32,28 @@ class Gnumeric < Formula
   depends_on "pango"
 
   uses_from_macos "bison" => :build
+  uses_from_macos "python" => :build
   uses_from_macos "perl"
+  uses_from_macos "zlib"
 
   on_macos do
     depends_on "gettext"
+    depends_on "harfbuzz"
+  end
+
+  on_linux do
+    depends_on "perl-xml-parser" => :build
   end
 
   def install
-    ENV.prepend_path "PERL5LIB", Formula["intltool"].opt_libexec/"lib/perl5" unless OS.mac?
-
     # ensures that the files remain within the keg
     inreplace "component/Makefile.in",
               "GOFFICE_PLUGINS_DIR = @GOFFICE_PLUGINS_DIR@",
               "GOFFICE_PLUGINS_DIR = @libdir@/goffice/@GOFFICE_API_VER@/plugins/gnumeric"
 
-    system "./configure", *std_configure_args,
+    system "./configure", "--disable-schemas-compile",
                           "--disable-silent-rules",
-                          "--disable-schemas-compile"
+                          *std_configure_args
     system "make", "install"
   end
 

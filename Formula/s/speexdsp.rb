@@ -1,11 +1,12 @@
 class Speexdsp < Formula
   desc "Speex audio processing library"
   homepage "https://github.com/xiph/speexdsp"
-  url "https://github.com/xiph/speexdsp/archive/SpeexDSP-1.2.1.tar.gz"
+  url "https://github.com/xiph/speexdsp/archive/refs/tags/SpeexDSP-1.2.1.tar.gz"
   sha256 "d17ca363654556a4ff1d02cc13d9eb1fc5a8642c90b40bd54ce266c3807b91a7"
   license "BSD-3-Clause"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "c19e5962197be02c5124dc4c2cef39ef6a6b00bddb5f3cb7dca9c3e31929d086"
     sha256 cellar: :any,                 arm64_sonoma:   "ff689f3f675047fd194a585d0a08a204f0bbd0026b0d67694be5b1b2fe08980d"
     sha256 cellar: :any,                 arm64_ventura:  "c794738735292d75e590ba371e29ac57fdfc465f712dd20823634a310759e824"
     sha256 cellar: :any,                 arm64_monterey: "f43bb5f238f0c3b74a4b08c09d4cc98c8935e77024f3c2e109b2683e5197f18c"
@@ -21,13 +22,11 @@ class Speexdsp < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   def install
     system "./autogen.sh"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make"
     system "make", "install"
   end

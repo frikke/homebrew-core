@@ -1,18 +1,19 @@
 class Cglm < Formula
   desc "Optimized OpenGL/Graphics Math (glm) for C"
   homepage "https://github.com/recp/cglm"
-  url "https://github.com/recp/cglm/archive/refs/tags/v0.9.1.tar.gz"
-  sha256 "ba16ee484c9d5e808ef01e55008a156831e8ff5297f10bbca307adeb827a0913"
+  url "https://github.com/recp/cglm/archive/refs/tags/v0.9.4.tar.gz"
+  sha256 "101376d9f5db7139a54db35ccc439e40b679bc2efb756d3469d39ee38e69c41b"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "0ad91be63d1d5a20d1013ef956eddf280b28dfd4dc6e1df235d24d2cb52ca5f8"
-    sha256 cellar: :any,                 arm64_monterey: "8d193551025d3f4bab0e571108cb0ac84ba6fa948ddaa210e18f7bacbd9ad371"
-    sha256 cellar: :any,                 arm64_big_sur:  "428d6899f28318fb3933c77b1756a70b8df8c67b1cf0ff260df43db640e2b422"
-    sha256 cellar: :any,                 ventura:        "5b07487bae460a44203457eb1e7e1a753b0aff917c7e68a05923fbc5c2e27a7c"
-    sha256 cellar: :any,                 monterey:       "52ee39da4fb86682f113aa8017b40ea771f23383b1297c3784f3267b3248f822"
-    sha256 cellar: :any,                 big_sur:        "9d53907b292a09644c130e4bb30fc7db8de473d482c34ef5326fa9f2c8dca220"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a9538f6e96c029fe704fd0f797f0fa6f9900eca7bce5495f9052a535fc6142ea"
+    sha256 cellar: :any,                 arm64_sequoia:  "858e0700d3b6ad0fec38974be8559f9c968249a8edff4b2eb3c521ea0ccfe0d8"
+    sha256 cellar: :any,                 arm64_sonoma:   "1ad803ddd6428b7c677461ae3eb1cbdcd291a351cac692cc8a37d2e648be6cab"
+    sha256 cellar: :any,                 arm64_ventura:  "ccd1f2fc02fbe4ec93f827b51c63df903dfa6386001cfd35c5445f39a97213c4"
+    sha256 cellar: :any,                 arm64_monterey: "f52fea8d00aa4b0d0b257af26d0055da43c8e28688f89423338f2904ff1ed0b8"
+    sha256 cellar: :any,                 sonoma:         "3da6c026eae1b0a9aa4eee3e04f73e58c8303093fb2f50acc1c4fe962f367f09"
+    sha256 cellar: :any,                 ventura:        "49ace90629f9606a33e932e26a44c4ac48403ebfb004d1681c345bdf7b6b38e1"
+    sha256 cellar: :any,                 monterey:       "5fd8a51b5f1e138a50e123ae5514896dd9f6c96dd879eb7076889a490fa40ed4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b3474c4cbe7b24d7be7cf198f2c8dd5d9779c381d1e5230fef79de7348656f79"
   end
 
   depends_on "autoconf" => :build
@@ -20,15 +21,13 @@ class Cglm < Formula
   depends_on "libtool" => :build
 
   def install
-    system "autoreconf", "-fiv"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <cglm/cglm.h>
       #include <assert.h>
 
@@ -42,7 +41,7 @@ class Cglm < Formula
         assert(glm_vec3_eqv_eps(r, z));
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-I#{include}", testpath/"test.c", "-o", "test"
     system "./test"
   end

@@ -1,29 +1,31 @@
 class Gosec < Formula
   desc "Golang security checker"
   homepage "https://securego.io/"
-  url "https://github.com/securego/gosec/archive/v2.17.0.tar.gz"
-  sha256 "5826ccb9310f9327ed2e010617a4742c1b12d28c199d1fd256f78606cbfc3c9a"
+  url "https://github.com/securego/gosec/archive/refs/tags/v2.22.0.tar.gz"
+  sha256 "3929466820ceeb9ee6e2f44967f4c86f3259d331192a67be5c838c448c7921d4"
   license "Apache-2.0"
   head "https://github.com/securego/gosec.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "310ebe82bcc35f9c95c1df3c3758b2c5bfbd6cca31b94bff74fc896caf996641"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ca07012d412c71f5c6101602a3e8f184d1832d878e29061e8333b26df095b9e8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "401fc3f79744541158c7e1d37f8b27dae97f85e0c292d60e40efd8bbe3ae6d2e"
-    sha256 cellar: :any_skip_relocation, ventura:        "67d1543d2d4fb348f293e902d09b4d32080717ae92e5e0161ea29d332d499160"
-    sha256 cellar: :any_skip_relocation, monterey:       "0967525aa0a4abd7435ee6aaac896823aec756d04fc141328da047256aa3f358"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4de02561ba69a1fab705034e76d8b77143144b9313babe9ec546654855e36dd8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "df127b801c72ae2388bdb7a6a5b16a00e828bc8c02952cfaa0ff4b9ad732c22d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "71ccd318efdec88f99b582e308d716420fe64f93c28954458da8fceab99c3870"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "71ccd318efdec88f99b582e308d716420fe64f93c28954458da8fceab99c3870"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "71ccd318efdec88f99b582e308d716420fe64f93c28954458da8fceab99c3870"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1a5498584c52af1c8bf5c075acf546ae32f0141a45d4049ff32b4a3f1c0fd3a4"
+    sha256 cellar: :any_skip_relocation, ventura:       "1a5498584c52af1c8bf5c075acf546ae32f0141a45d4049ff32b4a3f1c0fd3a4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9e3d6d5669d73ca4f32446fd63f4f5e36b0f4f42fe58f8d419065feeb435dda1"
   end
 
   depends_on "go"
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-X main.version=v#{version}"), "./cmd/gosec"
+    ldflags = "-s -w -X main.Version=#{version} -X main.GitTag= -X main.BuildDate=#{time.iso8601}"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/gosec"
   end
 
   test do
-    (testpath/"test.go").write <<~EOS
+    assert_match version.to_s, shell_output("#{bin}/gosec --version")
+
+    (testpath/"test.go").write <<~GO
       package main
 
       import "fmt"
@@ -34,7 +36,7 @@ class Gosec < Formula
 
           fmt.Println("Doing something with: ", username, password)
       }
-    EOS
+    GO
 
     output = shell_output("#{bin}/gosec ./...", 1)
     assert_match "G101 (CWE-798)", output

@@ -1,38 +1,35 @@
 class Libnfs < Formula
   desc "C client library for NFS"
   homepage "https://github.com/sahlberg/libnfs"
-  url "https://github.com/sahlberg/libnfs/archive/libnfs-5.0.2.tar.gz"
-  sha256 "637e56643b19da9fba98f06847788c4dad308b723156a64748041035dcdf9bd3"
+  url "https://github.com/sahlberg/libnfs/archive/refs/tags/libnfs-6.0.2.tar.gz"
+  sha256 "4e5459cc3e0242447879004e9ad28286d4d27daa42cbdcde423248fad911e747"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "68a438b2bae79969bca64c450249d7f96153fe2a52f00bd7ab470595c01a3f10"
-    sha256 cellar: :any,                 arm64_ventura:  "a1a8014854317d7d2cb77e7bdef425ea9ca5555dd0f1ada88326afe6dda189fb"
-    sha256 cellar: :any,                 arm64_monterey: "b8df8747861411e30845ca1a6ab42877c74d8ca3e65c838b5ad498faa6609481"
-    sha256 cellar: :any,                 arm64_big_sur:  "df45a5d53a8ddd243d7702fbbd834607db180679dd694eb9ef91bf14f1a399f2"
-    sha256 cellar: :any,                 sonoma:         "097829dbc3fbb17fb8f7c1bd3e4becaaccf07ddd3b51f45bb4dce236bee179c6"
-    sha256 cellar: :any,                 ventura:        "586c605f631aefc3ebfaca7f45dace462b7fbcf813a0e9e16992727b4d996f5e"
-    sha256 cellar: :any,                 monterey:       "af2b41b3437f4e5e5ead13ff3f3c4fb8cea0aa69813a56199e4d7b0547b6a7bd"
-    sha256 cellar: :any,                 big_sur:        "c4fd271ca3189c9fe0509bd7637f6d8c4b9974f47db586de2deb0893bbb4cf68"
-    sha256 cellar: :any,                 catalina:       "e188d926e1a762f20c892a5b9202de9c42e2221bc35899a22f5c6a064dac1dd1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e778214a1e42d82af233ca4ff61fb2cfec684bd9e610c26fc6152e600efd6830"
+    sha256 cellar: :any,                 arm64_sequoia: "2e9065bfd3abd3ffe1d38f5637551210ee628b9512eedeb4d30ec5889c2cd346"
+    sha256 cellar: :any,                 arm64_sonoma:  "146e3c3bff06a7f0235889cc38a392f4fa2a0371a03523f697a764b2c59ee770"
+    sha256 cellar: :any,                 arm64_ventura: "d7e4428a240be4fd0c4fec619de6b93846305156b054b8e813917a2a70a17a26"
+    sha256 cellar: :any,                 sonoma:        "4509c2de7ad0dc7583d3d4ad6f17719eaf306adf33dcc5e8b272a69c153aa276"
+    sha256 cellar: :any,                 ventura:       "15287f2942eb74117211df3c6b6bdb9bda26755f4d725c6e355bde38e162e7ba"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0477428f6b57eb2ebc18e86a9c62951d42623dfb516b6f8e6b409625f943a233"
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
+  depends_on "cmake" => :build
+  depends_on "docbook" => :build
+  depends_on "docbook-xsl" => :build
 
   def install
-    system "./bootstrap"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
 
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", "-DENABLE_DOCUMENTATION=ON", "-DENABLE_UTILS=ON", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    assert_match "No URL specified", shell_output("#{bin}/nfs-ls 2>&1", 1)
+
+    (testpath/"test.c").write <<~C
       #if defined(__linux__)
       # include <sys/time.h>
       #endif
@@ -52,7 +49,7 @@ class Libnfs < Formula
 
         return result;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lnfs", "-o", "test"
     system "./test"
   end

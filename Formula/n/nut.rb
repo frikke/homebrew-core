@@ -1,20 +1,9 @@
 class Nut < Formula
   desc "Network UPS Tools: Support for various power devices"
   homepage "https://networkupstools.org/"
+  url "https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz"
+  sha256 "e4b4b0cbe7dd39ba9097be7f7d787bb2fffbe35df64dff53b5fe393d659c597d"
   license "GPL-2.0-or-later"
-  revision 1
-
-  stable do
-    url "https://github.com/networkupstools/nut/releases/download/v2.8.0-signed/nut-2.8.0.tar.gz"
-    sha256 "c3e5a708da797b7c70b653d37b1206a000fcb503b85519fe4cdf6353f792bfe5"
-
-    # fix build failure
-    # remove in next release
-    patch do
-      url "https://github.com/networkupstools/nut/commit/9e6d3c79a4c0ed71c25fdfd350402bb2e78e42e8.patch?full_index=1"
-      sha256 "39472a04f1963a297713381a3a17e57183c1143a6602c194ca3016244caa6a9f"
-    end
-  end
 
   livecheck do
     url :stable
@@ -22,13 +11,14 @@ class Nut < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "2076a6fec70930a198b1ffc95372b783a953d893ed2531a704b8146014f6dda6"
-    sha256 arm64_monterey: "95970abbffadbffea2a7135b6650179c35fdf6896188c8e4e2b426052521f506"
-    sha256 arm64_big_sur:  "28d8de023cedfb15015a87d4bf8616ccff59b61c00918e652e82e55f4740bffc"
-    sha256 ventura:        "191e4df438c669eed832fcdce481e3a527d835699431b757ed4dd29c81ae19ce"
-    sha256 monterey:       "aa98d42f442ac810c3bb34341eefffa7893e5993934c57f4a95a43e9ac3fc001"
-    sha256 big_sur:        "d41f1ed095ccbf5efc17b1710d8f222bb0f0b7cf343e411eae2cc58f3e3d26fc"
-    sha256 x86_64_linux:   "da2d1bee4c97ef56f91023288452df6f5ea7744a0a9a75d907494c001aeea97a"
+    sha256 arm64_sequoia:  "dbfab84f13ae9c17fe130e2230f7dc957bbd1c01e6cb281fdd03d5cc3e82fc6a"
+    sha256 arm64_sonoma:   "43c9c0fc601204d370924ebdfe1a51a68ceec7be66b9cbde21fa748ca705c05f"
+    sha256 arm64_ventura:  "5c56ac1e0389d0991c2c94ed36e3cabb5dbedd8b695fa4a9747add1b3eca5c8f"
+    sha256 arm64_monterey: "1858aeb052a2b605a7d2ba9f231db1f0d997b9ddeb2da4cabae29520978e57b1"
+    sha256 sonoma:         "98df930592937b8cc3c9ed6137c4e3fc6e920d4b3b0122dbb5cd4ceb0c557f0e"
+    sha256 ventura:        "80b5f09bfb88e4a7ffa611a3b698385fa4c14a3474ae2f3d270a593276dcf106"
+    sha256 monterey:       "17722e1bb6e5e707dc81da194caa13848b035ebf81673261e716d188ef9693c2"
+    sha256 x86_64_linux:   "61047b843accc5c9a8b9de7fb525759445b7e30c07f0a682e06eb32724e96ce1"
   end
 
   head do
@@ -39,9 +29,13 @@ class Nut < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
-  depends_on "libusb-compat"
+  depends_on "pkgconf" => :build
+  depends_on "libusb"
   depends_on "openssl@3"
+
+  on_linux do
+    depends_on "systemd"
+  end
 
   conflicts_with "rhino", because: "both install `rhino` binaries"
 
@@ -49,9 +43,6 @@ class Nut < Formula
     if build.head?
       ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
       system "./autogen.sh"
-    else
-      # Regenerate configure, due to patch applied
-      system "autoreconf", "-i"
     end
 
     args = %W[
@@ -73,7 +64,9 @@ class Nut < Formula
       --without-libltdl
       --without-neon
       --without-nss
+      --without-nut_monitor
       --without-powerman
+      --without-pynut
       --without-snmp
       --without-wrap
     ]
@@ -97,6 +90,6 @@ class Nut < Formula
   end
 
   test do
-    system "#{bin}/dummy-ups", "-L"
+    system bin/"dummy-ups", "-L"
   end
 end

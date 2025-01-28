@@ -1,20 +1,20 @@
 class P11Kit < Formula
   desc "Library to load and enumerate PKCS#11 modules"
   homepage "https://p11-glue.freedesktop.org"
-  url "https://github.com/p11-glue/p11-kit/releases/download/0.25.0/p11-kit-0.25.0.tar.xz"
-  sha256 "d55583bcdde83d86579cabe3a8f7f2638675fef01d23cace733ff748fc354706"
+  url "https://github.com/p11-glue/p11-kit/releases/download/0.25.5/p11-kit-0.25.5.tar.xz"
+  sha256 "04d0a86450cdb1be018f26af6699857171a188ac6d5b8c90786a60854e1198e5"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 arm64_sonoma:   "d63c764955181159765918338c7c565ef0cf186db277666e3e09cb5c263ce214"
-    sha256 arm64_ventura:  "4dad6178e4d9f6ac8d9e20036b8ec1163d2d46dff494d1911e6ffcd7b19a4f93"
-    sha256 arm64_monterey: "d0263026b6e5f106d3edbfba4eb64ee0c8cf79a9230a016fb491191f2c7aeafc"
-    sha256 arm64_big_sur:  "33bbe0d8e1741d7647ec4e192daeb3dbb7da9c0107b98114ea94bdefd2b32ba9"
-    sha256 sonoma:         "1148b39149f4bf75fa0e3cd377549569c1f518c8ed2d6f001ea496636f1a957a"
-    sha256 ventura:        "6fff2dfee52269c5ec53206c849cf25e06db85ccdd4790aae13032cb2e649b27"
-    sha256 monterey:       "50c59d8c059b7d5cdc89dfe5d58f29ec5b0cba8a7cbe66be4686555666797a13"
-    sha256 big_sur:        "20b049e0ef2eca9979dd94a210b46093ff6305c91535e89f74c42c6c1015cd06"
-    sha256 x86_64_linux:   "7000de1b4a96605749dbc110b12f52b24227bd5900c3f32c1878eab75b0107d1"
+    rebuild 1
+    sha256 arm64_sequoia:  "a411c523067edccdf5288ff53f725d590c60d0a182f1e69238fcfc86018f3395"
+    sha256 arm64_sonoma:   "844c2f2f63155c6da1a6af44030866700c57981c974f71f4159a6d794e05fcfc"
+    sha256 arm64_ventura:  "97ccac96157529edec341b35d57e6ca9579fb25f42d62bb573a1013572101eed"
+    sha256 arm64_monterey: "aab401574960e088578df801ab10d600bfe6277f6d174bfc1bf90ea8348529e8"
+    sha256 sonoma:         "38423db237bdda5e2485a28e5f30c106f324c440d64a4e10bffb5fc997d91aa6"
+    sha256 ventura:        "ab67e4c145d61683447ef09ec9315bd22cc95efa699bbac9e2fc476104a579c0"
+    sha256 monterey:       "25fc56254568c72ad22c39c2768ca249992df53a9da2cbeee55ac221f67e1ae3"
+    sha256 x86_64_linux:   "65efc1a95ab97b86e0eb36f2e8782d3f6140d795f3bc33cb6e20267d5fee45f0"
   end
 
   head do
@@ -26,7 +26,9 @@ class P11Kit < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => :build
   depends_on "ca-certificates"
   depends_on "libtasn1"
 
@@ -36,25 +38,25 @@ class P11Kit < Formula
     # https://bugs.freedesktop.org/show_bug.cgi?id=91602#c1
     ENV["FAKED_MODE"] = "1"
 
-    if build.head?
-      ENV["NOCONFIGURE"] = "1"
-      system "./autogen.sh"
-    end
+    args = %W[
+      -Dsystem_config=#{etc}
+      -Dmodule_config=#{etc}/pkcs11/modules
+      -Dtrust_paths=#{etc}/ca-certificates/cert.pem"
+      -Dsystemd=disabled
+    ]
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
-                          "--with-module-config=#{etc}/pkcs11/modules",
-                          "--with-trust-paths=#{etc}/ca-certificates/cert.pem",
-                          "--without-systemd"
-    system "make"
+    system "meson", "setup", "_build", *args, *std_meson_args
+    system "meson", "compile", "-C", "_build", "--verbose"
     # This formula is used with crypto libraries, so let's run the test suite.
-    system "make", "check"
-    system "make", "install"
+    system "meson", "test", "-C", "_build", "--timeout-multiplier=2"
+    system "meson", "install", "-C", "_build"
+
+    # HACK: Work around p11-kit: couldn't load module: .../lib/pkcs11/p11-kit-trust.so
+    # Issue ref: https://github.com/p11-glue/p11-kit/issues/612
+    (lib/"pkcs11").install_symlink "p11-kit-trust.dylib" => "p11-kit-trust.so" if OS.mac?
   end
 
   test do
-    system "#{bin}/p11-kit", "list-modules"
+    assert_match "library-manufacturer: PKCS#11 Kit", shell_output("#{bin}/p11-kit list-modules --verbose")
   end
 end

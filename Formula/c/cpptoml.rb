@@ -1,14 +1,15 @@
 class Cpptoml < Formula
   desc "Header-only library for parsing TOML"
   homepage "https://github.com/skystrife/cpptoml"
-  url "https://github.com/skystrife/cpptoml/archive/v0.1.1.tar.gz"
+  url "https://github.com/skystrife/cpptoml/archive/refs/tags/v0.1.1.tar.gz"
   sha256 "23af72468cfd4040984d46a0dd2a609538579c78ddc429d6b8fd7a10a6e24403"
   license "MIT"
   revision 1
   head "https://github.com/skystrife/cpptoml.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5dd8ccfa15e88651af7ad7815bf041ead83e5afbf72f7a6d7c2e5da4a1e0da5b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "c7277d9959d90daba22c6e5e464e5d9877c6dce18d25932a5a7d53feac061139"
   end
 
   depends_on "cmake" => :build
@@ -32,7 +33,7 @@ class Cpptoml < Formula
   end
 
   test do
-    (testpath/"test.cc").write <<~EOS
+    (testpath/"test.cc").write <<~CPP
       #include "cpptoml.h"
       #include <iostream>
 
@@ -47,11 +48,11 @@ class Cpptoml < Formula
 
         return 1;
       }
-    EOS
+    CPP
 
-    (testpath/"brew.toml").write <<~EOS
+    (testpath/"brew.toml").write <<~TOML
       str = "Hello, Homebrew."
-    EOS
+    TOML
 
     system ENV.cxx, "-std=c++11", "-I#{include}", "test.cc", "-o", "test"
     assert_equal "Hello, Homebrew.", shell_output("./test").strip

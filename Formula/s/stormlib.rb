@@ -1,19 +1,18 @@
 class Stormlib < Formula
   desc "Library for handling Blizzard MPQ archives"
   homepage "http://www.zezula.net/en/mpq/stormlib.html"
-  url "https://github.com/ladislav-zezula/StormLib/archive/v9.25.tar.gz"
-  sha256 "414ebf1bdd220f3c8bc9eb93c063bb30238b45b2cd6e403d6415e5b71d0c3a40"
+  url "https://github.com/ladislav-zezula/StormLib/archive/refs/tags/v9.30.tar.gz"
+  sha256 "a709a6b034d206404f5297d85e474371203ff5483639955195d99b737bbf7dfe"
   license "MIT"
   head "https://github.com/ladislav-zezula/StormLib.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "c8d8c8b81d453cfdab7bf15f40009ce93d907d59a1090f88da23b8afaa38a585"
-    sha256 cellar: :any,                 arm64_monterey: "20d40a92add2aba2f7c9c0ba95e7656718554c56a5e7fdec3678510ec0898ce9"
-    sha256 cellar: :any,                 arm64_big_sur:  "e18783101236a68e4e50770a5b1abccc7d563984e425cfedecb43e352fa2eda1"
-    sha256 cellar: :any,                 ventura:        "9b3bd511605a7e36642453e78fbcfb8915a7aa837a8d4c734b4a42e68584de8e"
-    sha256 cellar: :any,                 monterey:       "b1fad171023fbb5f9dab315b368350c448257b8a6bde70e33a56c0874f97001b"
-    sha256 cellar: :any,                 big_sur:        "c4427158fb46683716b4a8f6e1f6701abda4216010c6acf937dece8209d35f4f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0299da7f18c6cd0ba1aab12c13b4b30b5d5ffbeea2d8a942c1a60c384ab73970"
+    sha256 cellar: :any,                 arm64_sequoia: "8b6795782ad6b2795e25bdc5a551043daaa07350632a4832bb6cc1405f4fedf2"
+    sha256 cellar: :any,                 arm64_sonoma:  "bb576754765e94f0857c3c2185433e40049c6e27defe7ad2527a72d4c4371db2"
+    sha256 cellar: :any,                 arm64_ventura: "b7f557770e52c0f9174dcc39378f37e271039449a9c0440ca1e1ad29bcbdef0f"
+    sha256 cellar: :any,                 sonoma:        "18bae47580410061160fd52e508b6fc253ef4a07b8ec47049d29a3ec03706615"
+    sha256 cellar: :any,                 ventura:       "7aa4237edb1220fb6bd6176e6d7783b003089d991adb5e321c231871db752088"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "61ecc0f8d4f072d3009874a20c7cc3419e8e7857a3be60865908880a9f949825"
   end
 
   depends_on "cmake" => :build
@@ -25,14 +24,17 @@ class Stormlib < Formula
   patch :DATA
 
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
-    system "cmake", ".", "-DBUILD_SHARED_LIBS=ON", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build/static", *std_cmake_args
+    system "cmake", "--build", "build/static"
+    system "cmake", "--install", "build/static"
+
+    system "cmake", "-S", ".", "-B", "build/shared", "-DBUILD_SHARED_LIBS=ON", *std_cmake_args
+    system "cmake", "--build", "build/shared"
+    system "cmake", "--install", "build/shared"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <StormLib.h>
 
@@ -40,7 +42,7 @@ class Stormlib < Formula
         printf("%s", STORMLIB_VERSION_STRING);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c"
     assert_equal version.to_s, shell_output("./test")
   end

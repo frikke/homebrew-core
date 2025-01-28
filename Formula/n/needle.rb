@@ -1,19 +1,30 @@
 class Needle < Formula
   desc "Compile-time safe Swift dependency injection framework with real code"
   homepage "https://github.com/uber/needle"
-  url "https://github.com/uber/needle/archive/v0.24.0.tar.gz"
-  sha256 "61b7259a369d04d24c0c532ecf3295fdff92e79e4d0f96abaed1552b19208478"
+  url "https://github.com/uber/needle/archive/refs/tags/v0.25.1.tar.gz"
+  sha256 "b9cf878b0ce9589e862ec5aa8ba3222e181ecbe038369989d2ee9d9c80157fbb"
   license "Apache-2.0"
 
-  bottle do
-    sha256 cellar: :any, arm64_ventura:  "2b953b5225793b663e30652c4dcf15af21883f3161e1424cf3ae4884def4fc85"
-    sha256 cellar: :any, arm64_monterey: "f5336518cc424b2a5daf3400d9968035966226f1372d75ad4e8d950a5bfced93"
-    sha256 cellar: :any, ventura:        "4a2e37bdcfa6fd09d7a6115ef0d61ed067f6c32ff336513a0e48efc7ce4e502c"
-    sha256 cellar: :any, monterey:       "0a7abfa75a75acf3773fc1bef1ed9e268ddda7da6ceafb2c5f74c6d36a4922c8"
+  # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
+  # labeled as "pre-release" on GitHub before the version is released, so it's
+  # necessary to use the `GithubLatest` strategy.
+  livecheck do
+    url :stable
+    strategy :github_latest
   end
 
-  depends_on xcode: ["14.0", :build]
+  bottle do
+    rebuild 1
+    sha256 cellar: :any, arm64_sequoia: "cbcf9f7c69f032ab6ff3a83bad525a86ab607985680870ea905f9fd8d413734b"
+    sha256 cellar: :any, arm64_sonoma:  "11b37daadfe93a3be6fe5605b760afbe130d6944100e62f0ceb2b75fce67110d"
+    sha256 cellar: :any, arm64_ventura: "dba912fe6c6eb664a0b43092a27e8bb9b9ffab66cea81e559f01bec356eb8265"
+    sha256 cellar: :any, sonoma:        "2297f9b535ac16dc443f30f5894772c85c70ec3bb4502b4520d3d93c4ad3ed09"
+    sha256 cellar: :any, ventura:       "9a4f63352a659ff766fdd61e5f8dbe71940c024a25f879ff07f75089fe3a19be"
+  end
+
   depends_on :macos
+
+  uses_from_macos "swift" => :build, since: :sonoma # swift 5.10+
 
   def install
     # Avoid building a universal binary.
@@ -31,14 +42,14 @@ class Needle < Formula
   end
 
   test do
-    (testpath/"Test.swift").write <<~EOS
+    (testpath/"Test.swift").write <<~SWIFT
       import Foundation
 
       protocol ChildDependency: Dependency {}
       class Child: Component<ChildDependency> {}
 
       let child = Child(parent: self)
-    EOS
+    SWIFT
 
     assert_match "Root\n", shell_output("#{bin}/needle print-dependency-tree #{testpath}/Test.swift")
     assert_match version.to_s, shell_output("#{bin}/needle version")

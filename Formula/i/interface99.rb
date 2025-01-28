@@ -7,7 +7,8 @@ class Interface99 < Formula
   head "https://github.com/Hirrolot/interface99.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "332dcbf6cb579b176aaa88edb543da80015b8f47b83c9c7b5f15c7cdeef9082d"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "c3300aa00993da5cbe12d0e1feaafe44d6c8e2e5f039ac3854bd5b9a1cadea40"
   end
 
   depends_on "metalang99"
@@ -17,7 +18,7 @@ class Interface99 < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <interface99.h>
       #include <stdio.h>
 
@@ -58,7 +59,7 @@ class Interface99 < Formula
         VCALL(t, scale, 5);
         printf("%d %d", VCALL(r, perim), VCALL(t, perim));
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-I#{Formula["metalang99"].opt_include}", "-o", "test"
     assert_equal "24 60 120 300", shell_output("./test")
   end

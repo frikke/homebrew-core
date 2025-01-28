@@ -18,12 +18,15 @@ class Khiva < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "1a6a2fad78cda325494014e7c43de7175b2e4859a4fdf4410febd7415e30f7e2"
   end
 
+  # Not compatible with newer `arrayfire` 3.9.0+ after changes in
+  # https://github.com/arrayfire/arrayfire/commit/be7f2d93de3796050e56037cc0c340a2ef34e813
+  # Last release on 2020-04-29 and last commit on 2020-05-20.
+  deprecate! date: "2024-09-27", because: :does_not_build
+
   depends_on "boost" => :build
   depends_on "cmake" => :build
   depends_on "arrayfire"
   depends_on "eigen"
-
-  fails_with gcc: "5"
 
   def install
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args,

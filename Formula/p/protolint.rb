@@ -1,20 +1,18 @@
 class Protolint < Formula
   desc "Pluggable linter and fixer to enforce Protocol Buffer style and conventions"
   homepage "https://github.com/yoheimuta/protolint"
-  url "https://github.com/yoheimuta/protolint.git",
-      tag:      "v0.46.0",
-      revision: "ad00a18de409c463d0ff00ad4f6709998f48c19f"
+  url "https://github.com/yoheimuta/protolint/archive/refs/tags/v0.52.0.tar.gz"
+  sha256 "4a5d866a9d64ce36ce08df2c2352230c3e831e9695c3bdd76933fcc199b68529"
   license "MIT"
   head "https://github.com/yoheimuta/protolint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "8ee97de0d5478f128e5231fd4ed780b86d44448d6c0bac84d5302368543d251c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a85b23728fc08c489a377039a9cc219eda8de5763168baef998616d872d978ae"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1fd4df565811c4d639437c4f50bb1af5f768212c852d4690cffee0903dee8401"
-    sha256 cellar: :any_skip_relocation, ventura:        "caf3c9deb352d764310af7ee7f4e1e326cea73da06f5cf01e2930a2558f0d48f"
-    sha256 cellar: :any_skip_relocation, monterey:       "5285f622669b67fbbe70f0369f9e003bd0d5164d4dca7570019dc5a4391be2cb"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8113ab81565a423fa6c90da55f6200d1d72f3fc846a1d4ed1581901eb52b2af2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "03a1cca78c3894f43d3cde77cb8a5b401886a8ac3a0d5f6daef91ffaf8d4abc7"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e492da997bb2043224e77682d1b48ebc460c1817b532b052f3b0c074215bc795"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e492da997bb2043224e77682d1b48ebc460c1817b532b052f3b0c074215bc795"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e492da997bb2043224e77682d1b48ebc460c1817b532b052f3b0c074215bc795"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e259a2c49f15fe8498371a346bcfdad697f511f5525d4099bd6b8be79da0d59b"
+    sha256 cellar: :any_skip_relocation, ventura:       "e259a2c49f15fe8498371a346bcfdad697f511f5525d4099bd6b8be79da0d59b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a33c71602e367cb4eb66a8f0d6871968d441bc3a514e48dc3843cd7efece856c"
   end
 
   depends_on "go" => :build
@@ -23,12 +21,12 @@ class Protolint < Formula
     protolint_ldflags = %W[
       -s -w
       -X github.com/yoheimuta/protolint/internal/cmd.version=#{version}
-      -X github.com/yoheimuta/protolint/internal/cmd.revision=#{Utils.git_head(length: 8)}
+      -X github.com/yoheimuta/protolint/internal/cmd.revision=#{tap.user}
     ]
     protocgenprotolint_ldflags = %W[
       -s -w
       -X github.com/yoheimuta/protolint/internal/cmd/protocgenprotolint.version=#{version}
-      -X github.com/yoheimuta/protolint/internal/cmd/protocgenprotolint.revision=#{Utils.git_head(length: 8)}
+      -X github.com/yoheimuta/protolint/internal/cmd/protocgenprotolint.revision=#{tap.user}
     ]
     system "go", "build", *std_go_args(ldflags: protolint_ldflags), "./cmd/protolint"
     system "go", "build",

@@ -1,19 +1,20 @@
 class Svls < Formula
   desc "SystemVerilog language server"
   homepage "https://github.com/dalance/svls"
-  url "https://github.com/dalance/svls/archive/refs/tags/v0.2.9.tar.gz"
-  sha256 "627887f4b105a024c31cd09c9baee9389e70652e85fa8231e5c52079db8dfeb3"
+  url "https://github.com/dalance/svls/archive/refs/tags/v0.2.12.tar.gz"
+  sha256 "ef6fde93d2434835e33fc75dd5234e993e75bdd446570f2da6d6524d61f19777"
   license "MIT"
   head "https://github.com/dalance/svls.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b06287783f54ef95e571ffd12a214bd81de29c817255ead7258a5e467807daeb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7f78f78fc86bff699caa5832095c15e37b7d8f0b259deac4b86785b86048142c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0e671644f9f09d8f210f8bc02ccdeb11e26551ed6456a4e0ac91e6c5f951a948"
-    sha256 cellar: :any_skip_relocation, ventura:        "98f6fe41cc18bb5f1d507780ea69a440d86b5fcb3826b5fe8f854bb4f5e94173"
-    sha256 cellar: :any_skip_relocation, monterey:       "b0e1874174a3b202d0f18ea02a1518944335f81717ca744dda7473370d79c40a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4005d141644426bed9ebebba0342fd61aa7a0d1a9c2d7bbe76b29ebfd0313f0f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f69b4da91e6b1d0a49751e5426042a184795acb3b54a7d9c560934fabe96f16c"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "f895be059680ba26c92d2ead708631180806928f737394b0c966b37f53b4cdac"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "9486530d01573d02d3a0c730556a555dfd58168cbeb922d6d5d26c7248e04f9c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1eb55479ec5c77a6628b8fda650f1c08e855cfc05b5003e33d69a5f2adc8ae44"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "efb890636d4b031626e3ece652ab77e67b9adbd2c5220da0eef8309d252e504a"
+    sha256 cellar: :any_skip_relocation, sonoma:         "b9d8f8ca0dc2994b77cd0de932de40bf08dabd92d24d6a41b434324c3062b6c1"
+    sha256 cellar: :any_skip_relocation, ventura:        "cb38783001b57658f16661f741fb920877e8918840ab839b50d89e3445028ca2"
+    sha256 cellar: :any_skip_relocation, monterey:       "1e5033c5b0abd2964ab4aab08a6203a9011fb3b66d45961ac2a05c337718bb5f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dbc706c7513b400b717bed634717f4fafd47a2d94bafde4574c59dabce57c10a"
   end
 
   depends_on "rust" => :build

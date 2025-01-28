@@ -1,10 +1,14 @@
 class Manticoresearch < Formula
   desc "Open source text search engine"
-  homepage "https://www.manticoresearch.com"
-  url "https://github.com/manticoresoftware/manticoresearch/archive/refs/tags/6.0.4.tar.gz"
-  sha256 "5081f4f60152d041f14fdaf993f4cc67b127e76c970b58db9bc9532cd1325d8a"
-  license "GPL-2.0-only"
-  revision 2
+  homepage "https://manticoresearch.com"
+  url "https://github.com/manticoresoftware/manticoresearch/archive/refs/tags/6.3.8.tar.gz"
+  sha256 "633a55f20545eb4c722dd05175b7187ca802d765fc3eaf9cce3bc2ebb4eaebbe"
+  license all_of: [
+    "GPL-3.0-or-later",
+    "GPL-2.0-only", # wsrep
+    { "GPL-2.0-only" => { with: "x11vnc-openssl-exception" } }, # galera
+    { any_of: ["Unlicense", "MIT"] }, # uni-algo (our formula is too new)
+  ]
   version_scheme 1
   head "https://github.com/manticoresoftware/manticoresearch.git", branch: "master"
 
@@ -15,49 +19,64 @@ class Manticoresearch < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "382659914489e64dd2771386eec177c354dae58fe39d1079c412449129945a58"
-    sha256 arm64_monterey: "b56a169ed02a580e6ee0db4ce5733dd4834d2f2222b3f467516a674ccf5db566"
-    sha256 arm64_big_sur:  "3304df12246dc8a9f6d42326314d15a6b53868e861d19199b5fe03d0c7678a44"
-    sha256 ventura:        "f61a87c738bff32816b0603dfb4c436315460b67dbde81e2e59be44267167b6a"
-    sha256 monterey:       "f5ee8de69414f39de8115ee0c03a1b01b642a3de66e7bf2708f3d53dc0f6c637"
-    sha256 big_sur:        "4725718f3048471a5fb43c797896818e24a89b63b91ca719a5f04b6a202f8f23"
-    sha256 x86_64_linux:   "1f42805be6d88b8bff08136540e27bfd593115698506fa79e257f97ff3375725"
+    sha256 arm64_sequoia: "6dcdd6b0272b3d137486441e402e76533ce3fa37af5ae5187b15f9b0d8e91323"
+    sha256 arm64_sonoma:  "1f37515148fac4f4b83d4c847900e3a4053671de246b6d6c969a8ef4995063d8"
+    sha256 arm64_ventura: "7d30b9fb98196c9a569adafb85f73c66d23f975beb1015931d9ee5933c8ba410"
+    sha256 sonoma:        "de5e34aa93653420dbd4f3cee685be832b6ddc8944ef8598265693030c966858"
+    sha256 ventura:       "006072f761e4ae6145779953a579ca3db29a3d505ffe5f10001d6b4faefdf850"
+    sha256 x86_64_linux:  "9499fd95c8b1e71dcd1d004531edc7b8baf0a8a52868f46c435adb752979a297"
   end
 
   depends_on "boost" => :build
   depends_on "cmake" => :build
-  depends_on "icu4c"
+  depends_on "nlohmann-json" => :build
+  depends_on "snowball" => :build # for libstemmer.a
+
+  # NOTE: `libpq`, `mariadb-connector-c`, `unixodbc` and `zstd` are dynamically loaded rather than linked
+  depends_on "cctz"
+  depends_on "icu4c@76"
   depends_on "libpq"
-  depends_on "mysql-client"
+  depends_on "mariadb-connector-c"
   depends_on "openssl@3"
+  depends_on "re2"
   depends_on "unixodbc"
+  depends_on "xxhash"
   depends_on "zstd"
 
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
+  uses_from_macos "expat"
   uses_from_macos "libxml2"
   uses_from_macos "zlib"
 
-  conflicts_with "sphinx", because: "manticoresearch is a fork of sphinx"
-
-  fails_with gcc: "5"
-
   def install
-    # ENV["DIAGNOSTIC"] = "1"
-    ENV["ICU_ROOT"] = Formula["icu4c"].opt_prefix.to_s
-    ENV["OPENSSL_ROOT_DIR"] = Formula["openssl"].opt_prefix.to_s
-    ENV["MYSQL_ROOT_DIR"] = Formula["mysql-client"].opt_prefix.to_s
+    # Work around error when building with GCC
+    # Issue ref: https://github.com/manticoresoftware/manticoresearch/issues/2393
+    ENV.append_to_cflags "-fpermissive" if OS.linux?
+
+    ENV["ICU_ROOT"] = deps.find { |dep| dep.name.match?(/^icu4c(@\d+)?$/) }
+                          .to_formula.opt_prefix.to_s
+    ENV["OPENSSL_ROOT_DIR"] = Formula["openssl@3"].opt_prefix.to_s
     ENV["PostgreSQL_ROOT"] = Formula["libpq"].opt_prefix.to_s
 
     args = %W[
       -DDISTR_BUILD=homebrew
+      -DCMAKE_INSTALL_LOCALSTATEDIR=#{var}
+      -DCMAKE_INSTALL_SYSCONFDIR=#{etc}
+      -DCMAKE_REQUIRE_FIND_PACKAGE_ICU=ON
+      -DCMAKE_REQUIRE_FIND_PACKAGE_cctz=ON
+      -DCMAKE_REQUIRE_FIND_PACKAGE_nlohmann_json=ON
+      -DCMAKE_REQUIRE_FIND_PACKAGE_re2=ON
+      -DCMAKE_REQUIRE_FIND_PACKAGE_stemmer=ON
+      -DCMAKE_REQUIRE_FIND_PACKAGE_xxHash=ON
+      -DMYSQL_CONFIG_EXECUTABLE=#{Formula["mariadb-connector-c"].opt_bin}/mariadb_config
+      -DRE2_LIBRARY=#{Formula["re2"].opt_lib/shared_library("libre2")}
       -DWITH_ICU_FORCE_STATIC=OFF
-      -D_LOCALSTATEDIR=#{var}
-      -D_RUNSTATEDIR=#{var}/run
-      -D_SYSCONFDIR=#{etc}
+      -DWITH_RE2_FORCE_STATIC=OFF
+      -DWITH_STEMMER_FORCE_STATIC=OFF
     ]
 
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, *args
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
@@ -84,9 +103,7 @@ class Manticoresearch < Formula
         binlog_path=#
       }
     EOS
-    pid = fork do
-      exec bin/"searchd"
-    end
+    pid = spawn(bin/"searchd")
   ensure
     Process.kill(9, pid)
     Process.wait(pid)

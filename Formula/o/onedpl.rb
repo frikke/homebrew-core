@@ -1,8 +1,8 @@
 class Onedpl < Formula
   desc "C++ standard library algorithms with support for execution policies"
-  homepage "https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-library.html"
-  url "https://github.com/oneapi-src/oneDPL/archive/refs/tags/oneDPL-2022.0.0-release.tar.gz"
-  sha256 "e22eb0155258abdccd810dc131baa3eac4a856507b6eef37462a077d37cd810e"
+  homepage "https://github.com/oneapi-src/oneDPL"
+  url "https://github.com/oneapi-src/oneDPL/archive/refs/tags/oneDPL-2022.7.1-release.tar.gz"
+  sha256 "0e6a1bee7a4f4375091c98b0b5290edf3178bb810384e0e106bf96c03649a754"
   # Apache License Version 2.0 with LLVM exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
 
@@ -12,7 +12,7 @@ class Onedpl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5f78ee41677887fa9c4ef1dbaf559f29e6754fbdc57550634d2c8e2dd12686c1"
+    sha256 cellar: :any_skip_relocation, all: "91836cae67bc7b9123778574e3f9a2521f5f838bc8f89bbc789ba13c8d90d95a"
   end
 
   depends_on "cmake" => :build
@@ -27,7 +27,7 @@ class Onedpl < Formula
   test do
     tbb = Formula["tbb"]
 
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <oneapi/dpl/execution>
       #include <oneapi/dpl/algorithm>
       #include <array>
@@ -40,7 +40,7 @@ class Onedpl < Formula
           assert(i==arr.at(i));
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-std=c++17", "-L#{tbb.opt_lib}", "-ltbb", "-I#{tbb.opt_include}",
                     "-I#{prefix}/stdlib", "-I#{include}", "-o", "test"
     system "./test"

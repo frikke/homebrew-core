@@ -7,9 +7,11 @@ class MariadbAT103 < Formula
 
   bottle do
     rebuild 1
+    sha256 arm64_sonoma:   "21a23ab05ca1eb330f3048fbb31702e4e990915dccefa902c6c72df33d828cc5"
     sha256 arm64_ventura:  "77eaf32d21e17300b3a3b11590a4ed1861b3d3267936bbfe258d4275fd8cfb9b"
     sha256 arm64_monterey: "bc11e66921738b0b77b602e876996cf41a0d927c46a72d7dcbd5a095174ff515"
     sha256 arm64_big_sur:  "9e4d0cd0ed3d195e4fa3367688d7bc8e527121790b6879efb1498ccceac67a48"
+    sha256 sonoma:         "7c67843cb334d786288e8b7384504ff65588b5b27e13bca113aca60dd1632c52"
     sha256 ventura:        "15fc82772ae37361c538e4202fe3a8f5d9425805222cd332dcba00da3021747a"
     sha256 monterey:       "14a19472312798a7ee55c4a970f2cce41d72af5999cd0170c2537cc1f846bec3"
     sha256 big_sur:        "9cf8aba1bf6cd89bc999bbfea106bd303c13b260eeb9999c9bf3bc6be8664994"
@@ -20,11 +22,11 @@ class MariadbAT103 < Formula
 
   # See: https://mariadb.com/kb/en/changes-improvements-in-mariadb-103/
   # End-of-life on 2023-05-25: https://mariadb.org/about/#maintenance-policy
-  deprecate! date: "2023-05-25", because: :unsupported
+  disable! date: "2024-02-21", because: :unsupported
 
   depends_on "bison" => :build
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "groonga"
   depends_on "openssl@1.1"
   depends_on "pcre2"
@@ -38,8 +40,6 @@ class MariadbAT103 < Formula
   on_linux do
     depends_on "linux-pam"
   end
-
-  fails_with gcc: "5"
 
   def install
     # Set basedir and ldata so that mysql_install_db can find the server
@@ -95,11 +95,11 @@ class MariadbAT103 < Formula
 
     # Don't create databases inside of the prefix!
     # See: https://github.com/Homebrew/homebrew/issues/4975
-    rm_rf prefix/"data"
+    rm_r(prefix/"data")
 
     # Save space
-    (prefix/"mysql-test").rmtree
-    (prefix/"sql-bench").rmtree
+    rm_r(prefix/"mysql-test")
+    rm_r(prefix/"sql-bench")
 
     # Link the setup script into bin
     bin.install_symlink prefix/"scripts/mysql_install_db"
@@ -122,12 +122,12 @@ class MariadbAT103 < Formula
     end
 
     # Install my.cnf that binds to 127.0.0.1 by default
-    (buildpath/"my.cnf").write <<~EOS
+    (buildpath/"my.cnf").write <<~INI
       # Default Homebrew MySQL server config
       [mysqld]
       # Only allow connections from localhost
       bind-address = 127.0.0.1
-    EOS
+    INI
     etc.install "my.cnf"
   end
 
@@ -140,7 +140,7 @@ class MariadbAT103 < Formula
 
     unless File.exist? "#{var}/mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
-      system "#{bin}/mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
+      system bin/"mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
         "--basedir=#{prefix}", "--datadir=#{var}/mysql", "--tmpdir=/tmp"
     end
   end
@@ -171,12 +171,12 @@ class MariadbAT103 < Formula
       "--auth-root-authentication-method=normal"
     port = free_port
     fork do
-      system "#{bin}/mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
+      system bin/"mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
         "--datadir=#{testpath}/mysql", "--port=#{port}", "--tmpdir=#{testpath}/tmp"
     end
     sleep 5
     assert_match "information_schema",
       shell_output("#{bin}/mysql --port=#{port} --user=root --password= --execute='show databases;'")
-    system "#{bin}/mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
+    system bin/"mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
   end
 end

@@ -4,6 +4,7 @@ class RxvtUnicode < Formula
   url "http://dist.schmorp.de/rxvt-unicode/rxvt-unicode-9.31.tar.bz2"
   sha256 "aaa13fcbc149fe0f3f391f933279580f74a96fd312d6ed06b8ff03c2d46672e8"
   license "GPL-3.0-only"
+  revision 2
 
   livecheck do
     url "http://dist.schmorp.de/rxvt-unicode/"
@@ -11,26 +12,30 @@ class RxvtUnicode < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "7dcc677369d1baab6f16df81f8b8eb55ec58e7250c63823105a4b41dfc076012"
-    sha256 arm64_monterey: "d7d065eaa8a9edb656446536bc45466062f0c8fd5aba80583bae20c2813b72f2"
-    sha256 arm64_big_sur:  "3770fbf0ca91a3f894862c40d27699aa2d602bd5a7420cb3c760c16d98c79f94"
-    sha256 ventura:        "de7ffce5e796bac2174392eff67aebcfc19a841e3c10c8e1eb43cf9afb319957"
-    sha256 monterey:       "54b0be5c3682b2d6974696b708935ad239ec26117a6028c201f5ca99a701dc90"
-    sha256 big_sur:        "ca8c7a88bdb67f56ea721039077450a4f4ceac8f5ea83518bca596f8daedecd5"
-    sha256 x86_64_linux:   "69f31db1144e72a56e1453390170053d38fdfcba1d359e6a34c88ff1842cf749"
+    sha256 arm64_sequoia: "1d23f1a4c263ebe7df9a0ee2163d6a93c9d4df1cc4263687da4de3851441a4f3"
+    sha256 arm64_sonoma:  "9a582a19640cd577067cd9aec10962f9f744853653b514899707d7f1b6264c42"
+    sha256 arm64_ventura: "1365ab0e69449f484abd3d5e36015b9c0fd0ea56719b6c31c8aaee2b9224bc3f"
+    sha256 sonoma:        "f31d79c1ebbec748afd99a199a574d290db3ec2a41786b541bb84c9379c2855c"
+    sha256 ventura:       "cb951ccd032eeda8764b273d19fbf39910b396196ec529f2bd878e5cb1e5100e"
+    sha256 x86_64_linux:  "f353a397eeca72af4958ccea670c84c4daf6c426c8f9e415c4b32bc4e2c1a545"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "libx11"
+  depends_on "libxext"
   depends_on "libxft"
   depends_on "libxmu"
   depends_on "libxrender"
-  depends_on "libxt"
 
   uses_from_macos "perl"
+
+  on_macos do
+    depends_on "libxt"
+  end
 
   resource "libptytty" do
     url "http://dist.schmorp.de/libptytty/libptytty-2.0.tar.gz"
@@ -46,11 +51,13 @@ class RxvtUnicode < Formula
 
   def install
     ENV.cxx11
+
     resource("libptytty").stage do
-      system "cmake", "-S", ".", "-B", "build", *std_cmake_args(install_prefix: buildpath), "-DBUILD_SHARED_LIBS=OFF"
+      system "cmake", "-S", ".", "-B", "build", "-DBUILD_SHARED_LIBS=OFF", *std_cmake_args(install_prefix: buildpath)
       system "cmake", "--build", "build"
       system "cmake", "--install", "build"
     end
+
     ENV.prepend_path "PKG_CONFIG_PATH", buildpath/"lib/pkgconfig"
     ENV.append "LDFLAGS", "-L#{buildpath}/lib"
 
@@ -68,10 +75,9 @@ class RxvtUnicode < Formula
   end
 
   test do
-    daemon = fork do
-      system bin/"urxvtd"
-    end
-    sleep 2
+    daemon = spawn bin/"urxvtd"
+    sleep 5
+    sleep 10 if OS.mac? && Hardware::CPU.intel?
     system bin/"urxvtc", "-k"
     Process.wait daemon
   end

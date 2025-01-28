@@ -9,18 +9,16 @@ class Pwncat < Formula
   head "https://github.com/cytopia/pwncat.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "13ef41fbecdf01f47064a3e29ce0ac70a4bfa0110e1dbc2cb5d6cd09a187642a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "13ef41fbecdf01f47064a3e29ce0ac70a4bfa0110e1dbc2cb5d6cd09a187642a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "13ef41fbecdf01f47064a3e29ce0ac70a4bfa0110e1dbc2cb5d6cd09a187642a"
-    sha256 cellar: :any_skip_relocation, ventura:        "28c110818dc6d9aa1a4c6a06376f5c66dfc485a6f74c21f94dd207ac6b1f2e39"
-    sha256 cellar: :any_skip_relocation, monterey:       "28c110818dc6d9aa1a4c6a06376f5c66dfc485a6f74c21f94dd207ac6b1f2e39"
-    sha256 cellar: :any_skip_relocation, big_sur:        "28c110818dc6d9aa1a4c6a06376f5c66dfc485a6f74c21f94dd207ac6b1f2e39"
-    sha256 cellar: :any_skip_relocation, catalina:       "28c110818dc6d9aa1a4c6a06376f5c66dfc485a6f74c21f94dd207ac6b1f2e39"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0c5614f155b08f02b5446436dabdffba7dcaa6b7e850c7a237ffd2fb8b970970"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1971f6379de0d9d4d43605e1cfe6635c966343e2afd1f18e5075059233853433"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1971f6379de0d9d4d43605e1cfe6635c966343e2afd1f18e5075059233853433"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1971f6379de0d9d4d43605e1cfe6635c966343e2afd1f18e5075059233853433"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a5c8fa660a7d88d2d31622417ba79e4757c41c2dcf27cebc3a36d26de3eda54b"
+    sha256 cellar: :any_skip_relocation, ventura:       "a5c8fa660a7d88d2d31622417ba79e4757c41c2dcf27cebc3a36d26de3eda54b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1971f6379de0d9d4d43605e1cfe6635c966343e2afd1f18e5075059233853433"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     virtualenv_install_with_resources

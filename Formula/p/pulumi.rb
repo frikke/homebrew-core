@@ -2,21 +2,18 @@ class Pulumi < Formula
   desc "Cloud native development platform"
   homepage "https://pulumi.io/"
   url "https://github.com/pulumi/pulumi.git",
-      tag:      "v3.83.0",
-      revision: "e509307b2e46f172a29a6cbb53aea0e23d92f2d9"
+      tag:      "v3.147.0",
+      revision: "bcbbcc67c1c6fe043e737e4ce1ae34aedd37390a"
   license "Apache-2.0"
   head "https://github.com/pulumi/pulumi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "419f901751f4ba74d2756914e10067b5c90807ac636b5a3a879d0d9d3a7fff01"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "fe55ea1c5dcbf1d65cba7a059d56e1f0288ea155056fc69ae08091b62a31e0c1"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6fe46bf563fa27e22e3aa83a9bcf4043a7c966852fd306ab5afeba01a8b32c59"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "08b0e8759924ed19be54672847b33ae79c57ab0e38654e89c1d458910008f2ee"
-    sha256 cellar: :any_skip_relocation, sonoma:         "7d4b8bfdbb881dbd4d0f4570764f8f49631eb435d4c1578718567f6e8c9a238f"
-    sha256 cellar: :any_skip_relocation, ventura:        "26b47df3c5f8af5b86eec08120bef631b5ffa86d74a21d3e72b804a9d38167c9"
-    sha256 cellar: :any_skip_relocation, monterey:       "9a7ba6d499499ef0f399b2f1b99e46554fae12bc8c54a36a104d13fb7e05a0cf"
-    sha256 cellar: :any_skip_relocation, big_sur:        "abf3291394b36137f35d81abcb35a8fe673bbc7fd7fbaba60013da4796f55e75"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f69b831976a395864e995b94358081d8b9a02eb2e211724ae09a10b41d3f0228"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a13e2ab224456f3f0a053809fd97b03096269f0b789adeda0341ec8ded0f7aab"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bded51aee87606aac8aeb8a2009b43d2b4bae32c74c71eab879a1ef86aae60da"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "0355c09a9e741ea82789479a5380688b0ab4bfee3d4e89c3841ddb6373afc8f3"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2edd7e89b69b870e0217db0b4438a2d1c5ae06838470319ec569822528b7cba7"
+    sha256 cellar: :any_skip_relocation, ventura:       "64781374b5b25baff99eb825455519273a3ad86c0f7b8ceb3b8d14fe75b1e4d9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8279a1a43b32c874d9d35542d9f27f5a71c0b4ce7f9b9a66573b9411b71bfb74"
   end
 
   depends_on "go" => :build
@@ -40,7 +37,7 @@ class Pulumi < Formula
   test do
     ENV["PULUMI_ACCESS_TOKEN"] = "local://"
     ENV["PULUMI_TEMPLATE_PATH"] = testpath/"templates"
-    system "#{bin}/pulumi", "new", "aws-typescript", "--generate-only",
+    system bin/"pulumi", "new", "aws-typescript", "--generate-only",
                                                      "--force", "-y"
     assert_predicate testpath/"Pulumi.yaml", :exist?, "Project was not created"
   end

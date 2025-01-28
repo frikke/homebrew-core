@@ -3,33 +3,25 @@ class Psutils < Formula
 
   desc "Utilities for manipulating PostScript documents"
   homepage "https://github.com/rrthomas/psutils"
-  url "https://files.pythonhosted.org/packages/df/de/ce4339642a35e20c163a1f835c326819a926fe8d82711206156629d74cff/pspdfutils-3.3.1.tar.gz"
-  sha256 "503e5469061fc6fb04ed19bddeb995b8320037417c8fc3fd2c46860c98593009"
+  url "https://files.pythonhosted.org/packages/6f/c9/ed4c246612b0e42afe8fad52a2dddde28f1389997c043e8cf8d414d5a0ee/psutils-3.3.9.tar.gz"
+  sha256 "12bfde60145846e6aaae9eead8c5f0c4a959528cd171727b6ff7044da5d7e57c"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "19fbb2f4b8145c12cdf89f69d3de7e91ca3c8f6f1abb78367abc726d966434ca"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ba13dace7298e93eee80e8d71574ca9c478f9e98290804930f0a4a9ad9c7f731"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "500d037b9d38ba151aae6cc03f256e319fd5ecccf81a14400c397dcf5aecc0b9"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8c48cba5470858f6f92ea1477d8f3cd55bdcab40e55bd76b16dcf6b4060c9f50"
-    sha256 cellar: :any_skip_relocation, sonoma:         "594a9e8e28d952624635d6e7e8d7b79b13c2e13247c3fda11eb66010888be543"
-    sha256 cellar: :any_skip_relocation, ventura:        "684a20162c61deaebe6de9d2778c0f740ce4523d2975896ecfc7e232f4e05742"
-    sha256 cellar: :any_skip_relocation, monterey:       "15331bc1256648f59d8675aef08268dbc026bbc20386da0b266c6eeae8c585ea"
-    sha256 cellar: :any_skip_relocation, big_sur:        "594c5b21308fc002f11e026c2f5091fc1a95caa1248a2f486c57cb59f2a2bdd6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7be364c0ab85c650ad1233876a967cdfbe38e41ba0058c7f176915f3e0f427e8"
+    sha256 cellar: :any_skip_relocation, all: "5016215004140f43a79f9ecb8022df760f02f64be2c1ea5670753d7f6398f2ac"
   end
 
   depends_on "libpaper"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   resource "puremagic" do
-    url "https://files.pythonhosted.org/packages/50/bb/c9860ce714ce2147b6168fdf817e67c3be6eabc822fab5ef41cc52bafdec/puremagic-1.15.tar.gz"
-    sha256 "6e46aa78113a466abc9f69e6e8a4ce90eb57d908dafb809597012621061462bd"
+    url "https://files.pythonhosted.org/packages/09/2d/40599f25667733e41bbc3d7e4c7c36d5e7860874aa5fe9c584e90b34954d/puremagic-1.28.tar.gz"
+    sha256 "195893fc129657f611b86b959aab337207d6df7f25372209269ed9e303c1a8c0"
   end
 
   resource "pypdf" do
-    url "https://files.pythonhosted.org/packages/7b/3e/1de6748e2f789cddcc3724caccc4876a862af563def5cbfd760566c9e828/pypdf-3.16.0.tar.gz"
-    sha256 "71fd274f5e02c7122f688f5b2609407d5dd92ecb4140d498108fc94ea9573800"
+    url "https://files.pythonhosted.org/packages/6b/9a/72d74f05f64895ebf1c7f6646cf7fe6dd124398c5c49240093f92d6f0fdd/pypdf-5.1.0.tar.gz"
+    sha256 "425a129abb1614183fd1aca6982f650b47f8026867c0ce7c4b9f281c443d2740"
   end
 
   def install

@@ -1,12 +1,12 @@
 class Jadx < Formula
   desc "Dex to Java decompiler"
   homepage "https://github.com/skylot/jadx"
-  url "https://github.com/skylot/jadx/releases/download/v1.4.7/jadx-1.4.7.zip"
-  sha256 "a13d2be02ed640de54df937ead680f31ea06f4b8efd01860b9f0cf18a7d40e34"
+  url "https://github.com/skylot/jadx/releases/download/v1.5.1/jadx-1.5.1.zip"
+  sha256 "12fd966431903b8e15c36e5007f19343475be7d8f2a55f082e7a929eeabc937e"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "035de90325e1e3b294a15302ef229b1f26cd8c255d2fa4b8ce335b59afca6c48"
+    sha256 cellar: :any_skip_relocation, all: "735427c63f8e20f067a5a50d4273cea56b5fd528bb0ad656d91a76762e774997"
   end
 
   head do
@@ -35,7 +35,7 @@ class Jadx < Formula
 
   test do
     resource("homebrew-test.apk").stage do
-      system "#{bin}/jadx", "-d", "out", "redex-test.apk"
+      system bin/"jadx", "-d", "out", "redex-test.apk"
     end
   end
 end

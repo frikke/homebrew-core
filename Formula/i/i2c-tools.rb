@@ -1,10 +1,9 @@
 class I2cTools < Formula
   desc "Heterogeneous set of I2C tools for Linux"
   homepage "https://i2c.wiki.kernel.org/index.php/I2C_Tools"
-  url "https://mirrors.edge.kernel.org/pub/software/utils/i2c-tools/i2c-tools-4.3.tar.xz"
-  sha256 "1f899e43603184fac32f34d72498fc737952dbc9c97a8dd9467fadfdf4600cf9"
+  url "https://mirrors.edge.kernel.org/pub/software/utils/i2c-tools/i2c-tools-4.4.tar.xz"
+  sha256 "8b15f0a880ab87280c40cfd7235cfff28134bf14d5646c07518b1ff6642a2473"
   license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
-  revision 1
 
   livecheck do
     url "https://mirrors.edge.kernel.org/pub/software/utils/i2c-tools/"
@@ -12,22 +11,19 @@ class I2cTools < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "72b4a7dd702576379650b3c314c5181e7fa26e21a2b5526284b7e0fa5190651a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "d20107422ff757ff511d2a8099bb04f96cba86e4a0a81081efe7a7c49d02b118"
   end
 
-  depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
   depends_on :linux
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
     system "make", "install", "PREFIX=#{prefix}", "EXTRA=eeprog"
-    cd "py-smbus" do
-      system python3, "-m", "pip", "install", *std_pip_args, "."
-    end
+    system python3, "-m", "pip", "install", *std_pip_args(build_isolation: true), "./py-smbus"
   end
 
   test do

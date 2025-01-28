@@ -11,9 +11,12 @@ class Libvoikko < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "5aa1e0f646f3533e698c59cc3c281fc5498408c410567e9d19950d44ed9e9612"
+    sha256 cellar: :any,                 arm64_sonoma:   "8957b0f49a5a0b2341645f36962a931cbe141000aef931db14cfdf0e303b194c"
     sha256 cellar: :any,                 arm64_ventura:  "b7a92f298b4e10b01505b6933f61bc858f0bc0713c825194802a8eae652dad20"
     sha256 cellar: :any,                 arm64_monterey: "a838e8ec04c3643544b3b832b31c8f62dddff8135f15c86548f07c1dcb78ebb3"
     sha256 cellar: :any,                 arm64_big_sur:  "1aad5d6a19c008bac0ded55478ade1f5b1535a29b7f4eb1130c5a1ca61c06946"
+    sha256 cellar: :any,                 sonoma:         "eb4956d52a0ce511f0be35d33e29fc53c8a967ae9d27d13ceed9d9be649b8256"
     sha256 cellar: :any,                 ventura:        "9f0e09cb95209e847f281cbfcaec7375637a726c36df6ff2d29d9954225b8846"
     sha256 cellar: :any,                 monterey:       "121c5c56e2d25d74e01d3d9ae1d3ddc885dcf1336fabf9b75bfa4f191e8bd9b7"
     sha256 cellar: :any,                 big_sur:        "8b613d992e6e2d7311447d13a07b02a9c8ac42f60634c60c4be798b2fd872b9d"
@@ -21,9 +24,10 @@ class Libvoikko < Formula
   end
 
   depends_on "foma" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => :build
   depends_on "hfstospell"
+
+  uses_from_macos "python" => :build
 
   resource "voikko-fi" do
     url "https://www.puimula.org/voikko-sources/voikko-fi/voikko-fi-2.5.tar.gz"
@@ -31,11 +35,9 @@ class Libvoikko < Formula
   end
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--with-dictionary-path=#{HOMEBREW_PREFIX}/lib/voikko"
+    system "./configure", "--disable-silent-rules",
+                          "--with-dictionary-path=#{HOMEBREW_PREFIX}/lib/voikko",
+                          *std_configure_args
     system "make", "install"
 
     resource("voikko-fi").stage do

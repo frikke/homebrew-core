@@ -1,18 +1,17 @@
 class Mask < Formula
   desc "CLI task runner defined by a simple markdown file"
   homepage "https://github.com/jakedeichert/mask/"
-  url "https://github.com/jacobdeichert/mask/archive/v0.11.3.tar.gz"
-  sha256 "539008c8c138bb38c142d0cc9f84c2b89b43e9eb8f5b349f5d0eb308de49860d"
+  url "https://github.com/jacobdeichert/mask/archive/refs/tags/mask/0.11.6.tar.gz"
+  sha256 "e76ae20a120c3ab44f1b14e73ff3f1b39d900bc66f8d2dab7fed4706bacd92fd"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "73f9c9c0c4560645e966bd43877dc515af084596ead09d6e5f0f84b2a5177513"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "1d7124bbbf12af553c85d1181f42a712f5b0002a9790220d4f81527aaa471674"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8f94ee39fe3f0054d250994ba555e7e5422b047d6171f0e2b99864d4e51c4ab1"
-    sha256 cellar: :any_skip_relocation, ventura:        "6ec576ca24d59929a51a18d91556e768f08eca59eac7c0c5d3739f6519150f94"
-    sha256 cellar: :any_skip_relocation, monterey:       "865ac5f8d110a6559e9823e254fc3e89f0289f1911a37b1b68dee77eddefc717"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a4634a535ceef99e088aae29e74504b0771a13ba0410795e4b0024c001792832"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "39d681c882ee39cc14d9e35b65ff876ee64a4dd37a592798a4bb7b3410c14f2b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0e768bea1c18237750a02152f2fa20f8bf243fde010b658312c760734d61d823"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b55cb4b9ba4a0cac458d0547cd61601bb75f64c11924bbe5c3ce922323a3f2f2"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "a57f97c20bee8a3b8b2ad860777cc9aa320b44542bb902ece6f2ab1454ee53ff"
+    sha256 cellar: :any_skip_relocation, sonoma:        "86c1ce171772495aea38cb4cf6d9f68e1bffd448a758bfe85cb3f923434a50ce"
+    sha256 cellar: :any_skip_relocation, ventura:       "f277b06ae9eacae3d0ed37abeb2ba5d5772583abe67cadebc18bed0cedb93efc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "293cfb240fcd5da53a9f141ddd6dbdd1f4055c8941c47b60e1753cd418be776a"
   end
 
   depends_on "rust" => :build
@@ -24,7 +23,7 @@ class Mask < Formula
   end
 
   test do
-    (testpath/"maskfile.md").write <<~EOS
+    (testpath/"maskfile.md").write <<~MARKDOWN
       # Example maskfile
 
       ## hello (name)
@@ -32,7 +31,7 @@ class Mask < Formula
       ```sh
       printf "Hello %s!" "$name"
       ```
-    EOS
+    MARKDOWN
     assert_equal "Hello Homebrew!", shell_output("#{bin}/mask hello Homebrew")
   end
 end

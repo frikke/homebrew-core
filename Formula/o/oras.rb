@@ -1,18 +1,17 @@
 class Oras < Formula
   desc "OCI Registry As Storage"
   homepage "https://github.com/oras-project/oras"
-  url "https://github.com/oras-project/oras/archive/refs/tags/v1.1.0.tar.gz"
-  sha256 "87059bbf96781980ba9826603ee10e2bb3cfafbe7b9410ba1c65fe336b9d4ee0"
+  url "https://github.com/oras-project/oras/archive/refs/tags/v1.2.2.tar.gz"
+  sha256 "09436b3048aab42fdfd5662f71da7d211f9d6e7ce66740cbbd8f3695ae621f6a"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6f81b5e0b9be89eb8695154cd5d8adfbc5fe5f54776e5384088c7808dc79457a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "fbfdd30ff5262d0b25c6098aedc220c44cfce8c8a4b98e4972b0dbdc3a2489ab"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fa17865465a26fa693a861d1d3333dfa33b1d2bfd4177f8b28d3809ca8c8de92"
-    sha256 cellar: :any_skip_relocation, ventura:        "392796efd0bde2575b9e7d1b2c7eeff86cd6518f32061ee23e698ac3fed95840"
-    sha256 cellar: :any_skip_relocation, monterey:       "4f05a3f7d50deebe6bd4a7b64afab15c02be52858608c77b808d7c2607efc6c6"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ac8b789e597663dfb719a6381b37d5892b7540e588ebbf67fd858ff1759216a0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2e1b9ed792c372bc02535f661e1d4d089d0ae01e31de7be0251c76b0e87316bd"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c0ab4fed3980c7d6975df20975d447004b17c604da7947b2e99d999d55170345"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c0ab4fed3980c7d6975df20975d447004b17c604da7947b2e99d999d55170345"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c0ab4fed3980c7d6975df20975d447004b17c604da7947b2e99d999d55170345"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2ab9bd7c87e28d26180474be395d27458369dc7225a6618223882d7ef03f6073"
+    sha256 cellar: :any_skip_relocation, ventura:       "2ab9bd7c87e28d26180474be395d27458369dc7225a6618223882d7ef03f6073"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bf849b37520f25e5fa0c0cef23a23b8b28fe64d51c45465c9cd0024f9dc18d1e"
   end
 
   depends_on "go" => :build
@@ -23,7 +22,7 @@ class Oras < Formula
       -X oras.land/oras/internal/version.Version=#{version}
       -X oras.land/oras/internal/version.BuildMetadata=Homebrew
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/oras"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/oras"
 
     generate_completions_from_executable(bin/"oras", "completion")
   end
@@ -32,12 +31,12 @@ class Oras < Formula
     assert_match "#{version}+Homebrew", shell_output("#{bin}/oras version")
 
     port = free_port
-    contents = <<~EOS
+    contents = <<~JSON
       {
         "key": "value",
         "this is": "a test"
       }
-    EOS
+    JSON
     (testpath/"test.json").write(contents)
 
     # Although it might not make much sense passing the JSON as both manifest and payload,

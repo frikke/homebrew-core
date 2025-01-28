@@ -1,57 +1,78 @@
 class Mpd < Formula
   desc "Music Player Daemon"
-  homepage "https://web.archive.org/web/20230506090801/https://www.musicpd.org/"
-  url "https://github.com/MusicPlayerDaemon/MPD/archive/refs/tags/v0.23.13.tar.gz"
-  sha256 "c002fd15033d791c8ac3dcc009b728b0e8440ed483ba56e3ff8964587fe9f97d"
+  homepage "https://github.com/MusicPlayerDaemon/MPD"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 3
   head "https://github.com/MusicPlayerDaemon/MPD.git", branch: "master"
 
+  stable do
+    url "https://github.com/MusicPlayerDaemon/MPD/archive/refs/tags/v0.23.16.tar.gz"
+    sha256 "a3ba8a4ef53c681ae5d415a79fbd1409d61cb3d03389a51595af24b330ecbb61"
+
+    # support libnfs 6.0.0, upstream commit ref, https://github.com/MusicPlayerDaemon/MPD/commit/31e583e9f8d14b9e67eab2581be8e21cd5712b47
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/557ad661621fa81b5e6ff92ab169ba40eba58786/mpd/0.23.16-libnfs-6.patch"
+      sha256 "e0f2e6783fbb92d9850d31f245044068dc0614721788d16ecfa8aacfc5c27ff3"
+    end
+  end
+
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a21b1f1b0d56d248df2f8ab332c4d70a41ea232136a9ffa7d91539e8308e2d28"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b641c81963a361820ddb9478a10ba2478874cb9ba1f00e05234f51c2d9e15abf"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e2df9d64db0154005420087258fefd1b3d835dc688679a2f7cf681a77d8feac5"
-    sha256 cellar: :any_skip_relocation, ventura:        "167be1c3a62175b460948a691a6aa49e8fcb454f6c57ee715db251278767577e"
-    sha256 cellar: :any_skip_relocation, monterey:       "d3ed12ae6333ad367d4a1eb01aa6ac51909d02197d39c680d86f43bd083f64ca"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e925b63fdceb63410fb99ee89b6deca6c9aad74426e7c7a4da5edc9037d6768d"
-    sha256                               x86_64_linux:   "f8488331afcf10558861c938b36346c8588fe3572ccc33819c5a2104fd1e23e4"
+    sha256 cellar: :any, arm64_sequoia: "9a9354f8f2e68f7b9a7f3374c69a6216e3bbbddfdf00c88bee70a11f7024ffd6"
+    sha256 cellar: :any, arm64_sonoma:  "1a816d6549cf5485e60b818e86933166a97af3f0f838fd9e4436b0d56b20262a"
+    sha256 cellar: :any, arm64_ventura: "7959d13d7d3e5e64d658b77b0f7204237b7bd0a8b74a200a34c55c3116a8f727"
+    sha256 cellar: :any, sonoma:        "34d9b1cd6e9963b8fa4042ea49b0b85aedb28574c5a3576d3a113c29f378da2a"
+    sha256 cellar: :any, ventura:       "6c57462d32ab0bbe02bcb8d36547d8895dc19e468ce3c6ffb626cbbeab15cc3e"
+    sha256               x86_64_linux:  "312aa5516ab7ba1c7018425dea8b0439850c6727d4073a85fd1e789d84889ad0"
   end
 
   depends_on "boost" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
+  depends_on "chromaprint"
   depends_on "expat"
   depends_on "faad2"
   depends_on "ffmpeg"
   depends_on "flac"
   depends_on "fluid-synth"
   depends_on "fmt"
+  depends_on "game-music-emu"
   depends_on "glib"
-  depends_on "icu4c"
+  depends_on "icu4c@76"
   depends_on "lame"
   depends_on "libao"
   depends_on "libgcrypt"
   depends_on "libid3tag"
+  depends_on "libmikmod"
   depends_on "libmpdclient"
   depends_on "libnfs"
+  depends_on "libogg"
   depends_on "libsamplerate"
   depends_on "libshout"
+  depends_on "libsndfile"
+  depends_on "libsoxr"
   depends_on "libupnp"
   depends_on "libvorbis"
   depends_on macos: :mojave # requires C++17 features unavailable in High Sierra
+  depends_on "mpg123"
   depends_on "opus"
+  depends_on "pcre2"
   depends_on "sqlite"
   depends_on "wavpack"
 
+  uses_from_macos "bzip2"
   uses_from_macos "curl"
+  uses_from_macos "zlib"
 
   on_linux do
     depends_on "systemd" => :build
+    depends_on "alsa-lib"
+    depends_on "dbus"
+    depends_on "jack"
+    depends_on "pulseaudio"
+    depends_on "systemd"
   end
-
-  fails_with gcc: "5"
 
   def install
     # mpd specifies -std=gnu++0x, but clang appears to try to build
@@ -60,12 +81,14 @@ class Mpd < Formula
     ENV.libcxx
 
     args = %W[
+      -Dcpp_std=c++20
       --sysconfdir=#{etc}
       -Dmad=disabled
       -Dmpcdec=disabled
       -Dsoundcloud=disabled
       -Dao=enabled
       -Dbzip2=enabled
+      -Dchromaprint=enabled
       -Dexpat=enabled
       -Dffmpeg=enabled
       -Dfluidsynth=enabled
@@ -74,6 +97,8 @@ class Mpd < Formula
       -Dupnp=pupnp
       -Dvorbisenc=enabled
       -Dwavpack=enabled
+      -Dgme=enabled
+      -Dmikmod=enabled
       -Dsystemd_system_unit_dir=#{lib}/systemd/system
       -Dsystemd_user_unit_dir=#{lib}/systemd/user
     ]

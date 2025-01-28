@@ -5,7 +5,7 @@ class Ydcv < Formula
   homepage "https://github.com/felixonmars/ydcv"
   url "https://files.pythonhosted.org/packages/1f/29/17124ebfdea8d810774977474a8652018c04c4a6db1ca413189f7e5b9d52/ydcv-0.7.tar.gz"
   sha256 "53cd59501557496512470e7db5fb14e42ddcb411fe4fa45c00864d919393c1da"
-  license "GPL-3.0"
+  license "GPL-3.0-only"
   revision 4
   head "https://github.com/felixonmars/ydcv.git", branch: "master"
 
@@ -23,7 +23,7 @@ class Ydcv < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "52f466e847bf7841d0108b5bdb3e034ea2412d9d8d354088d270c088e784482e"
   end
 
-  deprecate! date: "2023-07-09", because: :repo_archived
+  disable! date: "2024-07-05", because: :repo_archived
 
   depends_on "python@3.11"
 
@@ -41,6 +41,6 @@ class Ydcv < Formula
   end
 
   test do
-    system "#{bin}/ydcv", "--help"
+    system bin/"ydcv", "--help"
   end
 end

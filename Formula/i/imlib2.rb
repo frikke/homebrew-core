@@ -1,23 +1,22 @@
 class Imlib2 < Formula
   desc "Image loading and rendering library"
   homepage "https://sourceforge.net/projects/enlightenment/"
-  url "https://downloads.sourceforge.net/project/enlightenment/imlib2-src/1.12.0/imlib2-1.12.0.tar.gz"
-  sha256 "b139dca28d8de24fa50475851fdf59d3439f00e8b42e8c0f8daebb55a102455d"
+  url "https://downloads.sourceforge.net/project/enlightenment/imlib2-src/1.12.3/imlib2-1.12.3.tar.gz"
+  sha256 "544f789c7dfefbc81b5e82cd74dcd2be3847ae8ce253d402852f19a82f25186b"
   license "Imlib2"
 
   bottle do
-    sha256 arm64_sonoma:   "6bdef57218c517026b07df933ceb73f8589ab96aa0b648456982753a9b5cf744"
-    sha256 arm64_ventura:  "886bd312d78665ae7efda3afd62415a880ca2cf89755eca3e287dce773d4e12d"
-    sha256 arm64_monterey: "07daa7529afd7fc4414aa52dbd3c9d103ceada3eadb946be19a49f94617a7735"
-    sha256 arm64_big_sur:  "22967bf1ff05795915545d2c345965d565a7a33c1150ed6dbbd4f01baf804d9b"
-    sha256 sonoma:         "6189c114f4e23cf15b48ccce459b0f43c68ff58ef3ce4207d0b8a4af83efafe8"
-    sha256 ventura:        "9c996088bc94faf3fc0207b0b4ca8a6a7cd95f48df8161012c6c683f3a445294"
-    sha256 monterey:       "8c390ebf592b6999d47b57d043f525f252f27f0412410f3c4b106aa22c44996a"
-    sha256 big_sur:        "a78ea6aaf666532f3126da56baaca0084427a3796435f877e694b59cfd378b3a"
-    sha256 x86_64_linux:   "a4a6f6a70485b78567c91eaf019c5d519e7364cf63566ab5d781958081b42b50"
+    sha256 arm64_sequoia:  "d6e559c4ee70c8d822c87db6278486da760e73bf34ef2d4be40a1152a989275f"
+    sha256 arm64_sonoma:   "9085e6232c5f55a28549db1a2f5175ed3956307b894feee4c96e079136e0b0ad"
+    sha256 arm64_ventura:  "4e51a7001b37bc1b970df359ad757b3c6c86d94a95723e07e53b92a586d9fc64"
+    sha256 arm64_monterey: "854c0238df0cea22cefe702a71f4e411c0c68e1df76817430c75116ca75421f3"
+    sha256 sonoma:         "858748fdfe4b3a886b09099f91452d0f051721d9dffd639827c42b5d63c59f40"
+    sha256 ventura:        "428f45e532a9b3abbfd5fcdefab2881cf16838fef907f2de51245adb5e4036b7"
+    sha256 monterey:       "2332ec7db084abef90fdd880cdd70d26e7d650d1bc04f6758af582d79b923f93"
+    sha256 x86_64_linux:   "02135ffdab6c249729d5253a44c1a232c80be1f4464f8887524019404ed00b65"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "freetype"
   depends_on "giflib"
   depends_on "jpeg-turbo"
@@ -32,8 +31,7 @@ class Imlib2 < Formula
   uses_from_macos "zlib"
 
   def install
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules",
+    system "./configure", "--disable-silent-rules",
                           "--enable-amd64=no",
                           "--without-heif",
                           "--without-id3",
@@ -41,11 +39,12 @@ class Imlib2 < Formula
                           "--without-jxl",
                           "--without-ps",
                           "--without-svg",
-                          "--without-webp"
+                          "--without-webp",
+                          *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/imlib2_conv", test_fixtures("test.png"), "imlib2_test.png"
+    system bin/"imlib2_conv", test_fixtures("test.png"), "imlib2_test.png"
   end
 end

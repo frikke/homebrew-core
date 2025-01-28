@@ -1,40 +1,37 @@
-require "language/node"
-
 class MarkdownlintCli < Formula
   desc "CLI for Node.js style checker and lint tool for Markdown files"
   homepage "https://github.com/igorshubovych/markdownlint-cli"
-  url "https://registry.npmjs.org/markdownlint-cli/-/markdownlint-cli-0.36.0.tgz"
-  sha256 "13e89581cfc7b49613ff716e07d16b486af2075ac518c03d3fc45e4080961d9c"
+  url "https://registry.npmjs.org/markdownlint-cli/-/markdownlint-cli-0.44.0.tgz"
+  sha256 "df1ea79f06226d09e539f59e80b9c1f49baa01af3f97011fb5c621a3fd92bf6d"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "65d645bc14ddafa08c0c1057c87f123602a039cd2dca2e4a6df8878f9de29e0a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "65d645bc14ddafa08c0c1057c87f123602a039cd2dca2e4a6df8878f9de29e0a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "65d645bc14ddafa08c0c1057c87f123602a039cd2dca2e4a6df8878f9de29e0a"
-    sha256 cellar: :any_skip_relocation, ventura:        "ac0408c7b4f59bb3d2f07a398678d75f44661c4110691db27115910c929500a4"
-    sha256 cellar: :any_skip_relocation, monterey:       "ac0408c7b4f59bb3d2f07a398678d75f44661c4110691db27115910c929500a4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ac0408c7b4f59bb3d2f07a398678d75f44661c4110691db27115910c929500a4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "65d645bc14ddafa08c0c1057c87f123602a039cd2dca2e4a6df8878f9de29e0a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "37d23e1edb5a0361a19123e2e6a2536b242bf37952c6c44d39256c6bd60cc7a1"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "37d23e1edb5a0361a19123e2e6a2536b242bf37952c6c44d39256c6bd60cc7a1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "37d23e1edb5a0361a19123e2e6a2536b242bf37952c6c44d39256c6bd60cc7a1"
+    sha256 cellar: :any_skip_relocation, sonoma:        "c85a970380cbbe474257782bf59f347f8c9ebd62af9258dc0df33f0806a1ca88"
+    sha256 cellar: :any_skip_relocation, ventura:       "c85a970380cbbe474257782bf59f347f8c9ebd62af9258dc0df33f0806a1ca88"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "37d23e1edb5a0361a19123e2e6a2536b242bf37952c6c44d39256c6bd60cc7a1"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
-    (testpath/"test-bad.md").write <<~EOS
+    (testpath/"test-bad.md").write <<~MARKDOWN
       # Header 1
       body
-    EOS
-    (testpath/"test-good.md").write <<~EOS
+    MARKDOWN
+    (testpath/"test-good.md").write <<~MARKDOWN
       # Header 1
 
       body
-    EOS
-    assert_match "MD022/blanks-around-headings/blanks-around-headers",
+    MARKDOWN
+    assert_match "MD022/blanks-around-headings Headings should be surrounded by blank lines",
                  shell_output("#{bin}/markdownlint #{testpath}/test-bad.md  2>&1", 1)
     assert_empty shell_output("#{bin}/markdownlint #{testpath}/test-good.md")
   end

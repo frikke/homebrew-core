@@ -1,20 +1,17 @@
 class Fnt < Formula
   desc "Apt for fonts, the missing font manager for macOS/linux"
   homepage "https://github.com/alexmyczko/fnt"
-  url "https://github.com/alexmyczko/fnt/archive/refs/tags/1.4.1.tar.gz"
-  sha256 "263edd4e3ebd71bb5c63e5f063bfbed6a711b5786e6f6174c6ee586e530c1727"
+  url "https://github.com/alexmyczko/fnt/archive/refs/tags/1.8.tar.gz"
+  sha256 "9d0888ead98aae4d47ecb23d8208d4d48faea1c1628d49d00cea7c795afb8b65"
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3354ea71f3c637ff74666a5561a77b6c717bfc319c96682cb6affc7593fe5cee"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3354ea71f3c637ff74666a5561a77b6c717bfc319c96682cb6affc7593fe5cee"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3354ea71f3c637ff74666a5561a77b6c717bfc319c96682cb6affc7593fe5cee"
-    sha256 cellar: :any_skip_relocation, ventura:        "fd63e7162fbaa82f98a00c390f07d2860c5732a22194abd0f4b3b2550c36fd96"
-    sha256 cellar: :any_skip_relocation, monterey:       "fd63e7162fbaa82f98a00c390f07d2860c5732a22194abd0f4b3b2550c36fd96"
-    sha256 cellar: :any_skip_relocation, big_sur:        "fd63e7162fbaa82f98a00c390f07d2860c5732a22194abd0f4b3b2550c36fd96"
-    sha256 cellar: :any_skip_relocation, catalina:       "fd63e7162fbaa82f98a00c390f07d2860c5732a22194abd0f4b3b2550c36fd96"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3354ea71f3c637ff74666a5561a77b6c717bfc319c96682cb6affc7593fe5cee"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5c203667f19a6d4c8380bea8d798f2796562bf5cf8a7e3e0110ea44c0714984b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5c203667f19a6d4c8380bea8d798f2796562bf5cf8a7e3e0110ea44c0714984b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "5c203667f19a6d4c8380bea8d798f2796562bf5cf8a7e3e0110ea44c0714984b"
+    sha256 cellar: :any_skip_relocation, sonoma:        "ee0fc8f0dd7c4b3d122d870fb2e3c8591d33f69c8510dd85bf7dda90e2e0205f"
+    sha256 cellar: :any_skip_relocation, ventura:       "ee0fc8f0dd7c4b3d122d870fb2e3c8591d33f69c8510dd85bf7dda90e2e0205f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5c203667f19a6d4c8380bea8d798f2796562bf5cf8a7e3e0110ea44c0714984b"
   end
 
   depends_on "chafa"

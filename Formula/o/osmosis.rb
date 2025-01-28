@@ -1,12 +1,18 @@
 class Osmosis < Formula
   desc "Command-line OpenStreetMap data processor"
   homepage "https://wiki.openstreetmap.org/wiki/Osmosis"
-  url "https://github.com/openstreetmap/osmosis/releases/download/0.48.3/osmosis-0.48.3.tgz"
-  sha256 "b24c601578ea4cb0ca88302be6768fd0602bde86c254a0e0b90513581dba67ff"
-  license "LGPL-3.0"
+  url "https://github.com/openstreetmap/osmosis/releases/download/0.49.2/osmosis-0.49.2.tar"
+  sha256 "2a23a7bf7499a0727ae6987cf66fcafc03b37379dc02177c730f352bd67a0b97"
+  license :public_domain
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "03b25119fbe3db2e9ebde3b6752951ef2aa84501e9e68e1a9d39ac30fde7ed0b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "bbf0840fce8067bb973ff59a7e9d9774178ae11b9af976aa0842e80b90264b00"
   end
 
   depends_on "openjdk"
@@ -15,13 +21,13 @@ class Osmosis < Formula
   patch :DATA
 
   def install
-    libexec.install %w[bin/osmosis lib config script]
+    libexec.install %w[bin/osmosis lib script]
     (bin/"osmosis").write_env_script libexec/"osmosis", Language::Java.overridable_java_home_env
   end
 
   test do
     path = testpath/"test.osm"
-    path.write <<~EOS
+    path.write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <osm version="0.6" generator="CGImap 0.5.8 (30532 thorn-05.openstreetmap.org)" copyright="OpenStreetMap and contributors" attribution="https://www.openstreetmap.org/copyright" license="https://opendatacommons.org/licenses/odbl/1-0/">
       <bounds minlat="49.9363700" minlon="8.9159400" maxlat="49.9371300" maxlon="8.9173800"/>
@@ -39,20 +45,22 @@ class Osmosis < Formula
         <tag k="wheelchair:description" v="Kein Kasseler Bord"/>
       </node>
       </osm>
-    EOS
+    XML
 
-    system("#{bin}/osmosis", "--read-xml", "file=#{path}", "--write-null")
+    system(bin/"osmosis", "--read-xml", "file=#{path}", "--write-null")
   end
 end
 
 __END__
---- a/bin/osmosis 2010-11-16 06:58:44.000000000 +0100
-+++ b/bin/osmosis  2010-11-23 12:13:01.000000000 +0100
-@@ -83,6 +83,7 @@
- saveddir=`pwd`
- MYAPP_HOME=`dirname "$PRG"`/..
- MYAPP_HOME=`cd "$MYAPP_HOME" && pwd`
-+MYAPP_HOME="$MYAPP_HOME/libexec"
- cd "$saveddir"
+diff --git a/bin/osmosis b/bin/osmosis
+index 04b040a..648824e 100755
+--- a/bin/osmosis
++++ b/bin/osmosis
+@@ -84,6 +84,7 @@ done
+ # shellcheck disable=SC2034
+ APP_BASE_NAME=${0##*/}
+ APP_HOME=$( cd "${APP_HOME:-./}.." && pwd -P ) || exit
++APP_HOME="$APP_HOME/libexec"
 
- # Build up the classpath of required jar files via classworlds launcher.
+ # Use the maximum available, or set MAX_FD != -1 to use that value.
+ MAX_FD=maximum

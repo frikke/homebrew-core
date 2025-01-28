@@ -1,6 +1,6 @@
 class Vramsteg < Formula
   desc "Add progress bars to command-line applications"
-  homepage "https://gothenburgbitfactory.org/projects/vramsteg.html"
+  homepage "https://gothenburgbitfactory.org/vramsteg/"
   url "https://github.com/GothenburgBitFactory/vramsteg/releases/download/v1.1.0/vramsteg-1.1.0.tar.gz"
   sha256 "9cc82eb195e4673d9ee6151373746bd22513033e96411ffc1d250920801f7037"
   license "MIT"
@@ -12,9 +12,12 @@ class Vramsteg < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "0fc0621375da82a15b6a36551f6fe423df69a79c656beae75ce15a6e6c331556"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "f122182d7989681603772e5ca869e722b9a358e170f2f60135c635a51142a6a2"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "2158611ee7a141add85d1e540484a167ca3ba679d9e0ce60d9381b938e20ecb1"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "efdbbb479580eea937df42d340735d4d621783ba8fdff2987a4ac05b38623dbf"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a7bc2f2c1ca7f14f5c6551f48907f9be12b623c5ebc16cd454afefe337760336"
+    sha256 cellar: :any_skip_relocation, sonoma:         "824cff846fd4ad84038fc095676cf1e64927c7414742a536b9f0679f6adebd1c"
     sha256 cellar: :any_skip_relocation, ventura:        "b1bd6ff70efa1795e140c5dd958bc9faab78c6ad0bc6be86c191e09aa53398a7"
     sha256 cellar: :any_skip_relocation, monterey:       "0464b7532d2b80277a1c560422b20affe4e7b5ce41b8d5e33937a5038fe35993"
     sha256 cellar: :any_skip_relocation, big_sur:        "d004f9d2ef1b642f8128c368e57235f6d2580fd90d928da9996684430a6881ee"
@@ -29,8 +32,9 @@ class Vramsteg < Formula
   depends_on "cmake" => :build
 
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

@@ -1,18 +1,19 @@
 class Clblast < Formula
   desc "Tuned OpenCL BLAS library"
   homepage "https://github.com/CNugteren/CLBlast"
-  url "https://github.com/CNugteren/CLBlast/archive/1.6.1.tar.gz"
-  sha256 "e68d026108447cab53cb18d473b4363ab3958d7c8f97c522bbee1651069eec66"
+  url "https://github.com/CNugteren/CLBlast/archive/refs/tags/1.6.3.tar.gz"
+  sha256 "c05668c7461e8440fce48c9f7a8966a6f9e0923421acd7c0357ece9b1d83f20e"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "6e6fa024aeaf31caec71f60262761b7b5417924592cbeee885d2a100389ec4e6"
-    sha256 cellar: :any,                 arm64_monterey: "65249a30a77c6759bfb8f06c2668ed32190c90a1ac03ccb93e807b6cfbf43c98"
-    sha256 cellar: :any,                 arm64_big_sur:  "4593bc3935692822dc01dee7b1a4f0de3541b3cc7f30848a8cb0abeb44069964"
-    sha256 cellar: :any,                 ventura:        "bf75f1b66d72f1288fbf51c0fe4eb97a05383314f9f62e449a35e697d41400f9"
-    sha256 cellar: :any,                 monterey:       "bb5eba30ceb408c69155a6373b6bc1a28cf7ad5ac76909afdff7f4ef7c8dd1ce"
-    sha256 cellar: :any,                 big_sur:        "aaddf71aa357c3905415e59272102d4b45085ca4eee66e050f71ce5ebd6e1437"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e3327938fa465f3bd86ef8b91fdbadf490deeeacc698ba2ea72fa9452a5ef390"
+    sha256 cellar: :any,                 arm64_sequoia:  "62eea554bf1f9118b780962ec97537478020d4a4850942d200fd100319ebc25a"
+    sha256 cellar: :any,                 arm64_sonoma:   "51694bd4a8eefd817e62561ef30afa0807dd169cf8b8b3ed3599afd8240f0772"
+    sha256 cellar: :any,                 arm64_ventura:  "4ae97edde32865dae186f21292d0885d402be3e4622b76fb77f5b6240035f560"
+    sha256 cellar: :any,                 arm64_monterey: "b2190d5fe22baa139b0c6d4884af910db597fdcf1f6b02cc8dcbd377991f1e4b"
+    sha256 cellar: :any,                 sonoma:         "7af136b15b5d8fc47a2c392052a7b35ec447c4530c3f57fab3675e45e55d1e96"
+    sha256 cellar: :any,                 ventura:        "05968756c5c41c794e4134f1dc93756efe8beca0f76cd6959a7ba839f75ae791"
+    sha256 cellar: :any,                 monterey:       "3fbca33d20a9d99bc166e1af71058bfb56ed064ea5fbfdc733e1373afc553587"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7fc7ca301aa5cfd50033c67343f4fddcedffc6536274423081e71a2f86282e8e"
   end
 
   depends_on "cmake" => :build
@@ -24,8 +25,10 @@ class Clblast < Formula
   end
 
   def install
-    system "cmake", ".", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", "-DCMAKE_INSTALL_RPATH=#{rpath}", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
     pkgshare.install "samples" # for a simple library linking test
   end
 

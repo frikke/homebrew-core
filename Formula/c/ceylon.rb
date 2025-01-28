@@ -9,7 +9,7 @@ class Ceylon < Formula
     sha256 cellar: :any_skip_relocation, all: "c9e8be2d72811dcc4310d1633801fa34e38a7e2bbc779e945ce732ff03172dc2"
   end
 
-  deprecate! date: "2023-04-17", because: :deprecated_upstream
+  disable! date: "2024-02-06", because: :deprecated_upstream
 
   depends_on "openjdk@8"
 
@@ -26,13 +26,13 @@ class Ceylon < Formula
 
   test do
     cd "#{libexec}/samples/helloworld" do
-      system "#{bin}/ceylon", "compile", "--out", "#{testpath}/modules",
+      system bin/"ceylon", "compile", "--out", "#{testpath}/modules",
                                          "--encoding", "UTF-8",
                                          "com.example.helloworld"
-      system "#{bin}/ceylon", "doc", "--out", "#{testpath}/modules",
+      system bin/"ceylon", "doc", "--out", "#{testpath}/modules",
                                      "--encoding", "UTF-8", "--non-shared",
                                      "com.example.helloworld"
-      system "#{bin}/ceylon", "run", "--rep", "#{testpath}/modules",
+      system bin/"ceylon", "run", "--rep", "#{testpath}/modules",
                                      "com.example.helloworld/1.0", "John"
     end
   end

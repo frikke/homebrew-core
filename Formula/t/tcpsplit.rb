@@ -1,18 +1,17 @@
 class Tcpsplit < Formula
   desc "Break a packet trace into some number of sub-traces"
-  homepage "https://www.icir.org/mallman/software/tcpsplit/"
-  url "https://www.icir.org/mallman/software/tcpsplit/tcpsplit-0.2.tar.gz"
+  homepage "https://web.archive.org/web/20230609122227/https://www.icir.org/mallman/software/tcpsplit/"
+  url "https://web.archive.org/web/20230609122227/https://www.icir.org/mallman/software/tcpsplit/tcpsplit-0.2.tar.gz"
   sha256 "885a6609d04eb35f31f1c6f06a0b9afd88776d85dec0caa33a86cef3f3c09d1d"
-
-  livecheck do
-    url :homepage
-    regex(/href=.*?tcpsplit[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
+  # The license is similar to X11 but with a different phrasing to the no advertising clause
+  license :cannot_represent
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "59062e48ff67f9fc5a6b0f8d0cc397c888b1914c2881ac663d6ce8f9a074a34d"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "a3d3cd3c37dce379aa221133969b74a0b2bd61a6d7605172b952b26e3398a0cf"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "5bf4362d064b7f982e0fb8cb2e79010c80c19f555b79f18dd0e4f3a9dbfda8a1"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f40f957faef51ed496030a97cda8ca0eb0716826969872185080bb8e94780f36"
+    sha256 cellar: :any_skip_relocation, sonoma:         "4223a133c41217be90d0880fd1480e68e2b540fe4ab448144a14afa6d4139811"
     sha256 cellar: :any_skip_relocation, ventura:        "1931a69c46a6669e5a5a9716b260413bcbf24af89bb567ccde1bb17e1827f55a"
     sha256 cellar: :any_skip_relocation, monterey:       "51e4f267ddd4cd76011a85b0e094d78d4df67b4a3d16d6dd918834a929cba203"
     sha256 cellar: :any_skip_relocation, big_sur:        "49781c99d1496c5c0c8ec3e56e2edc604f5e8643f36e93b0ff8b974d448363d1"
@@ -24,6 +23,11 @@ class Tcpsplit < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "f90bcbd78ee73c48c113f3f2b974c5aa6b2e17cecb6fa531be3a62a40fa0fb9f"
   end
 
+  # Upstream has an incomplete certificate chain,
+  # so fetching and livechecking no longer work.
+  # Last release on 2013-02-27
+  disable! date: "2024-09-05", because: :unmaintained
+
   uses_from_macos "libpcap"
 
   def install
@@ -32,6 +36,6 @@ class Tcpsplit < Formula
   end
 
   test do
-    system "#{bin}/tcpsplit", "--version"
+    system bin/"tcpsplit", "--version"
   end
 end

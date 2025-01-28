@@ -1,8 +1,8 @@
 class Sdl2 < Formula
   desc "Low-level access to audio, keyboard, mouse, joystick, and graphics"
   homepage "https://www.libsdl.org/"
-  url "https://github.com/libsdl-org/SDL/releases/download/release-2.28.3/SDL2-2.28.3.tar.gz"
-  sha256 "7acb8679652701a2504d734e2ba7543ec1a83e310498ddd22fd44bf965eb5518"
+  url "https://github.com/libsdl-org/SDL/releases/download/release-2.30.11/SDL2-2.30.11.tar.gz"
+  sha256 "8b8d4aef2038533da814965220f88f77d60dfa0f32685f80ead65e501337da7f"
   license "Zlib"
 
   livecheck do
@@ -12,19 +12,16 @@ class Sdl2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "b78dcbdbfee6298d248eabb06468d7f991f2495104344f16dd35e503a6a0b1aa"
-    sha256 cellar: :any,                 arm64_ventura:  "764084498b650c302759a7eb26b1dc3886e650d8b6ac3f3f6f560a9cfe225b5e"
-    sha256 cellar: :any,                 arm64_monterey: "db232b4a952027efb697a56826442de66ab84328c2bc0b9e8f2b23465a1bcb2e"
-    sha256 cellar: :any,                 arm64_big_sur:  "003bc7fa2207369cd2ed794d3f88df844c9961bd7e172d1edb2f6aa20575474f"
-    sha256 cellar: :any,                 sonoma:         "4bff4927d69d7258b07540782a74d46d822d1113a8cbde0839f3b7fd1547b52e"
-    sha256 cellar: :any,                 ventura:        "7963704fdcfa3b1dbfbc82a18951109d9fddcdede7215fd9fa15c0709f9b98f1"
-    sha256 cellar: :any,                 monterey:       "63d2c2dab020fc0cbd13c815883108174eba3d394220724ae4baa561266a2e1e"
-    sha256 cellar: :any,                 big_sur:        "dc5f0129e21d34697904f54526c7c9f609b0b29cca456fd8f401b6abc7665e50"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0475ec88b9f73de4f52fac616899a7d1cfa0ca127530abe1e2e7a83fb973cc5b"
+    sha256 cellar: :any,                 arm64_sequoia: "b87f0d34432faf3630ad1f7ed5a65b8387ffadc8eb51c936fe7e973642a8207d"
+    sha256 cellar: :any,                 arm64_sonoma:  "6eed4d7882ace75c6831382cbadbdeb7cad356cdd5000fad7f0b2e7b17d917f8"
+    sha256 cellar: :any,                 arm64_ventura: "47101386010f483cb135c3b0caa574c8912777277ec63afdd8216788e8dfc720"
+    sha256 cellar: :any,                 sonoma:        "eb8211e78231337e7b2a50665a839d46254cac5a6cf6a88cef738ad81f7054cf"
+    sha256 cellar: :any,                 ventura:       "9809878a8d7eab5b71acb0cdcccc528313896a99972ae251ca693032df7bb427"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f53ea335f9990ec2aef849a995ea2d7b56db073ea4eb7fb8a34a53e4275d6970"
   end
 
   head do
-    url "https://github.com/libsdl-org/SDL.git", branch: "main"
+    url "https://github.com/libsdl-org/SDL.git", branch: "SDL2"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -32,7 +29,7 @@ class Sdl2 < Formula
   end
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "libice"
     depends_on "libxcursor"
     depends_on "libxscrnsaver"
@@ -50,23 +47,26 @@ class Sdl2 < Formula
     system "./autogen.sh" if build.head?
 
     args = %W[--prefix=#{prefix} --enable-hidapi]
-    args << if OS.mac?
-      "--without-x"
+    args += if OS.mac?
+      %w[--without-x]
     else
-      args << "--with-x"
-      args << "--enable-pulseaudio"
-      args << "--enable-pulseaudio-shared"
-      args << "--enable-video-dummy"
-      args << "--enable-video-opengl"
-      args << "--enable-video-opengles"
-      args << "--enable-video-x11"
-      args << "--enable-video-x11-scrnsaver"
-      args << "--enable-video-x11-xcursor"
-      args << "--enable-video-x11-xinerama"
-      args << "--enable-video-x11-xinput"
-      args << "--enable-video-x11-xrandr"
-      args << "--enable-video-x11-xshape"
-      "--enable-x11-shared"
+      %w[
+        --disable-rpath
+        --enable-pulseaudio
+        --enable-pulseaudio-shared
+        --enable-video-dummy
+        --enable-video-opengl
+        --enable-video-opengles
+        --enable-video-x11
+        --enable-video-x11-scrnsaver
+        --enable-video-x11-xcursor
+        --enable-video-x11-xinerama
+        --enable-video-x11-xinput
+        --enable-video-x11-xrandr
+        --enable-video-x11-xshape
+        --enable-x11-shared
+        --with-x
+      ]
     end
     system "./configure", *args
     system "make", "install"

@@ -1,8 +1,8 @@
 class Cortex < Formula
   desc "Long term storage for Prometheus"
   homepage "https://cortexmetrics.io/"
-  url "https://github.com/cortexproject/cortex/archive/v1.15.3.tar.gz"
-  sha256 "0a6d52faf64216ba1d49412d2ea09650d3228fed9b0c113c5abe738a25576239"
+  url "https://github.com/cortexproject/cortex/archive/refs/tags/v1.18.1.tar.gz"
+  sha256 "667a0d78c9c3c319ccee503951237883f1402dda33cf27f2e64af2faaa54412e"
   license "Apache-2.0"
 
   livecheck do
@@ -11,23 +11,22 @@ class Cortex < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "08cf26eef94fc949e40dbdeb5c028b4d27cb582ea5c047a61ed94f2457b95fec"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "08cf26eef94fc949e40dbdeb5c028b4d27cb582ea5c047a61ed94f2457b95fec"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "08cf26eef94fc949e40dbdeb5c028b4d27cb582ea5c047a61ed94f2457b95fec"
-    sha256 cellar: :any_skip_relocation, ventura:        "d4727b01516c8bcdef014cd0d68cac950399b87cf5c2b59bff975a8513e30f7a"
-    sha256 cellar: :any_skip_relocation, monterey:       "d4727b01516c8bcdef014cd0d68cac950399b87cf5c2b59bff975a8513e30f7a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d4727b01516c8bcdef014cd0d68cac950399b87cf5c2b59bff975a8513e30f7a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e819235ce5fc8ea63add27cd8d689bacb8a120e1ef71514b34bacc6a8f91d660"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fb49d58ab8929c00c1358ba9ac9f51e4534fdffd4a7bb19e48e8db3252b827f2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "fb49d58ab8929c00c1358ba9ac9f51e4534fdffd4a7bb19e48e8db3252b827f2"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "fb49d58ab8929c00c1358ba9ac9f51e4534fdffd4a7bb19e48e8db3252b827f2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "6800a1e6a4f9cca0921493e0df9f1c2090b7a7e1892824acfebe255dce203883"
+    sha256 cellar: :any_skip_relocation, ventura:       "6800a1e6a4f9cca0921493e0df9f1c2090b7a7e1892824acfebe255dce203883"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3efe5ab3e11b093a16037a06b05038d1eaab6e7b845b266e1657c83a806c4826"
   end
 
   depends_on "go" => :build
 
+  conflicts_with "cortexso", because: "both install `cortex` binaries"
+
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/cortex"
-    cd "docs/configuration" do
-      inreplace "single-process-config-blocks.yaml", "/tmp", var
-      etc.install "single-process-config-blocks.yaml" => "cortex.yaml"
-    end
+    inreplace "docs/configuration/single-process-config-blocks.yaml", "/tmp", var
+    etc.install "docs/configuration/single-process-config-blocks.yaml" => "cortex.yaml"
   end
 
   service do
@@ -46,7 +45,7 @@ class Cortex < Formula
 
     # A minimal working config modified from
     # https://github.com/cortexproject/cortex/blob/master/docs/configuration/single-process-config-blocks.yaml
-    (testpath/"cortex.yaml").write <<~EOS
+    (testpath/"cortex.yaml").write <<~YAML
       server:
         http_listen_port: #{port}
       ingester:
@@ -59,7 +58,7 @@ class Cortex < Formula
         backend: filesystem
         filesystem:
           dir: #{testpath}/data/tsdb
-    EOS
+    YAML
 
     Open3.popen3(
       bin/"cortex", "-config.file=cortex.yaml",
@@ -67,7 +66,7 @@ class Cortex < Formula
     ) do |_, _, stderr, wait_thr|
       Timeout.timeout(5) do
         stderr.each do |line|
-          refute line.start_with? "level=error"
+          refute_match "level=error", line
           # It is important to wait for this line. Finishing the test too early
           # may shadow errors that only occur when modules are fully loaded.
           break if line.include? "Cortex started"
@@ -77,7 +76,6 @@ class Cortex < Formula
       end
     ensure
       Process.kill "TERM", wait_thr.pid
-      Process.wait wait_thr.pid
     end
   end
 end

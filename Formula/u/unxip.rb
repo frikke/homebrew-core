@@ -1,31 +1,44 @@
 class Unxip < Formula
   desc "Fast Xcode unarchiver"
   homepage "https://github.com/saagarjha/unxip"
-  url "https://github.com/saagarjha/unxip.git",
-      tag:      "v2.2",
-      revision: "dbd4cad236901133c0bec0c54c9294a24a9f1a33"
+  url "https://github.com/saagarjha/unxip/archive/refs/tags/v3.1.tar.gz"
+  sha256 "d76cabf3c0c057d87fd910ab0de5d9a1108b037f7e7406802f40885d80d49295"
   license "LGPL-3.0-only"
   head "https://github.com/saagarjha/unxip.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cf94349d691350ec8160955c2a77025c3bc63b2c401553f5eff9f32883ce4a13"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c671c3fdb6be7fed02dadf61dfd2923723db45fe29fc5a8c193e260753ec687a"
-    sha256 cellar: :any_skip_relocation, ventura:        "0fc3789f8da947610c5fee132d43a17de421deaea890834a5535426477618ab4"
-    sha256 cellar: :any_skip_relocation, monterey:       "afe99e754d69a10def7565d2f83fa931b08a533c1fc9d71ce72854f42d5c5a53"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "abf884e88603357d56ed83f95f8d1bc6f366e3542578d823beb6414c97240d58"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6b25d509ece5113ddc99bb39e0ce031b578be3a6d146ecce3105e208da6f214c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e7f685faaad5e16412bce583d9420617136a7b3b04d2b399b6c25492afcddd54"
+    sha256                               x86_64_linux:  "e8ce3607ab1d6aeb51833fc2862c38e28068d172d00b865a89cd2d305ebf69a3"
   end
 
-  depends_on xcode: :build
-  depends_on :macos
-  depends_on macos: :monterey
-  uses_from_macos "swift"
+  depends_on macos: :sonoma
+
+  uses_from_macos "swift", since: :sonoma
+
+  on_sonoma :or_older do
+    depends_on xcode: ["16.0", :build]
+  end
+
+  # Uses Compression framework on macOS
+  on_linux do
+    depends_on "xz"
+    depends_on "zlib"
+  end
 
   def install
-    system "swift", "build", "--disable-sandbox", "-c", "release"
+    args = %w[--disable-sandbox --configuration release]
+    args += %W[-Xcc -I#{HOMEBREW_PREFIX}/include -Xlinker -L#{HOMEBREW_PREFIX}/lib] if OS.linux?
+
+    system "swift", "build", *args
     bin.install ".build/release/unxip"
   end
 
   test do
     assert_equal "unxip #{version}", shell_output("#{bin}/unxip --version").strip
+    # On Linux we don't have `xar` or XAR support in `libarchive`
+    return if OS.linux?
 
     # Create a sample xar archive just to satisfy a .xip header, then test
     # the failure case of expanding to a non-existent directory

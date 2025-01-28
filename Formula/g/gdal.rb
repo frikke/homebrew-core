@@ -1,9 +1,10 @@
 class Gdal < Formula
   desc "Geospatial Data Abstraction Library"
   homepage "https://www.gdal.org/"
-  url "https://github.com/OSGeo/gdal/releases/download/v3.7.2/gdal-3.7.2.tar.gz"
-  sha256 "fd8aabc63e02bcce2aecc0234af58171b91f478b6111f75b4b236919dac369a5"
+  url "https://github.com/OSGeo/gdal/releases/download/v3.10.1/gdal-3.10.1.tar.gz"
+  sha256 "b1c739256d074be42d67c6c3d33eee94c90a490ebb02fcb7fc21c569a6fc78bd"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://download.osgeo.org/gdal/CURRENT/"
@@ -11,13 +12,12 @@ class Gdal < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "ae8d8b7f0e1fb8cf64abe76e129ebf46c4ba9cfaea4a760c092e979a2022a9a8"
-    sha256 arm64_monterey: "21cd143023165431543aa93677ea62ddf5abf19aeb7a9dccae3fdcd883565d62"
-    sha256 arm64_big_sur:  "89becebfe1651b1a33dc86784aa952ac8923399b4e8063743ab9b36efe5d7aba"
-    sha256 ventura:        "1ac7769b179073211d6f45adbcc96e11e21bd87035eeb82c988a9c4e03fa7f8c"
-    sha256 monterey:       "346a54fa5d687b2bfceca2ea50629b185ca92e0d947ca88d5a23a63cb1baad15"
-    sha256 big_sur:        "11b8f87ffdba7e0e4aa9a04dddc2fa6e7cafacc14d42227114aac2f44412932b"
-    sha256 x86_64_linux:   "02924b38e20b7456137714e8c92ba9a40d7283712621e78a548ba4fd20d4c94f"
+    sha256 arm64_sequoia: "4c531d26f88c43eda29ccfa4ee6d7c7dbe2ef51e002d2163b412a574c2ba5924"
+    sha256 arm64_sonoma:  "424de907ba17642f73493fa706ab291040709391e9d9b8d4f09aa26f95e0a65e"
+    sha256 arm64_ventura: "28083a74e0046e946804d399331a05d617bcd38af511002d4adcf4f2396fe1c7"
+    sha256 sonoma:        "8ad294c5b65e44b95ee37e1d54da3aa73d26530f508ddac0d3ed8c8ce53aeacb"
+    sha256 ventura:       "b561845e5de7251513e4556beecbc0228fa640450410b4f192700706463a02e1"
+    sha256 x86_64_linux:  "d2752f6ae6bca91dd98bfd232920e72160219ec99b66a05167ced49812eee0f6"
   end
 
   head do
@@ -25,11 +25,13 @@ class Gdal < Formula
     depends_on "doxygen" => :build
   end
 
-  depends_on "boost" => :build  # for `libkml`
+  depends_on "boost" => :build # for `libkml`
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python-setuptools" => :build
   depends_on "swig" => :build
   depends_on "apache-arrow"
+  depends_on "c-blosc"
   depends_on "cfitsio"
   depends_on "epsilon"
   depends_on "expat"
@@ -37,10 +39,13 @@ class Gdal < Formula
   depends_on "geos"
   depends_on "giflib"
   depends_on "hdf5"
+  depends_on "imath"
   depends_on "jpeg-turbo"
   depends_on "jpeg-xl"
   depends_on "json-c"
+  depends_on "libaec"
   depends_on "libarchive"
+  depends_on "libdeflate"
   depends_on "libgeotiff"
   depends_on "libheif"
   depends_on "libkml"
@@ -50,6 +55,7 @@ class Gdal < Formula
   depends_on "libspatialite"
   depends_on "libtiff"
   depends_on "libxml2"
+  depends_on "lz4"
   depends_on "netcdf"
   depends_on "numpy"
   depends_on "openexr"
@@ -58,7 +64,7 @@ class Gdal < Formula
   depends_on "pcre2"
   depends_on "poppler"
   depends_on "proj"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "qhull"
   depends_on "sqlite"
   depends_on "unixodbc"
@@ -68,6 +74,12 @@ class Gdal < Formula
   depends_on "zstd"
 
   uses_from_macos "curl"
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "minizip"
+    depends_on "uriparser"
+  end
 
   on_linux do
     depends_on "util-linux"
@@ -76,10 +88,8 @@ class Gdal < Formula
   conflicts_with "avce00", because: "both install a cpl_conv.h header"
   conflicts_with "cpl", because: "both install cpl_error.h"
 
-  fails_with gcc: "5"
-
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
@@ -104,7 +114,7 @@ class Gdal < Formula
     ]
 
     # JavaVM.framework in SDK causing Java bindings to be built
-    args << "-DBUILD_JAVA_BINDINGS=OFF" if MacOS.version <= :catalina
+    args << "-DBUILD_JAVA_BINDINGS=OFF" if OS.mac? && MacOS.version <= :catalina
 
     system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
@@ -119,5 +129,7 @@ class Gdal < Formula
     system bin/"ogrinfo", "--formats"
     # Changed Python package name from "gdal" to "osgeo.gdal" in 3.2.0.
     system python3, "-c", "import osgeo.gdal"
+    # test for zarr blosc compressor
+    assert_match "BLOSC_COMPRESSORS", shell_output("#{bin}/gdalinfo --format Zarr")
   end
 end

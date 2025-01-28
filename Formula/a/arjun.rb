@@ -3,28 +3,24 @@ class Arjun < Formula
 
   desc "HTTP parameter discovery suite"
   homepage "https://github.com/s0md3v/Arjun"
-  url "https://files.pythonhosted.org/packages/51/cd/8eaadf3973a4e7bb519b885588b13348ddbe6d97ca06ecdcdda5f7a53dcb/arjun-2.2.1.tar.gz"
-  sha256 "b1904add44c0c5a8241910b0555d7e252281187b7dadd16ebc0843dc768cb36e"
+  url "https://files.pythonhosted.org/packages/04/22/c5b969720d2802de2248c2aac0414ee5ae234887cfe150564d591c73fb23/arjun-2.2.7.tar.gz"
+  sha256 "b193cdaf97bf7b0e8cd91a41da778639e01fd9738d5f666a8161377f475ce72e"
   license "AGPL-3.0-only"
-  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "58fb3067a738ec816d57d2749bc304703ad30ce39cc73d97d049e142c4b13d86"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a73485dc5b8e940f5a8653b15eb5d3dc02b841199551de73019d4154d4030789"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "31f7be78b336f904e935f7e2a5f192b5e5cb6aec331193cb8a6600e6b2525f87"
-    sha256 cellar: :any_skip_relocation, ventura:        "92eba3573ef8e3c438186c0045836817fb6ed89ec8eb0a0eaaabec34c5057077"
-    sha256 cellar: :any_skip_relocation, monterey:       "7fabbdb2a7a3164bd01ab139ba7ccd4d254efa7e40c2ade599c412de20aee68d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "19df3cf79b5734b715ae8a3c0996fdcd748e60f163ac8727956c8bf05a06ac5f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f662d9a2aeaa8b36c6ff54a091858051823bb7cbd09ba65ca102c5576a99d0d6"
+    sha256 cellar: :any_skip_relocation, all: "3c27e0658509ce22d7f7b8cd626c203f2b024f2228bdf476891d9bf987101630"
   end
 
-  depends_on "python-certifi"
-  depends_on "python@3.11"
+  depends_on "certifi"
+  depends_on "python@3.13"
+
+  def python3
+    "python3.13"
+  end
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/2a/53/cf0a48de1bdcf6ff6e1c9a023f5f523dfe303e4024f216feac64b6eb7f67/charset-normalizer-3.2.0.tar.gz"
-    sha256 "3bb3d25a8e6c0aedd251753a79ae98a093c7e7b471faa3aa9a93a81431987ace"
+    url "https://files.pythonhosted.org/packages/f2/4f/e1808dc01273379acc506d18f1504eb2d299bd4131743b9fc54d7be4df1e/charset_normalizer-3.4.0.tar.gz"
+    sha256 "223217c3d4f82c3ac5e29032b3f1c2eb0fb591b72161f86d93f5719079dae93e"
   end
 
   resource "dicttoxml" do
@@ -33,18 +29,23 @@ class Arjun < Formula
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz"
-    sha256 "814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"
+    url "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz"
+    sha256 "12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"
+  end
+
+  resource "ratelimit" do
+    url "https://files.pythonhosted.org/packages/ab/38/ff60c8fc9e002d50d48822cc5095deb8ebbc5f91a6b8fdd9731c87a147c9/ratelimit-2.2.1.tar.gz"
+    sha256 "af8a9b64b821529aca09ebaf6d8d279100d766f19e90b5059ac6a718ca6dee42"
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz"
-    sha256 "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
+    url "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz"
+    sha256 "55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/31/ab/46bec149bbd71a4467a3063ac22f4486ecd2ceb70ae8c70d5d8e4c2a7946/urllib3-2.0.4.tar.gz"
-    sha256 "8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11"
+    url "https://files.pythonhosted.org/packages/ed/63/22ba4ebfe7430b76388e7cd448d5478814d3032121827c12a2cc287e2260/urllib3-2.2.3.tar.gz"
+    sha256 "e7d814a81dad81e6caf2ec9fdedb284ecc9c73076b62654547cc64ccdcae26e9"
   end
 
   def install
@@ -52,7 +53,8 @@ class Arjun < Formula
   end
 
   test do
-    output = shell_output("#{bin}/arjun -u https://mockbin.org/ -m GET")
+    dbfile = libexec/Language::Python.site_packages(python3)/"arjun/db/small.txt"
+    output = shell_output("#{bin}/arjun -u https://mockbin.org/ -m GET -w #{dbfile}")
     assert_match "No parameters were discovered", output
   end
 end

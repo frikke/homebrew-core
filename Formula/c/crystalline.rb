@@ -1,22 +1,25 @@
 class Crystalline < Formula
   desc "Language Server Protocol implementation for Crystal"
   homepage "https://github.com/elbywan/crystalline"
-  url "https://github.com/elbywan/crystalline/archive/refs/tags/v0.10.0.tar.gz"
-  sha256 "26c926ba423e4b04fc52af501cd842c8255312014fc4aa1bc3735a8cd0df3426"
+  url "https://github.com/elbywan/crystalline/archive/refs/tags/v0.15.0.tar.gz"
+  sha256 "45ed0162e724d2ef080e5264086bcea5b53d12fcafc5ddefc3bbf16af021fc48"
   license "MIT"
 
   bottle do
-    sha256 arm64_ventura:  "3cb46e330dab39dad7f95b9bcb62e5cc059a5e223f8f0bbce3ebe1f78447b03f"
-    sha256 arm64_monterey: "52ec44a201cf107c54393203771380e931e85f1a842e2c35f69325f19b3003fe"
-    sha256 arm64_big_sur:  "baa787f5f7ec0d5503d34740c0b487f9c9202933d652c2d6a2cf834e2352d830"
-    sha256 ventura:        "ebb043ac152b8423a005281c4c479dfbc52cf14bca9603cc9a50cc59973925d7"
-    sha256 monterey:       "b62edecae1746cbc0824d08420bece5f42c703786e4240dd508c08e3d7d37d4d"
-    sha256 big_sur:        "b0398dcc4e016063f67cb5408c44a858061d735784015997e9715ba0495428fb"
-    sha256 x86_64_linux:   "4408fa4fb3a5df0272e21344d5b60656f1b14175b4c37c7b0ca5e067bf903369"
+    sha256 arm64_sequoia: "58cb6766d9b3bde9205fc294459629e62cc7b0f33c8340d56541cbf8d58b7cf5"
+    sha256 arm64_sonoma:  "d49db70364b4b5fffcd93c462c5522bbd0be7335b612ed59174866b1372f335f"
+    sha256 arm64_ventura: "25ee4d95d2bf90dd2ebfd9dd3ad08e5d50c2435407e54324872d2e30f8f61d87"
+    sha256 sonoma:        "2300f91fa3b8111f09e9749cf1fca4eeab71045765fedab5133081fb6ef9c52c"
+    sha256 ventura:       "47a3caec8b5e43a8da8d246da2aeaa2c84a4735b572b3680eedaba931bed4796"
+    sha256 x86_64_linux:  "715de9336f21432cd9d431bb5e7f4f280f9e5cef7947dccdb172b5dacab52ac4"
   end
 
+  depends_on "bdw-gc"
   depends_on "crystal"
+  depends_on "libevent"
   depends_on "libyaml"
+  depends_on "llvm"
+  depends_on "pcre2"
 
   def install
     system "shards", "install"
@@ -30,7 +33,7 @@ class Crystalline < Formula
   end
 
   test do
-    payload = <<~LSP_PAYLOAD
+    payload = <<~JSON
       {
         "jsonrpc": "2.0",
         "id": 1,
@@ -43,7 +46,7 @@ class Crystalline < Formula
           "workspaceFolders": null
         }
       }
-    LSP_PAYLOAD
+    JSON
 
     request = <<~LSP_REQUEST
       Content-Length: #{payload.size}
@@ -51,7 +54,7 @@ class Crystalline < Formula
       #{payload}
     LSP_REQUEST
 
-    output = pipe_output("#{bin}/crystalline", request, 0)
+    output = pipe_output(bin/"crystalline", request, 0)
     assert_match "Content-Length", output
   end
 end

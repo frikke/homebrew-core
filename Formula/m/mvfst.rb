@@ -1,36 +1,38 @@
 class Mvfst < Formula
   desc "QUIC transport protocol implementation"
-  homepage "https://github.com/facebookincubator/mvfst"
-  url "https://github.com/facebookincubator/mvfst/archive/refs/tags/v2023.09.04.00.tar.gz"
-  sha256 "15470fd5c9dbffa727caeb76bee415ebe55e4c1770cd215249fd8c27b88d1f66"
+  homepage "https://github.com/facebook/mvfst"
+  url "https://github.com/facebook/mvfst/archive/refs/tags/v2024.12.02.00.tar.gz"
+  sha256 "51d5971594c5a4017d14f080fece23f0f035e09a0df2f3553c886c8d990996f2"
   license "MIT"
-  head "https://github.com/facebookincubator/mvfst.git", branch: "main"
+  head "https://github.com/facebook/mvfst.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9690e90ae6e7d7b828cafe41604521d26d9076a8a0b3a1d06c6c16d7093fa360"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "692d2035ff89ccfbeec8542c3724cc0243c7195b33d8d3e36b1285c4f42bafea"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "895d2b70e446b901373ff07fdf9bf035a6d13116fedad1e2106d764f77471be9"
-    sha256 cellar: :any_skip_relocation, ventura:        "e9eb010dfd4a686aea235f73c3923521f95867cf985be09f14e964a4c958ad45"
-    sha256 cellar: :any_skip_relocation, monterey:       "9d2dbdde0cbbbaac207e2175622f8fa788a44db31af4d6e6c97e4fcc3198a1c6"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5032b673ee07a0f14ee4386a4365970ba186025df55d93913b87f15d3ea60098"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8f6bdc3948c24312911618584812d113182c5b77c3af4762c889ca54dcea018f"
+    sha256 cellar: :any,                 arm64_sequoia: "3de282eb5dc28d2939abe8a2d2ebc0d50834ac62a896615430799b7dda20088a"
+    sha256 cellar: :any,                 arm64_sonoma:  "7f486a7366faaaa6ee4c13ca32f8420523b105b62950c795a5e63eeaf69c6480"
+    sha256 cellar: :any,                 arm64_ventura: "2875cbc5ef31a7fa83c917be5321b68335a55f9a57ad6528eaa98fd5997a41ed"
+    sha256 cellar: :any,                 sonoma:        "1249758962084f0c3a439f573ffcc709cfe0513aacaf331dae400538f6bbdf4e"
+    sha256 cellar: :any,                 ventura:       "149e51283a8f46eaa38d71cf122c23fecd381fdfc6c068ba7c45a7f69851e2e9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "376432e3f205d4d4b554dac58d89241730932fe9280d85112f0c8a808b9f7d6c"
   end
 
   depends_on "cmake" => [:build, :test]
   depends_on "googletest" => :test
-  depends_on "boost"
+  depends_on "double-conversion"
   depends_on "fizz"
   depends_on "fmt"
   depends_on "folly"
   depends_on "gflags"
   depends_on "glog"
+  depends_on "libsodium"
   depends_on "openssl@3"
 
   def install
-    system "cmake", "-S", ".", "-B", "_build",
-                    "-DBUILD_TESTS=OFF",
-                    "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
-                    *std_cmake_args
+    shared_args = ["-DBUILD_SHARED_LIBS=ON", "-DCMAKE_INSTALL_RPATH=#{rpath}"]
+    linker_flags = %w[-undefined dynamic_lookup -dead_strip_dylibs]
+    linker_flags << "-ld_classic" if OS.mac? && MacOS.version == :ventura
+    shared_args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,#{linker_flags.join(",")}" if OS.mac?
+
+    system "cmake", "-S", ".", "-B", "_build", "-DBUILD_TESTS=OFF", *shared_args, *std_cmake_args
     system "cmake", "--build", "_build"
     system "cmake", "--install", "_build"
   end
@@ -59,20 +61,20 @@ class Mvfst < Formula
       target_include_directories(echo PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     CMAKE
 
-    system "cmake", ".", *std_cmake_args
-    system "cmake", "--build", "."
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
 
     server_port = free_port
-    server_pid = spawn "./echo", "--mode", "server",
-                                 "--host", "127.0.0.1", "--port", server_port.to_s
+    server_pid = spawn "./build/echo", "--mode", "server",
+                                       "--host", "127.0.0.1", "--port", server_port.to_s
     sleep 5
 
     Open3.popen3(
-      "./echo", "--mode", "client",
+      "./build/echo", "--mode", "client",
                 "--host", "127.0.0.1", "--port", server_port.to_s
     ) do |stdin, _, stderr|
       stdin.write "Hello world!\n"
-      Timeout.timeout(15) do
+      Timeout.timeout(60) do
         stderr.each do |line|
           break if line.include? "Client received data=echo Hello world!"
         end

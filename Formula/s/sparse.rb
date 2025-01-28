@@ -12,9 +12,12 @@ class Sparse < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "56f5a3f7e3acbbd57f46ef1bf435a2a5130d719dd9f28e3578eabe79097aef3a"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "b4bf9baccb8ffe407b9f59f8933d72d4676e08adbeffcd4f3dcea9c3b0db9ca5"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "c1c53b9ca28fe2ce54ff72f0f9642289704ccae97868a2a90e2cb02095e8d7df"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "3afb8b9256e015fcb1fc49608cea9fe6c02e6a93fa1df0a7720a30c5e8057699"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "57f40e26e5b3c4239c2f247705d3b6b27256482ef67c239cb34bc82ec5cea891"
+    sha256 cellar: :any_skip_relocation, sonoma:         "06d1f2a6ccf48df9c8d8dcc96d38cc9007adccf537fbd1517fdb2d7ff8681bb1"
     sha256 cellar: :any_skip_relocation, ventura:        "0f5139fcf069d80d6ac94c12904b9f46dd5066b24619dacef6ca3c34442730fe"
     sha256 cellar: :any_skip_relocation, monterey:       "7c86940a523d15f63966df796fdea74176c02be7adc8c4071d2f60a194bd30af"
     sha256 cellar: :any_skip_relocation, big_sur:        "c858bb88d9f4d2d00da1d7498ee130a6d134b77a07d786d9b3906b74fedc90b0"
@@ -23,10 +26,14 @@ class Sparse < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "8c282a77e53c828abe22a69af0b1dd9cb124b333344f9be1b0f0f3d0a55a3fb0"
   end
 
-  depends_on "gcc" if DevelopmentTools.clang_build_version < 1100
+  on_macos do
+    depends_on "gcc" if DevelopmentTools.clang_build_version < 1100
+  end
 
-  # error: use of unknown builtin '__builtin_clrsb'
-  fails_with :clang if DevelopmentTools.clang_build_version < 1100
+  fails_with :clang do
+    build 1099
+    cause "error: use of unknown builtin '__builtin_clrsb'"
+  end
 
   def install
     # BSD "install" does not understand the GNU -D flag.
@@ -40,6 +47,6 @@ class Sparse < Formula
 
   test do
     (testpath/"test.C").write("int main(int a) {return a;}\n")
-    system "#{bin}/sparse", testpath/"test.C"
+    system bin/"sparse", testpath/"test.C"
   end
 end

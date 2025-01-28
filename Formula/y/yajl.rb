@@ -7,6 +7,7 @@ class Yajl < Formula
 
   bottle do
     rebuild 4
+    sha256 cellar: :any,                 arm64_sequoia:  "dba63b344e3308d17991f4a71f5ac5dcdc12099cd1d64e1d32f2492a44562709"
     sha256 cellar: :any,                 arm64_sonoma:   "971639e642d5f2531ab6159ee96e86c159a9015fad89cc28eee10a3fc91eb9ef"
     sha256 cellar: :any,                 arm64_ventura:  "fe07a22a18a3172092b2b2163bceff50f423c142484f9a62687dcf2a8ee6e330"
     sha256 cellar: :any,                 arm64_monterey: "95735cd614157ed2756dac69c80d81b83d305f0dcb54c3299c00e5f0528ddd0e"
@@ -23,14 +24,14 @@ class Yajl < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "c206281370fe7277f21d17ff50fe9511233aff74501238516918027006c9cbf3"
   end
 
-  # Configure uses cmake internally
   depends_on "cmake" => :build
 
   def install
     ENV.deparallelize
 
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
     (include/"yajl").install Dir["src/api/*.h"]
   end
 

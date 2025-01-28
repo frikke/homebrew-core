@@ -1,19 +1,18 @@
 class Ddrescue < Formula
   desc "GNU data recovery tool"
   homepage "https://www.gnu.org/software/ddrescue/ddrescue.html"
-  url "https://ftp.gnu.org/gnu/ddrescue/ddrescue-1.27.tar.lz"
-  mirror "https://ftpmirror.gnu.org/ddrescue/ddrescue-1.27.tar.lz"
-  sha256 "38c80c98c5a44f15e53663e4510097fd68d6ec20758efdf3a925037c183232eb"
+  url "https://ftp.gnu.org/gnu/ddrescue/ddrescue-1.29.tar.lz"
+  mirror "https://ftpmirror.gnu.org/ddrescue/ddrescue-1.29.tar.lz"
+  sha256 "01a414327853b39fba2fd0ece30f7bee2e9d8c8e8eb314318524adf5a60039a3"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "37b18de8baf95b6bb38e322de59f191e2c50bb0bb0d16c8632e7da177bdad91c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "22b84e87b78d58f79c6178b6cc737f22aeb0a92cbe353c1cc156e201e093a242"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e8802e7d817f7362a6b17f8eb491b2eb67bd02b4f6234400eb399765f52fa985"
-    sha256 cellar: :any_skip_relocation, ventura:        "dfd7d7ccc834e7a36aea13c9d3c9f16c0623acdae03e9d2c9a12ec1cb8b61baf"
-    sha256 cellar: :any_skip_relocation, monterey:       "219b2c7be21bd51e52223a3810d820c5d0faf51d0956003bce0181020c7bf98c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "94f75c1743efdf6e58d538c8f2ebf324eda5c8e3b23ba5551df89d46bab11c55"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "44cba29aabb794d58f2f3d553f39866dec2821057a7a683ce892ddbb9325c721"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "19e7cdf715cf98eab8958472f1f44422aa890de890bf9b8b4b617da619bcc047"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "85d7d4446452b151420ab5fbfdc1c9eb9a78fa84d8a4314f8ed84c5c43929b55"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c800371fd465a91660b1c10912d7492ad3137f17c8f2eb4f93c3bf9284b1fe23"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3fd2c4a80a97627d8c3d03402786a3bba0a3006c05de07094ecc1274b726b961"
+    sha256 cellar: :any_skip_relocation, ventura:       "20dc0c65999e389090bb3631b781bf7f36a17dae90fc3683ee46af451c790acf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a299a8590b6d15de46b13b906a5e96c86f4caa697b342fafec1e6786a3c4deb3"
   end
 
   def install
@@ -23,6 +22,6 @@ class Ddrescue < Formula
   end
 
   test do
-    system bin/"ddrescue", "--force", "--size=64Ki", "/dev/zero", "/dev/null"
+    system bin/"ddrescue", "--force", "--size=64Ki", "/dev/zero", File::NULL
   end
 end

@@ -1,8 +1,8 @@
 class Maxwell < Formula
   desc "Reads MySQL binlogs and writes row updates as JSON to Kafka"
   homepage "https://maxwells-daemon.io/"
-  url "https://github.com/zendesk/maxwell/releases/download/v1.40.5/maxwell-1.40.5.tar.gz"
-  sha256 "a0e10a585ab859e55779ff25c2e21c1dd76295f8b66c3affba7c94d5f963c7f1"
+  url "https://github.com/zendesk/maxwell/releases/download/v1.42.3/maxwell-1.42.3.tar.gz"
+  sha256 "ced213a5a13e22cd86e17a0d264c386b8c883614d9a8a667d90f848b208fc293"
   license "Apache-2.0"
 
   livecheck do
@@ -11,10 +11,11 @@ class Maxwell < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "bef8fe95a792f7ae5e5f8ef01b6530717e0ebba183e8f19b1206ca6b4aab293a"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "25a206d887efceeeecd7983a0bc7d03fa0c0adfb91604ec7f10a20b505b02a3f"
   end
 
-  depends_on "openjdk@11"
+  depends_on "openjdk"
 
   def install
     libexec.install Dir["*"]
@@ -23,7 +24,7 @@ class Maxwell < Formula
       bin.install libexec/"bin/#{f}"
     end
 
-    bin.env_script_all_files(libexec/"bin", Language::Java.java_home_env("11.0"))
+    bin.env_script_all_files(libexec/"bin", Language::Java.java_home_env)
   end
 
   test do

@@ -6,9 +6,12 @@ class DfuUtil < Formula
   license "GPL-2.0-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "5cfdae94eea7b66aae31b16dd689bd8078d7aa685786dcf45f9f9324db12727d"
+    sha256 cellar: :any,                 arm64_sonoma:   "948497e1bb1a0f035517671d50e3d64c8843417210acb3cdc16232884399c783"
     sha256 cellar: :any,                 arm64_ventura:  "03e81fc129ada62759e3cd8d892131ca326851ab6631730e9d101405c0e2594d"
     sha256 cellar: :any,                 arm64_monterey: "7d09c40c797df76fdea2862b205111fa9c14d44b09c27a0b00e083fcc827bee9"
     sha256 cellar: :any,                 arm64_big_sur:  "c7dd53f422003b99c57f565aad8371e8cef1aa3de825f36cd927cd61ed64249d"
+    sha256 cellar: :any,                 sonoma:         "ec1b2eb46336cab4cac68f413d2e0dd9b1af2fd63182598ca40f4dd61595efb9"
     sha256 cellar: :any,                 ventura:        "84abd91cd4595f7d3445b7d3ba754528fdb671c7cfcdf82977b96e701c0cf60e"
     sha256 cellar: :any,                 monterey:       "5daf11ce553e067f293fc615889d22c74abb9ea9da21f57699c81d65ee9fa089"
     sha256 cellar: :any,                 big_sur:        "b970a649e90f3e080af2143e8479e0616959e35650defea16b96288c4af011dc"
@@ -25,13 +28,12 @@ class DfuUtil < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libusb"
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

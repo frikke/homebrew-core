@@ -1,8 +1,8 @@
 class Websocat < Formula
   desc "Command-line client for WebSockets"
   homepage "https://github.com/vi/websocat"
-  url "https://github.com/vi/websocat/archive/v1.12.0.tar.gz"
-  sha256 "ca6ab2bc71a9c641fbda7f15d4956f2e19ca32daba9b284d26587410944a3adb"
+  url "https://github.com/vi/websocat/archive/refs/tags/v1.14.0.tar.gz"
+  sha256 "919ee83c961074c176a129874a77c02889401f3548c2536a84c4427f97cfeb26"
   license "MIT"
 
   livecheck do
@@ -11,19 +11,18 @@ class Websocat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "bc2139c707ac38b85de0cdfae80e2204f6148a65224306d62ae40354422c41bc"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6c612057e9aab99c958b0b689b0bd61754bb93ff4d91220f63babd369f695afd"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fba655feb506df9af3717809b4d849c1704f417de006ef5813ccecbcb9445a64"
-    sha256 cellar: :any_skip_relocation, ventura:        "d4aa53b9d6fc7b9fb0543982400a2c4200ddde314cb04e2ef66051d380c1f5b0"
-    sha256 cellar: :any_skip_relocation, monterey:       "fda1056d37720a2b6dd9aa6eeea78556f0a76ac325cf90550cb43a10072829ac"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f2783ed46e6bfe8714459775b7b8557fe69f572d503f115f120f307148a25e06"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "265ab8fc1cf2ab156b6fc458bf229824ab3aa184d251596dc5473a80c90d8ee2"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "43528315c386262e6d11036b016fc7ddab24c362e1a38e036b31133c3bf194af"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4e1c06621d0e8448803752f47c35f13a56a16e118de637aa6c19c20f1c954abe"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "eeecfce3377a6c4093b50d964f083b4b03dc39f13b933e2b57a38eed3d957066"
+    sha256 cellar: :any_skip_relocation, sonoma:        "54a9d377c6bfa1776e72631b6a2599a1b45f409d2307b2c3dd36db86dfb8a778"
+    sha256 cellar: :any_skip_relocation, ventura:       "60b160dbc0fcb8ac2ffd81f9b27cc912ce15ba52b091897fe5d7ff0ff2e2cdd0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "47743949aee1665357d781c961840c97f3d781650995f7b0c9cb541f898c756f"
   end
 
   depends_on "rust" => :build
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "openssl@3"
   end
 
@@ -32,6 +31,6 @@ class Websocat < Formula
   end
 
   test do
-    system "#{bin}/websocat", "-t", "literal:qwe", "assert:qwe"
+    system bin/"websocat", "-t", "literal:qwe", "assert:qwe"
   end
 end

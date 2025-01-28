@@ -1,19 +1,18 @@
 class Bastet < Formula
   desc "Bastard Tetris"
   homepage "https://fph.altervista.org/prog/bastet.html"
-  url "https://github.com/fph/bastet/archive/0.43.2.tar.gz"
+  url "https://github.com/fph/bastet/archive/refs/tags/0.43.2.tar.gz"
   sha256 "f219510afc1d83e4651fbffd5921b1e0b926d5311da4f8fa7df103dc7f2c403f"
   license "GPL-3.0-or-later"
-  revision 5
+  revision 10
 
   bottle do
-    sha256 arm64_ventura:  "ab8917177ce7dbe0adf2ce68b2b74d931d62ac124b702a029475717e058dd5ee"
-    sha256 arm64_monterey: "af3f3df41a07583a6e6737c475b374a65eddb79c82d62e80f4350a0b93d206c5"
-    sha256 arm64_big_sur:  "62eb01fe9d32979f3f21a1e477a3808a6d0aaef5939342e2a02970b0367ffbfd"
-    sha256 ventura:        "cab6773e9e5cbfce880975e6401d150d06c541064333a5aa698e25b5c0335d78"
-    sha256 monterey:       "fda8ed1bd078f83d4027af1852af55c1314c5b3b7eeb249a141eade4f24f2529"
-    sha256 big_sur:        "9de7d39f5e3cd635dd8f2ac0ab8e8e95967fe25f1b00c95c5411927ed760ac0e"
-    sha256 x86_64_linux:   "758f1f3cca344de8ce227fcd021a36ac6c34a9460703e1d9d3f14a49d974b4e8"
+    sha256 arm64_sequoia: "3609a905ba94c6dfa333b703b2a98a7d2d104f98b9ea01e4ee8e5d50f7c1be93"
+    sha256 arm64_sonoma:  "3b694178acf005d63ff6005cc31b4432b2c085e6f4442787ec71d6ae684480f7"
+    sha256 arm64_ventura: "396f9c63d674290dc9b51e9a883f2de4d1beadc18f88ca517b9c4766e285e8a6"
+    sha256 sonoma:        "77d12f1eb8fa1ba72bb5c5c352247b059268110baa8c67cea54097b392b0e7f9"
+    sha256 ventura:       "c81ce5e9ebdb37bd5b779670c0ec6b79096b9be3f86116c5a52e6301ce0902aa"
+    sha256 x86_64_linux:  "d39605f160ac522349d9b0e7d0af9320cddd62793a2fa656caad94eb78c70bb2"
   end
 
   depends_on "boost"
@@ -27,6 +26,8 @@ class Bastet < Formula
 
   def install
     inreplace %w[Config.cpp bastet.6], "/var", var
+
+    ENV.append "CXX", "-std=c++14"
 
     system "make", "all"
 

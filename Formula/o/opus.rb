@@ -1,29 +1,28 @@
 class Opus < Formula
   desc "Audio codec"
   homepage "https://www.opus-codec.org/"
-  url "https://downloads.xiph.org/releases/opus/opus-1.4.tar.gz", using: :homebrew_curl
-  sha256 "c9b32b4253be5ae63d1ff16eea06b94b5f0f2951b7a02aceef58e3a3ce49c51f"
+  url "https://ftp.osuosl.org/pub/xiph/releases/opus/opus-1.5.2.tar.gz"
+  sha256 "65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1"
   license "BSD-3-Clause"
 
   livecheck do
-    url "https://downloads.xiph.org/releases/opus/"
+    url "https://ftp.osuosl.org/pub/xiph/releases/opus/"
     regex(%r{href=(?:["']?|.*?/)opus[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "d30af277113178e355bf6ca18ae8ca34acfb0e98849edf26761c758d0f42620d"
-    sha256 cellar: :any,                 arm64_ventura:  "6901207819378dec2bdac601e2d290e498939af95209438180f3f93a32dda447"
-    sha256 cellar: :any,                 arm64_monterey: "e2ba256cb11597c54056f624e086ae6f92488b33967c87ef59a1e0121f0c195d"
-    sha256 cellar: :any,                 arm64_big_sur:  "0439a29659def6c80fc81c19fb655c8f1948b090af9e4e22edb825cf568c0487"
-    sha256 cellar: :any,                 sonoma:         "83d594d4a0255a37c5c5c33b8b27e3c2ef9ffedaf28510864b34d63dca7632b8"
-    sha256 cellar: :any,                 ventura:        "105509c7708dd9befaa5a5451c41d878725e6f2fd7b24eeedb8e74d5a8ec5425"
-    sha256 cellar: :any,                 monterey:       "9af359f7b025b55113e4f24136a2da9bdc5f486a9cd45a382805e8371405a637"
-    sha256 cellar: :any,                 big_sur:        "ee33952391561419e2420137371c704af877d0f9ed9f06e1f383070c0051e0c7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "534b2fa7c50d3f46518355f2619824287983cdb95705dd1406cf51ae2b7008c3"
+    sha256 cellar: :any,                 arm64_sequoia:  "564c0c7f19ac41ed22baabf7c1bf2e172f81bad60ec211d03bda8eeb42ce2f1a"
+    sha256 cellar: :any,                 arm64_sonoma:   "017d3d10cf679cad5cee3501a53945903eabff9f7657214944bf9156f85e9872"
+    sha256 cellar: :any,                 arm64_ventura:  "d53715a8e666c4d91917f6746c2516aca2f160294ca5542a7db7a53d953c7447"
+    sha256 cellar: :any,                 arm64_monterey: "02260aea3cc13374c4366abb75e14034bb374d76873d4fbbd9f26794e1d727cb"
+    sha256 cellar: :any,                 sonoma:         "858dbe63f7a6489d18c9ab19114496081881623319bce3b917e686e63550dd84"
+    sha256 cellar: :any,                 ventura:        "742d2b0dabd25100776c6a57743fde9e05b02e154612ead68dc25c1ef57fcc3d"
+    sha256 cellar: :any,                 monterey:       "becc7d03c9219308c69f7704d33cc7cf0579a2db902e82ef33bf5266f69a54c1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d35c066cdcaad6a6b9f840fc2dd70da4ca02000c11b08674fa065b8bf7a9b925"
   end
 
   head do
-    url "https://gitlab.xiph.org/xiph/opus.git"
+    url "https://gitlab.xiph.org/xiph/opus.git", branch: "main"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -38,7 +37,7 @@ class Opus < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <opus.h>
 
       int main(int argc, char **argv)
@@ -62,7 +61,7 @@ class Opus < Formula
         }
         return err;
       }
-    EOS
+    CPP
     system ENV.cxx, "-I#{include}/opus", testpath/"test.cpp",
            "-L#{lib}", "-lopus", "-o", "test"
     system "./test"

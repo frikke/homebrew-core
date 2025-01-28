@@ -1,19 +1,23 @@
 class Kitex < Formula
   desc "Golang RPC framework for microservices"
   homepage "https://github.com/cloudwego/kitex"
-  url "https://github.com/cloudwego/kitex/archive/refs/tags/v0.7.1.tar.gz"
-  sha256 "98699ad088d61d18f75f0704df765df5650baf5fa954347db182771feb17b959"
+  url "https://github.com/cloudwego/kitex/archive/refs/tags/v0.12.1.tar.gz"
+  sha256 "6b446bb840b04626be6048f02fdaf899e613ada2038f2f169ec0a1262eee219e"
   license "Apache-2.0"
   head "https://github.com/cloudwego/kitex.git", branch: "develop"
 
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ba9e227edc8b3b91c084afcc101591b6de25c92ca26975c47671f0b48894eb13"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "18706d8cbe1851b9964d4b4441a0bf06f311f1194ab44047ca53952f31ffba70"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a6eb228d6c935ab833ce55e3f5cf2f17babbcb4876161bbb3716f7f1cb7b0a53"
-    sha256 cellar: :any_skip_relocation, ventura:        "f9208c938ebb59f6207a1cadf7201ae79ea82c4acee41c600c9ced000fa032cd"
-    sha256 cellar: :any_skip_relocation, monterey:       "1c11676602b3d1f379d9a1c8988a363b926ba567f34dfabf7e9b27b28dae4cf4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0387c815afa7034f59733f11893b2ed9c70d5f748c48d99d81b2ab34f0445769"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "148565d1b744350c2422670c8aba16f61b7c07e9a10a1bb9be36ce370d4821ce"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f8bb0db0325c188f59d389d0e18fa43cb64ac53aafc7c82e687fb5babe32dee2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f8bb0db0325c188f59d389d0e18fa43cb64ac53aafc7c82e687fb5babe32dee2"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f8bb0db0325c188f59d389d0e18fa43cb64ac53aafc7c82e687fb5babe32dee2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "7fe63a88fe601260e39785d72d37273aac35e8368b28b644416ae2b33f2eedad"
+    sha256 cellar: :any_skip_relocation, ventura:       "7fe63a88fe601260e39785d72d37273aac35e8368b28b644416ae2b33f2eedad"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ce5e4e6fef19a4785d6e6487f2ff64e393026bde795ae2c3c18b9e1d781e4f2e"
   end
 
   depends_on "go" => [:build, :test]
@@ -40,7 +44,7 @@ class Kitex < Formula
           Response echo(1: Request req)
       }
     EOS
-    system "#{bin}/kitex", "-module", "test", "test.thrift"
+    system bin/"kitex", "-module", "test", "test.thrift"
     assert_predicate testpath/"go.mod", :exist?
     refute_predicate (testpath/"go.mod").size, :zero?
     assert_predicate testpath/"kitex_gen"/"api"/"test.go", :exist?

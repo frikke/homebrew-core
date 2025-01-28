@@ -6,9 +6,11 @@ class Dterm < Formula
   license "GPL-2.0-only"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d0fc60ff39f0721d26034829ab0be58b0365d7daa69c45b3ba7e4fd08d4faa9d"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "a3ed01df00b32efe7a637e827ae2aec70a6d10063cef2128b7246a58f4f1e7a0"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "f26bc52d3523b70ac1265b8b04fd739a91988cf3841b49d837efa0561a278045"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c7da6c39a5a9edb1ed37346d39e2ebc40f64733f1607ae6290c4c3ab063e3b00"
+    sha256 cellar: :any_skip_relocation, sonoma:         "2a5265a16703cb70e8ba6d2bb380d87ab4fbd27c162eb1ea2d591202dd3fc7e6"
     sha256 cellar: :any_skip_relocation, ventura:        "cd3012cae88862d3935972cfa4c93b64ceb5937f4869656450f81ef7797009b1"
     sha256 cellar: :any_skip_relocation, monterey:       "9cf6f95be0d2fc679fc8776dbe5fac91eaa9b1671d5dddc86ce75cfc43364aab"
     sha256 cellar: :any_skip_relocation, big_sur:        "2766f4a9410153b28253e43695ba07aaf1886fb63747837b609aa81a2f46e5d5"
@@ -20,7 +22,7 @@ class Dterm < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "e32e1bc798fb4622c7fc33cd62f36fad897329075a8f738708fc319c08e82505"
   end
 
-  deprecate! date: "2023-04-16", because: :unsupported
+  disable! date: "2024-02-18", because: :unsupported
 
   on_linux do
     depends_on "readline"
@@ -33,6 +35,6 @@ class Dterm < Formula
   end
 
   test do
-    system "#{bin}/dterm", "help"
+    system bin/"dterm", "help"
   end
 end

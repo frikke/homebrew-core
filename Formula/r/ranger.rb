@@ -1,34 +1,26 @@
 class Ranger < Formula
-  include Language::Python::Shebang
+  include Language::Python::Virtualenv
 
   desc "File browser"
   homepage "https://ranger.github.io"
-  url "https://ranger.github.io/ranger-1.9.3.tar.gz"
-  sha256 "ce088a04c91c25263a9675dc5c43514b7ec1b38c8ea43d9a9d00923ff6cdd251"
+  url "https://github.com/ranger/ranger/archive/refs/tags/v1.9.4.tar.gz"
+  sha256 "7ad75e0d1b29087335fbb1691b05a800f777f4ec9cba84faa19355075d7f0f89"
   license "GPL-3.0-or-later"
-  revision 2
   head "https://github.com/ranger/ranger.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3a4d109e42f3146daeb999e613a9cedca98cbd851f98f950f54cfaab5e872c58"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3a4d109e42f3146daeb999e613a9cedca98cbd851f98f950f54cfaab5e872c58"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3a4d109e42f3146daeb999e613a9cedca98cbd851f98f950f54cfaab5e872c58"
-    sha256 cellar: :any_skip_relocation, ventura:        "92e4fd7b02e9314319342a86b176bcb78c902ab326b6db482c653194ec5389df"
-    sha256 cellar: :any_skip_relocation, monterey:       "92e4fd7b02e9314319342a86b176bcb78c902ab326b6db482c653194ec5389df"
-    sha256 cellar: :any_skip_relocation, big_sur:        "92e4fd7b02e9314319342a86b176bcb78c902ab326b6db482c653194ec5389df"
-    sha256 cellar: :any_skip_relocation, catalina:       "92e4fd7b02e9314319342a86b176bcb78c902ab326b6db482c653194ec5389df"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3a4d109e42f3146daeb999e613a9cedca98cbd851f98f950f54cfaab5e872c58"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "97ec1aa9eb07127348df0acbbe74ee70530e3c42b2b34b318d275a5b939b108c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "97ec1aa9eb07127348df0acbbe74ee70530e3c42b2b34b318d275a5b939b108c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "97ec1aa9eb07127348df0acbbe74ee70530e3c42b2b34b318d275a5b939b108c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9805b7b6198dac4993bf90919395a37d7e26dea6c1a059c87a82f30c56b915af"
+    sha256 cellar: :any_skip_relocation, ventura:       "9805b7b6198dac4993bf90919395a37d7e26dea6c1a059c87a82f30c56b915af"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "97ec1aa9eb07127348df0acbbe74ee70530e3c42b2b34b318d275a5b939b108c"
   end
 
-  depends_on "python@3.11"
-
-  def python
-    Formula["python@3.11"].opt_libexec/"bin/python"
-  end
+  depends_on "python@3.13"
 
   def install
-    system python, "-m", "pip", "install", *std_pip_args, "."
+    virtualenv_install_with_resources
   end
 
   test do
@@ -38,7 +30,7 @@ class Ranger < Formula
     (testpath/"test.py").write code
     assert_equal code, shell_output("#{bin}/rifle -w cat test.py")
 
-    ENV.prepend_path "PATH", python.parent
+    ENV.prepend_path "PATH", Formula["python@3.13"].opt_libexec/"bin"
     assert_equal "Hello World!\n", shell_output("#{bin}/rifle -p 2 test.py")
   end
 end

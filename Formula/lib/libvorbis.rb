@@ -13,6 +13,7 @@ class Libvorbis < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "c28d1e0b461a4cf6f5aee72e664ac6f5f6f3efaab44f15b91924f08474cfafe1"
     sha256 cellar: :any,                 arm64_sonoma:   "f71115c28f65e1a87ae0dbe695421ecacfcddcaa6f91a3e0a23493da73560de5"
     sha256 cellar: :any,                 arm64_ventura:  "941871c7cfee1e15b60191e1c70296554871bc36e4fc8104ffc8919bb767f555"
     sha256 cellar: :any,                 arm64_monterey: "08fc2566eda5d6fc2204c822bac51383a59c4536bae539b77cfe8c7f247f7517"
@@ -32,7 +33,7 @@ class Libvorbis < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libogg"
 
   resource("oggfile") do
@@ -43,13 +44,12 @@ class Libvorbis < Formula
   def install
     system "./autogen.sh" if build.head?
     inreplace "configure", " -force_cpusubtype_ALL", ""
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <assert.h>
       #include "vorbis/vorbisfile.h"
@@ -61,7 +61,7 @@ class Libvorbis < Formula
         printf("Encoded by: %s\\n", ov_comment(&vf,-1)->vendor);
         return 0;
       }
-    EOS
+    C
     testpath.install resource("oggfile")
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lvorbisfile",
                    "-o", "test"

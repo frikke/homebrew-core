@@ -1,20 +1,23 @@
 class KosliCli < Formula
   desc "CLI for managing Kosli"
   homepage "https://docs.kosli.com/client_reference/"
-  url "https://github.com/kosli-dev/cli.git",
-      tag:      "v2.6.6",
-      revision: "0cbd17e014040b3271375ae8fa6b6367b2bab644"
+  url "https://github.com/kosli-dev/cli/archive/refs/tags/v2.11.6.tar.gz"
+  sha256 "8b9af1c0d259e98c096a65e8741cb1539148d909c2a143e15b93ea85bd473803"
   license "MIT"
   head "https://github.com/kosli-dev/cli.git", branch: "main"
 
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1b038fc7bbb1938fe9b30fd3e6c339238e639b64f64dff0f231ad77f394f2769"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7fd12f5a2418edf9f99eb00dbb1aea2f3939bbcc3ef11d5f22e79f6ad68391ad"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "31b42e7f73d6c6b9b107e3467f36420db0bdd09dd6d2289c31338df352f6daf6"
-    sha256 cellar: :any_skip_relocation, ventura:        "f99436473de91d99a0c7bb0bdec8d40ec0d76ca3016dee3b4888ec60f96ed063"
-    sha256 cellar: :any_skip_relocation, monterey:       "8c9dabc3125c36a94f851640de441cd60bb4a9d51082dc7461375b112e85602c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8aeeec17dff7a2852003bf56ba4037ad079f1bb054a00de24e45ecf2bcd8faad"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9a90c44a3930866a18839a1eed17fb87072e7f76bbe8907317c18feaedef988d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b7206a188f61045ebc25de7f3b44f8f409f98488376bfca89c2419f9c3e42cec"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6509201d7f909c9651637757fa0968d864f7e3294447b3bd519985ef56e01662"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "803486c3701cffb3e0eef286b29e81469746ca8201ff4ca97f8fb03ef8e34240"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3a4ea53840953973dcb3aa9e4565aa32b33a409b0ab80f4a04c7c7867c4856ff"
+    sha256 cellar: :any_skip_relocation, ventura:       "087d96a52fe82dafd7fd95e7dd1b86cef6e14887ae61e1f6c13f05f515ff3f5b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a312dd53e21656ffe3467112c2513ecfa746d4fca23caa8ea86ba3eb291c370c"
   end
 
   depends_on "go" => :build
@@ -23,12 +26,12 @@ class KosliCli < Formula
     ldflags = %W[
       -s -w
       -X github.com/kosli-dev/cli/internal/version.version=#{version}
-      -X github.com/kosli-dev/cli/internal/version.gitCommit=#{Utils.git_head}
+      -X github.com/kosli-dev/cli/internal/version.gitCommit=#{tap.user}
       -X github.com/kosli-dev/cli/internal/version.gitTreeState=clean
     ]
-    system "go", "build", *std_go_args(output: bin/"kosli", ldflags: ldflags), "./cmd/kosli"
+    system "go", "build", *std_go_args(output: bin/"kosli", ldflags:), "./cmd/kosli"
 
-    generate_completions_from_executable(bin/"kosli", "completion", base_name: "kosli")
+    generate_completions_from_executable(bin/"kosli", "completion")
   end
 
   test do

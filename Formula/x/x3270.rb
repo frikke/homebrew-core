@@ -1,8 +1,8 @@
 class X3270 < Formula
   desc "IBM 3270 terminal emulator for the X Window System and Windows"
-  homepage "http://x3270.bgp.nu/"
-  url "http://x3270.bgp.nu/download/04.03/suite3270-4.3ga3-src.tgz"
-  sha256 "44d73c2614e5aa022bf16a1c8cceda2326e4c96a892da42f256ee4e13bc3a85d"
+  homepage "https://x3270.bgp.nu/"
+  url "http://x3270.bgp.nu/download/04.03/suite3270-4.3ga10-src.tgz"
+  sha256 "398c11a4bc862cb3f8536fe26a4c576d6f18756a446718af89b4fa5a972154c6"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,25 +11,25 @@ class X3270 < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "66c420133f3273c8808d468402963160b5322706115fb04cf01ab8574e71c8c0"
-    sha256 arm64_monterey: "e0acb175bd3a3969ffb3f865e17d9d41edca7c6221e42a30bca00d5aa68b6400"
-    sha256 arm64_big_sur:  "f2ff2e45eddeecaad0e03b1f2d601539fd02740cbdf3a1c5e6b3eddd6123a811"
-    sha256 ventura:        "d22c0fd8ecc142570494b50644bfc972ff6a43894dc01d22d237828589ae3478"
-    sha256 monterey:       "94cec9d1948cb40b9d169cbc4267b7b4f27135dfac52a9b4820980f748745c6f"
-    sha256 big_sur:        "4205866cc9cda834f11f0e7aa2018be598e72404b117356cc924b0144ea24b33"
-    sha256 x86_64_linux:   "d743d4ac5943098c71ae80620159ecfce874088b4b323bd98832ccc8c52bf4a6"
+    sha256 arm64_sequoia: "e0a50602a236f191cd93a8aadb1ecb1ffdfb8332c2fc46018c3c801b573483dd"
+    sha256 arm64_sonoma:  "928d0a205bbf28583b87124807574012c0ddfbb55be731b105c7b34bd2179b3b"
+    sha256 arm64_ventura: "5944432475eeacf621090f117dd36cd4fd829397a83b41dcb25581c7e90de386"
+    sha256 sonoma:        "b14a00d5f2e2c7a596e6f17cabf29cf45d0f85c8d37745d7891f8776dac099fe"
+    sha256 ventura:       "78c70e7aacfed1f6162ee4260ab1f210cdfa2e2383f596da7dd5960c5268b722"
+    sha256 x86_64_linux:  "a09b51f8fcd15a28844963ffecda7b30a6a3dae2624dc3019e0dbea23fbcbf02"
   end
 
+  depends_on "openssl@3"
   depends_on "readline"
 
-  uses_from_macos "tcl-tk"
+  uses_from_macos "ncurses"
 
   on_linux do
-    depends_on "openssl@3"
+    depends_on "tcl-tk@8"
   end
 
   def install
-    ENV.append "CPPFLAGS", "-I#{Formula["tcl-tk"].opt_include}/tcl-tk" unless OS.mac?
+    ENV.append "CPPFLAGS", "-I#{Formula["tcl-tk@8"].opt_include}/tcl-tk" if OS.linux?
 
     args = %w[
       --enable-c3270
@@ -37,7 +37,7 @@ class X3270 < Formula
       --enable-s3270
       --enable-tcl3270
     ]
-    system "./configure", *std_configure_args, *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
     system "make", "install.man"
   end

@@ -1,35 +1,30 @@
 class IosWebkitDebugProxy < Formula
   desc "DevTools proxy for iOS devices"
   homepage "https://github.com/google/ios-webkit-debug-proxy"
-  url "https://github.com/google/ios-webkit-debug-proxy/archive/v1.9.0.tar.gz"
-  sha256 "ba9bb2feaa976ad999e9e405d8cd8794cdf3546130a79f4785235200ead3c96c"
+  url "https://github.com/google/ios-webkit-debug-proxy/archive/refs/tags/v1.9.1.tar.gz"
+  sha256 "6b7781294cc84d383c7e7ecd05af08ca8d9b2af7a49ba648178ae4d84837c52b"
   license "BSD-3-Clause"
-  revision 2
   head "https://github.com/google/ios-webkit-debug-proxy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "2e15e2507a76e76bac5b808e5a312dee84534081d3b61ed9b0e6cd6064de41d7"
-    sha256 cellar: :any, arm64_monterey: "6e2de52a77bb737e611b61efcb6a3990daaa177f1b464e1ca9aa6bb067f6b10b"
-    sha256 cellar: :any, arm64_big_sur:  "cb9b1101f02036e9fff4bd42dc85184726f579f8781ae77b5ab6f63a4e8e0318"
-    sha256 cellar: :any, ventura:        "318c0dc88e175fea4de51f1d34c33fd28547d8cdbc13530fece81069ef3d8181"
-    sha256 cellar: :any, monterey:       "0380d81a70ec66f0cac1c1c86a71dc82a3d93fbfffbba49ac5435389855dd508"
-    sha256 cellar: :any, big_sur:        "07ebc21b39e195a83a93240d74432e882ca31618b4efe9805c39da194035271f"
+    sha256 cellar: :any,                 arm64_sequoia:  "b8ca23a0fe897b848f8fbe19273bf1e78793f7b0f9ec2ff9399173f4d8af7f1a"
+    sha256 cellar: :any,                 arm64_sonoma:   "e94dd8359b362248a2add9bb60bdd7eaf096290b5fada5d73b8c8cfa86ea79da"
+    sha256 cellar: :any,                 arm64_ventura:  "c74be0abfd3c227042b2be63c13207a9e6b72c228ab9c027d1f8c0ecd89f6abe"
+    sha256 cellar: :any,                 arm64_monterey: "34da6aa20a69ca6f79afff001898af9994b697331815b44ae572a05c25dda7e4"
+    sha256 cellar: :any,                 sonoma:         "f62dc78d90d3d02d3d0ea7f4d4d3d82b13affcdc403955113ec0d73d56c74fc3"
+    sha256 cellar: :any,                 ventura:        "22cb1b17edbddfc17bf64112a60d32fd659dfadce8cf1521018b994f89194f0d"
+    sha256 cellar: :any,                 monterey:       "a2ec7d1750d1c8d4370679e255f75957f6365bb55259b21967216ea5549ee88f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "44137a86b9210566d60a3b8b8e09f5cca01340f2db9441c6a29375df8e8e6db9"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libimobiledevice"
   depends_on "libplist"
+  depends_on "libusbmuxd"
   depends_on "openssl@3"
-
-  # Patch ios_webkit_debug_proxy to work with libplist 2.3.0
-  # Remove this once ios_webkit_debug_proxy gets a new release.
-  patch do
-    url "https://github.com/google/ios-webkit-debug-proxy/commit/94e4625ea648ece730d33d13224881ab06ad0fce.patch?full_index=1"
-    sha256 "39e7c648f1ecc96368caa469bd9aa0a552a272d72fafc937210f10d0894551e6"
-  end
 
   def install
     system "./autogen.sh", *std_configure_args
@@ -37,16 +32,18 @@ class IosWebkitDebugProxy < Formula
   end
 
   test do
+    assert_match version.to_s, shell_output("#{bin}/ios_webkit_debug_proxy --version")
+
+    # Fails in Linux CI with "`No device found, is it plugged in?`"
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     base_port = free_port
-    (testpath/"config.csv").write <<~EOS
+    (testpath/"config.csv").write <<~CSV
       null:#{base_port},:#{base_port + 1}-#{base_port + 101}
-    EOS
+    CSV
 
-    fork do
-      exec "#{bin}/ios_webkit_debug_proxy", "-c", testpath/"config.csv"
-    end
-
-    sleep(2)
+    spawn "#{bin}/ios_webkit_debug_proxy", "-c", testpath/"config.csv"
+    sleep 2
     assert_match "iOS Devices:", shell_output("curl localhost:#{base_port}")
   end
 end

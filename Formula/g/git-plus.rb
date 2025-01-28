@@ -9,16 +9,13 @@ class GitPlus < Formula
   head "https://github.com/tkrajina/git-plus.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a5993edd0f14bcf89323609395296369bf8c7c74697f421cf1324ed22246d295"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a5993edd0f14bcf89323609395296369bf8c7c74697f421cf1324ed22246d295"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a5993edd0f14bcf89323609395296369bf8c7c74697f421cf1324ed22246d295"
-    sha256 cellar: :any_skip_relocation, ventura:        "9bdce13d800f40dc51edcb780600d7cf7775624173f54521e4b6544619adcd63"
-    sha256 cellar: :any_skip_relocation, monterey:       "9bdce13d800f40dc51edcb780600d7cf7775624173f54521e4b6544619adcd63"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9bdce13d800f40dc51edcb780600d7cf7775624173f54521e4b6544619adcd63"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "58dd04bb2b4161b60ace6be84dce6a355d093c4a0312a03010b7d39b20e7ab0d"
+    rebuild 4
+    sha256 cellar: :any_skip_relocation, all: "87c0f95adbf84385ecf889a2efec12ffc43aa494baa99d7581d616db13e65306"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  conflicts_with "git-recent", because: "both install `git-recent` binaries"
 
   def install
     virtualenv_install_with_resources

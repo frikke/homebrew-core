@@ -1,15 +1,10 @@
 class Hashpump < Formula
   desc "Tool to exploit hash length extension attack"
   homepage "https://github.com/bwall/HashPump"
-  url "https://github.com/bwall/HashPump/archive/v1.2.0.tar.gz"
+  url "https://github.com/bwall/HashPump/archive/refs/tags/v1.2.0.tar.gz"
   sha256 "d002e24541c6604e5243e5325ef152e65f9fcd00168a9fa7a06ad130e28b811b"
   license "MIT"
   revision 7
-
-  livecheck do
-    url :stable
-    strategy :github_latest
-  end
 
   bottle do
     sha256 cellar: :any,                 arm64_ventura:  "ee4e8e386dbf585e9672aabb460e44e0a3ba40486d71443200912c1e39e95ad5"
@@ -20,6 +15,8 @@ class Hashpump < Formula
     sha256 cellar: :any,                 big_sur:        "680680ea8ab91083953e359b7fb74bd8195e4d9c94fdb3c351741d90983f72c8"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "542fd495cbe83aed52b7766926946f923d1e395f46cb4245b6ac6387cbeb0276"
   end
+
+  disable! date: "2024-09-16", because: :repo_removed
 
   depends_on "openssl@3"
   depends_on "python@3.11"
@@ -53,10 +50,10 @@ class Hashpump < Formula
     assert_match "&waffle=liege", output
     assert_equal 0, $CHILD_STATUS.exitstatus
 
-    (testpath/"test.py").write <<~EOS
+    (testpath/"test.py").write <<~PYTHON
       import hashpumpy
       print(hashpumpy.hashpump('ffffffff', 'original_data', 'data_to_add', len('KEYKEYKEY'))[0])
-    EOS
+    PYTHON
     assert_equal "e3c4a05f", shell_output("#{python3} test.py").chomp
   end
 end

@@ -1,8 +1,8 @@
 class DoviTool < Formula
   desc "CLI tool for Dolby Vision metadata on video streams"
   homepage "https://github.com/quietvoid/dovi_tool/"
-  url "https://github.com/quietvoid/dovi_tool/archive/refs/tags/2.0.3.tar.gz"
-  sha256 "6a4afe2733ab1a4eca6ff98c6038f60bbbed5c649b99c239759ccf0b17a3f818"
+  url "https://github.com/quietvoid/dovi_tool/archive/refs/tags/2.1.3.tar.gz"
+  sha256 "299d225fccb6360c5aaa2b8b35416d30f416d6f1746d9ec5820a16f6bbe5fa02"
   license "MIT"
   head "https://github.com/quietvoid/dovi_tool.git", branch: "main"
 
@@ -12,20 +12,20 @@ class DoviTool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "be9203db492cbbc19a2be63bc6e3c38afbf400cc7a248bddc1bbc154082230f7"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2969966d41ac5f184920327758aef057d6c494efc5bf30c689825d2bd2f288b7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "18b6fa8b33d62fceee6e7d3f93476ccf8aa434d47a92908b6a7abe6d3994ca07"
-    sha256 cellar: :any_skip_relocation, ventura:        "20d201b2018edece99efd7d2697dde13fa178d45427ec67e403293a403aa265b"
-    sha256 cellar: :any_skip_relocation, monterey:       "571131171d3f95269479c29bfbfd0caf2ea4ad8fdbeee37ae17fea39ae845e15"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5c1b7416c7abb7b987e03f50929c8cabbc8c8b8907e4fa3d834c4173b630f52e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "68f211eeb42e98aba295b3fbdfaa708e2542c7dbf17e382e51b5fb4ef620efff"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "120beef3c83a0d8828289c5bbf7645c9950224e88089a8b6aed625b219ce6c1c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8632fc24a977fc8d228abc6b872ae80baa030d07eed4696e7b42f8fed802ad78"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "a80d5309a8239a519a3baee66ec521e4e3f9ce62d2954c1e76eb20e06d06f8ea"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2e9cc14d2757a0adf25e84b2bbddc662d08232b6599678979dbceee2ff98715e"
+    sha256 cellar: :any_skip_relocation, ventura:       "a0c6e809d88c62e090f557ed407f4cc9c138e498933d7b3ad55f854fdb984b9e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "47a6672f164310531f016c712a65629f0c0d4a96407536c6d509808b87895788"
   end
 
   depends_on "rust" => :build
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "fontconfig"
+    depends_on "freetype"
   end
 
   def install

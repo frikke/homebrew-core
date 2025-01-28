@@ -1,12 +1,13 @@
 class YubikeyAgent < Formula
   desc "Seamless ssh-agent for YubiKeys and other PIV tokens"
-  homepage "https://filippo.io/yubikey-agent"
-  url "https://github.com/FiloSottile/yubikey-agent/archive/v0.1.6.tar.gz"
+  homepage "https://github.com/FiloSottile/yubikey-agent"
+  url "https://github.com/FiloSottile/yubikey-agent/archive/refs/tags/v0.1.6.tar.gz"
   sha256 "f156d089376772a34d2995f8261d821369a96a248ab586d27e3be0d9b72d7426"
   license "BSD-3-Clause"
   head "https://github.com/FiloSottile/yubikey-agent.git", branch: "main"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "ce973f7cd1e1b5252f039e2fe2154bea75ce4b7439f49ec908774e57e6d15031"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "68bef9f91a8d57edc11813ae0261a1a7c18a9a37afd7b376cb29c5e0b836bd69"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "16fbb36f3bab79726c96cfc94dfda3aaabe290a8c72f5a73dba3d76cee916ee1"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "028f45f8152045bbb98ddcac5ad41a554ee3a809e6e89cf76519b7b61e049243"
@@ -23,7 +24,7 @@ class YubikeyAgent < Formula
   uses_from_macos "pcsc-lite"
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "pinentry"
   end
 
@@ -52,8 +53,8 @@ class YubikeyAgent < Formula
 
   test do
     socket = testpath/"yubikey-agent.sock"
-    fork { exec bin/"yubikey-agent", "-l", socket }
+    spawn bin/"yubikey-agent", "-l", socket
     sleep 1
-    assert_predicate socket, :exist?
+    assert_path_exists socket
   end
 end

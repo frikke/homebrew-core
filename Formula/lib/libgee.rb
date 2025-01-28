@@ -1,27 +1,28 @@
 class Libgee < Formula
   desc "Collection library providing GObject-based interfaces"
   homepage "https://wiki.gnome.org/Projects/Libgee"
-  url "https://download.gnome.org/sources/libgee/0.20/libgee-0.20.6.tar.xz"
-  sha256 "1bf834f5e10d60cc6124d74ed3c1dd38da646787fbf7872220b8b4068e476d4d"
-  license "LGPL-2.1"
+  url "https://download.gnome.org/sources/libgee/0.20/libgee-0.20.8.tar.xz"
+  sha256 "189815ac143d89867193b0c52b7dc31f3aa108a15f04d6b5dca2b6adfad0b0ee"
+  license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "101f70ccbc7358b45e29cdf31cba5941089dda1ea52ed1158ce442afec8175ba"
-    sha256 cellar: :any,                 arm64_ventura:  "17b6833c15dcc5a55942ab6efcb13aec78855da1f7caadeb813bdbaf86936990"
-    sha256 cellar: :any,                 arm64_monterey: "f4d10b610efe36fcda4140bf67fd793928ab78ee1e1504d3ea41b568ad7de726"
-    sha256 cellar: :any,                 arm64_big_sur:  "e68e6466bdb5bd784e482f38187977b844eebde81dc73bff222172d7a2f4a80a"
-    sha256 cellar: :any,                 sonoma:         "ca981251c8491963f8af017b9d09abda3f29fa7b621f7032e50a3090efeec4f1"
-    sha256 cellar: :any,                 ventura:        "776df5810ebd490091f65aefe8b4f2157fd70670aeb09b940466cfddf09b292d"
-    sha256 cellar: :any,                 monterey:       "a7b8c8955ee24c3ec80eeb037ea5f8dafde3fd8070c3db61a45c271530b78e5d"
-    sha256 cellar: :any,                 big_sur:        "b9c9f8e2f261e7694ce63061bbf46264392493615cc470b243720a4ae2c7d6ae"
-    sha256 cellar: :any,                 catalina:       "859c21092eaf6cb269f2f5f65e7f5a441eb3a73a21abc0bc00a8a103e3413e4a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6268b9a5755df29c908c02893e7c784e6f37a4f340ae4bc4b17cf05ef8114b6e"
+    sha256 cellar: :any,                 arm64_sequoia: "f6f8a615e12ebbf0e2d1ef652b9d6118ce7090cf975e76c9199b80f2d54a0ee2"
+    sha256 cellar: :any,                 arm64_sonoma:  "a74893c386bc3c98b3eca70f4698eac4fc16a7c7ce9621ecd9951881b52617b2"
+    sha256 cellar: :any,                 arm64_ventura: "9f59442b282ad4bc6857568f22fc866f04111dfa83f52a36fdff920b72404efd"
+    sha256 cellar: :any,                 sonoma:        "54b304a5bb1c6cd0b4cf4ad92e33497616250375a1d199b056f712059484c8f8"
+    sha256 cellar: :any,                 ventura:       "18ef7dfdbad016c9f6027374cb705a7e2195204d524cc42439d98855e24837f0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "695ca3b94a6452ef5d365da12bcf3b9b12a3e80c298f5c6d032bd873926a9ef4"
   end
 
   depends_on "gobject-introspection" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => [:build, :test]
   depends_on "vala" => :build
+
   depends_on "glib"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     # ensures that the gobject-introspection files remain within the keg
@@ -32,35 +33,21 @@ class Libgee < Formula
               "@HAVE_INTROSPECTION_TRUE@typelibdir = $(libdir)/girepository-1.0"
     end
 
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-dependency-tracking"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gee.h>
 
       int main(int argc, char *argv[]) {
         GType type = gee_traversable_stream_get_type();
         return 0;
       }
-    EOS
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    flags = %W[
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/gee-0.8
-      -L#{gettext.opt_lib}
-      -L#{glib.opt_lib}
-      -L#{lib}
-      -lgee-0.8
-      -lglib-2.0
-      -lgobject-2.0
-    ]
-    flags << "-lintl" if OS.mac?
+    C
+
+    flags = shell_output("pkgconf --cflags --libs gee-0.8").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

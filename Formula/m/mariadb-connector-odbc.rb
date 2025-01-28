@@ -1,9 +1,9 @@
 class MariadbConnectorOdbc < Formula
   desc "Database driver using the industry standard ODBC API"
   homepage "https://mariadb.org/download/?tab=connector&prod=connector-odbc"
-  url "https://archive.mariadb.org/connector-odbc-3.1.19/mariadb-connector-odbc-3.1.19-src.tar.gz"
-  mirror "https://fossies.org/linux/misc/mariadb-connector-odbc-3.1.19-src.tar.gz/"
-  sha256 "26420dac7d6d630fc34fb2fe77fdc9fc2a7e8e896d274d3c052db9ecd06bd48f"
+  url "https://archive.mariadb.org/connector-odbc-3.2.4/mariadb-connector-odbc-3.2.4-src.tar.gz"
+  mirror "https://fossies.org/linux/misc/mariadb-connector-odbc-3.2.4-src.tar.gz/"
+  sha256 "964812d9b0df0a03482fbddb79ccab6a1879f14e9258476c57b5796cdb7f004b"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -18,13 +18,12 @@ class MariadbConnectorOdbc < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "584f054978da3cfb641a9504c4eb4ca19463f9a23c16b81714b210900dead39d"
-    sha256 cellar: :any,                 arm64_monterey: "21ef52b7656d91d41439996035a56aaaeb6650453bcbfd5a6e97c8020e8f03d3"
-    sha256 cellar: :any,                 arm64_big_sur:  "1476558de12837abd0307c1b55e920c421330d2a6b546260d00c86837ee1a3c6"
-    sha256 cellar: :any,                 ventura:        "8bed3cbed522f3c18755aba7ea46a872f73643c4f88d43fcc8f5992a0751f13c"
-    sha256 cellar: :any,                 monterey:       "1f7b12bf36787f8335ea55a5f3a10bd0dce9bb402adb23be9a6db164ba4cd977"
-    sha256 cellar: :any,                 big_sur:        "44a4dc52e2610f658964f73e69c3093dde7b39fdc51086ce2a4799741044142b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "011b218c61c1b204fb17be5277ea294257b93d729e0fead1d84059dbc0f95b1f"
+    sha256 cellar: :any,                 arm64_sequoia: "68d779eda8256080dc4bc7413144d7e76ad1e56ade42aaf3ee69bc2b2e721269"
+    sha256 cellar: :any,                 arm64_sonoma:  "2b6ca27ca543bf9c3b640e3b79d4c52525e27c0a56faecb0405311c1a6dc5405"
+    sha256 cellar: :any,                 arm64_ventura: "b15a8af2b708d497840b89b6df4cba3a62d686a854ce68629eab14a12ad808e5"
+    sha256 cellar: :any,                 sonoma:        "d14a130ef6d1228073a442770200607a1246ea8554680fe27dc93bc7c7087940"
+    sha256 cellar: :any,                 ventura:       "6116655b653ceb3979eaea39840d3f2fbb8e67f2e5162e1fda189bc698a81ee6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d17cbca36bc9f82b0e31201ffa3c1cfb304f6058c94fb59de7085fec07809245"
   end
 
   depends_on "cmake" => :build
@@ -36,15 +35,21 @@ class MariadbConnectorOdbc < Formula
     ENV.append_to_cflags "-I#{Formula["mariadb-connector-c"].opt_include}/mariadb"
     ENV.append "LDFLAGS", "-L#{Formula["mariadb-connector-c"].opt_lib}/mariadb"
     ENV.append "LDFLAGS", "-Wl,-rpath,#{Formula["mariadb-connector-c"].opt_lib}/mariadb" if OS.linux?
-    system "cmake", ".", "-DMARIADB_LINK_DYNAMIC=1",
-                         "-DWITH_SSL=OPENSSL",
-                         "-DOPENSSL_ROOT_DIR=#{Formula["openssl@3"].opt_prefix}",
-                         "-DWITH_IODBC=0",
-                         # Workaround 3.1.11 issues finding system's built-in -liconv
-                         # See https://jira.mariadb.org/browse/ODBC-299
-                         "-DICONV_LIBRARIES=#{MacOS.sdk_path}/usr/lib/libiconv.tbd",
-                         "-DICONV_INCLUDE_DIR=/usr/include",
-                         *std_cmake_args
+    args = [
+      "-DMARIADB_LINK_DYNAMIC=1",
+      "-DWITH_SSL=OPENSSL",
+      "-DOPENSSL_ROOT_DIR=#{Formula["openssl@3"].opt_prefix}",
+      "-DWITH_IODBC=0",
+      "-DICONV_INCLUDE_DIR=/usr/include",
+    ]
+
+    if OS.mac?
+      # Workaround 3.1.11 issues finding system's built-in -liconv
+      # See https://jira.mariadb.org/browse/ODBC-299
+      args << "-DICONV_LIBRARIES=#{MacOS.sdk_path}/usr/lib/libiconv.tbd"
+    end
+
+    system "cmake", ".", *args, *std_cmake_args
 
     # By default, the installer pkg is built - we don't want that.
     # maodbc limits the build to just the connector itself.

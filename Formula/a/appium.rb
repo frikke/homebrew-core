@@ -1,19 +1,18 @@
-require "language/node"
-
 class Appium < Formula
   desc "Automation for Apps"
   homepage "https://appium.io/"
-  url "https://registry.npmjs.org/appium/-/appium-2.1.3.tgz"
-  sha256 "af7a194c89df51986c343adca5d68dfe6b6380d50b393a7d6f93c2491feac624"
+  url "https://registry.npmjs.org/appium/-/appium-2.15.0.tgz"
+  sha256 "1127f622768d070c20491516870640325854dd6253f870d679934b5e22f86aca"
   license "Apache-2.0"
   head "https://github.com/appium/appium.git", branch: "master"
 
   bottle do
-    sha256                               arm64_ventura:  "e5cda4e54a7126fe2db09cddc195f7c08593f34d3b5fd54b1394f135120642a7"
-    sha256                               arm64_monterey: "9b1f7feb77e006c5953f8339fff2c5f50c1641b90f9c30316c99a7b948a7ebd9"
-    sha256                               arm64_big_sur:  "57f9c61ca3fcfd70229350aa07378fa5c24ac6f85a55c279044e13c262a5d76a"
-    sha256                               ventura:        "c80f2cf7b7e56b8eebdd7cf953c952a3666958ad49c107bf460d596642479039"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a838fd4c51ff7d3ea37566f1616feaf1fc1a9dad7ee8e6ece179190c147da131"
+    sha256 cellar: :any,                 arm64_sequoia: "55d243c70467d5d2c377304d27ac9f974881be9200c8ca2d433ab3a7db79dd61"
+    sha256 cellar: :any,                 arm64_sonoma:  "55d243c70467d5d2c377304d27ac9f974881be9200c8ca2d433ab3a7db79dd61"
+    sha256 cellar: :any,                 arm64_ventura: "55d243c70467d5d2c377304d27ac9f974881be9200c8ca2d433ab3a7db79dd61"
+    sha256                               sonoma:        "d2353825f8875a22ef7d85f02c4426d58df5927aebc78e08db3c0c983e14bf20"
+    sha256                               ventura:       "d2353825f8875a22ef7d85f02c4426d58df5927aebc78e08db3c0c983e14bf20"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "47beebdd78a0334d7a944ed8d80b2af2da94314acfba2af83ae3e638061a3c11"
   end
 
   depends_on "node"
@@ -23,14 +22,8 @@ class Appium < Formula
   end
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec), "--chromedriver-skip-install"
+    system "npm", "install", *std_npm_args, "--chromedriver-skip-install"
     bin.install_symlink Dir["#{libexec}/bin/*"]
-
-    # Delete obsolete module appium-ios-driver, which installs universal binaries
-    rm_rf libexec/"lib/node_modules/appium/node_modules/appium-ios-driver"
-
-    # Replace universal binaries with native slices
-    deuniversalize_machos
   end
 
   service do
@@ -43,19 +36,15 @@ class Appium < Formula
   end
 
   test do
+    output = shell_output("#{bin}/appium server --show-build-info")
+    assert_match version.to_s, JSON.parse(output)["version"]
+
+    output = shell_output("#{bin}/appium driver list 2>&1")
+    assert_match "uiautomator2", output
+
+    output = shell_output("#{bin}/appium plugin list 2>&1")
+    assert_match "images", output
+
     assert_match version.to_s, shell_output("#{bin}/appium --version")
-
-    port = free_port
-    begin
-      pid = fork do
-        exec bin/"appium --port #{port} &>appium-start.out"
-      end
-      sleep 3
-
-      assert_match "unknown command", shell_output("curl -s 127.0.0.1:#{port}")
-    ensure
-      Process.kill("TERM", pid)
-      Process.wait(pid)
-    end
   end
 end

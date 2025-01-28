@@ -3,12 +3,13 @@ class Httpstat < Formula
 
   desc "Curl statistics made simple"
   homepage "https://github.com/reorx/httpstat"
-  url "https://github.com/reorx/httpstat/archive/1.3.2.tar.gz"
+  url "https://github.com/reorx/httpstat/archive/refs/tags/1.3.2.tar.gz"
   sha256 "56c45aebdb28160dd16c73cf23af8208c19b30ec0166790685dfec115df9c92f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "6e4abcd3c43514f792ffcdc766d65e22f37b8b1c66d5bb89828c73d33b06f7c1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "4c6ac7e7f5619376d294d7921048b7bfc2745c280518b2ce977f8091d5536ef9"
   end
 
   uses_from_macos "curl"

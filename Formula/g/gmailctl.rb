@@ -1,20 +1,18 @@
 class Gmailctl < Formula
   desc "Declarative configuration for Gmail filters"
   homepage "https://github.com/mbrt/gmailctl"
-  url "https://github.com/mbrt/gmailctl/archive/v0.10.6.tar.gz"
-  sha256 "85757469561fd612209c8d7c5146b4a23d377d236a918c1636113c3d115acf60"
+  url "https://github.com/mbrt/gmailctl/archive/refs/tags/v0.11.0.tar.gz"
+  sha256 "6a299e60cfd5e58a327d2768cb9ce791b87d2e8be5293d29a4f4919d00cca2cf"
   license "MIT"
   head "https://github.com/mbrt/gmailctl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f94ddd5b80ac901282cb4e9d6ab837f0260c16ced3b1b47ea3d960d50a68cfd2"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c8f85806b696fe87c80b9769dba5c2e7aeaccbda8a2556d8ba9cab48b3a0baa3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "767e31d78fe9ce25a0bf0edffb32c923da320140428ec3b5a84b4364467386bc"
-    sha256 cellar: :any_skip_relocation, ventura:        "496ad97ff738102c0d59f8483bb7888486ec6feedff9f0955a1b01aa0e3e3602"
-    sha256 cellar: :any_skip_relocation, monterey:       "b5bc82815fa4e14df3d9b084c56b5e6883dadf09dbf4b728d28fe48e1c94620e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "74c1212da4c70372c8cf1149f2f04ce7677217108e06ecec6f8bfdab764d795a"
-    sha256 cellar: :any_skip_relocation, catalina:       "8ac17b8b385eb1b4b964d990ac9dc1bce622d72214f0f22a28a150cb271bbd95"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "380d3964ab5cac3f3dc71b37de03e699197e433990cda2ce0aa3c3b470605fe7"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ee77aed19516c088c2d625ce4a0c235834e22b74092fec144dc1b48494f742ce"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ee77aed19516c088c2d625ce4a0c235834e22b74092fec144dc1b48494f742ce"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "ee77aed19516c088c2d625ce4a0c235834e22b74092fec144dc1b48494f742ce"
+    sha256 cellar: :any_skip_relocation, sonoma:        "7fe6d471d8f4fda9b6c6e2f39b3d09b70c745291150d982db48ce8e03792a988"
+    sha256 cellar: :any_skip_relocation, ventura:       "7fe6d471d8f4fda9b6c6e2f39b3d09b70c745291150d982db48ce8e03792a988"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "60d4a9f72f8bb954e35ad8a7b31147f1f5f87fa3f56a18eaacc62b570fe1a399"
   end
 
   depends_on "go" => :build

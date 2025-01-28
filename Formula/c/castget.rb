@@ -11,9 +11,12 @@ class Castget < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "4ef2a3166dbe4c983bc4a83b891b28b430ecb348e0043da7f0a512cdf7391444"
+    sha256 cellar: :any,                 arm64_sonoma:   "a2f710b3cc40945afaef214606dc94e036ab266e176158fcd5dbd3e11b3de117"
     sha256 cellar: :any,                 arm64_ventura:  "85bc8985e90ece6ae58bf9d7a1f68eda1d2d2b3744694f5d7dfcfaf82d9b33df"
     sha256 cellar: :any,                 arm64_monterey: "dab2c9c9952ce1ecd3263ed1d6c1c002c772c9e7c310bde0b6277c46fd424edf"
     sha256 cellar: :any,                 arm64_big_sur:  "320ee21622d1bd939ea95055395d84e5d7cb2d6f091d0da9f05c9eb3d0cff7b9"
+    sha256 cellar: :any,                 sonoma:         "429edbc96bddebb64265eb6450a5ef92b6205979ce49d643b02c37b5a6928551"
     sha256 cellar: :any,                 ventura:        "6fc622c18f0e57ca04747ce77b5663200f6669c6a1a4f01b071a13ae942ca231"
     sha256 cellar: :any,                 monterey:       "e504eb4b4d6c38f21fdb20a8424de8ac6e98ee4dd970c397da89c0f936520be6"
     sha256 cellar: :any,                 big_sur:        "b91da84bac0b31dfb521f193b519c984cf943f15974f9427fa3e780028ea07aa"
@@ -23,22 +26,24 @@ class Castget < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "590a6ec3e2fe983ff5c82e3b5b96b43c87f3a51fd7848216da86dc48ba01b8ca"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "glib"
   depends_on "id3lib"
 
   uses_from_macos "curl"
   uses_from_macos "libxml2"
 
+  on_macos do
+    depends_on "gettext"
+  end
+
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.rss").write <<~EOS
+    (testpath/"test.rss").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <rss version="2.0">
         <channel>
@@ -51,7 +56,7 @@ class Castget < Formula
           </item>
         </channel>
       </rss>
-    EOS
+    XML
 
     (testpath/"castgetrc").write <<~EOS
       [test]
@@ -59,7 +64,7 @@ class Castget < Formula
       spool=#{testpath}
     EOS
 
-    system "#{bin}/castget", "-C", testpath/"castgetrc"
+    system bin/"castget", "-C", testpath/"castgetrc"
     assert_predicate testpath/"test.mp3", :exist?
   end
 end

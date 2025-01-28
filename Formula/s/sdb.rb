@@ -1,37 +1,31 @@
 class Sdb < Formula
   desc "Ondisk/memory hashtable based on CDB"
   homepage "https://github.com/radareorg/sdb"
-  url "https://github.com/radareorg/sdb/archive/1.9.6.tar.gz"
-  sha256 "da7ee00ed239f68dbb6a8fad165911ccbe332c6c664a5896cbd867fc9209c934"
+  url "https://github.com/radareorg/sdb/archive/refs/tags/2.0.2.tar.gz"
+  sha256 "8fc030eb8bb5b8b02af95615317ea5d7c9fbc1a06cbb46703e3fc8a6b428a3ae"
   license "MIT"
   head "https://github.com/radareorg/sdb.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "d2939cb0acdbf0be6a9ad82f1a5585967ead14eab2b9b0ad0fcf2b808cf84811"
-    sha256 cellar: :any,                 arm64_monterey: "94907d3f9db6fee04ddbd257199239eb67c1d02f8861c644e39bb074e82ec9f6"
-    sha256 cellar: :any,                 arm64_big_sur:  "07ecd9203fc1f6cd203738869734c82c5b85414347bbfff89cce08536d0b85fa"
-    sha256 cellar: :any,                 ventura:        "c0cdb33f226529e86954095cc6c211a51ca55fdb5c3d4f1d1f07ad066a922263"
-    sha256 cellar: :any,                 monterey:       "ea30adaba77c49d81d0d3f6f81597ee70407bd8de0ac291a33d6b9e3aeecf557"
-    sha256 cellar: :any,                 big_sur:        "dbbee831f313753b1c7d4e6fa2a2a3485e59391584975d30a77094b661536aa5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bfe7f6c1e471fb4c9d1347a968912b6ef1b56c1ce56b2929121f96dc5378488f"
+    sha256 cellar: :any,                 arm64_sequoia: "58d13c328d1ed7b41fbb692d7bcd87e657ca2a2f7e0d583820436ac82a3c7079"
+    sha256 cellar: :any,                 arm64_sonoma:  "0cd0d6f75a622d04d4b0e4a11bd88713bbcda7ab6bff745a0af845614e944baf"
+    sha256 cellar: :any,                 arm64_ventura: "b447543663b247729c12bbcf5191d564b7dd7702cc66d019f3d03a7f9ab20503"
+    sha256 cellar: :any,                 sonoma:        "70701ffdde52ba8e647a94e320246fcb758dbda7d6b91bb0b33543ccb96c7966"
+    sha256 cellar: :any,                 ventura:       "1075c34dba2bd26539fde81339e210d0852c2b4c2589439ba35a4c4603d93f0d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a4f53aa55609f3bfd90b1bccf2503ce7ec281d8662992beef201f2b577a91b1c"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "vala" => :build
   depends_on "glib"
 
-  # patch build to fix version.h not found
-  # remove in next release
-  patch do
-    url "https://github.com/radareorg/sdb/commit/3bc55289a73bddbd63a11d993c949f57e8a7f7cc.patch?full_index=1"
-    sha256 "d272212a0308a4e8f45f1413c67fb027409d885f3e97166e1a896c7d6b772c4b"
-  end
+  conflicts_with "snobol4", because: "both install `sdb` binaries"
 
   def install
-    system "meson", *std_meson_args, "build"
-    system "meson", "compile", "-C", "build", "-v"
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
   end
 

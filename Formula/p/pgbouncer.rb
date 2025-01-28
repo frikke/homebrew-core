@@ -1,8 +1,8 @@
 class Pgbouncer < Formula
   desc "Lightweight connection pooler for PostgreSQL"
   homepage "https://www.pgbouncer.org/"
-  url "https://www.pgbouncer.org/downloads/files/1.20.1/pgbouncer-1.20.1.tar.gz"
-  sha256 "24992cf557d73426d7048698dffc7b019e6364d4d8757ae2cf5e2471286a2088"
+  url "https://www.pgbouncer.org/downloads/files/1.24.0/pgbouncer-1.24.0.tar.gz"
+  sha256 "e76adf941a3191a416e223c0b2cdbf73159eef80a2a32314af6fbd82e41a1d41"
   license "ISC"
 
   livecheck do
@@ -11,13 +11,12 @@ class Pgbouncer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a94e496cf7ebbf7e0dd1bdcb4425c9d963db8068d0facb4b5cc8184d05d88f75"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "324e78695be835d58010fd647152733778178e5ef9197d81fdd024eabcaf979f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d2daded50db318c8083bf5aa1bee66b78a25914f068111c395054e47cecfcf44"
-    sha256 cellar: :any_skip_relocation, ventura:        "8df99b1040fd67c08f09205261ffadfc524a05be9661559919bbb42d476a80ab"
-    sha256 cellar: :any_skip_relocation, monterey:       "71cdcac59c53ec9c3a05f7483a49329c8b77fd64587020e0beb991e674da3d60"
-    sha256 cellar: :any_skip_relocation, big_sur:        "16c60979ed52c2b00c246f590188deb7aaef2a0d56370bbdd80addcd7ad49cfd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "428d8a811c4920e767ac1c70866f32988947df6692727783c596a244e729b10e"
+    sha256 cellar: :any,                 arm64_sequoia: "87aa1ebe4c4245e0864976983b532be084388ed482fc9795a2503a5d874e27f8"
+    sha256 cellar: :any,                 arm64_sonoma:  "43a76e841d08d4e0448795dffa6c9f69dfc86b2375a9e0557952d5ae5ed8605d"
+    sha256 cellar: :any,                 arm64_ventura: "1f405a92d760c6af0756ba2b32966d73ce9d4cffce462ac332b3d98f1b3b5f48"
+    sha256 cellar: :any,                 sonoma:        "262b7ed2c5749f2921add6f3065d367be16fc721f65c5bd48d04b3a08045a494"
+    sha256 cellar: :any,                 ventura:       "bcede5ab58af987fa0e16e4dd44ba4bb0356671459859783c2112d67856efbe1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "81d527e71fdf0028f6c281340e00462adfa848939d20abe32a6c94ecb65a9be3"
   end
 
   head do
@@ -29,7 +28,7 @@ class Pgbouncer < Formula
     depends_on "pandoc" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libevent"
   depends_on "openssl@3"
 

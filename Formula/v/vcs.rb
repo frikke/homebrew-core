@@ -3,6 +3,7 @@ class Vcs < Formula
   homepage "https://p.outlyer.net/vcs/"
   url "https://p.outlyer.net/files/vcs/vcs-1.13.4.tar.gz"
   sha256 "dc1d6145e10eeed61d16c3591cfe3496a6ac392c9c2f7c2393cbdb0cf248544b"
+  license "LGPL-2.0-or-later"
   revision 3
 
   livecheck do
@@ -11,24 +12,27 @@ class Vcs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "032fbce3c72e8ea03c3b4fbcde03f391d7c9df149ae5b664618d7e5b2a265bce"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "032fbce3c72e8ea03c3b4fbcde03f391d7c9df149ae5b664618d7e5b2a265bce"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5a12b2c51afec7626a44463cd9145bf47819e8561f05194f2f17ea8eec0459c9"
-    sha256 cellar: :any_skip_relocation, ventura:        "67aafd60a6d2b32a6bb487860c1ba6e6add8e082e9e6b5d4724d9932849940ce"
-    sha256 cellar: :any_skip_relocation, monterey:       "67aafd60a6d2b32a6bb487860c1ba6e6add8e082e9e6b5d4724d9932849940ce"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f13c9ce9291572d343bb3411e059601aa71fc4776138f13d33941653aab4dfb4"
-    sha256 cellar: :any_skip_relocation, catalina:       "3ae09912577433e9aee40da787b21b278d2e4d625454e6a554a10dfd71a3cb82"
-    sha256 cellar: :any_skip_relocation, mojave:         "2100a37453706602e0bd5941c7fb343cf64659493b27889957bad498934c6daf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "032fbce3c72e8ea03c3b4fbcde03f391d7c9df149ae5b664618d7e5b2a265bce"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "65bbf115d8f6b21bf141e823218b52ce3cae82bfc2c4783d1ffabec160b1c6b3"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "65bbf115d8f6b21bf141e823218b52ce3cae82bfc2c4783d1ffabec160b1c6b3"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "65bbf115d8f6b21bf141e823218b52ce3cae82bfc2c4783d1ffabec160b1c6b3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "65bbf115d8f6b21bf141e823218b52ce3cae82bfc2c4783d1ffabec160b1c6b3"
+    sha256 cellar: :any_skip_relocation, sonoma:         "c910f7b36e0b796a03ebf4fa4a7b2adb315188db72901920abc95c790c3edd8e"
+    sha256 cellar: :any_skip_relocation, ventura:        "c910f7b36e0b796a03ebf4fa4a7b2adb315188db72901920abc95c790c3edd8e"
+    sha256 cellar: :any_skip_relocation, monterey:       "c910f7b36e0b796a03ebf4fa4a7b2adb315188db72901920abc95c790c3edd8e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f48057f0e485f6e6b20d221f4f036e0708d896e6bb3165837e5a96f193710c1b"
   end
 
   depends_on "ffmpeg"
   depends_on "ghostscript"
-  depends_on "gnu-getopt"
   depends_on "imagemagick"
 
+  on_macos do
+    depends_on "gnu-getopt"
+  end
+
   def install
-    inreplace "vcs", "declare GETOPT=getopt", "declare GETOPT=#{Formula["gnu-getopt"].opt_bin}/getopt"
+    inreplace "vcs", "declare GETOPT=getopt", "declare GETOPT=#{Formula["gnu-getopt"].opt_bin}/getopt" if OS.mac?
 
     system "make", "install", "prefix=#{prefix}"
   end

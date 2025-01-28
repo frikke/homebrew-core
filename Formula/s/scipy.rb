@@ -1,80 +1,59 @@
 class Scipy < Formula
   desc "Software for mathematics, science, and engineering"
   homepage "https://www.scipy.org"
-  url "https://files.pythonhosted.org/packages/9c/ef/87a5565907645998d7c62e76b84b0ca9f0b7c25cd433f5617a968051cec3/scipy-1.11.2.tar.gz"
-  sha256 "b29318a5e39bd200ca4381d80b065cdf3076c7d7281c5e36569e99273867f61d"
+  url "https://files.pythonhosted.org/packages/76/c6/8eb0654ba0c7d0bb1bf67bf8fbace101a8e4f250f7722371105e8b6f68fc/scipy-1.15.1.tar.gz"
+  sha256 "033a75ddad1463970c96a88063a1df87ccfddd526437136b6ee81ff0312ebdf6"
   license "BSD-3-Clause"
   head "https://github.com/scipy/scipy.git", branch: "main"
 
   bottle do
-    sha256                               arm64_ventura:  "f7787de170ca640e8c7bd39d827e559a7c042836059fb2bfc08055f656434cc5"
-    sha256                               arm64_monterey: "7b67ca107ddff3187ee21f43c85da04519da5f40d833d9aef47aa9349b12e4b0"
-    sha256                               arm64_big_sur:  "0cb8876bfeb7b2677793a2c1c66036434fa35b26004cbe84ebbc822ffd142af5"
-    sha256                               ventura:        "cec1b1041514017e7c0bebc80a3feb3e7cb5f4618c7b3b86b3fc6c6d5d863ff4"
-    sha256                               monterey:       "371e080a6f3dcfc720ed1a3bd347088689621edb31705be8081b2c22c3b1d0bc"
-    sha256                               big_sur:        "1a18627dd982bbff60a3c639628660c0dc5cddfd7d90f6a33808a0c30b8a41d7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "38a71fc17322aba7a79cf52adad58df2c1bf3b42691a269a779a2b56d0671d46"
+    sha256 cellar: :any,                 arm64_sequoia: "6472d44d3dfa4a422c6cdfab4b8a1cc9ee16b0c9e06b03f0c43c65ef8b6b479a"
+    sha256 cellar: :any,                 arm64_sonoma:  "bc753cc567ec613d2e608bdc3f281d317924a942653ca97c6706854ac86bb75f"
+    sha256 cellar: :any,                 arm64_ventura: "1439cbcfcdbd2703c0dc49255e2687ab98b816d783a3d000da41d1fd0a74b7e1"
+    sha256 cellar: :any,                 sonoma:        "f1704b5265584a54bc1f7ecd6f01f0d111a574a6dae91a6afade3dab17181690"
+    sha256 cellar: :any,                 ventura:       "0399839970756650f097d49c8f690b1c6ef4c6b8e82249b34732970f4aaca0a6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "33c52f32ca50f844b879507689f4be97a0f6a82b17e95059adc17ccf434e473f"
   end
 
-  depends_on "libcython" => :build
   depends_on "meson" => :build
-  depends_on "meson-python" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
-  depends_on "pythran" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
   depends_on "gcc" # for gfortran
   depends_on "numpy"
   depends_on "openblas"
-  depends_on "pybind11"
-  depends_on "python@3.11"
   depends_on "xsimd"
+
+  on_linux do
+    depends_on "patchelf" => :build
+  end
 
   cxxstdlib_check :skip
 
-  fails_with gcc: "5"
-
-  def python3
-    "python3.11"
+  def pythons
+    deps.map(&:to_formula)
+        .select { |f| f.name.start_with?("python@") }
+        .map { |f| f.opt_libexec/"bin/python" }
   end
 
   def install
-    openblas = Formula["openblas"]
-    ENV["ATLAS"] = "None" # avoid linking against Accelerate.framework
-    ENV["BLAS"] = ENV["LAPACK"] = openblas.opt_lib/shared_library("libopenblas")
-
-    config = <<~EOS
-      [DEFAULT]
-      library_dirs = #{HOMEBREW_PREFIX}/lib
-      include_dirs = #{HOMEBREW_PREFIX}/include
-      [openblas]
-      libraries = openblas
-      library_dirs = #{openblas.opt_lib}
-      include_dirs = #{openblas.opt_include}
-    EOS
-
-    Pathname("site.cfg").write config
-
-    site_packages = Language::Python.site_packages(python3)
-    ENV.prepend_path "PATH", Formula["libcython"].opt_libexec/"bin"
-    ENV.prepend_path "PYTHONPATH", Formula["libcython"].opt_libexec/site_packages
-    ENV.prepend_path "PYTHONPATH", Formula["pythran"].opt_libexec/site_packages
-    ENV.prepend_path "PYTHONPATH", Formula["numpy"].opt_prefix/site_packages
-    ENV.prepend_create_path "PYTHONPATH", site_packages
-
-    system python3, "-m", "pip", "install", *std_pip_args, "."
+    pythons.each do |python3|
+      system python3, "-m", "pip", "install", *std_pip_args(build_isolation: true), "."
+    end
   end
 
-  # cleanup leftover .pyc files from previous installs which can cause problems
-  # see https://github.com/Homebrew/homebrew-python/issues/185#issuecomment-67534979
   def post_install
-    rm_f Dir["#{HOMEBREW_PREFIX}/lib/python*.*/site-packages/scipy/**/*.pyc"]
+    HOMEBREW_PREFIX.glob("lib/python*.*/site-packages/scipy/**/*.pyc").map(&:unlink)
   end
 
   test do
-    (testpath/"test.py").write <<~EOS
+    (testpath/"test.py").write <<~PYTHON
       from scipy import special
       print(special.exp10(3))
-    EOS
-    assert_equal "1000.0", shell_output("#{python3} test.py").chomp
+    PYTHON
+    pythons.each do |python3|
+      assert_equal "1000.0", shell_output("#{python3} test.py").chomp
+    end
   end
 end

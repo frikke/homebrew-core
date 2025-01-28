@@ -1,14 +1,17 @@
 class Ldpl < Formula
   desc "Compiled programming language inspired by COBOL"
   homepage "https://www.ldpl-lang.org/"
-  url "https://github.com/Lartu/ldpl/archive/4.4.tar.gz"
+  url "https://github.com/Lartu/ldpl/archive/refs/tags/4.4.tar.gz"
   sha256 "c34fb7d67d45050c7198f83ec9bb0b7790f78df8c6d99506c37141ccd2ac9ff1"
   license "Apache-2.0"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "6e33c979551ec86b80944f16b45b337ff39010f021aea26a1e150156abbbbeea"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "8e793d5e90093676f1a1f9fe3d4919d50602c91d078e567af2b17deb6ebcc7f5"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "bf6959046e581454ad99a0916570bb6ec7891ad1666829ee926d14ae9029886b"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "bf32d6e3ea635273e2b9489962bbaf8e0cb635baf2f683ce140ca7b678e4b4dc"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5c7715953497aa0104ad8262e84757529b33d1af90b9a41288895018515bea7f"
+    sha256 cellar: :any_skip_relocation, sonoma:         "84d39d38f0c81fbbab1f11df1fa5fb2d804f8338a97b1ce85f086d59aae56d1f"
     sha256 cellar: :any_skip_relocation, ventura:        "f9e3a39562bdfcbc8d90486286ff19bbb0163c4df653c9e808c509c2a4ac9f00"
     sha256 cellar: :any_skip_relocation, monterey:       "cde038edd67c523982be570ffb9ad84615a66731fb7de753c58c5b33bda1691e"
     sha256 cellar: :any_skip_relocation, big_sur:        "528888090d44cc065bcd6fdb941bfa751dba25e66c086cf4b427cc1e86549783"

@@ -1,10 +1,9 @@
 class SaneBackends < Formula
   desc "Backends for scanner access"
   homepage "http://www.sane-project.org/"
-  url "https://gitlab.com/sane-project/backends/uploads/110fc43336d0fb5e514f1fdc7360dd87/sane-backends-1.2.1.tar.gz"
-  sha256 "f832395efcb90bb5ea8acd367a820c393dda7e0dd578b16f48928b8f5bdd0524"
+  url "https://gitlab.com/sane-project/backends/uploads/83bdbb6c9a115184c2d48f1fdc6847db/sane-backends-1.3.1.tar.gz"
+  sha256 "aa82f76f409b88f8ea9793d4771fce01254d9b6549ec84d6295b8f59a3879a0c"
   license "GPL-2.0-or-later"
-  revision 1
 
   livecheck do
     url :head
@@ -12,13 +11,15 @@ class SaneBackends < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "fb030d64b3e6974586384b4398b4652a109dfb5723e21fc4e237170d59870392"
-    sha256 arm64_monterey: "dde5b1ae3dba8beba083c3adff88626792e0ca4b68f2eaddfd445122fa06e561"
-    sha256 arm64_big_sur:  "816f955ec13f1767fa9bf3e721a3fb55a06bd17482c3db58fca4dab8c1a0ea44"
-    sha256 ventura:        "dd313349947d2636690227b64fcaf52d17b9389851787906f37bf91351076775"
-    sha256 monterey:       "0de46efc5c9fdfb44ee043fff93b630b88cb678de1cda40d62c30575d7979435"
-    sha256 big_sur:        "68a5dadc176006ccaac9957884dfa582bde20c846e0567201efb381e5cc190af"
-    sha256 x86_64_linux:   "d015337c002f86128e3af57eb58afdc40ad8716fdde860c60c939cc803245117"
+    rebuild 1
+    sha256 arm64_sequoia:  "73d9e6f08781212504191af29da392c4f0896ba8b7f8192276af15b97db1d32d"
+    sha256 arm64_sonoma:   "0719713dac96d44d1f64d0e427c8c210e55796d93819693e796f8712759e1f70"
+    sha256 arm64_ventura:  "2c26a72e1a02d2989c5f961635c40e28da1ca235d9fec0c89f6647e326761d08"
+    sha256 arm64_monterey: "aac23e69bcfcdcdaf83b2ac5cc0dca17f324621a2a034bdcacffffd4138ec99b"
+    sha256 sonoma:         "43895d634e21a8c8d4cb472cef60d106f72c15507483d055d30fb0a553908fa4"
+    sha256 ventura:        "8379299b3089d0f27f9ae1c419338909509302a08c3108b92d7d25d6b04ad61c"
+    sha256 monterey:       "6ac5e0c8740a6353dd927f01a7324a88f2deacdbebad1a0de9594d40e09eadfe"
+    sha256 x86_64_linux:   "2ffeeb34668acc8fe57e84f36ffe4c9cae0d00261c7e19558f62e1ec3eb02b11"
   end
 
   head do
@@ -31,7 +32,7 @@ class SaneBackends < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
@@ -41,13 +42,24 @@ class SaneBackends < Formula
   uses_from_macos "python" => :build
   uses_from_macos "libxml2"
 
+  on_linux do
+    depends_on "systemd"
+  end
+
+  # Fix compilation failure with clang 16, remove in next version
+  # https://gitlab.com/sane-project/backends/-/issues/774
+  patch do
+    url "https://gitlab.com/sane-project/backends/-/commit/e45ba84b665e3ac339e27e594d8651ee1577d638.diff"
+    sha256 "4cdb099c77cf94aad013f8b8c4e064c5d009629a84da5b67947ce2c7b0829c3d"
+  end
+
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", *std_configure_args,
+    system "./configure", "--enable-local-backends",
                           "--localstatedir=#{var}",
                           "--without-gphoto2",
-                          "--enable-local-backends",
-                          "--with-usb=yes"
+                          "--with-usb=yes",
+                          *std_configure_args
     system "make", "install"
   end
 

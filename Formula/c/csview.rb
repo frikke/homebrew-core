@@ -1,20 +1,19 @@
 class Csview < Formula
   desc "High performance csv viewer for cli"
   homepage "https://github.com/wfxr/csview"
-  url "https://github.com/wfxr/csview/archive/v1.2.2.tar.gz"
-  sha256 "c8c4d1207b225e4257f301af6333d28cfee611781cfa51bf8227b742b043105a"
+  url "https://github.com/wfxr/csview/archive/refs/tags/v1.3.4.tar.gz"
+  sha256 "91fadcddef511265f4bf39897ce4a65c457ac89ffd8dd742dc209d30bf04d6aa"
   license any_of: ["MIT", "Apache-2.0"]
   head "https://github.com/wfxr/csview.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6e42c9e597ae8be86fb856bb117a9342495b3813f06b930efb14333ceb54c44d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2bcb6b524bfbe7d4cee5a4ed47eb9fbe6e460165b8a3b1e5b47391e3ccea588c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "714f0dcb10d7d0a00f0c234f999eb1b18521f1f6443a4f781bf192b5603f8100"
-    sha256 cellar: :any_skip_relocation, ventura:        "6f62c3017653188b898c1aea5376ffe1ccbf0041aad78cf85c2b5266d0841d54"
-    sha256 cellar: :any_skip_relocation, monterey:       "165a69b5e284288f82e0e70e1a33755c3545a6fa19ef5e2511d21d90fbb22796"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0a0a21831088d78cb6d28567fda931d01a242e5b77eefb21cdf420a4f8db351c"
-    sha256 cellar: :any_skip_relocation, catalina:       "bda29a8d29c3a9263f35151c347b9791b45eb8f40e9709f76d623472c015a6d2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "47d0c394c85f711c1c98dbbe724f7d0e1820725fffc8a716b9f0fb73c87d34d3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "25e89b345b9a280bb3e1ed9131878aa372277f1b8ac5647938f4056fd8267a97"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2e558ed523b25a07d5d6110f2686154c2f1b43ee5fe4e28cc63d1287f475292c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "726c20bdf56990f680feea91504782ff3ed966ff27a4d63ac2fd7d8e9244e70c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b0cfc60d188ba14a0d17909bcf78e21673ee65aee2d0bfadd28ffaa741ce2816"
+    sha256 cellar: :any_skip_relocation, ventura:       "46a886931cb6f7876fa7dca415a2d25f61063e69a4d47dd1fa7eb2726f2bc41e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1dcad326ae8950b1557bdf2dc4e6477ae867a0f4f05211373bde145c87154e7c"
   end
 
   depends_on "rust" => :build
@@ -23,7 +22,7 @@ class Csview < Formula
     system "cargo", "install", *std_cargo_args
 
     zsh_completion.install  "completions/zsh/_csview"
-    bash_completion.install "completions/bash/csview.bash"
+    bash_completion.install "completions/bash/csview.bash" => "csview"
     fish_completion.install "completions/fish/csview.fish"
   end
 

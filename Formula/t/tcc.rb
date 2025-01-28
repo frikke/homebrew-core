@@ -45,19 +45,23 @@ class Tcc < Formula
 
     ENV.deparallelize
     system "./configure", *args
-    system "make", "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
+
+    make_args = []
+    make_args << "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}" if OS.mac?
+
+    system "make", *make_args
     system "make", "install"
   end
 
   test do
-    (testpath/"hello-c.c").write <<~EOS
+    (testpath/"hello-c.c").write <<~C
       #include <stdio.h>
       int main()
       {
         puts("Hello, world!");
         return 0;
       }
-    EOS
+    C
     assert_equal "Hello, world!\n", shell_output("#{bin}/tcc -run hello-c.c")
   end
 end

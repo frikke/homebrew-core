@@ -1,22 +1,18 @@
 class Libmonome < Formula
   desc "Library for easy interaction with monome devices"
   homepage "https://monome.org/"
-  url "https://github.com/monome/libmonome/archive/v1.4.6.tar.gz"
-  sha256 "dbb886eacb465ea893465beb7b5ed8340ae77c25b24098ab36abcb69976ef748"
+  url "https://github.com/monome/libmonome/archive/refs/tags/v1.4.8.tar.gz"
+  sha256 "b98bce2a99481fc3aa8a29fc60310180d24473fce86f5edb55ddfe84d9e9dd69"
   license "ISC"
   head "https://github.com/monome/libmonome.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "9ef12b4c1229b2bb0d400bd0f5da95da9a275b51f96bf62968dd6b3eece681cc"
-    sha256 cellar: :any,                 arm64_ventura:  "e2deec1fde2416c71c2791e9831aa2b3cf3423bb6c63f600b1276b9c6954db71"
-    sha256 cellar: :any,                 arm64_monterey: "5525c4c775e115f9921620fbc6887a1660a70683d3d7cde9791e1e689f65b7c7"
-    sha256 cellar: :any,                 arm64_big_sur:  "9f7ec039cd4a2f3374ad095eb4ee37d951beea4480c586a2b8f3ecdcff31e235"
-    sha256 cellar: :any,                 sonoma:         "630005f9b541e90fbbc1bee717b565ea4bce7f170992d30bd2a9f91b0a56dd2d"
-    sha256 cellar: :any,                 ventura:        "9179a403cca09e0701923f329d26b526e240e89ac487615f0adfcd41721fce41"
-    sha256 cellar: :any,                 monterey:       "7184b921c76cbb2c0e2d0984e30273627bd4f55a970de06c39f3bdd56d617a1d"
-    sha256 cellar: :any,                 big_sur:        "98c2de88e32527214e0c16874553043b9ad7d31e2d83f14f4700ff96f271fd11"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "21757bb4952cf37ac4ae45ae62dcefc5ca22d9cd04474a6d51f9b67dbca1a392"
+    sha256 cellar: :any,                 arm64_sequoia: "50321cfdaca220bccec61c6ec8e142784c3f02879656218b88eaeb660f2b8dba"
+    sha256 cellar: :any,                 arm64_sonoma:  "c219343f215edf79464c897022ae2fe87c8e5c075279576330ddef92ef6d7274"
+    sha256 cellar: :any,                 arm64_ventura: "f1a92fb448fd91324d64ac05c4b7ee756d3bd24e2306a6e4f3f59633f5eec3e0"
+    sha256 cellar: :any,                 sonoma:        "034c7bbcda99a0adc3fdc38ca23f8692d1199291cacbb35a2bcee1c3ad79b2a1"
+    sha256 cellar: :any,                 ventura:       "ed75041e84f7adc92cdd481496634297651dd1974ba9289cbfcedc14d3554507"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "40da298d04ff272067c8f88b2b71e939eb0a7e98387a05f976c6d75d4e0c5ae6"
   end
 
   depends_on "liblo"

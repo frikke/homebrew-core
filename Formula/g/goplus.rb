@@ -1,19 +1,25 @@
 class Goplus < Formula
   desc "Programming language for engineering, STEM education, and data science"
   homepage "https://goplus.org"
-  url "https://github.com/goplus/gop/archive/v1.1.6.tar.gz"
-  sha256 "e96c62e254d5600851b1479e03f05f7b70a91516de28b26b686c4b7f6b4dcb87"
+  url "https://github.com/goplus/gop/archive/refs/tags/v1.2.6.tar.gz"
+  sha256 "51db5c4116fd229d7cd65c3b45552dc0cd7aa9c89798a9ba71ae2f0f243c7f05"
   license "Apache-2.0"
   head "https://github.com/goplus/gop.git", branch: "main"
 
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 arm64_ventura:  "f2655bcc4256523bbedac33504243317eb722f1487a8d8ade3d5b6f97b3e16d5"
-    sha256 arm64_monterey: "dd57548063da4333a46dd58bba1ab370feb1dfea4aab9bd71889701ee30bb811"
-    sha256 arm64_big_sur:  "2f5a6dd005220f8d70b162e5b12ec16442fc5b8ca134d8e9faefc31e46397d03"
-    sha256 ventura:        "1c483b3cae4196342550cfd4cd1ac56ec2aa29a3b68c63a3dce092de922606fb"
-    sha256 monterey:       "84a19d4b70b87964d799c8808703f8e11e50a386de5a0abed61e6a31e87d6d24"
-    sha256 big_sur:        "40aa7cd615adbb7489c26aa2f9076e2fb320bdc5c0d1f5b8430de46f613669f0"
-    sha256 x86_64_linux:   "162e4b149d60176d919174aca3e5090e3dfd9d3d1b1e4dc721e435c8724e8324"
+    sha256 arm64_sequoia:  "fe0832efcd98cc11821ead934130a36a38b58990ca730a1a5ac266abd17d7cd8"
+    sha256 arm64_sonoma:   "30286ecee2169db6a0e94bba10db54b4e64f1b7d9515645577b63792fafd9717"
+    sha256 arm64_ventura:  "82b9263ee8902427ae05adef43e88d03b706d7777e3fa642b2469a28824e30d2"
+    sha256 arm64_monterey: "41709633aaebd432c31033b3aaa859244e82916f121533c503124afdbaf8fcac"
+    sha256 sonoma:         "47c58fe9d037ebb24bd73a19b27465393be5f266fca5675a9064f0cdfa18548c"
+    sha256 ventura:        "99f652be78900129bb9fd131df5c8b6b8b40630c71f4447c75288b5c65e3c510"
+    sha256 monterey:       "ab73c20e21526ee3b2e6f905f9a14a29e56f292b61c8f8ab9dc7e4ce10491e80"
+    sha256 x86_64_linux:   "ae23a9efa61937f365d0d248e8da1b210de1e31d49ad6d89a9940eeb64c17162"
   end
 
   depends_on "go"
@@ -27,20 +33,20 @@ class Goplus < Formula
   end
 
   test do
-    (testpath/"hello.gop").write <<~EOS
+    (testpath/"hello.gop").write <<~GOP
       println("Hello World")
-    EOS
+    GOP
 
     # Run gop fmt, run, build
     ENV.prepend "GO111MODULE", "on"
 
-    assert_equal "v#{version}", shell_output("#{bin}/gop env GOPVERSION").chomp unless head?
+    assert_equal "v#{version}", shell_output("#{bin}/gop env GOPVERSION").chomp
     system bin/"gop", "fmt", "hello.gop"
     assert_equal "Hello World\n", shell_output("#{bin}/gop run hello.gop")
 
-    (testpath/"go.mod").write <<~EOS
+    (testpath/"go.mod").write <<~GOMOD
       module hello
-    EOS
+    GOMOD
 
     system "go", "get", "github.com/goplus/gop/builtin"
     system bin/"gop", "build", "-o", "hello"

@@ -1,25 +1,25 @@
 class Tz < Formula
   desc "CLI time zone visualizer"
   homepage "https://github.com/oz/tz"
-  url "https://github.com/oz/tz/archive/refs/tags/v0.6.3.tar.gz"
-  sha256 "82fa7604f3abd3f224d0d6a52976e5de27127d41b2ef80507f3a964ea9b2ef58"
+  url "https://github.com/oz/tz/archive/refs/tags/v0.7.0.tar.gz"
+  sha256 "0672552741bd9b2e6334906c544b98fc53997e282c93265de9b332a6af7d3932"
   license "GPL-3.0-or-later"
   head "https://github.com/oz/tz.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "83aaf5ea3205df997942013f5a6c8660c41ae6da4526d16d55335e5dabdccfc0"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "83aaf5ea3205df997942013f5a6c8660c41ae6da4526d16d55335e5dabdccfc0"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "83aaf5ea3205df997942013f5a6c8660c41ae6da4526d16d55335e5dabdccfc0"
-    sha256 cellar: :any_skip_relocation, ventura:        "c5673576b5029313511c42bafd35fe8309cf023792222c1e25f7fd9a8656b2b4"
-    sha256 cellar: :any_skip_relocation, monterey:       "c5673576b5029313511c42bafd35fe8309cf023792222c1e25f7fd9a8656b2b4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c5673576b5029313511c42bafd35fe8309cf023792222c1e25f7fd9a8656b2b4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "92db3447fdf82ca46731489658954d1fb9e28457e9ed714df9115dbed8b6b2e9"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5510e9d4d0a6cba3ed231a8036f55414352924495ec7d027dc1fcfe62004021f"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5510e9d4d0a6cba3ed231a8036f55414352924495ec7d027dc1fcfe62004021f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "5510e9d4d0a6cba3ed231a8036f55414352924495ec7d027dc1fcfe62004021f"
+    sha256 cellar: :any_skip_relocation, sonoma:        "fecfd326efe5aaedea6afd1b998f337ab8319158da33a98828705d9592996f74"
+    sha256 cellar: :any_skip_relocation, ventura:       "fecfd326efe5aaedea6afd1b998f337ab8319158da33a98828705d9592996f74"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4d1e72e63e14a004a0ab74f84f8c2076872ed232f98dc684796ad81f4a83a574"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do

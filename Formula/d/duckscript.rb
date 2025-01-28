@@ -1,28 +1,30 @@
 class Duckscript < Formula
   desc "Simple, extendable and embeddable scripting language"
   homepage "https://sagiegurari.github.io/duckscript"
-  url "https://github.com/sagiegurari/duckscript/archive/0.9.1.tar.gz"
-  sha256 "08a3f129d20f477566e287df5a6f4ad6a3cda0d768d2afd768cfd8bf5887c770"
+  url "https://github.com/sagiegurari/duckscript/archive/refs/tags/0.11.1.tar.gz"
+  sha256 "2e23b16359fb9b2c521f0bd250f6eb754bcb8ef40a7f8bf8076f87387276032a"
   license "Apache-2.0"
   head "https://github.com/sagiegurari/duckscript.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c34cbf3c04918d7ed5f2eb74f7312c9802d50f88d72fed9634ad77faad880959"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "89fb3963f71ac1e0b8308042a8c7cbeabf46f9b44144e22b147345f57a7cc38d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "31e1c3e7e1d33513a27e7f847b6470f742a197265b001867094dcbf5bd976f5e"
-    sha256 cellar: :any_skip_relocation, ventura:        "3268db8ab4fa9e04140e2b7cfd23fbab4b7c996eaae1ac3ec80626183d44328a"
-    sha256 cellar: :any_skip_relocation, monterey:       "da2b397a39a48c8c1f020f7bd674c29d94b18901fe505661672da1a315d9c579"
-    sha256 cellar: :any_skip_relocation, big_sur:        "056a6fcfeabaafc88005d778ca5da53a2606abc2245512c05507fc2e02d2a526"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "74726accb1c1ddee812cfc653a9e3c0e996ff217448d32c083cf0aed6719566d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5582ec1f3830f0ba37bd1562663c64df16dec7249edea7abf44b8d4a4283e912"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6d23b3da8b2b44581e7f0dfe911f8e1edd43279a88aded7ea8d5e025d35972ab"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f462e56f82dcf7e2a30276ba5b9f43f310ee9de6c1143fc7da8d481cc195a436"
+    sha256 cellar: :any_skip_relocation, sonoma:        "0821ca6f519677e8504aeb4307b2f9c2fbfa6a7423eff300e2a8da4e6aae966a"
+    sha256 cellar: :any_skip_relocation, ventura:       "8dd3fca5e3317481cd6d2e8c0d4d83b66de311179eec5fd7fb04a43e14bd3ebc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5235e7033e0a8ed818f198f52df387bd1d82422000c9a32297b7265df247ac36"
   end
 
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
+
   uses_from_macos "bzip2"
 
   on_linux do
-    depends_on "pkg-config" => :build
     depends_on "openssl@3" # Uses Secure Transport on macOS
   end
+
+  conflicts_with "duck", because: "both install `duck` binaries"
 
   def install
     system "cargo", "install", "--features", "tls-native", *std_cargo_args(path: "duckscript_cli")

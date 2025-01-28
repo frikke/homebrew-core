@@ -1,8 +1,8 @@
 class Fswatch < Formula
   desc "Monitor a directory for changes and run a shell command"
   homepage "https://github.com/emcrisostomo/fswatch"
-  url "https://github.com/emcrisostomo/fswatch/releases/download/1.17.1/fswatch-1.17.1.tar.gz"
-  sha256 "c38e341c567f5f16bfa64b72fc48bba5e93873d8572522e670e6f320bbc2122f"
+  url "https://github.com/emcrisostomo/fswatch/releases/download/1.18.2/fswatch-1.18.2.tar.gz"
+  sha256 "1e5ec35c0bd8f39d45cb326e85362a0472e6b6b5a65eca7934c357e54926dfeb"
   license all_of: ["GPL-3.0-or-later", "Apache-2.0"]
 
   livecheck do
@@ -11,21 +11,16 @@ class Fswatch < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "96cea06f4891e9af44abcd6f30a250c8efebe660104893b7fd80c8f22b2ab569"
-    sha256 cellar: :any, arm64_monterey: "b7f5facb15c82b5dc9eb94e8cfaa4857e562609be24fdd716051c35bd2e85e8b"
-    sha256 cellar: :any, arm64_big_sur:  "ec08b3bf8f659a864d0c54f022939b45ea647c25769a8ab908f60f28ffbd803c"
-    sha256 cellar: :any, ventura:        "570223c980f22c296e4d6fa6e6058e778bb0e74d0dd9745ec49ec3940aeb5863"
-    sha256 cellar: :any, monterey:       "6c57d2ea9ff9e425069580bba25c74f5890f454b807f4a94810271909d47283e"
-    sha256 cellar: :any, big_sur:        "1da6e45f4051477e02acbf2f3d13a7917b8a80a38ca35d6ac8cbaff780df4651"
-    sha256 cellar: :any, catalina:       "c97ee3973b847257ad99f6ffff3c6ba3d33dbf2a333e0bbe289832b7e490f051"
-    sha256               x86_64_linux:   "60e3f628f00ace185e22523a1850f0521184e7477263ef69a1a0fcebd8b0f077"
+    sha256 cellar: :any, arm64_sequoia: "6be389864292dde6b3c0dddc1e49526b16c268c74883b7870dab4c30fe984e6a"
+    sha256 cellar: :any, arm64_sonoma:  "aa63026628cc6e1c90eda516154a5325bccf356a492e6023e4ffa6388d240c98"
+    sha256 cellar: :any, arm64_ventura: "f191a3440e9f4530666f4178666690dea983db5e930657ecf7d403c619b76d1a"
+    sha256 cellar: :any, sonoma:        "ba69935f4fbd020b5be907d73fc46a98c3d1402f587cdf08c846187cd4ff8572"
+    sha256 cellar: :any, ventura:       "89c2390e3b368f922280a3c287d4c17049adc67b87579afa71b3a90a9bba1b3a"
+    sha256               x86_64_linux:  "b7714de26333fb00bf33ac6ebae5260e50bbf8045dffe9ac8535a5aaf83019d1"
   end
 
   def install
-    ENV.cxx11
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

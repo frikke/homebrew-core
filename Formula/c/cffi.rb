@@ -1,62 +1,62 @@
 class Cffi < Formula
   desc "C Foreign Function Interface for Python"
   homepage "https://cffi.readthedocs.io/en/latest/"
-  url "https://files.pythonhosted.org/packages/2b/a8/050ab4f0c3d4c1b8aaa805f70e26e84d0e27004907c5b8ecc1d31815f92a/cffi-1.15.1.tar.gz"
-  sha256 "d400bfb9a37b1351253cb402671cea7e89bdecc294e8016a707f6d1d8ac934f9"
+  url "https://files.pythonhosted.org/packages/fc/97/c783634659c2920c3fc70419e3af40972dbaf758daa229a7d6ea6135c90d/cffi-1.17.1.tar.gz"
+  sha256 "1c39c6016c32bc48dd54561950ebd6836e1670f2ae46128f67cf49e789c52824"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "82d180fb97e07d7debff3e97fe8450dd4dab44477166a7e98a678ccfbc8c3999"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5971b4b3104b5b50eb147696a0ce95d93b2e62fe6dc219a78368e512f6d0b519"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4b3a6548b25534c9cb8fc9561d2fdbee5a59c9fc9c0acf7bc766a0918683487e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f6e36e0a87362dfe3052329c7a38f7bd10325ab6473f58ba90e428f065df68d2"
-    sha256 cellar: :any_skip_relocation, sonoma:         "db12ed813d5bcc194ce6b9edae9e6459bb71b782f465923c39d2c538bb6d3fd0"
-    sha256 cellar: :any_skip_relocation, ventura:        "3865305b346855d194487dae89baf1d4c8ea47d25a18adf48d1f46896eb06aa0"
-    sha256 cellar: :any_skip_relocation, monterey:       "1f56e911853ab2d4d0508a4062c00e47d3c83e73ad99a5fc93114dc76798a881"
-    sha256 cellar: :any_skip_relocation, big_sur:        "746640d4f76e427485dbf604b51a3c753e1ddf2cf56337d9e80fe1167cdbc610"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ca6ed36c6e14a67c5c7d105a46905a8144ea2f1fed314159fc9de67de52cb07a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "908333c6c31b4da4876ccb707cdf2b1ec52aee3d83fc3c4a1b8b52f148883512"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7818f620936fb017c68eb02c8985dfecd297349b97e67550d4915cef440dd2fe"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b143786bb8ede8b8ad7230b6be8c004f276dacccbd4647a3f169099a536fd3a6"
+    sha256 cellar: :any_skip_relocation, sonoma:        "8e1c24e4e78f041f98e0394a6a07ef560ea84d980f0f3c3dd3ea7fb6c3f91aa4"
+    sha256 cellar: :any_skip_relocation, ventura:       "7c8eea38ba0103ddbb0243d0ed9f74a79875f1f0dfe9d8421f3e2f45dca69da5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a49b146e624fa887497252f89c76d8e7cfcdc4d9a4ec444a5b8db856324198cf"
   end
 
+  depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
   depends_on "pycparser"
-  depends_on "python@3.11"
+
   uses_from_macos "libffi"
 
-  def python3
-    "python3.11"
+  def pythons
+    deps.map(&:to_formula)
+        .select { |f| f.name.start_with?("python@") }
+        .map { |f| f.opt_libexec/"bin/python" }
   end
 
   def install
-    system python3, "-m", "pip", "install", *std_pip_args, "."
+    pythons.each do |python|
+      system python, "-m", "pip", "install", *std_pip_args(build_isolation: true), "."
+    end
   end
 
   test do
     assert_empty resources, "This formula should not have any resources!"
-    (testpath/"sum.c").write <<~EOS
+    (testpath/"sum.c").write <<~C
       int sum(int a, int b) { return a + b; }
-    EOS
+    C
 
-    system ENV.cc, "-shared", "sum.c", "-o", testpath/shared_library("libsum")
+    libsum = testpath/shared_library("libsum")
+    system ENV.cc, "-shared", "sum.c", "-o", libsum
 
-    (testpath/"sum_build.py").write <<~PYTHON
+    (testpath/"sum.py").write <<~PYTHON
       from cffi import FFI
-      ffibuilder = FFI()
+      ffi = FFI()
 
       declaration = """
         int sum(int a, int b);
       """
 
-      ffibuilder.cdef(declaration)
-      ffibuilder.set_source(
-        "_sum_cffi",
-        declaration,
-        libraries=['sum'],
-        extra_link_args=['-L#{testpath}', '-Wl,-rpath,#{testpath}']
-      )
-
-      ffibuilder.compile(verbose=True)
+      ffi.cdef(declaration)
+      lib = ffi.dlopen("#{libsum}")
+      print(lib.sum(1, 2))
     PYTHON
 
-    system python3, "sum_build.py"
-    assert_equal 3, shell_output("#{python3} -c 'import _sum_cffi; print(_sum_cffi.lib.sum(1, 2))'").to_i
+    pythons.each do |python|
+      assert_equal 3, shell_output("#{python} sum.py").to_i
+    end
   end
 end

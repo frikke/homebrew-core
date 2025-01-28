@@ -20,6 +20,7 @@ class Flac < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "aaed493bc3a3d841318f952a119cb5cd2646f9a9950f20e9458717969f6c662f"
     sha256 cellar: :any,                 arm64_sonoma:   "ce19f4c9e89fb7b89c5ea1c070bb6cdb7deedf800a6843bd042ceb902b43ed03"
     sha256 cellar: :any,                 arm64_ventura:  "3962fce4abb2716cd21a9b9ebeda4f2e5c4bea08c32ea3cc0316f369da054019"
     sha256 cellar: :any,                 arm64_monterey: "187cfc571ab437b847cb2da754706a271be30727637cde5b60fa982568ebcf91"
@@ -39,25 +40,19 @@ class Flac < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libogg"
 
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --disable-debug
-      --prefix=#{prefix}
-      --enable-static
-    ]
     system "./autogen.sh" if build.head?
-    system "./configure", *args
+    system "./configure", "--enable-static", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/flac", "--decode", "--force-raw", "--endian=little", "--sign=signed",
-                          "--output-name=out.raw", test_fixtures("test.flac")
-    system "#{bin}/flac", "--endian=little", "--sign=signed", "--channels=1", "--bps=8",
-                          "--sample-rate=8000", "--output-name=out.flac", "out.raw"
+    system bin/"flac", "--decode", "--force-raw", "--endian=little", "--sign=signed",
+                       "--output-name=out.raw", test_fixtures("test.flac")
+    system bin/"flac", "--endian=little", "--sign=signed", "--channels=1", "--bps=8",
+                       "--sample-rate=8000", "--output-name=out.flac", "out.raw"
   end
 end

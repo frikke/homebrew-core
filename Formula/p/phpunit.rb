@@ -1,8 +1,8 @@
 class Phpunit < Formula
   desc "Programmer-oriented testing framework for PHP"
   homepage "https://phpunit.de"
-  url "https://phar.phpunit.de/phpunit-10.3.4.phar"
-  sha256 "0cec9c0f8b3001b1d16acbb429517d29bcf8209572a877db097b2da8087767e8"
+  url "https://phar.phpunit.de/phpunit-11.5.3.phar"
+  sha256 "00674310d7d48db7fe105e02b17b43e6be8b65fd37195a39724bc71cc5aaa866"
   license "BSD-3-Clause"
 
   livecheck do
@@ -12,7 +12,7 @@ class Phpunit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "1d9b4b164066b2727b52f491d4be79716887d32d2a3b929001263fea6ba23d23"
+    sha256 cellar: :any_skip_relocation, all: "3dc273d43fb70ceb0a25afcecf9ee6da060636f117aef78d8757a9b1e83ad496"
   end
 
   depends_on "php" => :test
@@ -22,7 +22,7 @@ class Phpunit < Formula
   end
 
   test do
-    (testpath/"src/autoload.php").write <<~EOS
+    (testpath/"src/autoload.php").write <<~PHP
       <?php
       spl_autoload_register(
           function($class) {
@@ -40,9 +40,9 @@ class Phpunit < Formula
           true,
           false
       );
-    EOS
+    PHP
 
-    (testpath/"src/Email.php").write <<~EOS
+    (testpath/"src/Email.php").write <<~PHP
       <?php
         declare(strict_types=1);
 
@@ -79,9 +79,9 @@ class Phpunit < Formula
                 }
             }
         }
-    EOS
+    PHP
 
-    (testpath/"tests/EmailTest.php").write <<~EOS
+    (testpath/"tests/EmailTest.php").write <<~PHP
       <?php
       declare(strict_types=1);
 
@@ -113,7 +113,7 @@ class Phpunit < Formula
           }
       }
 
-    EOS
+    PHP
     assert_match(/^OK \(3 tests, 3 assertions\)$/,
       shell_output("#{bin}/phpunit --bootstrap src/autoload.php tests/EmailTest.php"))
   end

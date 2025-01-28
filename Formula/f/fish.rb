@@ -1,8 +1,8 @@
 class Fish < Formula
   desc "User-friendly command-line shell for UNIX-like operating systems"
   homepage "https://fishshell.com"
-  url "https://github.com/fish-shell/fish-shell/releases/download/3.6.1/fish-3.6.1.tar.xz"
-  sha256 "55402bb47ca6739d8aba25e41780905b5ce1bce0a5e0dd17dca908b5bc0b49b2"
+  url "https://github.com/fish-shell/fish-shell/releases/download/3.7.1/fish-3.7.1.tar.xz"
+  sha256 "614c9f5643cd0799df391395fa6bbc3649427bb839722ce3b114d3bbc1a3b250"
   license "GPL-2.0-only"
 
   livecheck do
@@ -13,15 +13,14 @@ class Fish < Formula
   pour_bottle? only_if: :default_prefix
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "70fdce88ebe0aa417321a41fceb2b1323c6a1bcca50951efbc2d47a0f887640a"
-    sha256 cellar: :any,                 arm64_ventura:  "571264d1c65ebb98496384a27239a938098d87f6fd3177394d82b915a0c499fc"
-    sha256 cellar: :any,                 arm64_monterey: "b8eeb9a400c53d767264c7df2aa5174ed52515347e1c47210b2a51dafc086654"
-    sha256 cellar: :any,                 arm64_big_sur:  "d01c4f24ea68d3790664f33d22758fe475f2dd69b547c4dd57d01ba4b2e33594"
-    sha256 cellar: :any,                 sonoma:         "83a1807f04308a2c7dfe006156b8018c90e17d9df927b20eddf1b1925c60e365"
-    sha256 cellar: :any,                 ventura:        "2af848db0107a294a3fcb9adb00242ace9428a8ff3d7638998f4a7c3340d64b5"
-    sha256 cellar: :any,                 monterey:       "f2150d371dbb4d63c93a5de2b7179ad219be124d3a33d6ba8c01d1064d209c53"
-    sha256 cellar: :any,                 big_sur:        "f6377a53c4bc817e7655b9f6af6664fd1595043bda7dbde9eca4e16e47a58465"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "67618246603a384573a202679a2b0169601e6011aa110fe96b536dc40fa95e33"
+    sha256 cellar: :any,                 arm64_sequoia:  "6f00c494ab15af26f19ec21c2ca954b3870d400d8b22203a5bf7f1cf86465570"
+    sha256 cellar: :any,                 arm64_sonoma:   "479ae1960544dc4a84c961f125bb9cc42c194ec2a04f0ffb1591e0c3c1d7d577"
+    sha256 cellar: :any,                 arm64_ventura:  "51719eb992cbea31b99828036479b510011c1b4eef131a7b684bf4835f01374e"
+    sha256 cellar: :any,                 arm64_monterey: "0261f26bf449353f84f83ebfe3922fb2d6a0f98e65c551f3d3b14d0e26e78723"
+    sha256 cellar: :any,                 sonoma:         "a5b25fde2926a00b08d77798c52030543252418733442fc25eb1e0ce99b95010"
+    sha256 cellar: :any,                 ventura:        "f2d8ddb5b5e4a29dc9e39230845b514c9fc169e5f2922a1369bd72decc141886"
+    sha256 cellar: :any,                 monterey:       "8518a301b9136ecbd87373b39c6736fae1fc0569da2fa8be7d5f066f1b320fd0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c69075343a17848c5f56d4af091e84604f7447fd91d62ebd92ce20b9eb67f2b5"
   end
 
   head do
@@ -54,6 +53,6 @@ class Fish < Formula
   end
 
   test do
-    system "#{bin}/fish", "-c", "echo"
+    system bin/"fish", "-c", "echo"
   end
 end

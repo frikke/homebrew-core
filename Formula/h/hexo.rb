@@ -1,33 +1,29 @@
-require "language/node"
-
 class Hexo < Formula
   desc "Fast, simple & powerful blog framework"
   homepage "https://hexo.io/"
-  url "https://registry.npmjs.org/hexo/-/hexo-6.3.0.tgz"
-  sha256 "133c1b7ce9a9b0f703da7bd0201d0ec4ad49f5f610c9b008da6df2ec30f3f4ba"
+  url "https://registry.npmjs.org/hexo/-/hexo-7.3.0.tgz"
+  sha256 "807b356fef2aa9623788b0e2b997fc6955c4c0a2a70fc1a8776c281194e4277e"
   license "MIT"
   head "https://github.com/hexojs/hexo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6910c3128a0ffdcb7239a1fe6aeb9344e6b6ea8d9a8500291fa5423179ae45f7"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e8c8eb3ef1a60934230d70b1195c6bf1d708be8ae1fb7f1922f31d3e8796cf35"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e8c8eb3ef1a60934230d70b1195c6bf1d708be8ae1fb7f1922f31d3e8796cf35"
-    sha256 cellar: :any_skip_relocation, ventura:        "775cdefaaf9057243806ddd222912d35f964340d7f436d3f6437af5dfabf06b5"
-    sha256 cellar: :any_skip_relocation, monterey:       "a5daf9b48cf25528279debdd2b1ad37baaa6d08cfd6e18e212a60a68dc3f35ef"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a5daf9b48cf25528279debdd2b1ad37baaa6d08cfd6e18e212a60a68dc3f35ef"
-    sha256 cellar: :any_skip_relocation, catalina:       "a5daf9b48cf25528279debdd2b1ad37baaa6d08cfd6e18e212a60a68dc3f35ef"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "95e726055fa242838fa081dce26d2ff0441d1aeef2ddd6b5065b04961441d625"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "8a1d3ba84fcc6755801b4e0d7838adb598b651c8ac4648b33bcbdff5797a5a20"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "209a443cc5a02dd08fad22385e10e453b903b22ab90d0c19a825da1bcba3d6be"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "209a443cc5a02dd08fad22385e10e453b903b22ab90d0c19a825da1bcba3d6be"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "209a443cc5a02dd08fad22385e10e453b903b22ab90d0c19a825da1bcba3d6be"
+    sha256 cellar: :any_skip_relocation, sonoma:         "e44df1e02afe2df6e9957c624aa306392d7ef6e9273a65bad30cce1826644443"
+    sha256 cellar: :any_skip_relocation, ventura:        "e44df1e02afe2df6e9957c624aa306392d7ef6e9273a65bad30cce1826644443"
+    sha256 cellar: :any_skip_relocation, monterey:       "e44df1e02afe2df6e9957c624aa306392d7ef6e9273a65bad30cce1826644443"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "803c580e42eadd1f4dd66bcb435bbc117df28b3a1e6a9c0c85551940d9d3c79a"
   end
 
   depends_on "node"
 
   def install
     mkdir_p libexec/"lib"
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
-
-    # Replace universal binaries with their native slices.
-    deuniversalize_machos
   end
 
   test do

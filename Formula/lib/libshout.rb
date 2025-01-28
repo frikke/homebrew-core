@@ -13,6 +13,7 @@ class Libshout < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "49c3066752128e45a877701bceb70aa87a5206860ced2da703537c50c2c71d6e"
     sha256 cellar: :any,                 arm64_sonoma:   "d33f7df96360cb44be07c2df6c3149372314fe2a72f56ee7df3042454d5bd1d1"
     sha256 cellar: :any,                 arm64_ventura:  "9231d4d7890507d132e7a64201b7ead203a22cb47850c9cf7ee099fbc5c8a6cd"
     sha256 cellar: :any,                 arm64_monterey: "60b072983a4133b4e504760df1173592f72f20ad4c563eaf4818c3f1de726c04"
@@ -24,7 +25,7 @@ class Libshout < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "898c7da67e779f3cce1a4b3f7b5cff8af87725d7235b3a138c06396db1b2eeec"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libogg"
   depends_on "libvorbis"
   depends_on "openssl@3"
@@ -38,8 +39,9 @@ class Libshout < Formula
   end
 
   def install
-    # Workaround for Xcode 14.3
-    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version == 1403
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
     system "./configure", *std_configure_args
     system "make", "install"
   end

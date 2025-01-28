@@ -7,7 +7,8 @@ class Metalang99 < Formula
   head "https://github.com/Hirrolot/metalang99.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "32b71a356b77df0dc6f4deee767caf0e383aec97be42eb4c7a5361a1cd595850"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "3727bb2cae31e9169ccd276a34128d690a3ac7c488226fb51666021896397ea2"
   end
 
   def install
@@ -15,7 +16,7 @@ class Metalang99 < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <metalang99.h>
 
@@ -27,7 +28,7 @@ class Metalang99 < Formula
         ML99_ASSERT_EQ(factorial(v(4)), v(24));
         printf("%d", ML99_EVAL(factorial(v(5))));
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-o", "test"
     assert_equal "120", shell_output("./test")

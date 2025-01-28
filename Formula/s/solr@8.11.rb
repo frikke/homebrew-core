@@ -1,12 +1,18 @@
 class SolrAT811 < Formula
   desc "Enterprise search platform from the Apache Lucene project"
   homepage "https://solr.apache.org/"
-  url "https://dlcdn.apache.org/lucene/solr/8.11.2/solr-8.11.2.tgz"
-  sha256 "54d6ebd392942f0798a60d50a910e26794b2c344ee97c2d9b50e678a7066d3a6"
+  url "https://dlcdn.apache.org/lucene/solr/8.11.4/solr-8.11.4.tgz"
+  mirror "https://archive.apache.org/dist/lucene/solr/8.11.4/solr-8.11.4.tgz"
+  sha256 "163fbdf246bbd78910bc36c3257ad50cdf31ccc3329a5ef885c23c9ef69e0ebe"
   license "Apache-2.0"
 
+  livecheck do
+    url "https://solr.apache.org/downloads.html"
+    regex(/href=.*?solr[._-]v?(8\.11(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "430113d21cb3e006e400a60001b5e020cd502aa4d0381f7db437bb9a68f45568"
+    sha256 cellar: :any_skip_relocation, all: "65d79494d324de0e00931020fc1e1624c7929566a4d66cee0b33052111f6e523"
   end
 
   keg_only :versioned_formula
@@ -45,20 +51,8 @@ class SolrAT811 < Formula
     return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
 
     ENV["SOLR_PID_DIR"] = testpath
-    port = free_port
 
     # Info detects no Solr node => exit code 3
     assert_match "No Solr nodes are running", shell_output("#{bin}/solr status", 3)
-    # Start a Solr node => exit code 0
-    shell_output("#{bin}/solr start -p #{port} -Djava.io.tmpdir=/tmp")
-    # Info detects a Solr node => exit code 0
-    assert_match "Found 1 Solr nodes", shell_output("#{bin}/solr status")
-    # Impossible to start a second Solr node on the same port => exit code 1
-    shell_output("#{bin}/solr start -p #{port}", 1)
-    # Stop a Solr node => exit code 0
-    # Exit code is 1 without init process in a docker container
-    shell_output("#{bin}/solr stop -p #{port}", (OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]) ? 1 : 0)
-    # No Solr node left to stop => exit code 1
-    shell_output("#{bin}/solr stop -p #{port}", 1)
   end
 end

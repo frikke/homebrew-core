@@ -1,9 +1,9 @@
 class Cproto < Formula
   desc "Generate function prototypes for functions in input files"
   homepage "https://invisible-island.net/cproto/"
-  url "https://invisible-mirror.net/archives/cproto/cproto-4.7v.tgz"
-  mirror "https://deb.debian.org/debian/pool/main/c/cproto/cproto_4.7v.orig.tar.gz"
-  sha256 "f3dec3f6102770196976459c4b44ac27355f6120da76e5231ec1323e379d1511"
+  url "https://invisible-mirror.net/archives/cproto/cproto-4.7x.tgz"
+  mirror "https://deb.debian.org/debian/pool/main/c/cproto/cproto_4.7x.orig.tar.gz"
+  sha256 "fb24b7254d8a5118913d3b7a54331975e60553afc70b88e4e7c2998203478cfe"
   license :public_domain
 
   livecheck do
@@ -12,13 +12,12 @@ class Cproto < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "66b12ef2111da682532b6a745465a0518d9f62f225c8f721e54de879e202c9ab"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "bb92f280ed1b571d91217a48eb4b5c7369620c45d2b6a55ad6678890eb7d7b56"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c48d435813db09cb41c3a478d2d0b5dcfea5798ac5f326870b4be8551f8fd4e4"
-    sha256 cellar: :any_skip_relocation, ventura:        "f43845911736c5506cc0ffe3160cb25f4806a0d78c71537d5fc26a405b3bed24"
-    sha256 cellar: :any_skip_relocation, monterey:       "5677c429de0a06a71ff73f2a5e2d4812f7f06a648df63752325906539da65ca0"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b8144d5fbd994924bb14a473a26211e7c3e7d5cc45606ff82c2f6023b48fe64a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "aef0e5ac3dd5df85888a5c06e8dbec67142174fdc95f789caa880a64655c5255"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "74d14e6a7fe7d38a689657640c86f216d7ac5a5a472dac25d11a0668b5a76cb0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b7d8b448e7cac556d0061b2009604cbaf8eab809ce5d49ead798537ce6a707c1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c4fd395a6bca7ab53b5d1ec26d42cffdf5eae1d09d2dfbabf97a272433783304"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9fa78ac025b54e39d8bde868a2448c3bcfefb75ae582e44f35e0b8b371359245"
+    sha256 cellar: :any_skip_relocation, ventura:       "321f6ca8a2ed5969e8e122279366e2c9b66457384599ab66fa3fb54d24348fb8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b48c6f4e571b667be12169a26d7b873fa73e22bbfabd5be8d4af34c5056f488e"
   end
 
   uses_from_macos "bison" => :build

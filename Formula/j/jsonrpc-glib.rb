@@ -1,74 +1,51 @@
 class JsonrpcGlib < Formula
   desc "GNOME library to communicate with JSON-RPC based peers"
   homepage "https://gitlab.gnome.org/GNOME/jsonrpc-glib"
-  url "https://download.gnome.org/sources/jsonrpc-glib/3.44/jsonrpc-glib-3.44.0.tar.xz"
-  sha256 "69406a0250d0cc5175408cae7eca80c0c6bfaefc4ae1830b354c0433bcd5ce06"
+  url "https://download.gnome.org/sources/jsonrpc-glib/3.44/jsonrpc-glib-3.44.1.tar.xz"
+  sha256 "1361d17e9c805646afe5102e59baf8ca450238600fcabd01586c654b78bb30df"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "81179b347f42fa5088707b190fc8c44cce5b4674a95d99124d15e17f55e07c64"
-    sha256 cellar: :any, arm64_monterey: "b9968d2db4506aa9493ae18baa2baf3606b94a270910fdc5d4a3928f6a1eb26f"
-    sha256 cellar: :any, arm64_big_sur:  "7a93842a0f8c1f9d2e926fbeca2ba17d176616e66b29b26fe128f5d1e68730bc"
-    sha256 cellar: :any, ventura:        "1a7c09d2663ff3df9280511655b194ced292b3fdc366fe502bfee8105978525f"
-    sha256 cellar: :any, monterey:       "4c5889ec718dd7362a9593d3d4be9c76a12f2252e9eda92b165e945cd8883080"
-    sha256 cellar: :any, big_sur:        "5f6b0972656e86a895a4026f5738416eb37b798792adcd30edb4ad3868a8bb05"
-    sha256               x86_64_linux:   "03191c798dee38b9983e2afb84310debbbd3850b21ad675b6629aa9e8cd677cc"
+    sha256 cellar: :any, arm64_sequoia:  "86e923e83351dc15ea3f8e42f004b43b42ccb4948e77d5765130f30c119c667a"
+    sha256 cellar: :any, arm64_sonoma:   "2f74a9be30520cf2db1b7bb27ec12561b14d77dad8673fde2b3ca360d7c60388"
+    sha256 cellar: :any, arm64_ventura:  "c4a222df659e62204a4d37afe1e07a380b2e1418cc2a99b9a445d3a5a3a77238"
+    sha256 cellar: :any, arm64_monterey: "a820e5106b6a5683afa616cc68aa1dd09a94fa48a47c154ebb8fc3b3c6ae5284"
+    sha256 cellar: :any, sonoma:         "001dd9f46c106194cdb65ab86ca327af3639d88d7e569339d972f0989204c5b8"
+    sha256 cellar: :any, ventura:        "327ea36ff03c446861852f77250db9c4aaffd6c63bb0538d2af0a274d7f2e300"
+    sha256 cellar: :any, monterey:       "d6b2438a15f0a4c0dfb464bbc5cfa277deadad086bab02da55d453d6eb1f8c5b"
+    sha256               x86_64_linux:   "a4403578f986fa53a5f8c41444aeb7ba65f34e2e5685ab58c0424457c2f2eddd"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => [:build, :test]
   depends_on "vala" => :build
+
   depends_on "glib"
   depends_on "json-glib"
 
+  on_macos do
+    depends_on "gettext"
+  end
+
   def install
-    mkdir "build" do
-      system "meson", *std_meson_args, "-Dwith_vapi=true", ".."
-      system "ninja", "-v"
-      system "ninja", "install", "-v"
-    end
+    system "meson", "setup", "build", "-Dwith_vapi=true", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <jsonrpc-glib.h>
 
       int main(int argc, char *argv[]) {
         JsonrpcInputStream *stream = jsonrpc_input_stream_new(NULL);
         return 0;
       }
-    EOS
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    json_glib = Formula["json-glib"]
-    pcre = Formula["pcre"]
-    flags = (ENV.cflags || "").split + (ENV.cppflags || "").split + (ENV.ldflags || "").split
-    flags += %W[
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/jsonrpc-glib-1.0
-      -I#{json_glib.opt_include}/json-glib-1.0
-      -I#{pcre.opt_include}
-      -D_REENTRANT
-      -L#{gettext.opt_lib}
-      -L#{glib.opt_lib}
-      -L#{json_glib.opt_lib}
-      -L#{lib}
-      -lgio-2.0
-      -lglib-2.0
-      -lgobject-2.0
-      -ljson-glib-1.0
-      -ljsonrpc-glib-1.0
-    ]
-    if OS.mac?
-      flags << "-lintl"
-      flags << "-Wl,-framework"
-      flags << "-Wl,CoreFoundation"
-    end
-    system ENV.cc, "test.c", "-o", "test", *flags
+    C
+    pkg_config_cflags = shell_output("pkgconf --cflags --libs jsonrpc-glib-1.0").chomp.split
+    system ENV.cc, "test.c", "-o", "test", *pkg_config_cflags
     system "./test"
   end
 end

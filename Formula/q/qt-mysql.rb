@@ -1,23 +1,20 @@
 class QtMysql < Formula
   desc "Qt SQL Database Driver"
   homepage "https://www.qt.io/"
-  url "https://download.qt.io/official_releases/qt/6.5/6.5.1/submodules/qtbase-everywhere-src-6.5.1.tar.xz"
-  sha256 "db56fa1f4303a1189fe33418d25d1924931c7aef237f89eea9de58e858eebfed"
+  url "https://download.qt.io/official_releases/qt/6.7/6.7.3/submodules/qtbase-everywhere-src-6.7.3.tar.xz"
+  sha256 "8ccbb9ab055205ac76632c9eeddd1ed6fc66936fc56afc2ed0fd5d9e23da3097"
   license any_of: ["GPL-2.0-only", "GPL-3.0-only", "LGPL-3.0-only"]
-  revision 1
 
   livecheck do
     formula "qt"
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1bfc728209369a52f821cd0fa3a5148f8d52cfe3107383eeac28617fb0fd687e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e1bf71b43b404d012bcbb62949657acfb21524983edf36965f94fef34a15a326"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "20d8e8a698289dd1b715fae366fc4e8b7cad5debbaf83d756f8e2c7cb24dd13c"
-    sha256 cellar: :any_skip_relocation, ventura:        "c0ef0588a2b6195d1c55215f0dad2c495245ee59dde5f59d4efca9c88f4ad961"
-    sha256 cellar: :any_skip_relocation, monterey:       "6883b13f11a91ff7048ff6a237d4b8820788ebef95a6831fdd99937069413ce9"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0979f7ffccab1379db612b87abcde50753837fe98c86ed6636f6d4459c41a653"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c338506a9c2845d4a52fa1a8b1a0076fb6c44bded46a83be696f06fc950daed2"
+    sha256 cellar: :any,                 arm64_sonoma:  "9a2b6030dfe103e7659ffb179f0d28d7190cd595ea63299cbeda0e2aae417300"
+    sha256 cellar: :any,                 arm64_ventura: "b79b338cb5f8b80b96d1799b6d9d3e0cb09866717c45f6bf62cdb05bd34276be"
+    sha256 cellar: :any,                 sonoma:        "251df7385ae4075b181a238ac73ec4f53f8d5f149028e21debfbfb00a4b76ee6"
+    sha256 cellar: :any,                 ventura:       "efd45ba29bf8fb77413a1b93da740fed5084667d5388ac04413fcfc0486de172"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "39b8e320a0015f6487c15594abe6b16e28b50a7ab892e99ae3538aa6e70ae026"
   end
 
   depends_on "cmake" => [:build, :test]
@@ -27,8 +24,6 @@ class QtMysql < Formula
 
   conflicts_with "qt-mariadb", "qt-percona-server",
     because: "qt-mysql, qt-mariadb, and qt-percona-server install the same binaries"
-
-  fails_with gcc: "5"
 
   def install
     args = std_cmake_args + %W[
@@ -50,7 +45,7 @@ class QtMysql < Formula
   end
 
   test do
-    (testpath/"CMakeLists.txt").write <<~EOS
+    (testpath/"CMakeLists.txt").write <<~CMAKE
       cmake_minimum_required(VERSION #{Formula["cmake"].version})
       project(test VERSION 1.0.0 LANGUAGES CXX)
       set(CMAKE_CXX_STANDARD 17)
@@ -63,7 +58,7 @@ class QtMysql < Formula
           main.cpp
       )
       target_link_libraries(test PRIVATE Qt6::Core Qt6::Sql)
-    EOS
+    CMAKE
 
     (testpath/"test.pro").write <<~EOS
       QT       += core sql
@@ -75,7 +70,7 @@ class QtMysql < Formula
       SOURCES += main.cpp
     EOS
 
-    (testpath/"main.cpp").write <<~EOS
+    (testpath/"main.cpp").write <<~CPP
       #include <QCoreApplication>
       #include <QtSql>
       #include <cassert>
@@ -87,7 +82,7 @@ class QtMysql < Formula
         assert(db.isValid());
         return 0;
       }
-    EOS
+    CPP
 
     system "cmake", "-S", ".", "-B", "build", "-DCMAKE_BUILD_TYPE=Debug"
     system "cmake", "--build", "build"

@@ -1,19 +1,17 @@
 class Qdmr < Formula
   desc "Codeplug programming tool for DMR radios"
   homepage "https://dm3mat.darc.de/qdmr/"
-  url "https://github.com/hmatuschek/qdmr/archive/refs/tags/v0.11.3.tar.gz"
-  sha256 "bad499faec7533c460e72c121716141f8cca0ea613ed55143ba1780b06a49b9a"
+  url "https://github.com/hmatuschek/qdmr/archive/refs/tags/v0.12.1.tar.gz"
+  sha256 "80eaadc6f817894fde6773d1b021e7a8ec051cbb774f63e6a097e21d8a56d8b5"
   license "GPL-3.0-or-later"
-  revision 1
 
   bottle do
-    sha256 arm64_ventura:  "a3d47d1a4f74f29d7205b551e09602e0d7459677f25653fc788e3bf8fe3cbd6f"
-    sha256 arm64_monterey: "b825f13edb4f363391a354ff6c99b1f117dbc07ea222804ddeade267642fafc6"
-    sha256 arm64_big_sur:  "e24d6e79da29b3e49aa5e727b89aa6c41cfc8d87d6d731576ad643507701a867"
-    sha256 ventura:        "96a334c4673dd26658fac496c7788bb27f4efcdf0b1bf8f2b720888a435e2cbb"
-    sha256 monterey:       "7702c73879f9acdbab76b3fdfa684533f674a6b36f35ed23ae91ae1c983f73a7"
-    sha256 big_sur:        "0115dad9c598ae7fd2ebcf0127d5daaf87db0bb324698ff99dd6e8e9d3c99d86"
-    sha256 x86_64_linux:   "f63dfccf38fe9a7542be3adec7d0ca85777c566a8a92fd3a9e5f527ad8db270e"
+    sha256 arm64_sequoia: "466b1ea108063ed50d951b3e79694867255e395d516cbb43e294cbb9ffce4ca0"
+    sha256 arm64_sonoma:  "b16fb78360a1a05305e2f31dc1b6949e45271b57589b486e930bd77814d2b6cc"
+    sha256 arm64_ventura: "04817d917185b0e67cd0f9791108465ac2d01b54351931c2c902725f9c17bc91"
+    sha256 sonoma:        "86034b508621ad37972850dc34850dff0031e1ad7827b6ee69f60cc11e79b774"
+    sha256 ventura:       "43852bc488a99f1ea2eeeb638b59c24ddb30b8d559a45e0a978b26efca56b0e7"
+    sha256 x86_64_linux:  "7fbb488e9feba30be04cfa868546e46ea105bae7041549c7132a7e25eacb0910"
   end
 
   depends_on "cmake" => :build
@@ -28,7 +26,7 @@ class Qdmr < Formula
   end
 
   test do
-    (testpath/"config.yaml").write <<~EOS
+    (testpath/"config.yaml").write <<~YAML
       radioIDs:
         - dmr: {id: id1, name: DM3MAT, number: 2621370}
 
@@ -39,7 +37,7 @@ class Qdmr < Formula
             rxFrequency: 123.456780   # <- Up to 10Hz precision
             txFrequency: 1234.567890
 
-    EOS
+    YAML
     system bin/"dmrconf", "--radio=d878uv2", "encode", "config.yaml", "config.dfu"
   end
 end

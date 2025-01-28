@@ -1,32 +1,25 @@
 class Ibazel < Formula
   desc "Tools for building Bazel targets when source files change"
   homepage "https://github.com/bazelbuild/bazel-watcher"
-  url "https://github.com/bazelbuild/bazel-watcher/archive/refs/tags/v0.23.7.tar.gz"
-  sha256 "21920e77f0dca97a4b098588b60d5afefab6efc6db384c755e01084ecaf0620f"
+  url "https://github.com/bazelbuild/bazel-watcher/archive/refs/tags/v0.25.3.tar.gz"
+  sha256 "064e313f2e2fa39ebd71a8f6b5eb44e7c832b713c0fc4077811d88830aa2e68e"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "bf92e59b275b9b679f1981c95662ec3a9e66f24138d8ae996977562eaa00b627"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e21a82d5ac71ad718f70508a7bd5b84e98860932dfe72330fce68bb6af5f6e76"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fb1c42c2b1431706f654f888d728878e8cf179d82bb67f76b396fc5824cfe4b7"
-    sha256 cellar: :any_skip_relocation, ventura:        "25f3e191c945b09cc8ade60a849f54d9a72b6578643d3bd25a99124a65454a0b"
-    sha256 cellar: :any_skip_relocation, monterey:       "0425b8634086d48374555a66352a4a34c22c923de1d1bb0dd47b0f9e8b091bce"
-    sha256 cellar: :any_skip_relocation, big_sur:        "02e214ea899f496aabbeb88cf8d0fc656b3b4f3bf0b809dd7c09140a2cce4828"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2cd9fc0b538066a09667ab2888b2817c79eae97984b1e14c922aef3ebcd9c7a8"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2c12651e6c9cbc680f6e787336fc2f2af53ccdd09cc7fafc8ee27a9317f507df"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2c12651e6c9cbc680f6e787336fc2f2af53ccdd09cc7fafc8ee27a9317f507df"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "3244d3623fc940b32da49370e3b4d78edae09fa66fc336a80dc5a2a6bfca08d1"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a2a7ca0a10912f7e99064fa84f76e4c05a0d1e1aefc026572187c66064872f37"
+    sha256 cellar: :any_skip_relocation, ventura:       "74d628872158223d2254232f97bc08654db611958b4269ed5b60aa91d8c3ec50"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1dd9fbcb138b56677b3123f7194cb5d13675a5cdd6f8dcfd9a41f218b3b67828"
   end
 
+  depends_on "bazelisk" => [:build, :test]
   depends_on "go" => [:build, :test]
 
-  on_macos do
-    depends_on "bazel" => [:build, :test]
-  end
-
-  on_linux do
-    depends_on "bazelisk" => [:build, :test]
-  end
-
   # bazel 6.x support issue, https://github.com/bazelbuild/bazel-watcher/issues/616
-  # patch to use bazel 6.3.2, upstream PR, https://github.com/bazelbuild/bazel-watcher/pull/575
+  # patch to use bazel 6.4.0, upstream PR, https://github.com/bazelbuild/bazel-watcher/pull/575
   patch :DATA
 
   def install
@@ -35,42 +28,34 @@ class Ibazel < Formula
   end
 
   test do
-    # Test building a sample Go program
-    (testpath/"WORKSPACE").write <<~EOS
-      load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+    # Write MODULE.bazel with Bazel module dependencies
+    (testpath/"MODULE.bazel").write <<~BAZEL
+      bazel_dep(name = "rules_go", version = "0.50.1")
+      bazel_dep(name = "gazelle", version = "0.40.0")
 
-      http_archive(
-        name = "io_bazel_rules_go",
-        sha256 = "278b7ff5a826f3dc10f04feaf0b70d48b68748ccd512d7f98bf442077f043fe3",
-        urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.41.0/rules_go-v0.41.0.zip",
-            "https://github.com/bazelbuild/rules_go/releases/download/v0.41.0/rules_go-v0.41.0.zip",
-        ],
+      # Register the Go SDK extension properly
+      go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
+
+      # Register the Go SDK installed on the host.
+      go_sdk.host()
+    BAZEL
+
+    (testpath/"BUILD.bazel").write <<~BAZEL
+      load("@rules_go//go:def.bzl", "go_binary")
+
+      go_binary(
+          name = "bazel-test",
+          srcs = ["test.go"],
       )
+    BAZEL
 
-      load("@io_bazel_rules_go//go:deps.bzl", "go_host_sdk", "go_rules_dependencies")
-
-      go_rules_dependencies()
-
-      go_host_sdk(name = "go_sdk")
-    EOS
-
-    (testpath/"test.go").write <<~EOS
+    (testpath/"test.go").write <<~GO
       package main
       import "fmt"
       func main() {
         fmt.Println("Hi!")
       }
-    EOS
-
-    (testpath/"BUILD").write <<~EOS
-      load("@io_bazel_rules_go//go:def.bzl", "go_binary")
-
-      go_binary(
-        name = "bazel-test",
-        srcs = glob(["*.go"])
-      )
-    EOS
+    GO
 
     pid = fork { exec("ibazel", "build", "//:bazel-test") }
     out_file = "bazel-bin/bazel-test_/bazel-test"
@@ -90,4 +75,4 @@ index 8a30e8f..09b254e 100644
 +++ b/.bazelversion
 @@ -1 +1 @@
 -5.4.0
-+6.3.2
++6.4.0

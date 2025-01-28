@@ -3,21 +3,18 @@ class Serialosc < Formula
   homepage "https://github.com/monome/docs/blob/gh-pages/serialosc/osc.md"
   # pull from git tag to get submodules
   url "https://github.com/monome/serialosc.git",
-      tag:      "v1.4.3",
-      revision: "12fa410a14b2759617c6df2ff9088bc79b3ee8de"
+      tag:      "v1.4.5",
+      revision: "79ac58b0737bc8a6617d90ab41fb00b791a5a746"
   license "ISC"
   head "https://github.com/monome/serialosc.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "3080c9badf496b7befff93f8a00d58fa83ce0de652bb0eb08296b409491b2efb"
-    sha256 cellar: :any,                 arm64_monterey: "318e77a4ee30e5b95315e2d05ee4967400fabc94cfb9621961f425132fa96f78"
-    sha256 cellar: :any,                 arm64_big_sur:  "f5b5a750553afaad105661c6c3a1d863bd18e89a6c1f818877e09fab50798e23"
-    sha256 cellar: :any,                 ventura:        "740a5861d890f439eab1812de773d574c27dac4581db94ccbb09a1c3acb70077"
-    sha256 cellar: :any,                 monterey:       "cf20c8747d7be7d4fea6709348af811a25f7e82c40ec462f6f2fe746951da665"
-    sha256 cellar: :any,                 big_sur:        "dd151339ca334c6719b61216a4ca378f1980079de8b7d666a7b544aa3eb71484"
-    sha256 cellar: :any,                 catalina:       "8f47b03bae3c5309d74a3032264246f33e9c05141b6679a057b9cfbc0fa3a8c8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a80b151ced619522b991261dfb4a40a18acd6b47a02c82a2748fe13b29636813"
+    sha256 cellar: :any,                 arm64_sequoia: "b1ba9d4682993c2b91b290ae127d7d3b4f9bf824096990f70680651a79390459"
+    sha256 cellar: :any,                 arm64_sonoma:  "84e6065faa98dbfb31e366907c0ad337472165ccffb3c8299cf2649811d19d6b"
+    sha256 cellar: :any,                 arm64_ventura: "f52aa361a0b6fcd4636a6e98d7b14d720ada9da0f2a78389f94296a54532d294"
+    sha256 cellar: :any,                 sonoma:        "594dd66c1a55996360013bad6a3f6fe042a5ee853b855b19e8703e0b501ac5cd"
+    sha256 cellar: :any,                 ventura:       "20f48d409724d37c319fd7595e47cc051be3e4343771168dfecbb9cd83e420d4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9b66b2d89de42e40b3f3659dbb4f461698d0ff515047af8fd58ca543efe2757c"
   end
 
   depends_on "confuse"
@@ -33,7 +30,7 @@ class Serialosc < Formula
   end
 
   def install
-    system "python3", "./waf", "configure", "--enable-system-libuv", "--prefix=#{prefix}"
+    system "python3", "./waf", "configure", "--prefix=#{prefix}"
     system "python3", "./waf", "build"
     system "python3", "./waf", "install"
   end

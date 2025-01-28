@@ -1,20 +1,18 @@
 class Davix < Formula
   desc "Library and tools for advanced file I/O with HTTP-based protocols"
   homepage "https://github.com/cern-fts/davix"
-  url "https://github.com/cern-fts/davix/releases/download/R_0_8_4/davix-0.8.4.tar.gz"
-  sha256 "519d56f746e86ea3fd615bc49e559b520df07e051e1ca3d8c092067958f3b2b7"
+  url "https://github.com/cern-fts/davix/releases/download/R_0_8_8/davix-0.8.8.tar.gz"
+  sha256 "7ff139babf39030dd9984ad5ff8cd5da1ced2963f53f04efc387101840ff3458"
   license "LGPL-2.1-or-later"
-  revision 1
   head "https://github.com/cern-fts/davix.git", branch: "devel"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "d6c39dcc41daaa79286a5f843a96438016dd3dc12e6b90496fa0c0a8c98879de"
-    sha256 cellar: :any,                 arm64_monterey: "63ddded6d7553a2b25b7577a90b6f0b26d71a9b0491aeb0538e6e8d96a453dc2"
-    sha256 cellar: :any,                 arm64_big_sur:  "8077eff019705fe76a8bbc059e12a3925cd5e3619a1f5b1709a0efe9d7117dfb"
-    sha256 cellar: :any,                 ventura:        "6afd4fc8493c01b9d575ed87d170a8ca3b06b88c6fa7603b43dc8fa124488194"
-    sha256 cellar: :any,                 monterey:       "d5d56f9c9fe987cb03a000f86a0b0a7af42a801765ea7ec4c27264e41834f49d"
-    sha256 cellar: :any,                 big_sur:        "dfa3470f6a0e655a4c07d5cdf4821e5ed115c1cce287208fe1feec7f7dcd79b0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b41952cfa51be57c74dd2998a8c8d33234082d9b2ea9725d1b8b727bf1996235"
+    sha256 cellar: :any,                 arm64_sequoia: "9c20406f04d9aa93eb65ea95ea0c093e2c74c042eab6452ffe887ec10f634367"
+    sha256 cellar: :any,                 arm64_sonoma:  "b1ab99aeec645d8aad1ca6c5796a83d737fb434854372ff81bd123e5be7c551c"
+    sha256 cellar: :any,                 arm64_ventura: "7245869754071c3e8e1eab9f2297c566f3f7c09323a3a389d867f30ddaab0e1a"
+    sha256 cellar: :any,                 sonoma:        "7e957e1bce4aa4c65e178929fc3c3949eee4fa669ec3ba4b9b34975df1c0b5dd"
+    sha256 cellar: :any,                 ventura:       "e3e271e1fe83c01de2b5de177a27b26e8be326ae38a6a5db6bc2a177afb74980"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "478040f1e1bea1d2b68ca3e69963d22831171cc1cc36fb61624be6b808147102"
   end
 
   depends_on "cmake" => :build
@@ -34,6 +32,8 @@ class Davix < Formula
       -DEMBEDDED_LIBCURL=FALSE
       -DCMAKE_INSTALL_RPATH=#{rpath}
       -DLIB_SUFFIX=
+      -DBENCH_TESTS=FALSE
+      -DDAVIX_TESTS=FALSE
     ]
 
     system "cmake", "-S", ".", "-B", "build", *args
@@ -42,6 +42,6 @@ class Davix < Formula
   end
 
   test do
-    system "#{bin}/davix-get", "https://brew.sh"
+    system bin/"davix-get", "https://brew.sh"
   end
 end

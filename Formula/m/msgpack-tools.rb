@@ -6,9 +6,12 @@ class MsgpackTools < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "89db8ac554a849076b6b033ccd4d01758772b92c528107049b1ad0df61e3adcf"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "89cbb09892efa84ffed3f4b4184d91a42526e0884034d00edfcff5ef914acf27"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "b0efee2e7c968df487992d42aa94cc349e9d64762331226b637efe8853ba15d8"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "f4bf0c32cce899c521d54e6f26f7bd60c10ad64d4054df064ee42b4437ad9178"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "775db49a7259ddf909dd2a05a529e7e308cc2ac376ad116c1668bb659bd34a1c"
+    sha256 cellar: :any_skip_relocation, sonoma:         "a4999dde3a882d85ed7afada6d7366d13bfabc1d37614f06a2510cf97baf1f65"
     sha256 cellar: :any_skip_relocation, ventura:        "6606dc9490eafb04a6078c34847f311aeb4460d28cf2fc90bb0fa3622904a502"
     sha256 cellar: :any_skip_relocation, monterey:       "8d663e0e00679aba8e9bba953aeb99ca657cfd8206769447e6459c33433f6d05"
     sha256 cellar: :any_skip_relocation, big_sur:        "570a72e93de0677f94a586cb49e04ac1fe68655e451860d45a250702fc6e0383"
@@ -24,13 +27,18 @@ class MsgpackTools < Formula
   conflicts_with "remarshal", because: "both install 'json2msgpack' binary"
 
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install", "PREFIX=#{prefix}/"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    json_data = '{"hello":"world"}'
-    assert_equal json_data,
-      pipe_output("#{bin}/json2msgpack | #{bin}/msgpack2json", json_data, 0)
+    json_data = <<~JSON
+      {"hello":"world"}
+    JSON
+
+    msgpack_data = pipe_output("#{bin}/json2msgpack", json_data)
+    output = pipe_output("#{bin}/msgpack2json", msgpack_data)
+    assert_equal json_data.strip, output.strip
   end
 end

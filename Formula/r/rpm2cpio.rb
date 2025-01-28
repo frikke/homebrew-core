@@ -12,14 +12,15 @@ class Rpm2cpio < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a0d766ccb938671a8c732670ae21369f7213ff1c75bcbae8dd3375043ca7a0f4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4dc679df047764833091737b1c6abe53f76788281df5fa220ff0914cf5f7bde6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f4048459b1dce919e2cdbb30b79b7893a5ebac6edf34ec82bc7ac224836b06c5"
-    sha256 cellar: :any_skip_relocation, ventura:        "d23abbffe4e9bb974d7be5a6e07ba8105b641a01cbd924d439b87a9824849deb"
-    sha256 cellar: :any_skip_relocation, monterey:       "d93f7543c723d33c9cc2666bfe057583889d60d4d250f4f6921e1844a652043e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9a704cd7500da1e5ee5da24db92d732212c7d3e1106ab7dd54888f5fcb681475"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5a5a71b883b56d4c4188946221d349a9e0bdbc5f2f1a835df26b0504c439b335"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "57971030692fdb6757848c6febbfa2ee6b331287482019e45760328de8e03720"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "cfb382b55ce5155b2313bade20f110e59d9617e0d3ecedacb8d32e587800595d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "25a31e16c6737137ab53e8c0768be89309f77d78e8ebb2a4ecf2a3bc9e1ee8fb"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8bec9fc7497aea14f5ed7e57d4d56e0899b9fee2fc8d0773f6df1186e6b07327"
+    sha256 cellar: :any_skip_relocation, sonoma:         "fc05b2691766343ce66af5f1b1ab8e439c0370d4b8bb7d00ad7111a102f89659"
+    sha256 cellar: :any_skip_relocation, ventura:        "0b59b750cefaa5e3e10b411be76ce61e6842ac5a33ae8fe2f9d5882748350db9"
+    sha256 cellar: :any_skip_relocation, monterey:       "01c30bbc719f13559f1d351beeeca74b6e74a874ec79fdc2e461feec12bd199d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8a6ed93e8d9f082a0fda4538dcb4d94a75423e73d21ec86d5f1e0040a3e1b3c7"
   end
 
   depends_on "libarchive"
@@ -35,7 +36,7 @@ class Rpm2cpio < Formula
 
   test do
     resource "homebrew-testdata" do
-      url "https://rpmfind.net/linux/fedora/linux/development/rawhide/Everything/x86_64/os/Packages/h/hello-2.12.1-2.fc39.x86_64.rpm"
+      url "https://rpmfind.net/linux/fedora/linux/releases/39/Everything/x86_64/os/Packages/h/hello-2.12.1-2.fc39.x86_64.rpm"
       sha256 "10f9944f95ca54f224133cffab1cfab0c40e3adb64e4190d3d9e8f9dbed680f9"
     end
 

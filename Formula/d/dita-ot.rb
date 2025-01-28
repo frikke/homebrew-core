@@ -1,8 +1,8 @@
 class DitaOt < Formula
   desc "DITA Open Toolkit is an implementation of the OASIS DITA specification"
   homepage "https://www.dita-ot.org/"
-  url "https://github.com/dita-ot/dita-ot/releases/download/4.1.1/dita-ot-4.1.1.zip"
-  sha256 "a86ae9499ddba7f9703e1ae3eeaa6ea9f83b8a128ec6c4b01adaf803cf9d1cfb"
+  url "https://github.com/dita-ot/dita-ot/releases/download/4.2.4/dita-ot-4.2.4.zip"
+  sha256 "d8f66d3d2ddd628398b79b0eccb10acc2a28c54206b958f629cd54c6795eeb88"
   license "Apache-2.0"
 
   livecheck do
@@ -11,19 +11,18 @@ class DitaOt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2aeefbf349a91e9c1507505e55571ce25643b1f17f585461534aaee33d4ec867"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2aeefbf349a91e9c1507505e55571ce25643b1f17f585461534aaee33d4ec867"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2aeefbf349a91e9c1507505e55571ce25643b1f17f585461534aaee33d4ec867"
-    sha256 cellar: :any_skip_relocation, ventura:        "a30970174eb19921756e13b48ca1bca143c78633ad31f93b51757b502b23d42e"
-    sha256 cellar: :any_skip_relocation, monterey:       "a30970174eb19921756e13b48ca1bca143c78633ad31f93b51757b502b23d42e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a30970174eb19921756e13b48ca1bca143c78633ad31f93b51757b502b23d42e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "03fe56d9b44a8dc175884dfc0f525cb0edc6e7d98a0176c0bc045dbe5a7dc0a5"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1c758b5ed07493d17ec4c1cc9c556e5df0ae141f5a19d671697e4fcb0acaac00"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1c758b5ed07493d17ec4c1cc9c556e5df0ae141f5a19d671697e4fcb0acaac00"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1c758b5ed07493d17ec4c1cc9c556e5df0ae141f5a19d671697e4fcb0acaac00"
+    sha256 cellar: :any_skip_relocation, sonoma:        "d7baa9a7a2816335e474e3fb110c55bae58dd8f0c79a670ba248a1bbd83de301"
+    sha256 cellar: :any_skip_relocation, ventura:       "d7baa9a7a2816335e474e3fb110c55bae58dd8f0c79a670ba248a1bbd83de301"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a8ff14873b2335b8b358f829ccc9b91fcfda7529367681347df643597e7ec7e8"
   end
 
   depends_on "openjdk"
 
   def install
-    rm_f Dir["bin/*.bat", "config/env.bat", "startcmd.*"]
+    rm(Dir["bin/*.bat", "config/env.bat", "startcmd.*"])
     libexec.install Dir["*"]
     (bin/"dita").write_env_script libexec/"bin/dita", JAVA_HOME: Formula["openjdk"].opt_prefix
   end

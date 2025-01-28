@@ -1,10 +1,10 @@
 class Morse < Formula
   desc "QSO generator and morse code trainer"
   homepage "http://www.catb.org/~esr/morse/"
-  url "http://www.catb.org/~esr/morse/morse-2.5.tar.gz"
-  sha256 "476d1e8e95bb173b1aadc755db18f7e7a73eda35426944e1abd57c20307d4987"
+  # reported the artifact issue on the project page, https://gitlab.com/esr/morse-classic/-/issues/1
+  url "https://gitlab.com/esr/morse-classic/-/archive/2.6/morse-classic-2.6.tar.bz2"
+  sha256 "ec44144d52a1eef36fbe0ca400c54556a7ba8f8c3de38d80512d19703b89f615"
   license "BSD-2-Clause"
-  revision 2
 
   livecheck do
     url :homepage
@@ -12,21 +12,27 @@ class Morse < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "c10ed6e8fcfc5eba8f26332554eab00725618885103a64012ae1439d6086a8b6"
-    sha256 cellar: :any,                 arm64_monterey: "a35043d1c63aa545d5bedb01c1e84c425a30f2b991468a00cd7a5aa12ee14d91"
-    sha256 cellar: :any,                 arm64_big_sur:  "cb06d8049d00c1b52a2c6538ea10918a7623541df2304c1f9c154e042fde868d"
-    sha256 cellar: :any,                 ventura:        "364dda70103cf7696e1a8f5b7506fa7a34bfce18f4a3a5552015b71dde9192e8"
-    sha256 cellar: :any,                 monterey:       "ed97cdede281a1b7adf2c483cca6630fbf91a4180724f58ea9a313a886bce8d1"
-    sha256 cellar: :any,                 big_sur:        "a956bb32257136228025435a70344d3322b621be1c932e1f61be3fbc1db3b000"
-    sha256 cellar: :any,                 catalina:       "f489bcc53ec31f5473e2116bd8d4f6867e15501cc8400e9992d1949331d18dee"
-    sha256 cellar: :any,                 mojave:         "e696b87957c0215da2e9f600f66460c341b4141b4ef86096dd78d9000a5ceafe"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "50847c19aed821be27839b60979e43ffd45f9c3ba66a469421a6204d950ffad2"
+    sha256 cellar: :any,                 arm64_sequoia:  "d2d07a8df0960df4b556fc6dca7f17bdc71f430cdc0dccf22911b444ecc2a5bd"
+    sha256 cellar: :any,                 arm64_sonoma:   "0286b2ad85c1add1655abfb88976233c98db5050e38d9d3995c1adb9c9a10a1e"
+    sha256 cellar: :any,                 arm64_ventura:  "2474d8763e32b94635781a29c7ead023710fb0186a9d21fb22cfcd7a8d22e4eb"
+    sha256 cellar: :any,                 arm64_monterey: "b11f64cb45004eba37bf06e0d367e71b6f088fe7d05e80019125c325a48fcd9d"
+    sha256 cellar: :any,                 sonoma:         "6892afd65e72497a1fc11d849031e2ea034ffbd41f644a018ec14d0a1a110bfe"
+    sha256 cellar: :any,                 ventura:        "6b25ce35c70900babe4699533e2161b58b7b73cb9349821e9043b5aa01f95e71"
+    sha256 cellar: :any,                 monterey:       "56d73fcfdfaa67270047046e7785881149585063ea71f9d5da7e32b42f3fcd61"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6f8504ea84011770dbba7831cfb9a35742be9efc2d849657385fb7a68e7ade6f"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "xmlto" => :build
   depends_on "pulseaudio"
 
+  patch :DATA
+
   def install
+    ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
+
+    ENV["CC"] = "#{ENV.cc} -Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
     system "make", "all"
     bin.install %w[morse QSO]
     man1.install %w[morse.1 QSO.1]
@@ -39,3 +45,19 @@ class Morse < Formula
     assert_match "Could not initialize audio", shell_output("#{bin}/morse -- 2>&1", 1)
   end
 end
+
+__END__
+diff --git a/Makefile b/Makefile
+index 8bdf1f6..df39baa 100644
+--- a/Makefile
++++ b/Makefile
+@@ -28,8 +28,8 @@
+ #DEVICE = X11
+ #DEVICE = Linux
+ #DEVICE = OSS
+-DEVICE = ALSA
+-#DEVICE = PA
++#DEVICE = ALSA
++DEVICE = PA
+
+ VERSION=$(shell sed -n <NEWS '/^[0-9]/s/:.*//p' | head -1)

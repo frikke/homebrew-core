@@ -1,8 +1,8 @@
 class Libbsd < Formula
   desc "Utility functions from BSD systems"
   homepage "https://libbsd.freedesktop.org/"
-  url "https://libbsd.freedesktop.org/releases/libbsd-0.11.7.tar.xz"
-  sha256 "9baa186059ebbf25c06308e9f991fda31f7183c0f24931826d83aa6abd8a0261"
+  url "https://libbsd.freedesktop.org/releases/libbsd-0.12.2.tar.xz"
+  sha256 "b88cc9163d0c652aaf39a99991d974ddba1c3a9711db8f1b5838af2a14731014"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,11 +11,16 @@ class Libbsd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "0c3b62f8f0c7e04a245a75cbea9f8cdaca2c00edb812e13ebd9fd10767df8d2d"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "e9bd43f6679707dbe86536dd3d9daefd9988db71b911d9b1fd7bbb04658b446c"
+    sha256 cellar: :any,                 arm64_sonoma:  "aa3c342efa7b87672ed780f3ac53680a5493f0e267eab9d71cd4d4380146342c"
+    sha256 cellar: :any,                 arm64_ventura: "3f8b9f7545d170c69e15ba9e24edb7cf7cb98ccda39dd3c8a4ed0d28c75b7bb5"
+    sha256 cellar: :any,                 sonoma:        "4fc8e8c21ed393023cae19ff35ec7b5faf7df85c9bc843dafcb7f96b5b1f8537"
+    sha256 cellar: :any,                 ventura:       "110fd177f3769fc485f1deff7a88c1f268d588fffcc9c58c0919ce4a3a30b6d4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "31fb2290fe313559d9de741089809ea8d5bc8cffdaf8237f350c6d2f836bba95"
   end
 
   depends_on "libmd"
-  depends_on :linux
 
   def install
     system "./configure",
@@ -26,6 +31,7 @@ class Libbsd < Formula
   end
 
   test do
-    assert_match "strtonum", shell_output("nm #{lib/"libbsd.so.#{version}"}")
+    libbsd = lib/shared_library("libbsd", version.major.to_s)
+    assert_match "strtonum", shell_output("nm #{libbsd}")
   end
 end

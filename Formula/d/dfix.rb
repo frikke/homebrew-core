@@ -23,7 +23,7 @@ class Dfix < Formula
   end
 
   # https://github.com/dlang-community/dfix/issues/60
-  deprecate! date: "2023-06-25", because: :unmaintained
+  disable! date: "2024-02-22", because: :unmaintained
 
   on_arm do
     depends_on "ldc" => :build
@@ -45,13 +45,13 @@ class Dfix < Formula
   end
 
   test do
-    system "#{bin}/dfix", "--help"
+    system bin/"dfix", "--help"
 
     cp "#{pkgshare}/testfile_master.d", "testfile.d"
-    system "#{bin}/dfix", "testfile.d"
+    system bin/"dfix", "testfile.d"
     system "diff", "testfile.d", "#{pkgshare}/testfile_expected.d"
     # Make sure that running dfix on the output of dfix changes nothing.
-    system "#{bin}/dfix", "testfile.d"
+    system bin/"dfix", "testfile.d"
     system "diff", "testfile.d", "#{pkgshare}/testfile_expected.d"
   end
 end

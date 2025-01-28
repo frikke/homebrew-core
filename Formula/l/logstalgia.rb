@@ -4,16 +4,15 @@ class Logstalgia < Formula
   url "https://github.com/acaudwell/Logstalgia/releases/download/logstalgia-1.1.4/logstalgia-1.1.4.tar.gz"
   sha256 "c049eff405e924035222edb26bcc6c7b5f00a08926abdb7b467e2449242790a9"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 6
 
   bottle do
-    sha256 arm64_ventura:  "9b001377cd185e70644b8428ce26297a7c4ae96112a54823bb081904ea879c5d"
-    sha256 arm64_monterey: "c9f234fcec4d06c0e9c65d26071f4408baa98f3faaf27e39782464d020cba296"
-    sha256 arm64_big_sur:  "2daf20ebefabb9a3e4574e1669ac4e4d07e2cc94175c3c2d0344f608f4d640a2"
-    sha256 ventura:        "d974776b03bfaf4523e459f9e4e9441cf29eef373930f770e574a84c17e70911"
-    sha256 monterey:       "40d4ae599af8f864d33af1043f10fa51a61fd56be16cbb15dec46d9b0927741a"
-    sha256 big_sur:        "87e55b99f349681141a8f23263d83e233b69f75b75eb9e8288ce767955fd80e0"
-    sha256 x86_64_linux:   "817b2d9dff6267ecc43d36d3e5b300586d958073f77d6bb7c827c21fca184c6b"
+    sha256 arm64_sequoia: "221c64339ccde05aa3c801dee8b6b622a413e02eb8dc5b518c557b355d274597"
+    sha256 arm64_sonoma:  "ad28ec258c7b1719cccc9e5c0fcec798ab2ffd38ce69fd94b9f05d2d5ea23cba"
+    sha256 arm64_ventura: "c067670175d1f468fb49ce3c8358f2a591bac1cca15bc1e9a1c9a37d3a1d94de"
+    sha256 sonoma:        "fd5806743b355f6106ded586a2447df24681cbb66b259c48141492350070eb7e"
+    sha256 ventura:       "3acf2aaaffda836946cb952e0cc463b92ba958a3791e3f1719ce57e09071c774"
+    sha256 x86_64_linux:  "b95612106ad5cb74aeb54a1d355a57c7a8953a80d775e781e46274116a3c5d82"
   end
 
   head do
@@ -25,7 +24,8 @@ class Logstalgia < Formula
   end
 
   depends_on "glm" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "boost"
   depends_on "freetype"
   depends_on "glew"
@@ -34,20 +34,19 @@ class Logstalgia < Formula
   depends_on "sdl2"
   depends_on "sdl2_image"
 
+  on_linux do
+    depends_on "mesa"
+    depends_on "mesa-glu"
+  end
+
   def install
-    # clang on Mt. Lion will try to build against libstdc++,
-    # despite -std=gnu++0x
-    ENV.libcxx
+    ENV.cxx11 # to build with boost>=1.85
 
-    # For non-/usr/local installs
-    ENV.append "CXXFLAGS", "-I#{HOMEBREW_PREFIX}/include"
-
-    # Handle building head.
-    system "autoreconf", "-f", "-i" if build.head?
-
-    system "./configure", *std_configure_args,
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", "--disable-silent-rules",
                           "--with-boost-libdir=#{Formula["boost"].opt_lib}",
-                          "--without-x"
+                          "--without-x",
+                          *std_configure_args
     system "make"
     system "make", "install"
   end

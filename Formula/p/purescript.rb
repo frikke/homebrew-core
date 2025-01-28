@@ -1,35 +1,41 @@
 class Purescript < Formula
   desc "Strongly typed programming language that compiles to JavaScript"
   homepage "https://www.purescript.org/"
-  # TODO: Try to switch `ghc@9.2` to `ghc` when purescript.cabal allows base>=4.17
-  url "https://hackage.haskell.org/package/purescript-0.15.10/purescript-0.15.10.tar.gz"
-  sha256 "c12dff938d66cbcd184eaa5fee127679342f14d6243d8195969ed48b26d4ea22"
+  # NOTE: If the build fails due to dependency resolution, do not report issue
+  # upstream as we modify upstream's constraints in order to use a newer GHC.
+  url "https://hackage.haskell.org/package/purescript-0.15.15/purescript-0.15.15.tar.gz"
+  sha256 "9c4a23ea47ff09adc34e260610beabd940ec5c15088234cf120e8660dd220e67"
   license "BSD-3-Clause"
   head "https://github.com/purescript/purescript.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "045428ed6c0d93e46a79fa3fa540cffe4af94de79d667cdef5390043b8ea881e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ed75c825e3acb3845dae944270e4382026e789b09e86912a0e9ee79fea1e51b8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a70b85c4fee0dda2b9eeda7758ea0bf04feb8dbca29d7abf7063fffa192f6a7d"
-    sha256 cellar: :any_skip_relocation, ventura:        "855a89536c33efb70c635ff5a466611ef0abf260a9a4b955814ccfb52396244b"
-    sha256 cellar: :any_skip_relocation, monterey:       "291ddd60ce776ae02fa046d3f12db72320fce60855b21efb6aafc04d43c34a70"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5cecc078307e465933e940450de69acf7f0decca77a97499dd1f723972135f78"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0c6574c035c301287d56c71a6f60bb5bc3780f4256c75457b0d93711ff9c7157"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "3c1767c6fe89d2e486911f5c60c81222996c3b47971d57b533bb57ace2d22a4b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "69551d14eb101c3640582d055929b2d6338310c5422530edb2b1e35dbd648830"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "720d717ad6d38ba67c288cca2cc03b236cf29ed3badeb823743d1ab091f8704f"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7d4a9daf4fca5b870a4e45590a13e56e8e78f9bef3729047f064a48a86e7e3f9"
+    sha256 cellar: :any_skip_relocation, sonoma:         "133fd37b35ea0ebc610965f55332f02bbf67a00db14c4b518f9e7b714fdd705f"
+    sha256 cellar: :any_skip_relocation, ventura:        "25f3df8f4c4e5eaf94f4fb9411dfcd48ffaaf257f96e454eef88ff387dd7bc8d"
+    sha256 cellar: :any_skip_relocation, monterey:       "a5cf0585bded8ce93f09124d885a8dc00b373b6ca63407300d5b3bcc10aebe9d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c07fee914dfa9648df6df6152b7c5d7f0297d2e8133a653a4f3511dcfb72b01c"
   end
 
-  depends_on "ghc@9.2" => :build
-  depends_on "haskell-stack" => :build
+  depends_on "cabal-install" => :build
+  depends_on "ghc@9.6" => :build
 
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
   def install
-    # Use ncurses in REPL, providing an improved experience when editing long
-    # lines in the REPL.
-    # See https://github.com/purescript/purescript/issues/3696#issuecomment-657282303.
-    inreplace "stack.yaml", "terminfo: false", "terminfo: true"
+    # Minimal set of dependencies that need to be unbound to build with newer GHC
+    allow_newer_deps = %w[
+      aeson
+      base
+      memory
+      template-haskell
+    ]
 
-    system "stack", "install", "--system-ghc", "--no-install-ghc", "--skip-ghc-check", "--local-bin-path=#{bin}"
+    system "cabal", "v2-update"
+    system "cabal", "v2-install", "--allow-newer=#{allow_newer_deps.join(",")}", *std_cabal_v2_args
   end
 
   test do

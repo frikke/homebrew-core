@@ -1,7 +1,7 @@
 class OpenexrAT2 < Formula
   desc "High dynamic-range image file format"
   homepage "https://www.openexr.com/"
-  url "https://github.com/AcademySoftwareFoundation/openexr/archive/v2.5.8.tar.gz"
+  url "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v2.5.8.tar.gz"
   sha256 "db261a7fcc046ec6634e4c5696a2fc2ce8b55f50aac6abe034308f54c8495f55"
   license "BSD-3-Clause"
 
@@ -18,10 +18,10 @@ class OpenexrAT2 < Formula
 
   keg_only :versioned_formula
 
-  deprecate! date: "2023-02-04", because: :unsupported
+  disable! date: "2024-02-07", because: :unsupported
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "ilmbase"
 
   uses_from_macos "zlib"

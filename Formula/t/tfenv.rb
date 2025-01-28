@@ -1,7 +1,7 @@
 class Tfenv < Formula
   desc "Terraform version manager inspired by rbenv"
   homepage "https://github.com/tfutils/tfenv"
-  url "https://github.com/tfutils/tfenv/archive/v3.0.0.tar.gz"
+  url "https://github.com/tfutils/tfenv/archive/refs/tags/v3.0.0.tar.gz"
   sha256 "463132e45a211fa3faf85e62fdfaa9bb746343ff1954ccbad91cae743df3b648"
   license "MIT"
   head "https://github.com/tfutils/tfenv.git", branch: "master"
@@ -12,7 +12,8 @@ class Tfenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4905c2390b0254348be44da1c4a05b3d8bf4d8704b94d16b739d64fd4709784b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "c66a9c7c90b14b63c471b56405ec064b081474cc85528b324bd1bcc1c1af248d"
   end
 
   uses_from_macos "unzip"
@@ -21,6 +22,7 @@ class Tfenv < Formula
     depends_on "grep"
   end
 
+  conflicts_with "tenv", because: "tfenv symlinks terraform binaries"
   conflicts_with "terraform", because: "tfenv symlinks terraform binaries"
 
   def install

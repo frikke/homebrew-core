@@ -1,18 +1,17 @@
 class DuaCli < Formula
   desc "View disk space usage and delete unwanted data, fast"
   homepage "https://lib.rs/crates/dua-cli"
-  url "https://github.com/Byron/dua-cli/archive/refs/tags/v2.20.1.tar.gz"
-  sha256 "05ce2d74ec1282803c6825b0436d8b268eef176060b844ae29746a3d338fe658"
+  url "https://github.com/Byron/dua-cli/archive/refs/tags/v2.30.0.tar.gz"
+  sha256 "8c5b0b30d9f2a5d7fef5621d8dd38690a4394d428206bb0473c2b48234d43331"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e55e886006366e0bbaf87b741d782997cff53779204060d772fa641104a0f4fc"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "9e45562d2303c72404e917d6ebd21d45e08e92da458fa7e31bc92503f158d1cf"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "911dece14e16458500f806ef74be1f22fd9bee50e6ecd9b48f8eb02953a67843"
-    sha256 cellar: :any_skip_relocation, ventura:        "df03bc090641f93dc0c122dd6e323183af61c8c7e1b0fa50f7ee7792b6117ba8"
-    sha256 cellar: :any_skip_relocation, monterey:       "c58a5d68db3faa7d3b29049598c0967202e08bc68fa85bc3efdfaa2b97983776"
-    sha256 cellar: :any_skip_relocation, big_sur:        "18ed6f07fc379d000cb96ac204e7f0e1249ca8a69529ad8ca4abecb731b7e0dd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "44dff7181ddb90c892a558ceadbd44eae2c65d6e8738be65e7798dca0142bd55"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1b528c9dffdcbc18ae5049aef0673938dc00e69367d30105ce86e558cb191479"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0ac15f4abc82f154d03f8e384da9ce1af37e36f71f84136bf157c92b650b8c5e"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "fa3b62f2e9141eb656bc8359d59223c9b317d681759d15f7348523c733900ef9"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a4dadef8ebfb0cefe0b24968ed83b472738f481c5f4ff80eb9ed7600d9b3f7d6"
+    sha256 cellar: :any_skip_relocation, ventura:       "f67e8a8625f1400c26d60ff0b98b895d2054960c1fe4e5d8ec21d5cd0057cc4d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "572a6d480fa4c74ebdaf6e22138573d94f2169e49717b4441e9384e3a0e14c45"
   end
 
   depends_on "rust" => :build
@@ -26,24 +25,11 @@ class DuaCli < Formula
     (testpath/"empty.txt").write("")
     (testpath/"file.txt").write("01")
 
-    # upstream discussions, https://github.com/Byron/dua-cli/issues/163
-    # need update after this PR, https://github.com/Byron/dua-cli/pull/158
-    expected_macos = <<~EOS
-      \e[32m      0  B\e[39m #{testpath}/empty.txt
-      \e[32m      2  B\e[39m #{testpath}/file.txt
-      \e[32m      2  B\e[39m total
-    EOS
-
-    expected_linux = <<~EOS
-      \e[32m     0   B\e[39m #{testpath}/empty.txt
-      \e[32m     2   B\e[39m #{testpath}/file.txt
-      \e[32m     2   B\e[39m total
-    EOS
-
-    if OS.mac?
-      assert_equal expected_macos, shell_output("#{bin}/dua -A #{testpath}/*.txt")
-    else
-      assert_equal expected_linux, shell_output("#{bin}/dua -A #{testpath}/*.txt")
-    end
+    expected = %r{
+      \e\[32m\s*0\s*B\e\[39m\ #{testpath}/empty.txt\n
+      \e\[32m\s*2\s*B\e\[39m\ #{testpath}/file.txt\n
+      \e\[32m\s*2\s*B\e\[39m\ total\n
+    }x
+    assert_match expected, shell_output("#{bin}/dua -A #{testpath}/*.txt")
   end
 end

@@ -19,7 +19,7 @@ class GccAT8 < Formula
 
   # Unsupported per https://gcc.gnu.org/gcc-8/
   # Last release on 2021-05-14
-  deprecate! date: "2023-05-16", because: :deprecated_upstream
+  disable! date: "2024-02-22", because: :deprecated_upstream
 
   # The bottles are built on systems with the CLT installed, and do not work
   # out of the box on Xcode-only systems due to an incorrect sysroot.
@@ -143,7 +143,7 @@ class GccAT8 < Formula
     # Rename man7.
     Dir.glob(man7/"*.7") { |file| add_suffix file, version_suffix }
     # Even when we disable building info pages some are still installed.
-    info.rmtree
+    rm_r(info)
   end
 
   def add_suffix(file, suffix)
@@ -177,7 +177,7 @@ class GccAT8 < Formula
       specs = libgcc/"specs"
       ohai "Creating the GCC specs file: #{specs}"
       specs_orig = Pathname.new("#{specs}.orig")
-      rm_f [specs_orig, specs]
+      rm([specs_orig, specs].select(&:exist?))
 
       system_header_dirs = ["#{HOMEBREW_PREFIX}/include"]
 
@@ -229,18 +229,18 @@ class GccAT8 < Formula
   end
 
   test do
-    (testpath/"hello-c.c").write <<~EOS
+    (testpath/"hello-c.c").write <<~C
       #include <stdio.h>
       int main()
       {
         puts("Hello, world!");
         return 0;
       }
-    EOS
-    system "#{bin}/gcc-#{version.major}", "-o", "hello-c", "hello-c.c"
+    C
+    system bin/"gcc-#{version.major}", "-o", "hello-c", "hello-c.c"
     assert_equal "Hello, world!\n", `./hello-c`
 
-    (testpath/"hello-cc.cc").write <<~EOS
+    (testpath/"hello-cc.cc").write <<~CPP
       #include <iostream>
       struct exception { };
       int main()
@@ -251,11 +251,11 @@ class GccAT8 < Formula
           catch (...) { }
         return 0;
       }
-    EOS
-    system "#{bin}/g++-#{version.major}", "-o", "hello-cc", "hello-cc.cc"
+    CPP
+    system bin/"g++-#{version.major}", "-o", "hello-cc", "hello-cc.cc"
     assert_equal "Hello, world!\n", `./hello-cc`
 
-    (testpath/"test.f90").write <<~EOS
+    (testpath/"test.f90").write <<~FORTRAN
       integer,parameter::m=10000
       real::a(m), b(m)
       real::fact=0.5
@@ -265,8 +265,8 @@ class GccAT8 < Formula
       end do
       write(*,"(A)") "Done"
       end
-    EOS
-    system "#{bin}/gfortran-#{version.major}", "-o", "test", "test.f90"
+    FORTRAN
+    system bin/"gfortran-#{version.major}", "-o", "test", "test.f90"
     assert_equal "Done\n", `./test`
   end
 end

@@ -1,27 +1,26 @@
 class Squid < Formula
   desc "Advanced proxy caching server for HTTP, HTTPS, FTP, and Gopher"
-  homepage "http://www.squid-cache.org/"
-  url "http://www.squid-cache.org/Versions/v5/squid-5.9.tar.xz"
-  sha256 "3fe5c2007da2757446af91b6ef974f154b208120a9a39396ea681e5c4abb04b5"
+  homepage "https://www.squid-cache.org/"
+  url "http://www.squid-cache.org/Versions/v6/squid-6.12.tar.xz"
+  sha256 "f3df3abb2603a513266f24a5d4699a9f0d76b9f554d1848b67f9c51cd3b3cb50"
   license "GPL-2.0-or-later"
 
   livecheck do
-    url "http://www.squid-cache.org/Versions/v5/"
-    regex(/href=.*?squid[._-]v?(\d+(?:\.\d+)+)-RELEASENOTES\.html/i)
+    url "https://www.squid-cache.org/Versions/"
+    regex(%r{<td>\s*v?(\d+(?:\.\d+)+)\s*</td>}im)
   end
 
   bottle do
-    sha256 arm64_ventura:  "cbbdf13ee2098c32baa9bfe690f1446fbee226bf5cf0c80868a0698b467c3aa1"
-    sha256 arm64_monterey: "3537c064875681dcb687f279bd35913ce722d2fb6703fe1ebc7982aa1576bffc"
-    sha256 arm64_big_sur:  "ef839dc315ae730bc6fb368c9737cc93d3ad5b94ac7a9bc52718eee367024d60"
-    sha256 ventura:        "0c3919881cbdff7c75ceec04d543f600f2202a7c937f97834f0d7ce3268a65ec"
-    sha256 monterey:       "da56d1913c356397fad87e2985f431c328aab8505a4a3c23bd3963b21b4bb12f"
-    sha256 big_sur:        "bf89451bfc3a8e21874bccc31554c74a9268d829dbe4056eab2bdea12025c5a8"
-    sha256 x86_64_linux:   "d01a8a7022a0e077201d9e433224092f726834cdb1923d051c29b902dffe706a"
+    sha256 arm64_sequoia: "46834c46b9dfba33e335871ea5521c52f0970e22492a10a7652e4c6ce7ad60d9"
+    sha256 arm64_sonoma:  "0e5e93eebd07b2919e38a59becf1738a94d36d2ab36e8244fd0f50fb557acab0"
+    sha256 arm64_ventura: "066142a4881ba69f68ab5c80f8997392225b44a3ffe1f6c098a457476ca55eec"
+    sha256 sonoma:        "e47b6716e23cfe55ebc170cc8a563883e2d12bd2a0f7c190dbeaff3dcc3456d0"
+    sha256 ventura:       "66876aa03fd2e9937b29cdb881fb1ced3ffd269209e282a4f2586f61fe3577ae"
+    sha256 x86_64_linux:  "6706fe36e154fa9191414c35176698c6c3204ddae2ee3bdb415bbf5636b3099f"
   end
 
   head do
-    url "lp:squid", using: :bzr
+    url "https://git.launchpad.net/squid", using: :git, branch: "v6"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -37,7 +36,7 @@ class Squid < Formula
     ENV.append "LDFLAGS", "-lresolv"
 
     # For --disable-eui, see:
-    # http://www.squid-cache.org/mail-archive/squid-users/201304/0040.html
+    # https://www.squid-cache.org/mail-archive/squid-users/201304/0040.html
     args = %W[
       --disable-debug
       --disable-dependency-tracking
@@ -49,6 +48,8 @@ class Squid < Formula
       --disable-eui
       --enable-pf-transparent
       --with-included-ltdl
+      --with-gnutls=no
+      --with-nettle=no
       --with-openssl
       --enable-delay-pools
       --enable-disk-io=yes
@@ -65,6 +66,8 @@ class Squid < Formula
     run [opt_sbin/"squid", "-N", "-d 1"]
     keep_alive true
     working_dir var
+    log_path var/"log/squid.log"
+    error_log_path var/"log/squid.log"
   end
 
   test do

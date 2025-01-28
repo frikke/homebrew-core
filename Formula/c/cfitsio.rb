@@ -1,9 +1,10 @@
 class Cfitsio < Formula
   desc "C access to FITS data files with optional Fortran wrappers"
   homepage "https://heasarc.gsfc.nasa.gov/docs/software/fitsio/fitsio.html"
-  url "https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-4.3.0.tar.gz"
-  sha256 "fdadc01d09cf9f54253802c5ec87eb10de51ce4130411415ae88c30940621b8b"
+  url "https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-4.5.0.tar.gz"
+  sha256 "e4854fc3365c1462e493aa586bfaa2f3d0bb8c20b75a524955db64c27427ce09"
   license "CFITSIO"
+  revision 1
 
   livecheck do
     url :homepage
@@ -11,24 +12,29 @@ class Cfitsio < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "66bbe65d87983f36e5c6ca2d99298648d40cd8c230f34cd0ef7a77752eae895d"
-    sha256 cellar: :any,                 arm64_ventura:  "2277a6e4c476abc34b523cf109c953b3806e64c2d1cb9b84da1ab7b9ceeeef5f"
-    sha256 cellar: :any,                 arm64_monterey: "add3210ab372315981d5d605e4ffff89fa86b084de194d0e23f74a3cd4d0ddc6"
-    sha256 cellar: :any,                 arm64_big_sur:  "5dbf782fda9673167313fc383297801f5fcacf28c5b77d7890d1e14c31de1971"
-    sha256 cellar: :any,                 sonoma:         "1ba1c40e953cdd9259d42bf17e8590b20d929c2d8df4d0446f6130ce7a9551ed"
-    sha256 cellar: :any,                 ventura:        "bc600b6381d62b0dd5eb710be4e355655f4e70484e9a35e1e649a1b0a01e191e"
-    sha256 cellar: :any,                 monterey:       "e003577a5564d577f30d283aba0aacd7ee5a3bd61381de6f511ec48d7c7349f5"
-    sha256 cellar: :any,                 big_sur:        "0eb99bd2ea626eef4ad8ea6966b4591ae6f13e4a41be6586d1397838fdcc73f9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "17a2da00592ef8a3f786b2ad112f89d35c3b85d09ba5cfc2491066fd286812ef"
+    sha256 cellar: :any,                 arm64_sequoia: "e6139f7d1a4dfe717577e7226a84a1dd5d8d42040cc0a7c8354a75256b2b10d4"
+    sha256 cellar: :any,                 arm64_sonoma:  "1e7e4fda58375d9d078b921619e56faf26bd292929efe86d92b71eb87ff1d0b8"
+    sha256 cellar: :any,                 arm64_ventura: "d35c85a73544d6203d2b3f56ca42442df061a0a6e51c9a4afe3f98ca2d9345aa"
+    sha256 cellar: :any,                 sonoma:        "bd4d8e9a2605a35c33e104e61a9e698779b24436dcc034c71971b4710a6f9ddc"
+    sha256 cellar: :any,                 ventura:       "89f00358a0b2e72c71145d284ad6a87e9a83ad21bac6dafdf1030b486421f579"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4c62d02305a42040e5955fa82615f4b7be982d511cc166fbc85a0febbead1be5"
   end
 
+  depends_on "cmake" => :build
   uses_from_macos "zlib"
 
+  # Fix pkg-config file location, should be removed on next release
+  patch do
+    url "https://github.com/HEASARC/cfitsio/commit/d2828ae5af42056bb4fde397f3205479d01a4cf1.patch?full_index=1"
+    sha256 "690d0bde53fc276f53b9a3f5d678ca1d03280fae7cfa84e7b59b87304fcdcb46"
+  end
+
   def install
-    system "./configure", "--prefix=#{prefix}", "--enable-reentrant"
-    system "make", "shared"
-    system "make", "install"
-    (pkgshare/"testprog").install Dir["testprog*"]
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
+    (pkgshare/"testprog").install Dir["testprog*", "utilities/testprog.c"]
   end
 
   test do

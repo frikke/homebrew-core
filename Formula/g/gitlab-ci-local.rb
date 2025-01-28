@@ -1,32 +1,29 @@
-require "language/node"
-
 class GitlabCiLocal < Formula
   desc "Run gitlab pipelines locally as shell executor or docker executor"
   homepage "https://github.com/firecow/gitlab-ci-local"
-  url "https://registry.npmjs.org/gitlab-ci-local/-/gitlab-ci-local-4.43.0.tgz"
-  sha256 "ccb2f2bed0ef73bf8287f769770b692aa65f47cd37c024eb2331f9b7afc256b3"
+  url "https://registry.npmjs.org/gitlab-ci-local/-/gitlab-ci-local-4.57.0.tgz"
+  sha256 "9a86c4e8ab6a8e0617b9244c100f50eddd272a9f080c370607cd993e24c8c45e"
   license "MIT"
   head "https://github.com/firecow/gitlab-ci-local.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5a3715b632d061230aa8bbbffc5915c5d3a4d939481c34a5ea70d32906a4b65a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5a3715b632d061230aa8bbbffc5915c5d3a4d939481c34a5ea70d32906a4b65a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5a3715b632d061230aa8bbbffc5915c5d3a4d939481c34a5ea70d32906a4b65a"
-    sha256 cellar: :any_skip_relocation, ventura:        "18cecf9e17d5404ef3539f74f433db107fe48e50065ccc3160832c26bab9eca2"
-    sha256 cellar: :any_skip_relocation, monterey:       "18cecf9e17d5404ef3539f74f433db107fe48e50065ccc3160832c26bab9eca2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "18cecf9e17d5404ef3539f74f433db107fe48e50065ccc3160832c26bab9eca2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5a3715b632d061230aa8bbbffc5915c5d3a4d939481c34a5ea70d32906a4b65a"
+    sha256                               arm64_sequoia: "c554226dcc01a2b63a7692aa2b44d70b4cc707f7fc15902f4502a6359c5a692a"
+    sha256                               arm64_sonoma:  "dc5482ed2feb9841fc1f26457f3e0f570f1d47523dab77a439e372be836aad4e"
+    sha256                               arm64_ventura: "2570917dd299c4ef3354ab8d70c7509be56c7d2d0af624b5042aba0e32d25d6d"
+    sha256                               sonoma:        "05c77cb4111fccddbf1c9ae21cc8dad185915dbd2c22b62b57d4f9d815bb5ed2"
+    sha256                               ventura:       "0664b3036f576b3454e1eb4c8ecdb4115a4bcd06aed4bb517d241d202937bae0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ac1f3233695e3223a14a8a2468e509d069d346c8b0a87cdda98ad15266d5dca9"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
-    (testpath/".gitlab-ci.yml").write <<~YML
+    (testpath/".gitlab-ci.yml").write <<~YAML
       ---
       stages:
         - build
@@ -47,7 +44,7 @@ class GitlabCiLocal < Formula
           - shared-docker
         script:
           - echo $HELLO
-    YML
+    YAML
 
     system "git", "init"
     system "git", "add", ".gitlab-ci.yml"

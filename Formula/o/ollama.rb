@@ -1,30 +1,48 @@
 class Ollama < Formula
   desc "Create, run, and share large language models (LLMs)"
-  homepage "https://ollama.ai/"
-  url "https://github.com/jmorganca/ollama.git",
-      tag:      "v0.0.19",
-      revision: "45ac07cd025f9d1e84917db3f00e0f3e5651aede"
+  homepage "https://ollama.com/"
+  url "https://github.com/ollama/ollama.git",
+      tag:      "v0.5.7",
+      revision: "a420a453b4783841e3e79c248ef0fe9548df6914"
   license "MIT"
-  head "https://github.com/jmorganca/ollama.git", branch: "main"
+  head "https://github.com/ollama/ollama.git", branch: "main"
+
+  # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
+  # labeled as "pre-release" on GitHub before the version is released, so it's
+  # necessary to use the `GithubLatest` strategy.
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c28605511527744c3ab620cac100eb06b37cc61a2ae25787cceb39a3e5453a4c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "76a75f39312e93533fc994a4834c81b8eb299a0112c2581f7cdbd543588d8732"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0f0a925eb20550fc7692e265098b041d1ce1a48ae33a8f5fca280043f0b536db"
-    sha256 cellar: :any_skip_relocation, ventura:        "20ba83604dadb1d87737b2268c33e27a6cf2115d3412c06ba2db3ae12488cbeb"
-    sha256 cellar: :any_skip_relocation, monterey:       "4db836410137eabb475fa8c57e9b8a2e814c28a1e51d0c98694b232bac215745"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d1df20f8318a30f2ad5ff6262d8a0c754d08670b36af281a5462e26c16c3da8c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "87a5f4499beb3e41c73d758346921342f87443581059870a224cb01e22b6bc62"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0fe8dbfeeb5284879408737c5615b91c8d08169536fd57742a987589ba44217d"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "dd37facc87ba11d7bcd58f814b8e22f47dddf852b74d95d804f539274d8770a3"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "57a1ed69fe3c1633933f67f4a91c20cd1c21466e8be8580477507749bfb84d66"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b4390fe3dc7a039b1f86303935def4970bf0f5cd83bf0f53ec61ab80b63006be"
+    sha256 cellar: :any_skip_relocation, ventura:       "b9eb13583578fbc6d39e8b4f573e47635c86b53833842354cc49f68376585a77"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "db8635b21f1431f65509182a516df6a87b41380237db1748718b472d677efcdb"
   end
 
   depends_on "cmake" => :build
   depends_on "go" => :build
 
   def install
-    # Fix build on big sur by setting SDKROOT
-    ENV["SDKROOT"] = MacOS.sdk_path if OS.mac? && MacOS.version == :big_sur
+    # Fix to makefile path, should be checked in next release
+    # https://github.com/ollama/ollama/blob/89d5e2f2fd17e03fd7cd5cb2d8f7f27b82e453d7/llama/llama.go#L3
+    inreplace "llama/llama.go", "//go:generate make -j", "//go:generate make -C ../ -j"
+
+    # Silence tens of thousands of SDK warnings
+    ENV["SDKROOT"] = MacOS.sdk_path if OS.mac?
+
+    ldflags = %W[
+      -s -w
+      -X=github.com/ollama/ollama/version.Version=#{version}
+      -X=github.com/ollama/ollama/server.mode=release
+    ]
+
     system "go", "generate", "./..."
-    system "go", "build", *std_go_args(ldflags: "-s -w")
+    system "go", "build", *std_go_args(ldflags:)
   end
 
   service do
@@ -37,11 +55,10 @@ class Ollama < Formula
 
   test do
     port = free_port
-    ENV["OLLAMA_HOST"] = "localhost"
-    ENV["OLLAMA_PORT"] = port.to_s
+    ENV["OLLAMA_HOST"] = "localhost:#{port}"
 
-    pid = fork { exec "#{bin}/ollama", "serve" }
-    sleep 1
+    pid = fork { exec bin/"ollama", "serve" }
+    sleep 3
     begin
       assert_match "Ollama is running", shell_output("curl -s localhost:#{port}")
     ensure

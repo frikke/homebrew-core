@@ -16,6 +16,7 @@ class Popt < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "4ff5f0c8c34f510a7336b16f42a6e058d028ff2025e9b01093b294be84d90bb2"
     sha256 cellar: :any,                 arm64_sonoma:   "2fb8801217b8bcddc5c15974478b7fd89992868fdd6b09360835e7b6f0cef791"
     sha256 cellar: :any,                 arm64_ventura:  "9cabf84985466e8531cff42433a8df6b16668222537544b0295dab0cef292e53"
     sha256 cellar: :any,                 arm64_monterey: "1154aeb3aedee17c3dddb8f7896f4b5f6b4d7d9dc5334fd1011fb96768788e9c"
@@ -35,7 +36,7 @@ class Popt < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdlib.h>
       #include <popt.h>
@@ -85,7 +86,7 @@ class Popt < Formula
           printf("%d\\n%d\\n%d\\n%d\\n%d\\n", optiona, optionb, optionc, flag1, flag2);
           return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lpopt", "-o", "test"
     assert_equal "123\n456\n789\n1\n0\n", shell_output("./test -a 123 -b 456 -c 789 -f")
     assert_equal "987\n654\n321\n0\n1\n", shell_output("./test --optiona=987 --optionb=654 --optionc=321 --flag2")

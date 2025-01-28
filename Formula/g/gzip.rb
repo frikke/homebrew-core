@@ -1,12 +1,13 @@
 class Gzip < Formula
   desc "Popular GNU data compression program"
-  homepage "https://www.gnu.org/software/gzip"
+  homepage "https://www.gnu.org/software/gzip/"
   url "https://ftp.gnu.org/gnu/gzip/gzip-1.13.tar.gz"
   mirror "https://ftpmirror.gnu.org/gzip/gzip-1.13.tar.gz"
   sha256 "20fc818aeebae87cdbf209d35141ad9d3cf312b35a5e6be61bfcfbf9eddd212a"
   license "GPL-3.0-or-later"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "359aaa0923f31127cbe534ce8641d8f39296bf6aa1d09b6aedd735f9c7e3886d"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "38a03ba8613b6fe20ef75870676c52459bbb536635d060efddc11b56fb8bfe24"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "c8ae3a3e940815c0e947e8a15492927b8cf2dcc9b9605cbae983026b2e50751d"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "aa80caf733d87c7f2178bde35b8773ea4cab0e8eb3d644be62f9a87b6a8e0a73"
@@ -25,8 +26,8 @@ class Gzip < Formula
 
   test do
     (testpath/"foo").write "test"
-    system "#{bin}/gzip", "foo"
-    system "#{bin}/gzip", "-t", "foo.gz"
+    system bin/"gzip", "foo"
+    system bin/"gzip", "-t", "foo.gz"
     assert_equal "test", shell_output("#{bin}/gunzip -c foo")
   end
 end

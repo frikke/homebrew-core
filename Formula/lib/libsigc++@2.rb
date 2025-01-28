@@ -6,6 +6,7 @@ class LibsigcxxAT2 < Formula
   license "LGPL-3.0-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "60b84e4af2ddcceecaed25095c2dd11efd191c3a96d7c39b08552fcfaeca82ad"
     sha256 cellar: :any,                 arm64_sonoma:   "d84c23bbe72a865f26ed4426a029b5a4a2ae9f4410a446737469e463be28f353"
     sha256 cellar: :any,                 arm64_ventura:  "c3faa72283c90172978072aae40c1f7cc75ebecdc58cbb292f50759c2f6a0f50"
     sha256 cellar: :any,                 arm64_monterey: "f08cb049ca155fb8ac09d1586ea415084ba95e3e2aa760c5b4ddabe51ea44b08"
@@ -22,17 +23,13 @@ class LibsigcxxAT2 < Formula
   depends_on "ninja" => :build
 
   def install
-    ENV.cxx11
-
-    mkdir "build" do
-      system "meson", *std_meson_args, ".."
-      system "ninja"
-      system "ninja", "install"
-    end
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <sigc++/sigc++.h>
 
       void somefunction(int arg) {}
@@ -42,7 +39,7 @@ class LibsigcxxAT2 < Formula
          sigc::slot<void, int> sl = sigc::ptr_fun(&somefunction);
          return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cpp",
                    "-L#{lib}", "-lsigc-2.0", "-I#{include}/sigc++-2.0", "-I#{lib}/sigc++-2.0/include", "-o", "test"
     system "./test"

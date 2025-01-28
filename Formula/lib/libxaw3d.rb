@@ -1,23 +1,23 @@
 class Libxaw3d < Formula
   desc "X.Org: 3D Athena widget set based on the Xt library"
   homepage "https://www.x.org"
-  url "https://xorg.freedesktop.org/archive/individual/lib/libXaw3d-1.6.5.tar.gz"
-  sha256 "1123d80c58f45616ef18502081eeec5e92f20c7e7dd82a24f9e2e4f3c0e86dc7"
+  url "https://xorg.freedesktop.org/archive/individual/lib/libXaw3d-1.6.6.tar.gz"
+  sha256 "0cdb8f51c390b0f9f5bec74454e53b15b6b815bc280f6b7c969400c9ef595803"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "d39e435b9ea53aa2a222ff74107f55c89de431ecfaa759e20c88ce4891ec49f9"
-    sha256 cellar: :any,                 arm64_ventura:  "1da3249d130032a6b1e74e656b981e65c1f1454c0e4fcd1a5005371af5d5ea76"
-    sha256 cellar: :any,                 arm64_monterey: "5f5ed1fc3a846fd3debce17e0fe28d83385ba9f5910137d22c37318b5021d1a7"
-    sha256 cellar: :any,                 arm64_big_sur:  "08e254bef35a20cf08ffb942277b0795a24c8f4ca0a73217a943acdaec4d3169"
-    sha256 cellar: :any,                 sonoma:         "a51463ace1336ba399136faf96db1a26faead1ccfdacee143fdd294fd58eedc7"
-    sha256 cellar: :any,                 ventura:        "112d6fa3cfb439948c7a4e7575e6bfccf3d169a0d8b970c85e8108d180a2622e"
-    sha256 cellar: :any,                 monterey:       "6f7f9edb56f71177289815a000e350d18141801e6917e9a22544f032b7a29517"
-    sha256 cellar: :any,                 big_sur:        "ca5b661b63007f4ad1e437429e2b6908e1aa13d0b7ff9fdfd4b24b097e02221c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "54a525a07f6901b07b3e47c3c09aa4d36a1357c822a7fca4446ca4893bc813bc"
+    sha256 cellar: :any,                 arm64_sequoia:  "84926ca78b2283f5c32b42e003c4a6711d208aa2c0d31e81192816561e967830"
+    sha256 cellar: :any,                 arm64_sonoma:   "2bcf584c0f4e7997ce9e72a452237f102eba55f0069565eb407f5fafe5d85fb5"
+    sha256 cellar: :any,                 arm64_ventura:  "ee7c26268433917e585a7acc992c04abeac87d2954fe1a3d1e8978e1d89d3832"
+    sha256 cellar: :any,                 arm64_monterey: "906cc60ffd7998219e6cd38bfd86e9331193ac7cc38ec5557a751a5d76c60f91"
+    sha256 cellar: :any,                 sonoma:         "7c63814a4ba44cd9b855922ae73e393fe8d1c75e74451b26de218cf790fffe2d"
+    sha256 cellar: :any,                 ventura:        "813b0a28985d4942c631d31e26c6135bca92a88652aa6c634cd92b957dcbce61"
+    sha256 cellar: :any,                 monterey:       "57849f92c0f2cdd938b95d8c0f7aec3f8b1c5c8d06211a290c3112b67b212b78"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ce52f2da8dd74a3df5d277ffeb678f86a9572b0c52a29e513aa688d37e704210"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "util-macros" => :build
   depends_on "libx11"
   depends_on "libxext"
@@ -25,29 +25,35 @@ class Libxaw3d < Formula
   depends_on "libxpm"
   depends_on "libxt"
 
+  # Backport fix for improved linking on macOS
+  patch do
+    on_macos do
+      url "https://gitlab.freedesktop.org/xorg/lib/libxaw3d/-/commit/b2365950e5314b0453dd7cf2a552aa30ec19c046.diff"
+      sha256 "18919b30bfafd2642895a4f9497f54b8d263e4eb593f192a923340732ed4afa8"
+    end
+  end
+
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
       --enable-gray-stipples
       --enable-arrow-scrollbars
       --enable-multiplane-bitmaps
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <X11/Xaw3d/Label.h>
       int main() { printf("%d", sizeof(LabelWidget)); }
-    EOS
+    C
     system ENV.cc, "test.c", "-o", "test"
     output = shell_output("./test").chomp
     assert_match "8", output

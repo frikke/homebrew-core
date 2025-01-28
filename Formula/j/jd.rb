@@ -1,18 +1,19 @@
 class Jd < Formula
   desc "JSON diff and patch"
   homepage "https://github.com/josephburnett/jd"
-  url "https://github.com/josephburnett/jd/archive/v1.7.1.tar.gz"
-  sha256 "3d0b693546891bab41ca5c3be859bc760631608c9add559aa561fb751cdd1c92"
+  url "https://github.com/josephburnett/jd/archive/refs/tags/v1.9.1.tar.gz"
+  sha256 "92f1b183510874a73327bfb70cb2c0fed2fc1f2d08191f0736dc4863d6766110"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0a2b07ba96ff95b927175fcdf22386d458b43fd0fd318263d7dfcd851deaa920"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a5459ba7e6a8b80bc8874dde1d866fda9b99f291ac41e462ec0de9c1eee45d2a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e23b8fd52d1d4d56c8e402127d7fd5ec9f7d3939ebf0be57c0360265bdab09ab"
-    sha256 cellar: :any_skip_relocation, ventura:        "17ae4f04c0016a933f923aacc09696a7ec54ac8ea76e5f2e7ba28903d84b2738"
-    sha256 cellar: :any_skip_relocation, monterey:       "9080e532d8e9c322d6322148d2c7a21bc8606fd9257683724d02f43f21cd4742"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f40bd8456140f8332ec1e13efef5a260f12e33908306a6b6429cea3446140408"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "112215528c11ec54910cdbd320d9c0ced6714d87f27a573fb86e40c26829b70b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "e8fc3eccec5d7cdd882b9b457051fe4126e27a633d42c5f71921889c8d0086f1"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "00a6b8ffb60f702efa00a994ebc0524702950a2625910a62cc440d7b49c86a22"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "00a6b8ffb60f702efa00a994ebc0524702950a2625910a62cc440d7b49c86a22"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "00a6b8ffb60f702efa00a994ebc0524702950a2625910a62cc440d7b49c86a22"
+    sha256 cellar: :any_skip_relocation, sonoma:         "c8c2f957c610c1cd6a61d16db61993fcddfdf99af05bc66ad3bcbd9f1ea49600"
+    sha256 cellar: :any_skip_relocation, ventura:        "c8c2f957c610c1cd6a61d16db61993fcddfdf99af05bc66ad3bcbd9f1ea49600"
+    sha256 cellar: :any_skip_relocation, monterey:       "c8c2f957c610c1cd6a61d16db61993fcddfdf99af05bc66ad3bcbd9f1ea49600"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eb4a069f48c9659771846717bfd6539bc67ab48d9874f57e06e826e20631ca73"
   end
 
   depends_on "go" => :build
@@ -30,8 +31,7 @@ class Jd < Formula
       - "bar"
       + "baz"
     EOF
-    output = shell_output("#{bin}/jd a.json b.json", 1)
-    assert_equal output, expected
+    assert_equal expected, shell_output("#{bin}/jd a.json b.json", 1)
     assert_empty shell_output("#{bin}/jd b.json c.json")
   end
 end

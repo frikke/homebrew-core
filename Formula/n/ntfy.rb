@@ -1,38 +1,27 @@
 class Ntfy < Formula
   desc "Send push notifications to your phone or desktop via PUT/POST"
   homepage "https://ntfy.sh/"
-  url "https://github.com/binwiederhier/ntfy.git",
-      tag:      "v2.7.0",
-      revision: "2f0ec88f40418660e5b99a7ad589d661d8c4ff6f"
+  url "https://github.com/binwiederhier/ntfy/archive/refs/tags/v2.11.0.tar.gz"
+  sha256 "56b4c91d53e479e207b8064d894516030f608848c76c6d4eed2d37277d337e71"
   license any_of: ["Apache-2.0", "GPL-2.0-only"]
   head "https://github.com/binwiederhier/ntfy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "29be8f25881322e5c1b5154c3e3b9c7bfdd74b550eafdfd10df60815a64eda64"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "29be8f25881322e5c1b5154c3e3b9c7bfdd74b550eafdfd10df60815a64eda64"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "29be8f25881322e5c1b5154c3e3b9c7bfdd74b550eafdfd10df60815a64eda64"
-    sha256 cellar: :any_skip_relocation, ventura:        "9f6a4c9ad4c6c17e7e680644fa50e78fbab475a209c2af06680d7b0cfdc62482"
-    sha256 cellar: :any_skip_relocation, monterey:       "9f6a4c9ad4c6c17e7e680644fa50e78fbab475a209c2af06680d7b0cfdc62482"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9f6a4c9ad4c6c17e7e680644fa50e78fbab475a209c2af06680d7b0cfdc62482"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "46d20995998868f11cce74529f74483dd195a7a07fcb849b3ce60439cd950ec3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "abc17b439d382f5daf76f7dd15581a8dec3e9704d4437a1e6baf9b8619b4ec6a"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "abc17b439d382f5daf76f7dd15581a8dec3e9704d4437a1e6baf9b8619b4ec6a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "abc17b439d382f5daf76f7dd15581a8dec3e9704d4437a1e6baf9b8619b4ec6a"
+    sha256 cellar: :any_skip_relocation, sonoma:        "cb248dc77fe6a324db6329ba5135236737ea76b14c288e59f886cd2f8987e995"
+    sha256 cellar: :any_skip_relocation, ventura:       "cb248dc77fe6a324db6329ba5135236737ea76b14c288e59f886cd2f8987e995"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "903dd3fc5c04f5ac38ac940439a60b28c554b44afabe4550c435e56e07f50b34"
   end
 
   depends_on "go" => :build
 
   def install
     system "make", "cli-deps-static-sites"
-    ldflags = %W[
-      -X main.version=#{version}
-      -X main.date=#{time.strftime("%F")}
-      -X main.commit=#{Utils.git_head}
-      -s
-      -w
-    ]
-    with_env(
-      "CGO_ENABLED" => "0",
-    ) do
-      system "go", "build", *std_go_args(ldflags: ldflags), "-tags", "noserver"
-    end
+    ldflags = "-s -w -X main.version=#{version} -X main.date=#{time.iso8601} -X main.commit=#{tap.user}"
+    system "go", "build", *std_go_args(ldflags:), "-tags", "noserver"
   end
 
   test do

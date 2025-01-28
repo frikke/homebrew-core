@@ -1,19 +1,18 @@
 class Starship < Formula
   desc "Cross-shell prompt for astronauts"
   homepage "https://starship.rs"
-  url "https://github.com/starship/starship/archive/v1.16.0.tar.gz"
-  sha256 "133888e190ce1563927e16ee693da3026d2e668d975ac373f853e030743775c5"
+  url "https://github.com/starship/starship/archive/refs/tags/v1.22.1.tar.gz"
+  sha256 "5434a3d1ca16987a1dd30146c36aaa4371dbe1c7f1a7995c0cf12ab3eb9326d7"
   license "ISC"
   head "https://github.com/starship/starship.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3a4007d531448fabfc3a001c3e6d766e23be6110de120f6717c984b861ce3ae8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "776271b363c182dfb5226aa7c60e1714c8b43f5826acf63610730bc178da3147"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8a58e85e1e647cec4290336f29db4b2ba1e1f8814128ab5eed05ecff4cffa3bf"
-    sha256 cellar: :any_skip_relocation, ventura:        "1a2a777bc300111d5f4cdc09caf8cc8ce74ab7172938eabce4d1e464a83b85c4"
-    sha256 cellar: :any_skip_relocation, monterey:       "0ba30b7f99837320458a9332a7ae09b7755f830523f0289d61dc7c89639e248a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3de83ca0922d0157232366e9bf95e24c7b1b887429e2f724f4a87171f6e83d9d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f63e19895e8afc93b2da3fd6d25e00c271ef072ecd73967ca680976405530ce1"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c707e68e71ce0e6bbd721f40d3a6d4d413952640a85e2b4057c354181b2a7416"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "18c06aa1ecc92e736f0cf18ef476eefe95bd0515110aa885506da3d3282af522"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "df88c2c2b3976851cacfab457cc693887b63f09fb3c270d992f7fd75290f9429"
+    sha256 cellar: :any_skip_relocation, sonoma:        "480793d14d7014c6f3de40dac80fe11f64f225a82bddef5f92d0510d87d85417"
+    sha256 cellar: :any_skip_relocation, ventura:       "5bf4c974cdcccf64dfe197a531a047290e7f3f849ddc4dcfa5fb24cbf51508e5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8815fb22c318600592fa236cf612e5892adbab219ae26b007d2df2838a1e711d"
   end
 
   depends_on "cmake" => :build
@@ -22,7 +21,7 @@ class Starship < Formula
   uses_from_macos "zlib"
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "dbus"
   end
 

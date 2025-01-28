@@ -1,20 +1,18 @@
 class Atasm < Formula
   desc "Atari MAC/65 compatible assembler for Unix"
-  homepage "https://atari.miribilist.com/atasm/"
-  url "https://atari.miribilist.com/atasm/atasm109.zip"
+  homepage "https://sourceforge.net/projects/atasm/"
+  url "https://downloads.sourceforge.net/project/atasm/atasm/atasm-1.09/atasm109.zip"
   version "1.09"
   sha256 "dbab21870dabdf419920fcfa4b5adfe9d38b291a60a4bc2ba824595f7fbc3ef0"
   license "GPL-2.0-or-later"
 
-  livecheck do
-    url "https://atari.miribilist.com/atasm/VERSION.TXT"
-    regex(/  version (\d+(?:\.\d+)+) /i)
-  end
-
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "f9402a817b9438f3ba44ecf8ef38e70dcfe070a43251f9d62fe0785212b2d0e9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "7c4910e7d916c52776028f38d6b61858f7d0a4bc85bb46571f08bdcfbc6418df"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "727eea7c68b8de0a001e3b0937c429af8797af568433be534d74ada42a1925eb"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "fab0b76cba3104965e4627681e2f5776df2337ad3300ba6acf140a0151afe237"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f4c812d6e1cc7f0b02d3c00160d7656779fe163f62c55da63ae2359bc472585b"
+    sha256 cellar: :any_skip_relocation, sonoma:         "47a836c3560e9a8929e45aab4c124d1a7db6b533440a55f1e239d9b563dbdf52"
     sha256 cellar: :any_skip_relocation, ventura:        "516c1388cf1e4c11c805dd8f9670b53be3ee63469b0d4804c24917b5cba18432"
     sha256 cellar: :any_skip_relocation, monterey:       "16ea6c4cd36ace328c78bbe3daeaad7e22ea30c5e013b07584eb00e9931ef67e"
     sha256 cellar: :any_skip_relocation, big_sur:        "8d7eba0c0fa5194201d4fac69466c807bf01d3676424a1501d3bc35cec2e43c1"
@@ -37,7 +35,7 @@ class Atasm < Formula
 
   test do
     cd "#{doc}/examples" do
-      system "#{bin}/atasm", "-v", "test.m65", "-o/tmp/test.bin"
+      system bin/"atasm", "-v", "test.m65", "-o/tmp/test.bin"
     end
   end
 end

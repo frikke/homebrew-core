@@ -1,19 +1,29 @@
 class Driftctl < Formula
   desc "Detect, track and alert on infrastructure drift"
-  homepage "https://driftctl.com"
-  url "https://github.com/snyk/driftctl/archive/v0.39.0.tar.gz"
-  sha256 "384e9d675881546b635e0864a88139f02bae0602f0e2a935c84856840c5bba83"
+  # website bug report, https://github.com/snyk/driftctl/issues/1700
+  homepage "https://github.com/snyk/driftctl"
+  url "https://github.com/snyk/driftctl/archive/refs/tags/v0.40.0.tar.gz"
+  sha256 "30781d35092dd1dd1b34f22e63e3130a062cf4a3f511f61be013a0ff2a0c7767"
   license "Apache-2.0"
   head "https://github.com/snyk/driftctl.git", branch: "main"
 
+  # There can be a notable gap between when a version is tagged and a
+  # corresponding release is created, so we check the "latest" release instead
+  # of the Git tags.
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4bd0ef3cf76e7168310eaf9d4cfa8154d0cfc32e107feda9288b3ca18c26e76c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4bd0ef3cf76e7168310eaf9d4cfa8154d0cfc32e107feda9288b3ca18c26e76c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4bd0ef3cf76e7168310eaf9d4cfa8154d0cfc32e107feda9288b3ca18c26e76c"
-    sha256 cellar: :any_skip_relocation, ventura:        "4867ada6616e2cc615ed4cd5918cd6c17797829aa8abe2ef7e204468b64e536d"
-    sha256 cellar: :any_skip_relocation, monterey:       "4867ada6616e2cc615ed4cd5918cd6c17797829aa8abe2ef7e204468b64e536d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4867ada6616e2cc615ed4cd5918cd6c17797829aa8abe2ef7e204468b64e536d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0044e27f2515c0d9f13764be7ff0b4eb0fb15be2a503030c23ade51c7db9a130"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d87de2f3a5e0374a88d7ea3cbdedd603f88a7567a230aa48812e9e0457555540"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "f3ea52c1d74b676c7a9ead834f1d2d21515330c78b3a603361099b68f26184ff"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "950108c93c9b3b586dd38225b9500c3567bb450c48c2167aa0f77065c69976ca"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6f77e681d25b272b43d33ceffc3e267b96bb19e24849680ff8dcb655b9ee1194"
+    sha256 cellar: :any_skip_relocation, sonoma:         "714af9730f7afe6a70eaea540001371f4e4ab5ff7968cde2ef07da4c31813865"
+    sha256 cellar: :any_skip_relocation, ventura:        "8b9dfc0d29cf894157daea9ac173949a11dc37457b6ff829470cb664908b73f9"
+    sha256 cellar: :any_skip_relocation, monterey:       "6ad20c81d5755fd801e386ffd8a4c9298970af04ddc32e3b68562a5288fc2576"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d87fead37c01350837835281119173d3ddd3d392f117bb03310a7b88f9f9a14a"
   end
 
   depends_on "go" => :build
@@ -25,7 +35,7 @@ class Driftctl < Formula
       -X github.com/snyk/driftctl/pkg/version.version=v#{version}
     ]
 
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
 
     generate_completions_from_executable(bin/"driftctl", "completion")
   end

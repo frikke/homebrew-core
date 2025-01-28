@@ -6,9 +6,12 @@ class Fann < Formula
   license "LGPL-2.1-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "1a57d8d2501d63d56451fb00bc9fed3e5596b0afd995638b1c290e6a7aa663f5"
+    sha256 cellar: :any,                 arm64_sonoma:   "b89f592bc6efa6bc3098f6881b6e6af8adf0ca7a1dc3e6eb4677ba86f9ac44dc"
     sha256 cellar: :any,                 arm64_ventura:  "5d06935d9df379bbb543080a1cfb15503854cd88cb88c6d14186187fdd18607a"
     sha256 cellar: :any,                 arm64_monterey: "dd693aef10b32db6fe84a9eabfbd1e05c1d4ed83c4e48e936745fa76b2af7a4f"
     sha256 cellar: :any,                 arm64_big_sur:  "2fc8447731fd2a1c7f4957b55e3906041796fd5c9c528c611048f48558e644fc"
+    sha256 cellar: :any,                 sonoma:         "0b08fdabfb9f16f1a62e12d2317bf0914251f9f145807a142fdfac16f5e6587f"
     sha256 cellar: :any,                 ventura:        "f7df3b27256ce1656e6ccd36986dd65ee5b0bb8d9b5d0c5f3871bfe8c87ccfe6"
     sha256 cellar: :any,                 monterey:       "468d340a979831b709a4a67defc13796a7763019836d15d98f723aa1b8cb1981"
     sha256 cellar: :any,                 big_sur:        "4d7d975ad6d820ce4938ba6235881b11cfebb93ad8f5ac4cb5dabf2356f2ffa0"
@@ -41,7 +44,7 @@ class Fann < Formula
     desired_error = 0.001
     max_epochs = 500000
 
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <fann.h>
       int main()
       {
@@ -62,7 +65,7 @@ class Fann < Formula
           fann_destroy(ann);
           return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lfann", "-lm", "-o", "test"
     output = shell_output(testpath/"test")

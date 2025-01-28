@@ -6,18 +6,14 @@ class Itstool < Formula
   license "GPL-3.0-or-later"
   revision 1
 
+  livecheck do
+    url "https://itstool.org/download.html"
+    regex(/href=.*?itstool[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "05c01072744630247231614186f9b39b895460e2cca5df893f3bf243536c4e9b"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "63d15cf95366fdd8d62b26b7105d8c097d9c715ac080d04118ba5c8eba8c4690"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "63d15cf95366fdd8d62b26b7105d8c097d9c715ac080d04118ba5c8eba8c4690"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "63d15cf95366fdd8d62b26b7105d8c097d9c715ac080d04118ba5c8eba8c4690"
-    sha256 cellar: :any_skip_relocation, sonoma:         "ac36039eadf0dc807c897cec71a5799495ea3b77334d97be0ae1bc6756c4f3b2"
-    sha256 cellar: :any_skip_relocation, ventura:        "d7df12dd9d64c70c59da80ea8e65bdc10a2cb3f74e5cd701a48f9958c62def29"
-    sha256 cellar: :any_skip_relocation, monterey:       "d7df12dd9d64c70c59da80ea8e65bdc10a2cb3f74e5cd701a48f9958c62def29"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d7df12dd9d64c70c59da80ea8e65bdc10a2cb3f74e5cd701a48f9958c62def29"
-    sha256 cellar: :any_skip_relocation, catalina:       "d7df12dd9d64c70c59da80ea8e65bdc10a2cb3f74e5cd701a48f9958c62def29"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "63d15cf95366fdd8d62b26b7105d8c097d9c715ac080d04118ba5c8eba8c4690"
+    rebuild 5
+    sha256 cellar: :any_skip_relocation, all: "789a00622218d97cded8fbc0e82b043478c693b62f25a372769f4d0cd8eb7cb6"
   end
 
   head do
@@ -28,10 +24,13 @@ class Itstool < Formula
   end
 
   depends_on "libxml2"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  def python3
+    "python3.13"
+  end
 
   def install
-    python3 = "python3.11"
     ENV.append_path "PYTHONPATH", Formula["libxml2"].opt_prefix/Language::Python.site_packages(python3)
 
     configure = build.head? ? "./autogen.sh" : "./configure"
@@ -42,12 +41,15 @@ class Itstool < Formula
     bin.env_script_all_files libexec/"bin", PYTHONPATH: ENV["PYTHONPATH"]
     pkgshare.install_symlink libexec/"share/itstool/its"
     man1.install_symlink libexec/"share/man/man1/itstool.1"
+
+    # Check for itstool data files in HOMEBREW_PREFIX. This also ensures uniform bottles.
+    inreplace libexec/"bin/itstool", "/usr/local", HOMEBREW_PREFIX
   end
 
   test do
-    (testpath/"test.xml").write <<~EOS
+    (testpath/"test.xml").write <<~XML
       <tag>Homebrew</tag>
-    EOS
+    XML
     system bin/"itstool", "-o", "test.pot", "test.xml"
     assert_match "msgid \"Homebrew\"", File.read("test.pot")
   end

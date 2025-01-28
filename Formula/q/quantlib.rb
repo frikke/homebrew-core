@@ -1,18 +1,17 @@
 class Quantlib < Formula
   desc "Library for quantitative finance"
   homepage "https://www.quantlib.org/"
-  url "https://github.com/lballabio/QuantLib/releases/download/v1.31.1/QuantLib-1.31.1.tar.gz"
-  sha256 "13b5346217153ae3c185e0c640cc523a1a6522c3a721698b2c255fd9a1a15a68"
+  url "https://github.com/lballabio/QuantLib/releases/download/v1.37/QuantLib-1.37.tar.gz"
+  sha256 "b284e54ef2133c9eccccc23e210ae5b41b2f37c797b3d7257492a391e436ad24"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "fdd80e703612298821f31f2c278f78c72d629727cac272cb86c5e5a7da4edb3b"
-    sha256 cellar: :any,                 arm64_monterey: "1a7dacc192c9e2a00ed99c40cc0facfe2bb92cf19508d7d36351783371b03b92"
-    sha256 cellar: :any,                 arm64_big_sur:  "01ee485c8a3bf337909e5868eebe03398afc1f1b6ae5dfa08ab8b6653532a4e1"
-    sha256 cellar: :any,                 ventura:        "c3a009b596872f95e707f907b55944939518e2adfa02336b7fd49d2c09a88f04"
-    sha256 cellar: :any,                 monterey:       "66619bae355c05e0a8b03f153ece4fd73b5830e557f0b9d6e1f125671547875f"
-    sha256 cellar: :any,                 big_sur:        "328e3ca951ee9c9f7698f081ec2d20fd568430fa8d47f3fbf6a12d69ebdeb549"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5eb2a3b254492cf1f450cd95bc21cee4084248dd55da1280cd5cf0ad0bf22f81"
+    sha256 cellar: :any,                 arm64_sequoia: "a260eed77410c1810daf98f6bd3a225bec5345e8fd7eef0387674062e7f82a24"
+    sha256 cellar: :any,                 arm64_sonoma:  "e16bb557632a3c717cbcfe313777660e5bcd8a947627b53b91da0e9c392dab47"
+    sha256 cellar: :any,                 arm64_ventura: "930b58c0d30608c8a0d9477e1b3c767046460a58697995d8315eba57e1fa15e5"
+    sha256 cellar: :any,                 sonoma:        "8ca81c3ce45c996b7ff9f72cb620c61843581019bcf68d3a25cf8ae52ed77ec3"
+    sha256 cellar: :any,                 ventura:       "f06734001cb1c4ae23aa159af0d1ab9495c7e038dc0250345290a77d1917c091"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "04c22fea4ff52f74fe932242915d7122cb4eaf66fc31faae5461df650ebda564"
   end
 
   head do
@@ -36,7 +35,6 @@ class Quantlib < Formula
                             "--enable-intraday"
 
       system "make", "install"
-      prefix.install_metafiles
     end
   end
 

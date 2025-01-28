@@ -1,18 +1,17 @@
 class Bittwist < Formula
   desc "Libcap-based Ethernet packet generator"
   homepage "https://bittwist.sourceforge.io"
-  url "https://downloads.sourceforge.net/project/bittwist/macOS/Bit-Twist%203.8/bittwist-macos-3.8.tar.gz"
-  sha256 "d3abce2703406115f257765c40b75eb5f45f01fe61e42a2e77e38a93aece22d0"
+  url "https://downloads.sourceforge.net/project/bittwist/macOS/Bit-Twist%204.7/bittwist-macos-4.7.tar.gz"
+  sha256 "2ff00070d57221672af5198268088ffee8ed6b5ade33d6f26be5b3b4125b48f1"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "340d68a07b0e0e3b35d5033a0d374aa33d3b83507566f17f4f7fc84d120947fa"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "73652da4ecec5d1abee5d6b677044a14479bf0825b27f2535e4fa9092e6e2b1e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1fe5bc474fd586b73e79eb183604227698dd6082d3aa02833338348d177d696d"
-    sha256 cellar: :any_skip_relocation, ventura:        "37c8abaad02d566504a4e159b9b1f276f33ef938c5c3ccb07a3afb911f308ee7"
-    sha256 cellar: :any_skip_relocation, monterey:       "77b38e9fb9ecfe31bbae1d430d1c63748b2c7d77377fb6a34d82ff99a3329240"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d5eb62aef4579495f97ef94b6f0c092257b8c994ae7742cda6611c6820d140a8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5c8f5e60580874c7527a5309ebcdd9a3d3f36989a07599b9f17592b8784340d2"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8e8c5033fb2ebd8dc27832f1b4252d3f1b4cfadee39831d6af68028f28f9e8e5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "364a968f6b30db2db01a77f6b2c55c609d3c8165607c40e0f2b4b1ea011c81c0"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "5f5fe1bc269cc3195450240348b9b808f60b19c88b1362a533ef7f615d6b7c40"
+    sha256 cellar: :any_skip_relocation, sonoma:        "523fc5af61f3f3815d23cfbc1089548d86b072a301c5424923cdac4028a61d95"
+    sha256 cellar: :any_skip_relocation, ventura:       "3df91f28e930a032ea31108f1ceb250b14d0a02b5026060924027457426183b8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f85b61e9d72e5d329a7b3a01813b01f2c72e81dc451bf144e8860b0cd868472d"
   end
 
   uses_from_macos "libpcap"
@@ -23,7 +22,7 @@ class Bittwist < Formula
   end
 
   test do
-    system "#{bin}/bittwist", "-help"
-    system "#{bin}/bittwiste", "-help"
+    system bin/"bittwist", "-help"
+    system bin/"bittwiste", "-help"
   end
 end

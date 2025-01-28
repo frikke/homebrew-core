@@ -2,20 +2,17 @@ class JingTrang < Formula
   desc "Schema validation and conversion based on RELAX NG"
   homepage "http://www.thaiopensource.com/relaxng/"
   url "https://github.com/relaxng/jing-trang.git",
-      tag:      "V20220510",
-      revision: "84ec6ad578d6e0a77342baa5427851f98028bfd8"
+      tag:      "V20241231",
+      revision: "a6bc0041035988325dfbfe7823ef2c098fc56597"
   license "BSD-3-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5dcb20d5192ca4d965c42beae8adab82fc8b919ee96a11d2d315a06e7aa214d6"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ee7b261bf84183f59e0c0b8d37c8fe8802297eaf894a5d132cf58a15b66c57ba"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a22bf4effa32d1b17b54a975e7b8dc7ca08b9991696fee7e9d95d649d6a021ec"
-    sha256 cellar: :any_skip_relocation, ventura:        "fe895e7b7d28c66cf7853b53658c4d972756a33072d98039f306f70ea537f3d6"
-    sha256 cellar: :any_skip_relocation, monterey:       "6e5d22a93244e1234b68ff9aec22c9f757def6cdfd127f00ecf9c426071f321c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c44cb54e793d544152dd0cb28564d52a731da574aa704e4197f21c04097875a1"
-    sha256 cellar: :any_skip_relocation, catalina:       "7dcf958640d82be13d25eaebd84af8f1db6f151ada7c942609a58a14dedb5c5b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4eed5e67a543cf3259aed905ee2a34be05ccc664e5744395609d1d7c2a093d35"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "dd185ecd711ae39122b5a5c2b7d1ac25fb655d24db51a20ddbfe3fe081bc0be5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c59e3c55b275f245636396619acf1d1d99e5673aca25f21d546bfc151cb370ea"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "908bcd6e6f9ed7d3a00030052aadef34a4fd796fde206f54b61299c26a320a73"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3f7742f4501958222de06977c2be07e64fdcf2197400aa3043136bf6e370bd1e"
+    sha256 cellar: :any_skip_relocation, ventura:       "384ffca335b8ed354aabcc431f161a8da3f375116d1e20b56de0f080f3182166"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d0a3f1c8df1a2607c3640ea20c71d26027067f9ec7c8fe5878d627d222dd26a5"
   end
 
   depends_on "ant" => :build
@@ -50,7 +47,7 @@ class JingTrang < Formula
         element core:slug { xsd:string }?
       }
     EOS
-    (testpath/"test.xml").write <<~EOS
+    (testpath/"test.xml").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <response xmlns:core="http://www.bbc.co.uk/ontologies/coreconcepts/">
         <results>
@@ -70,7 +67,7 @@ class JingTrang < Formula
           </thing>
         </results>
       </response>
-    EOS
+    XML
 
     system bin/"jing", "-c", "test.rnc", "test.xml"
     system bin/"trang", "-I", "rnc", "-O", "rng", "test.rnc", "test.rng"

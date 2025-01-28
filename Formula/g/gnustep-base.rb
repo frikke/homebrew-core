@@ -1,9 +1,10 @@
 class GnustepBase < Formula
   desc "Library of general-purpose, non-graphical Objective C objects"
   homepage "https://github.com/gnustep/libs-base"
-  url "https://github.com/gnustep/libs-base/releases/download/base-1_29_0/gnustep-base-1.29.0.tar.gz"
-  sha256 "fa58eda665c3e0b9c420dc32bb3d51247a407c944d82e5eed1afe8a2b943ef37"
+  url "https://github.com/gnustep/libs-base/releases/download/base-1_30_0/gnustep-base-1.30.0.tar.gz"
+  sha256 "00b5bc4179045b581f9f9dc3751b800c07a5d204682e3e0eddd8b5e5dee51faa"
   license "GPL-2.0-or-later"
+  revision 2
 
   livecheck do
     url :stable
@@ -17,35 +18,39 @@ class GnustepBase < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "f7b268cf13fbe24b2471b778c42c38c2000e05d08113e7a7aa28d34385a85a26"
-    sha256 cellar: :any,                 arm64_monterey: "ef39d1e12dcce4df899511dbc8bef26420873c8ff067a645e2f3771d4ffba68c"
-    sha256 cellar: :any,                 arm64_big_sur:  "80743312a107c370f518900583f95c359599b8a164cd995b8ec5694a8835be98"
-    sha256 cellar: :any,                 ventura:        "b2af7e946b32130040a310ba179cc18b4e71a084928585e165077556edd3fe48"
-    sha256 cellar: :any,                 monterey:       "9f1293102d1932e18e70d2fb7c49d2b768a98f94c9c9147b4384a61bbf0a90a6"
-    sha256 cellar: :any,                 big_sur:        "c5635161e124a5bad33bb9acfc47abc3bc66b3a32d0f571296e468ffe73f92f3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "403e69d3d5ab1ed07a7e36e6254af6420c5fed69d386faa033ffa51a2c41939b"
+    sha256 cellar: :any,                 arm64_sequoia: "ea43137e462651bed14654d6f3568cc8492737a08f5c46d8be3e20af283e69ac"
+    sha256 cellar: :any,                 arm64_sonoma:  "ecf6464f4da0a825cc66b56634ca7c2cf002206e329ed1675744b69fa054ee85"
+    sha256 cellar: :any,                 arm64_ventura: "1e74001b2ebbe64808248f9ea1fcf883f8214b94acb11034e1a588026d835c01"
+    sha256 cellar: :any,                 sonoma:        "c656ea5e74ef316bdff831a8179ca085f5a8339f5b347ee9385fff91ebada811"
+    sha256 cellar: :any,                 ventura:       "9afc177e4bb6eaea89c6920e9fc2574037596b5976034c0d861d9195ae9ac933"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d6f9704b5d7ceae3cf1d3500f852493a7d9dc8dd37d75ee58566f8003907a4dd"
   end
 
   depends_on "gnustep-make" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gmp"
   depends_on "gnutls"
 
-  uses_from_macos "icu4c", since: :monterey
+  uses_from_macos "llvm" => :build
   uses_from_macos "libffi"
+  uses_from_macos "libxml2"
   uses_from_macos "libxslt"
+  uses_from_macos "zlib"
 
-  on_linux do
-    # Needs to be built with Clang for Objective-C, but fails with LLVM 16.
-    depends_on "llvm@15" => :build
-    depends_on "libobjc2"
+  on_system :linux, macos: :big_sur_or_older do
+    depends_on "icu4c@76"
   end
 
-  # Fix build with new libxml2.
-  # https://github.com/gnustep/libs-base/pull/295
+  on_linux do
+    depends_on "libobjc2"
+    depends_on "zstd"
+    fails_with :gcc
+  end
+
+  # fix incompatible pointer error, upstream pr ref, https://github.com/gnustep/libs-base/pull/414
   patch do
-    url "https://github.com/gnustep/libs-base/commit/37913d006d96a6bdcb963f4ca4889888dcce6094.patch?full_index=1"
-    sha256 "57e353fedc530c82036184da487c25e006a75a4513e2a9ee33e5109446cf0534"
+    url "https://github.com/gnustep/libs-base/commit/2b2dc3da7148fa6e01049aae89d3e456b5cc618f.patch?full_index=1"
+    sha256 "680a1911a7a600eca09ec25b2f5df82814652af2c345d48a8e5ef23959636fe6"
   end
 
   def install
@@ -53,21 +58,21 @@ class GnustepBase < Formula
     ENV["GNUSTEP_MAKEFILES"] = if OS.mac?
       Formula["gnustep-make"].opt_prefix/"Library/GNUstep/Makefiles"
     else
-      ENV.clang # To use `llvm@15` clang
       Formula["gnustep-make"].share/"GNUstep/Makefiles"
     end
 
-    if OS.mac? && (sdk = MacOS.sdk_path_if_needed)
+    if OS.mac? && MacOS.version > :big_sur && (sdk = MacOS.sdk_path_if_needed)
       ENV["ICU_CFLAGS"] = "-I#{sdk}/usr/include"
       ENV["ICU_LIBS"] = "-L#{sdk}/usr/lib -licucore"
-      # Workaround for implicit function declaration error.
-      ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version == 1403
+
+      # Fix compile with newer Clang
+      ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
     end
 
     # Don't let gnustep-base try to install its makefiles in cellar of gnustep-make.
     inreplace "Makefile.postamble", "$(DESTDIR)$(GNUSTEP_MAKEFILES)", share/"GNUstep/Makefiles"
 
-    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install", "GNUSTEP_HEADERS=#{include}",
                               "GNUSTEP_LIBRARY=#{share}",
                               "GNUSTEP_LOCAL_DOC_MAN=#{man}",
@@ -76,12 +81,12 @@ class GnustepBase < Formula
   end
 
   test do
-    (testpath/"test.xml").write <<~EOS
+    (testpath/"test.xml").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <test>
         <text>I'm an XML document.</text>
       </test>
-    EOS
+    XML
 
     assert_match "Validation failed: no DTD found", shell_output("#{bin}/xmlparse test.xml 2>&1")
   end

@@ -1,10 +1,11 @@
 class MitScheme < Formula
   desc "MIT/GNU Scheme development tools and runtime library"
   homepage "https://www.gnu.org/software/mit-scheme/"
-  url "https://ftp.gnu.org/gnu/mit-scheme/stable.pkg/12.1/mit-scheme-12.1.tar.gz"
-  mirror "https://ftpmirror.gnu.org/gnu/mit-scheme/stable.pkg/12.1/mit-scheme-12.1.tar.gz"
-  sha256 "5509fb69482f671257ab4c62e63b366a918e9e04734feb9f5ac588aa19709bc6"
+  url "https://ftp.gnu.org/gnu/mit-scheme/stable.pkg/12.1/mit-scheme-12.1-svm1-64le.tar.gz"
+  mirror "https://ftpmirror.gnu.org/gnu/mit-scheme/stable.pkg/12.1/mit-scheme-12.1-svm1-64le.tar.gz"
+  sha256 "2c5b5bf1f44c7c2458da79c0943e082ae37f1752c7d9d1ce0a61f7afcbf04304"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://ftp.gnu.org/gnu/mit-scheme/stable.pkg/?C=M&O=D"
@@ -13,54 +14,24 @@ class MitScheme < Formula
   end
 
   bottle do
-    sha256 monterey:     "bae1d2a271efb27c40b785490cb77ae62a2ad2856c49169df4ca4b6fa5d15a77"
-    sha256 big_sur:      "e53230ae27dc40a7b3a4ed54dfe9e905b60a605f5693e5fdbea513f4a5f12b35"
-    sha256 x86_64_linux: "84fc2e7429a15a8a894e39b4edfe042e4ddc404ef517896bcf63c8ee0c97bbed"
+    sha256 arm64_sequoia:  "5b2f5cddeb07d989aeb50ed587357c3da57bc2cfbe13dd5e3cc29b754ec6dfc9"
+    sha256 arm64_sonoma:   "da2acf2666e321393c150917e783456c04942de61a2b4db2eebfaeaac094168b"
+    sha256 arm64_ventura:  "23923b9cbbf60f33e46325ec788edaf149b1d43b62ddd69beff33528b14453c3"
+    sha256 arm64_monterey: "cfdb8ea9127c65a67e727fe75c293cde238172a18de91343540ff49c949f8449"
+    sha256 sonoma:         "a8ebb5f3d8e66fd9a2924b02bdd0e920e5484890865ea107fdbba9a737dc703c"
+    sha256 ventura:        "03ec5e2d199d6736dc7345d4ca3c083a78c53cb024b3874edb0e45aeb7123a2a"
+    sha256 monterey:       "72fcee689c1ca44d5834d654490f8368f099e939f4065c4f9f06d24c0022bd19"
+    sha256 x86_64_linux:   "0e910ffb8aff109164099832f8d465f54e9e0c731a0580cb0c794970e3f6ce11"
   end
-
-  # Has a hardcoded compile check for /Applications/Xcode.app
-  # Dies on "configure: error: SIZEOF_CHAR is not 1" without Xcode.
-  # https://github.com/Homebrew/homebrew-x11/issues/103#issuecomment-125014423
-  depends_on xcode: :build
 
   uses_from_macos "m4" => :build
   uses_from_macos "ncurses"
-
-  on_macos do
-    depends_on arch: :x86_64 # No support for Apple silicon: https://www.gnu.org/software/mit-scheme/#status
-  end
 
   on_system :linux, macos: :ventura_or_newer do
     depends_on "texinfo" => :build
   end
 
-  resource "bootstrap" do
-    on_arm do
-      url "https://ftp.gnu.org/gnu/mit-scheme/stable.pkg/12.1/mit-scheme-12.1-aarch64le.tar.gz"
-      sha256 "708ffec51843adbc77873fc18dd3bafc4bd94c96a8ad5be3010ff591d84a2a8b"
-    end
-
-    on_intel do
-      url "https://ftp.gnu.org/gnu/mit-scheme/stable.pkg/12.1/mit-scheme-12.1-x86-64.tar.gz"
-      sha256 "8cfbb21b0e753ab8874084522e4acfec7cadf83e516098e4ab788368b748ae0c"
-    end
-  end
-
   def install
-    # Setting -march=native, which is what --build-from-source does, can fail
-    # with the error "the object ..., passed as the second argument to apply, is
-    # not the correct type." Only Haswell and above appear to be impacted.
-    # Reported 23rd Apr 2016: https://savannah.gnu.org/bugs/index.php?47767
-    # NOTE: `unless build.bottle?` avoids overriding --bottle-arch=[...].
-    ENV["HOMEBREW_OPTFLAGS"] = "-march=#{Hardware.oldest_cpu}" unless build.bottle?
-
-    resource("bootstrap").stage do
-      cd "src"
-      system "./configure", "--prefix=#{buildpath}/staging", "--without-x"
-      system "make"
-      system "make", "install"
-    end
-
     # Liarc builds must launch within the src dir, not using the top-level
     # Makefile
     cd "src"
@@ -85,7 +56,7 @@ class MitScheme < Formula
     end
 
     inreplace "edwin/compile.sh" do |s|
-      s.gsub! "mit-scheme", "#{bin}/mit-scheme"
+      s.gsub! "mit-scheme", bin/"mit-scheme"
     end
 
     ENV.prepend_path "PATH", buildpath/"staging/bin"
@@ -97,7 +68,7 @@ class MitScheme < Formula
 
   test do
     # https://www.cs.indiana.edu/pub/scheme-repository/code/num/primes.scm
-    (testpath/"primes.scm").write <<~EOS
+    (testpath/"primes.scm").write <<~SCHEME
       ;
       ; primes
       ; By Ozan Yigit
@@ -125,7 +96,7 @@ class MitScheme < Formula
         (sieve (interval-list 2 n)))
 
       ; (primes<= 300)
-    EOS
+    SCHEME
 
     output = shell_output(
       "#{bin}/mit-scheme --load primes.scm --eval '(primes<= 72)' < /dev/null",

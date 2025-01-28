@@ -2,19 +2,18 @@ class ChartTesting < Formula
   desc "Testing and linting Helm charts"
   homepage "https://github.com/helm/chart-testing"
   url "https://github.com/helm/chart-testing.git",
-      tag:      "v3.9.0",
-      revision: "88cc7026481da7468e34a614b8ca4f0da42c063c"
+      tag:      "v3.12.0",
+      revision: "d6991035017d7ac0e3dec3d1b5ad2e5f18674b32"
   license "Apache-2.0"
   head "https://github.com/helm/chart-testing.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0cdcc408a6a87349a6e42f4e0c81967274a34569b9ed00f0b7064320463fa42c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0cdcc408a6a87349a6e42f4e0c81967274a34569b9ed00f0b7064320463fa42c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0cdcc408a6a87349a6e42f4e0c81967274a34569b9ed00f0b7064320463fa42c"
-    sha256 cellar: :any_skip_relocation, ventura:        "5908cc67c2a3664c1ec17f437537703c67779852bb00a5fe27131d2daef434a5"
-    sha256 cellar: :any_skip_relocation, monterey:       "5908cc67c2a3664c1ec17f437537703c67779852bb00a5fe27131d2daef434a5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5908cc67c2a3664c1ec17f437537703c67779852bb00a5fe27131d2daef434a5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5317a23611aed11ccb204e575df76e5e2f3742624f75f1065af45c08e9df6c4c"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f2138869a05cf42de24e10d8512bc26070ac19169d3bb41f061c226a67ac7aaa"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f2138869a05cf42de24e10d8512bc26070ac19169d3bb41f061c226a67ac7aaa"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f2138869a05cf42de24e10d8512bc26070ac19169d3bb41f061c226a67ac7aaa"
+    sha256 cellar: :any_skip_relocation, sonoma:        "aaaa3bcedb8fae176cd2ba889ebe715f11b3592ee61be0917c3ed8b232b4081e"
+    sha256 cellar: :any_skip_relocation, ventura:       "aaaa3bcedb8fae176cd2ba889ebe715f11b3592ee61be0917c3ed8b232b4081e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dc2bea119cc70298682e2b83e5ab7df72f962ce06068a8548c4f643a77aea1ce"
   end
 
   depends_on "go" => :build
@@ -22,15 +21,18 @@ class ChartTesting < Formula
   depends_on "yamllint" => :test
   depends_on "yamale"
 
+  conflicts_with "coreos-ct", because: "both install `ct` binaries"
+
   def install
     # Fix default search path for configuration files, needed for ARM
     inreplace "pkg/config/config.go", "/usr/local/etc", etc
     ldflags = %W[
+      -s -w
       -X github.com/helm/chart-testing/v#{version.major}/ct/cmd.Version=#{version}
       -X github.com/helm/chart-testing/v#{version.major}/ct/cmd.GitCommit=#{Utils.git_head}
       -X github.com/helm/chart-testing/v#{version.major}/ct/cmd.BuildDate=#{time.strftime("%F")}
     ]
-    system "go", "build", *std_go_args(output: bin/"ct", ldflags: ldflags), "./ct/main.go"
+    system "go", "build", *std_go_args(ldflags:, output: bin/"ct"), "./ct"
     etc.install "etc" => "ct"
   end
 

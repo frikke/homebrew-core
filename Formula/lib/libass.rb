@@ -1,20 +1,19 @@
 class Libass < Formula
   desc "Subtitle renderer for the ASS/SSA subtitle format"
   homepage "https://github.com/libass/libass"
-  url "https://github.com/libass/libass/releases/download/0.17.1/libass-0.17.1.tar.xz"
-  sha256 "f0da0bbfba476c16ae3e1cfd862256d30915911f7abaa1b16ce62ee653192784"
+  url "https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.xz"
+  sha256 "eae425da50f0015c21f7b3a9c7262a910f0218af469e22e2931462fed3c50959"
   license "ISC"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "c320bdf176cb7198e3e045c5a845cf1da09b2bee09d82b6ee8a4421e28bf31aa"
-    sha256 cellar: :any,                 arm64_ventura:  "0f5b7f92f0a546fdc3132dc9aba43cfa6a0c9817fea4ae5757c300eff84848e2"
-    sha256 cellar: :any,                 arm64_monterey: "7d035facb52ae4af37f85aced182fa1500acc7b62a7ad1f0d0340215a7142f87"
-    sha256 cellar: :any,                 arm64_big_sur:  "0ba42a7412c531c983e6485f1dc6f2751b29442189ac35398ebbfb556193b5e2"
-    sha256 cellar: :any,                 sonoma:         "c948495c4b40c68abc93918130911c868fe2209a0b6421cc5cc1d8dc1b38b1c5"
-    sha256 cellar: :any,                 ventura:        "690c44517e17fb4a72d442aa0b66942b4f5956a629dfbb5bb4a481917fb4083c"
-    sha256 cellar: :any,                 monterey:       "f21c63595e10a2b146cb82dbc07fe2adb1bbcfefc4751c0ec33bb0cbc7994cbc"
-    sha256 cellar: :any,                 big_sur:        "07e931e619def22ebab6739a7532479c837fae15222d99beb59aacbd4e308590"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "980cf8c0847512a6ff3df227516c85d6b42fd9775a7b26dc40226be5b202fefd"
+    sha256 cellar: :any,                 arm64_sequoia:  "2c948ddd9b7a94dd267cdc24cd684903b292d26d6ce92e6d2d7c68136b071e4d"
+    sha256 cellar: :any,                 arm64_sonoma:   "9e8889c7d434e4a56a0f9abbb1fded340dae984d05121ad5413715e3abb03fd3"
+    sha256 cellar: :any,                 arm64_ventura:  "d0724c2ba6a6aa6f1ffb604a5cde5bf341e835369e72216042bbb2587acb83cf"
+    sha256 cellar: :any,                 arm64_monterey: "f16d796553df4b3ae94c458ae687ce824ea8e66a75bd66ff6df2f0bfe4202ab7"
+    sha256 cellar: :any,                 sonoma:         "4db6c9473a71166cd6cc5d95b5fab7da9432e081855aad495fe2eb7c0b51bf31"
+    sha256 cellar: :any,                 ventura:        "1284a21e45e033cf6df87e7fc01e3d9fb3204e24ba5580bdfac941fff69e9a63"
+    sha256 cellar: :any,                 monterey:       "07a27068fd1c52b021d39b0cd9daa99b2fd6f0ac8f70e05b20b9116c5d848507"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "45ef7e90470c2f9a0304b343b6216b9632be26599ca0cbadd3705d5cbf11851b"
   end
 
   head do
@@ -25,7 +24,7 @@ class Libass < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "freetype"
   depends_on "fribidi"
   depends_on "harfbuzz"
@@ -40,19 +39,16 @@ class Libass < Formula
   end
 
   def install
-    system "autoreconf", "-i" if build.head?
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-    ]
     # libass uses coretext on macOS, fontconfig on Linux
-    args << "--disable-fontconfig" if OS.mac?
-    system "./configure", *args
+    args = OS.mac? ? ["--disable-fontconfig"] : []
+
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include "ass/ass.h"
       int main() {
         ASS_Library *library;
@@ -74,7 +70,7 @@ class Libass < Formula
           return 1;
         }
       }
-    EOS
+    CPP
     system ENV.cc, "test.cpp", "-I#{include}", "-L#{lib}", "-lass", "-o", "test"
     system "./test"
   end

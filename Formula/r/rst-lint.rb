@@ -8,19 +8,16 @@ class RstLint < Formula
   license "Unlicense"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "977a9d1c0f562445d972e95d59e883d26a7966b18ca3a124577936d8dde74018"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "977a9d1c0f562445d972e95d59e883d26a7966b18ca3a124577936d8dde74018"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "977a9d1c0f562445d972e95d59e883d26a7966b18ca3a124577936d8dde74018"
-    sha256 cellar: :any_skip_relocation, ventura:        "c8bbc56f35fe2f218241996e273e173cbb2e19535ca95dd77bf97c6ce6ca5479"
-    sha256 cellar: :any_skip_relocation, monterey:       "c8bbc56f35fe2f218241996e273e173cbb2e19535ca95dd77bf97c6ce6ca5479"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c8bbc56f35fe2f218241996e273e173cbb2e19535ca95dd77bf97c6ce6ca5479"
-    sha256 cellar: :any_skip_relocation, catalina:       "c8bbc56f35fe2f218241996e273e173cbb2e19535ca95dd77bf97c6ce6ca5479"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "680297bd09a922363c112da4ce90736e24c732d5907727684625aa639ac777c3"
+    rebuild 8
+    sha256 cellar: :any_skip_relocation, all: "33af15142db56039486e955b7a684f745bb02857f97b0aca3d5095a4b389d35b"
   end
 
-  depends_on "docutils"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  resource "docutils" do
+    url "https://files.pythonhosted.org/packages/ae/ed/aefcc8cd0ba62a0560c3c18c33925362d46c6075480bfa4df87b28e169a9/docutils-0.21.2.tar.gz"
+    sha256 "3a6b18732edf182daa3cd12775bbb338cf5691468f91eeeb109deff6ebfa986f"
+  end
 
   def install
     virtualenv_install_with_resources
@@ -32,7 +29,7 @@ class RstLint < Formula
       Hello World
       ===========
     EOS
-    assert_equal "", shell_output("#{bin}/rst-lint pass.rst")
+    assert_empty shell_output("#{bin}/rst-lint pass.rst")
 
     # test invocation on a file with a whitespace style issue
     (testpath/"fail.rst").write <<~EOS

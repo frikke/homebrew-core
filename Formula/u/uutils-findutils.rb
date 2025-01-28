@@ -1,26 +1,27 @@
 class UutilsFindutils < Formula
   desc "Cross-platform Rust rewrite of the GNU findutils"
   homepage "https://github.com/uutils/findutils"
-  url "https://github.com/uutils/findutils/archive/refs/tags/0.4.2.tar.gz"
-  sha256 "b02fce9219393b47384229b397c7fbe479435ae8ccf8947f4b6cf7ac159d80f9"
+  url "https://github.com/uutils/findutils/archive/refs/tags/0.7.0.tar.gz"
+  sha256 "129c263c6953b5c6aa756666aa9f5e968e04c1d0315d9d8ad9e93ec3d1823bc0"
   license "MIT"
   head "https://github.com/uutils/findutils.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "46c3776daae394601d7bbe347a624b40aec9d980e6670cbaf4281377d3c9f8fb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5676fc52e1c936b9c4c0d7e05a0dcbe941ab36f9f42c45500ab59329946034a9"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fd8dbcce4cde5f848b8fdacd58fcc7f49feb06960c91e994308e6a66837be7c0"
-    sha256 cellar: :any_skip_relocation, ventura:        "3b12831cd03483b5a11a08f899261b55325649110652916e309e5592f7205165"
-    sha256 cellar: :any_skip_relocation, monterey:       "757cb5575ac4a797d11fc9e7b47c82faf20303f8e2942f8ac3845fb564ec123d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b92ef5601c1730634241e4127797be3e74a9859847e2571360b0503a2ccb6ca0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "11ce4cb813793fe4d60014fc621a9e74ff93c6c1f3eb3f0217423d5e8ed120d4"
+    sha256 cellar: :any,                 arm64_sequoia:  "a2b1a4305f6c079d9ce173c0f498c6f7b2caa89598fd70ff9575ac416cb3cbe3"
+    sha256 cellar: :any,                 arm64_sonoma:   "1eeebb99c9740e5ea9150fccc38a24fd8e87e5a80b9c6270059b81d10e70c6ec"
+    sha256 cellar: :any,                 arm64_ventura:  "6a36f901c622e3cf5a998e8d7df717f5affe8f5a6331e347adefb87e186bdbbb"
+    sha256 cellar: :any,                 arm64_monterey: "91ce728daeb833d7efe8483a47b48e7938c1f023bfe491f2144e5eac60980ba5"
+    sha256 cellar: :any,                 sonoma:         "a73adc73887339585c483b4b11eef740bf31e466245fac18a842208d385720f6"
+    sha256 cellar: :any,                 ventura:        "519814920c34176946e9a41fbecfa86d851c65dbcd0ea8de1ab344e16e6de38e"
+    sha256 cellar: :any,                 monterey:       "97839bae94b7710646bfac19a06b20732a714b0641c4f7899fbd73a1225483f4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1960b1bfa82f3b45f2df7580e15e9114a04503da577ec1cc76a02c3e2191bb7d"
   end
 
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
+  depends_on "oniguruma"
 
-  on_linux do
-    depends_on "llvm@15" => :build
-  end
+  uses_from_macos "llvm" => :build
 
   def unwanted_bin_link?(cmd)
     %w[
@@ -29,7 +30,9 @@ class UutilsFindutils < Formula
   end
 
   def install
-    ENV["LIBCLANG_PATH"] = Formula["llvm@15"].opt_lib.to_s if OS.linux?
+    ENV["RUSTONIG_DYNAMIC_LIBONIG"] = "1"
+    ENV["RUSTONIG_SYSTEM_LIBONIG"] = "1"
+
     system "cargo", "install", *std_cargo_args(root: libexec)
     mv libexec/"bin", libexec/"uubin"
     Dir.children(libexec/"uubin").each do |cmd|
@@ -46,9 +49,35 @@ class UutilsFindutils < Formula
     EOS
   end
 
+  def check_binary_linkage(binary, library)
+    binary.dynamically_linked_libraries.any? do |dll|
+      next false unless dll.start_with?(HOMEBREW_PREFIX.to_s)
+
+      File.realpath(dll) == File.realpath(library)
+    end
+  end
+
   test do
     touch "HOMEBREW"
     assert_match "HOMEBREW", shell_output("#{bin}/ufind .")
     assert_match "HOMEBREW", shell_output("#{opt_libexec}/uubin/find .")
+
+    expected_linkage = {
+      libexec/"uubin/find"  => [
+        Formula["oniguruma"].opt_lib/shared_library("libonig"),
+      ],
+      libexec/"uubin/xargs" => [
+        Formula["oniguruma"].opt_lib/shared_library("libonig"),
+      ],
+    }
+    missing_linkage = []
+    expected_linkage.each do |binary, dylibs|
+      dylibs.each do |dylib|
+        next if check_binary_linkage(binary, dylib)
+
+        missing_linkage << "#{binary} => #{dylib}"
+      end
+    end
+    assert missing_linkage.empty?, "Missing linkage: #{missing_linkage.join(", ")}"
   end
 end

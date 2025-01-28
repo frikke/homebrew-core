@@ -1,9 +1,10 @@
 class TigerVnc < Formula
   desc "High-performance, platform-neutral implementation of VNC"
   homepage "https://tigervnc.org/"
-  url "https://github.com/TigerVNC/tigervnc/archive/v1.13.1.tar.gz"
-  sha256 "b7c5b8ed9e4e2c2f48c7b2c9f21927db345e542243b4be88e066b2daa3d1ae25"
+  url "https://github.com/TigerVNC/tigervnc/archive/refs/tags/v1.14.1.tar.gz"
+  sha256 "579d0d04eb5b806d240e99a3c756b38936859e6f7db2f4af0d5656cc9a989d7c"
   license "GPL-2.0-or-later"
+  revision 1
 
   # Tags with a 90+ patch are unstable (e.g., the 1.9.90 tag is used for the
   # 1.10.0 beta release) and this regex should only match the stable versions.
@@ -13,21 +14,24 @@ class TigerVnc < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "020433420a88dee43baf6d3f615c599fcfb198af33a1aa7804b558c42d567530"
-    sha256 cellar: :any, arm64_monterey: "7736e3193f654d40c55995280d7a1bd065f869fff11780c83b26321fa83cf614"
-    sha256 cellar: :any, arm64_big_sur:  "85d05acc79800b9e5ebb4c187480edbb97afb7b54f0990513ca30ab0a0714d7e"
-    sha256 cellar: :any, ventura:        "7955a68a220e7823e98620a6f9be3c43e3057ae773388e5612cff6619fd93733"
-    sha256 cellar: :any, monterey:       "08a5dc1ad2f983174eda1c31e68bd66f2db1276cdde640df82ec2d2497b1a990"
-    sha256 cellar: :any, big_sur:        "d4961d1d80f491537148c9c5f800ada12df1ece76cc017e1ad10403f740055eb"
-    sha256               x86_64_linux:   "5d79edb3286b58e516c615f9350576d50737b61fe4aa94809b0eac7dabda978c"
+    sha256 cellar: :any, arm64_sequoia: "7bc176a2d61c328fb349c89517136f824ba6a24e8bd1ce2742212b0a72779136"
+    sha256 cellar: :any, arm64_sonoma:  "7cf35ae52dae8555f601816857569539b6f4a4567d0430aca2069ffd064afa30"
+    sha256 cellar: :any, arm64_ventura: "d3a0850c956e85032de86105e5f41e4b9d0a284ac459325787689f9a0f1620f8"
+    sha256 cellar: :any, sonoma:        "0d423088741028380b8ac0e6afb22e83820f8551d6eeea5c46a68c4b04f62c2d"
+    sha256 cellar: :any, ventura:       "9276bf7e39d26bd7822f00b894e36a59851d201c60f478d2404636da226736d5"
+    sha256               x86_64_linux:  "7387518d8ad605dd07089fdb78ac5894aa3c9c15bd763d80458a3a907e74cba3"
   end
 
   depends_on "cmake" => :build
-  depends_on "fltk"
+  depends_on "fltk@1.3"
   depends_on "gettext"
+  depends_on "gmp"
   depends_on "gnutls"
   depends_on "jpeg-turbo"
+  depends_on "nettle"
   depends_on "pixman"
+
+  uses_from_macos "zlib"
 
   on_linux do
     depends_on "libx11"
@@ -46,13 +50,13 @@ class TigerVnc < Formula
 
   def install
     turbo = Formula["jpeg-turbo"]
-    args = std_cmake_args + %W[
+    args = %W[
       -DJPEG_INCLUDE_DIR=#{turbo.include}
       -DJPEG_LIBRARY=#{turbo.lib}/#{shared_library("libjpeg")}
-      .
     ]
-    system "cmake", *args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

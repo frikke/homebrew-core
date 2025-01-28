@@ -1,18 +1,14 @@
 class Mat2 < Formula
+  include Language::Python::Virtualenv
+
   desc "Metadata anonymization toolkit"
   homepage "https://0xacab.org/jvoisin/mat2"
-  url "https://files.pythonhosted.org/packages/d5/e4/f02d057fe6cf32b68e402c5f86276244105da40161e84ef785b2ae0bf809/mat2-0.13.4.tar.gz"
-  sha256 "744aeee924c9898a397fe930593b803c540389bf39cd24553b99a89acc2f5901"
+  url "https://files.pythonhosted.org/packages/ce/53/da9720bf3d8a3419e2d337ba0d12817c75578ada4ec1f161fc602dd2ed1d/mat2-0.13.5.tar.gz"
+  sha256 "d7e7c4f0f0cfcf8bd656f97919281d0c6207886d84bdfdbb192c152ebf91fe19"
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d819a4c3378ae61661b84cb80b6af98dbad0a428f1df8d449535921f02aa4b0b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d70ff80d80b17a49cb04e3a7a9f57193b6c6ecb4d8d16ef4ed3e6c774c1cabf4"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b46db4fed2cc62e1d49ea4dae92e377be930a5ec4c68567f238cc040ad9aa2b2"
-    sha256 cellar: :any_skip_relocation, ventura:        "e2dd7f2c2173b2b9ed71e7679eaabc566662f29b022ec79bc02e27bfa7c129ba"
-    sha256 cellar: :any_skip_relocation, monterey:       "9a853a6c22eea046e1215a2bb0b27285f7d676257804d54372d67463be5c5b32"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e2f8e5df6a82ec6922cd6d37f1b5324f5f230cff057e24a3aeee7e7c1aad74ee"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "96f1839a0c399423ac7ceff166d28ea992671b2b52cd1a43fde19d9a8293c5e2"
+    sha256 cellar: :any_skip_relocation, all: "7b534040135d940e613435f419dd0556e98b876b3ff9364d67dc001ac3412ec7"
   end
 
   depends_on "exiftool"
@@ -22,22 +18,15 @@ class Mat2 < Formula
   depends_on "poppler"
   depends_on "py3cairo"
   depends_on "pygobject3"
-  depends_on "python-mutagen"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
-  # patch man1 file layout, remove in next release
-  # https://0xacab.org/jvoisin/mat2/-/merge_requests/111
-  patch do
-    url "https://0xacab.org/jvoisin/mat2/-/commit/406924bb6164384fe0a8a8f3dc8dfe7d15577cfc.diff"
-    sha256 "4c1c57ca8fe1eabea41d66f3ef9bd4eb2bac8ac181fceeefece4b92b5be9658d"
-  end
-
-  def python3
-    which("python3.11")
+  resource "mutagen" do
+    url "https://files.pythonhosted.org/packages/81/e6/64bc71b74eef4b68e61eb921dcf72dabd9e4ec4af1e11891bbd312ccbb77/mutagen-1.47.0.tar.gz"
+    sha256 "719fadef0a978c31b4cf3c956261b3c58b6948b32023078a2117b1de09f0fc99"
   end
 
   def install
-    system python3, "-m", "pip", "install", *std_pip_args, "."
+    virtualenv_install_with_resources
   end
 
   test do

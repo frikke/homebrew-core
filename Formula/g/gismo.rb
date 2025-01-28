@@ -1,28 +1,34 @@
 class Gismo < Formula
   desc "C++ library for isogeometric analysis (IGA)"
   homepage "https://gismo.github.io"
-  url "https://github.com/gismo/gismo/archive/refs/tags/v21.12.0.tar.gz"
-  sha256 "4001b4c49661ca8b71baf915e773341e115d154077bef218433a3c1d72ee4f0c"
+  url "https://github.com/gismo/gismo/archive/refs/tags/v25.01.0.tar.gz"
+  sha256 "d1250b3d3a37c9d7d3f9cb63e4a36ae07b76aa47335847008be7516cc390c61e"
   license "MPL-2.0"
+  head "https://github.com/gismo/gismo.git", branch: "stable"
 
-  bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "2c1e2f3e321ee74a7d53fab75dfa03d1228cb328b788eb65b5237d0c5c15c5b9"
-    sha256 cellar: :any,                 arm64_monterey: "67fb8c504ab96451c1be3c590d81e424cb513f5bee72415c101c2dcf28b5d88a"
-    sha256 cellar: :any,                 arm64_big_sur:  "25a1d59c5e94aad0861a99f63ad2adac55890eb35ba9ff997e4de69e334a15e6"
-    sha256 cellar: :any,                 ventura:        "81ca83442c82f9e2b186bddc4c41afafbcd48543e1f4b824a82753a735616639"
-    sha256 cellar: :any,                 monterey:       "1e62c2393cddcbea345d697fc2edc4f89b5e84ea0937d9833ee0b0995c855402"
-    sha256 cellar: :any,                 big_sur:        "b866e490fa3a9f742caab85f3bb290c7c678f6a976be51f70855797066ab8cf4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dc809b43a86065f48c301531493a3553f042c3990c6e2edabac31ed30bb54db8"
+  # There can be a notable gap between when a version is tagged and a
+  # corresponding release is created, so we check the "latest" release instead
+  # of the Git tags.
+  livecheck do
+    url :stable
+    strategy :github_latest
   end
 
-  head do
-    url "https://github.com/gismo/gismo.git", branch: "stable"
+  bottle do
+    sha256 cellar: :any,                 arm64_sequoia: "0d9ef9f132c2b82020b765e47616508bd9def1f8f86d4f7df80cd4634d14b71e"
+    sha256 cellar: :any,                 arm64_sonoma:  "73968e5e169f150fb150bb800a0f1890c9505e913cebe465cd5b91c191ab17ca"
+    sha256 cellar: :any,                 arm64_ventura: "3119c3a59c2b2a28875eb6e40eafd5889da5bd62f698c269dfe4b05f30eddf10"
+    sha256 cellar: :any,                 sonoma:        "992c1d9e553767311d57b918950ed5bf1a67847f4847ecd8130a783d36f7a745"
+    sha256 cellar: :any,                 ventura:       "8be99fca669151b6be0f2082abe7c8fa55f68a613fa63d76b04e257773abc1e7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "79f6aebd7ab833f834c834c129b0aab808a62f9d3d66aa19281d4ed6db0277a2"
   end
 
   depends_on "cmake" => :build
   depends_on "openblas"
   depends_on "suite-sparse"
   depends_on "superlu"
+
+  uses_from_macos "zlib"
 
   on_macos do
     depends_on "libomp"
@@ -49,7 +55,7 @@ class Gismo < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <gismo.h>
       using namespace gismo;
       int main()
@@ -61,7 +67,7 @@ class Gismo < Formula
         M.setOnes();
         gsInfo << M*v << std::endl;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-I#{include}/gismo", "-std=c++14", "-o", "test"
     assert_equal %w[4 4], shell_output("./test").split
   end

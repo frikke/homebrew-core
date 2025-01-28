@@ -1,19 +1,20 @@
 class Dtools < Formula
   desc "D programming language tools"
   homepage "https://dlang.org/"
-  url "https://github.com/dlang/tools/archive/refs/tags/v2.105.2.tar.gz"
-  sha256 "dc34d753742cf3c1d3612bef27862cb6930b650b99e3db847a840d2059fd0423"
+  url "https://github.com/dlang/tools/archive/refs/tags/v2.109.1.tar.gz"
+  sha256 "6f9db3ec124356f1ba6b10681e6bb07e364a434faf8d1644ef2e254b90a16459"
   license "BSL-1.0"
   head "https://github.com/dlang/tools.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "81d518e2d0fc8549456b212a575342033aac5190693f17cd891a26812fa21270"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3082003c01763ca16ff51358e5d01250ff3cf73657d021bd5f714662708d0677"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b0a10191cad28288d566bc4f65723d1398f18a5703821eb9880d1c04d69619d1"
-    sha256 cellar: :any_skip_relocation, ventura:        "fa6237ca8240e330aac3ee3ae595227f2eed3b3a3d846d4f74676b40479ec640"
-    sha256 cellar: :any_skip_relocation, monterey:       "b88490f92a9ecb8661ec8254ea7578c62f2a9206774efa2cd00380d53b890857"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5f6ff75e0dadafe852bcc9144d03e6f36af6d134d7f7d27328d45fa2e0e54ff7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1eb37c05c9c77589a3707efa178de28e6756ba528b9c9a5cce80f343e611d30d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "014f22a3cb9d11924138766bcb02867a949faf4d555287c8aa37a29358047de0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "e4da9f80c0dd636bdbdc3dc13440887df95716c9f718a64ea7ba9eacf69f41c8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d07da51134f24a745adfde5e2876e6cf81b650e3286648e5cce94b7e289eb450"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "422bb5c6da88abfe0055afa0e8d0a57f1d039b18cd1ecf70903dad2b946a3f5a"
+    sha256 cellar: :any_skip_relocation, sonoma:         "58cc9814b16fe73c3223b9190aad9e4208671f1272f2458fb02d1e77c03708bd"
+    sha256 cellar: :any_skip_relocation, ventura:        "dbfd5583ea5a1a2f26aad14c97152bef1599157fc6679f6d9949815eecc6ce73"
+    sha256 cellar: :any_skip_relocation, monterey:       "6344b77d8ab17334e4ccac3c3ab53d6c617871cf2a7c1ddda56ec502abdff3d0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4bcfd9495f99afff506110cd6bdf016c70b993f4437fab7567fa3e56bf0d46eb"
   end
 
   depends_on "dub" => :build
@@ -41,13 +42,13 @@ class Dtools < Formula
   end
 
   test do
-    (testpath/"hello.d").write <<~EOS
+    (testpath/"hello.d").write <<~D
       import std.stdio;
       void main()
       {
         writeln("Hello world!");
       }
-    EOS
+    D
     assert_equal "Hello world!", shell_output("#{bin}/rdmd #{testpath}/hello.d").chomp
   end
 end

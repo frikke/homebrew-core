@@ -1,30 +1,35 @@
 class Soapysdr < Formula
   desc "Vendor and platform neutral SDR support library"
   homepage "https://github.com/pothosware/SoapySDR/wiki"
-  url "https://github.com/pothosware/SoapySDR/archive/soapy-sdr-0.8.1.tar.gz"
-  sha256 "a508083875ed75d1090c24f88abef9895ad65f0f1b54e96d74094478f0c400e6"
   license "BSL-1.0"
   revision 1
   head "https://github.com/pothosware/SoapySDR.git", branch: "master"
 
+  stable do
+    url "https://github.com/pothosware/SoapySDR/archive/refs/tags/soapy-sdr-0.8.1.tar.gz"
+    sha256 "a508083875ed75d1090c24f88abef9895ad65f0f1b54e96d74094478f0c400e6"
+
+    # Replace distutils for python 3.12+
+    # https://github.com/pothosware/SoapySDR/commit/1ee5670803f89b21d84a6a84acbb578da051c119
+    patch :DATA
+  end
+
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "6b73c034ca3f25efac4922bf336bff165074d79bc2ee0c276c74275728b81025"
-    sha256 cellar: :any,                 arm64_monterey: "28ed02a75df0cafb919f0d9e30c0a312884762736868fe094fbaacec27bb12a8"
-    sha256 cellar: :any,                 arm64_big_sur:  "d20855a9fdd81d185e576cd308b00ab1f657736c721167bdb61fc7ec2d17b507"
-    sha256 cellar: :any,                 ventura:        "1479afce35a2e6b61412bd416041d85fe051a2ed6879734f6092c5fa1fe72f70"
-    sha256 cellar: :any,                 monterey:       "9f3a6c8d3c6a9f0b8aaa9030da6d246dd40119309372bebc9e0952dc271d7dfe"
-    sha256 cellar: :any,                 big_sur:        "3b7dfa0601c4c808ffb3f5195d1194f65adfb26a9182a8bd7ba61d0fdcd73202"
-    sha256 cellar: :any,                 catalina:       "a47d2eca6bf6f4c4c4aaf15887cb2ac5ee22c0f6b1859e7bd2ec1d008fa19b28"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e8708223be2fc61637991a16921166770a1977f19634aa61e4b7ec6473f0ee8e"
+    rebuild 3
+    sha256 cellar: :any,                 arm64_sequoia: "2cd1b0106c59df55ee3022f0e426718979343f8c0791a1cbf189a0230b582967"
+    sha256 cellar: :any,                 arm64_sonoma:  "037c6ec56ece7b022d890f8c42f9e8b7e012ec9a641901d4d73a961a8f7f069d"
+    sha256 cellar: :any,                 arm64_ventura: "d091d29209ae4319ddb8db5f2bc8c3f828953db36b619f2288df08c6cb2f2db1"
+    sha256 cellar: :any,                 sonoma:        "e90833db385d8e3ce0c8eb4f138834d1da1db6879ca46be2f5f52a4f68957e44"
+    sha256 cellar: :any,                 ventura:       "dbbc7e560136986fb5604d2c752890d5ee299725768fa61dc5ddd2bfd2e73be0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d1227202d6306ddbc0d33b3f94904cc51b6ebfd61802fd411fb51fdd306e2f4a"
   end
 
   depends_on "cmake" => :build
   depends_on "swig" => :build
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
@@ -45,3 +50,57 @@ class Soapysdr < Formula
     system python3, "-c", "import SoapySDR"
   end
 end
+
+__END__
+diff --git a/python/get_python_lib.py b/python/get_python_lib.py
+index 0c71652..307ab51 100644
+--- a/python/get_python_lib.py
++++ b/python/get_python_lib.py
+@@ -1,19 +1,35 @@
+ import os
++import pathlib
+ import sys
+-import site
+-from distutils.sysconfig import get_python_lib
++import sysconfig
+
+-if __name__ == '__main__':
+-    prefix = sys.argv[1]
++if __name__ == "__main__":
++    prefix = pathlib.Path(sys.argv[1]).resolve()
+
+-    #ask distutils where to install the python module
+-    install_dir = get_python_lib(plat_specific=True, prefix=prefix)
++    # default install dir for the running Python interpreter
++    default_install_dir = pathlib.Path(sysconfig.get_path("platlib")).resolve()
+
+-    #use sites when the prefix is already recognized
++    # if default falls under the desired prefix, we're done
+     try:
+-        paths = [p for p in site.getsitepackages() if p.startswith(prefix)]
+-        if len(paths) == 1: install_dir = paths[0]
+-    except AttributeError: pass
++        relative_install_dir = default_install_dir.relative_to(prefix)
++    except ValueError:
++        # get install dir for the specified prefix
++        # can't use the default scheme because distributions modify it
++        # newer Python versions have 'venv' scheme, use for all OSs.
++        if "venv" in sysconfig.get_scheme_names():
++            scheme = "venv"
++        elif os.name == "nt":
++            scheme = "nt"
++        else:
++            scheme = "posix_prefix"
++        prefix_install_dir = pathlib.Path(
++            sysconfig.get_path(
++                "platlib",
++                scheme=scheme,
++                vars={"base": prefix, "platbase": prefix},
++            )
++        ).resolve()
++        relative_install_dir = prefix_install_dir.relative_to(prefix)
+
+-    #strip the prefix to return a relative path
+-    print(os.path.relpath(install_dir, prefix))
++    # want a relative path for use in the build system
++    print(relative_install_dir)

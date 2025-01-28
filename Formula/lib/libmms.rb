@@ -7,6 +7,7 @@ class Libmms < Formula
 
   bottle do
     rebuild 2
+    sha256 cellar: :any,                 arm64_sequoia:  "3bb78466780c6a9b24cf16bb0c333e5e62e8aca7b7f27a1175dcce96d369dd92"
     sha256 cellar: :any,                 arm64_sonoma:   "256fd337db7087fc76bbd4b119df0621377c33b231eb11e609680955b65b19dc"
     sha256 cellar: :any,                 arm64_ventura:  "c341b6abc297d20d408019a94893e6f9bb2859c34d3e100926bac2550a2d41b0"
     sha256 cellar: :any,                 arm64_monterey: "cc895b39e7d44f9ddf9f09319b35a89e093e345dc28ee6f786529012a4ab86e2"
@@ -23,13 +24,12 @@ class Libmms < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "5bf0654cdf09b4ca5c749e75d8920ff2eddee195e31a468c64bee07f74571b29"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "glib"
 
   def install
     ENV.append "LDFLAGS", "-liconv" if OS.mac?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 end

@@ -1,8 +1,8 @@
 class PythonAT38 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tar.xz"
-  sha256 "3ffb71cd349a326ba7b2fadc7e7df86ba577dd9c4917e52a8401adbda7405e3f"
+  url "https://www.python.org/ftp/python/3.8.20/Python-3.8.20.tar.xz"
+  sha256 "6fb89a7124201c61125c0ab4cf7f6894df339a40c02833bfd28ab4d7691fafb4"
   license "Python-2.0"
 
   livecheck do
@@ -11,22 +11,24 @@ class PythonAT38 < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "1600c7c13c514c57428c1d6057df0d935ef7b836919f4c2febde7acb72c32eda"
-    sha256 arm64_ventura:  "e46543e4b7c3eba41b67530b1f4f95b7a7f7bcc3955c88667bcaf7f774910eb8"
-    sha256 arm64_monterey: "f0b098a991698f07a990b6c33bbb0a3ecd0afd0f4592eb6e9fd6214e42afa877"
-    sha256 arm64_big_sur:  "d62d849037220459e4795fb6b3504fe026f03ed7c3342077a5c7cc014118b637"
-    sha256 sonoma:         "c654f3f66ab693ff1389e0b4d8f58ea087c19439977e0bfc7d5d4cb159c1fb5f"
-    sha256 ventura:        "0dc45f8ce4621dda697f67e37d3c566a5b66d745b1a7574483ac645cf5a92053"
-    sha256 monterey:       "9134d12fdb3896a24d1dd876b551459024491d3926d22dadfefbe87e7cbbc588"
-    sha256 big_sur:        "34012296f4cb3f8a877e905af35a33e658ad250f64f6ad29203aa662eabd8ce6"
-    sha256 x86_64_linux:   "8076a79df232035817b166b73b23e50d41eef747668eec8c7936b353c5d42fd2"
+    sha256 arm64_sequoia:  "1fa19eccb400ea5724d9cd6077ef473ecb1d506b8f515034b3565222f0cd8cb6"
+    sha256 arm64_sonoma:   "49082bc289bc3547b509f24e962cc8cbefad015345c0675631e42b3b23d2ecc7"
+    sha256 arm64_ventura:  "d1b22ac3c7066fb48a1c5274f14bc5f0df724c25a309bd479b5880120c8e44a0"
+    sha256 arm64_monterey: "339f24fcd11f9c005d7f1818a88bcc79683938b2bc1ff95dc236eab157f112a2"
+    sha256 sonoma:         "125c3d7416bee3f05086683dd74455604064ecda2808af868720e54c6b9e7e6a"
+    sha256 ventura:        "6760f38435697b00dcb5dc9f5dfd6adfd57df3c63158e03ebf486e88afb2cdc8"
+    sha256 monterey:       "15cd39037b6f0aa7e9776c32f984862606c47252d668ecbb0be3d924aa5d245a"
+    sha256 x86_64_linux:   "35120e0281d3baffdb30ea545cc728b67f7bc3bd732e2e06dc26692f467b9d8c"
   end
 
   # setuptools remembers the build flags python is built with and uses them to
   # build packages later. Xcode-only systems need different flags.
   pour_bottle? only_if: :clt_installed
 
-  depends_on "pkg-config" => :build
+  # https://devguide.python.org/versions/#versions
+  disable! date: "2024-10-14", because: :deprecated_upstream
+
+  depends_on "pkgconf" => :build
   depends_on "gdbm"
   depends_on "mpdecimal"
   depends_on "openssl@3"
@@ -47,24 +49,21 @@ class PythonAT38 < Formula
     depends_on "libnsl"
   end
 
-  skip_clean "bin/pip3", "bin/pip-3.4", "bin/pip-3.5", "bin/pip-3.6", "bin/pip-3.7", "bin/pip-3.8"
-  skip_clean "bin/easy_install3", "bin/easy_install-3.4", "bin/easy_install-3.5", "bin/easy_install-3.6",
-             "bin/easy_install-3.7", "bin/easy_install-3.8"
-
   # Always update to latest release
-  resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/19/20/d8dd9d8becaf3e2d6fdc17cc41870d5ada5ceda518996cf5968c2ca71bd8/setuptools-68.1.2.tar.gz"
-    sha256 "3d4dfa6d95f1b101d695a6160a7626e15583af71a5f52176efa5d39a054d475d"
+  # setup.py got removed in pip 24.1b1 and above
+  resource "pip" do
+    url "https://files.pythonhosted.org/packages/94/59/6638090c25e9bc4ce0c42817b5a234e183872a1129735a9330c472cc2056/pip-24.0.tar.gz"
+    sha256 "ea9bd1a847e8c5774a5777bb398c19e80bcd4e2aa16a4b301b718fe6f593aba2"
   end
 
-  resource "pip" do
-    url "https://files.pythonhosted.org/packages/ba/19/e63fb4e0d20e48bd2167bb7e857abc0e21679e24805ba921a224df8977c0/pip-23.2.1.tar.gz"
-    sha256 "fb0bd5435b3200c602b5bf61d2d43c2f13c02e29c1707567ae7fbc514eb9faf2"
+  resource "setuptools" do
+    url "https://files.pythonhosted.org/packages/3e/2c/f0a538a2f91ce633a78daaeb34cbfb93a54bd2132a6de1f6cec028eee6ef/setuptools-74.1.2.tar.gz"
+    sha256 "95b40ed940a1c67eb70fc099094bd6e99c6ee7c23aa2306f4d2697ba7916f9c6"
   end
 
   resource "wheel" do
-    url "https://files.pythonhosted.org/packages/a4/99/78c4f3bd50619d772168bec6a0f34379b02c19c9cced0ed833ecd021fd0d/wheel-0.41.2.tar.gz"
-    sha256 "0c5ac5ff2afb79ac23ab82bab027a0be7b5dbcf2e54dc50efe4bf507de1f7985"
+    url "https://files.pythonhosted.org/packages/b7/a0/95e9e962c5fd9da11c1e28aa4c0d8210ab277b1ada951d2aee336b505813/wheel-0.44.0.tar.gz"
+    sha256 "a29c3f2817e95ab89aa4660681ad547c0e9547f20e75b0562fe7723c9a2a9d49"
   end
 
   # Link against libmpdec.so.3, update for mpdecimal.h symbol cleanup.
@@ -117,13 +116,6 @@ class PythonAT38 < Formula
       --with-system-libmpdec
     ]
 
-    if OS.mac?
-      args << "--enable-framework=#{frameworks}"
-      args << "--with-dtrace"
-    else
-      args << "--enable-shared"
-    end
-
     # Python re-uses flags when building native modules.
     # Since we don't want native modules prioritizing the brew
     # include path, we move them to [C|LD]FLAGS_NODIST.
@@ -135,14 +127,22 @@ class PythonAT38 < Formula
     ldflags_nodist = ["-L#{HOMEBREW_PREFIX}/lib", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib"]
     cppflags       = ["-I#{HOMEBREW_PREFIX}/include"]
 
-    if MacOS.sdk_path_if_needed
-      # Help Python's build system (setuptools/pip) to build things on SDK-based systems
-      # The setup.py looks at "-isysroot" to get the sysroot (and not at --sysroot)
-      cflags  << "-isysroot #{MacOS.sdk_path}"
-      ldflags << "-isysroot #{MacOS.sdk_path}"
+    if OS.mac?
+      args << "--enable-framework=#{frameworks}"
+      args << "--with-dtrace"
+
+      if MacOS.sdk_path_if_needed
+        # Help Python's build system (setuptools/pip) to build things on SDK-based systems
+        # The setup.py looks at "-isysroot" to get the sysroot (and not at --sysroot)
+        cflags  << "-isysroot #{MacOS.sdk_path}"
+        ldflags << "-isysroot #{MacOS.sdk_path}"
+      end
+
+      # Avoid linking to libgcc https://mail.python.org/pipermail/python-dev/2012-February/116205.html
+      args << "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
+    else
+      args << "--enable-shared"
     end
-    # Avoid linking to libgcc https://mail.python.org/pipermail/python-dev/2012-February/116205.html
-    args << "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
 
     args << "--with-tcltk-includes=-I#{Formula["tcl-tk"].opt_include/"tcl-tk"}"
     args << "--with-tcltk-libs=-L#{Formula["tcl-tk"].opt_lib} -ltcl8.6 -ltk8.6"
@@ -243,7 +243,7 @@ class PythonAT38 < Formula
     end
 
     # Remove the site-packages that Python created in its Cellar.
-    site_packages_cellar.rmtree
+    rm_r(site_packages_cellar)
 
     %w[setuptools pip wheel].each do |r|
       (libexec/r).install resource(r)
@@ -282,16 +282,16 @@ class PythonAT38 < Formula
     site_packages_cellar.parent.install_symlink site_packages
 
     # Write our sitecustomize.py
-    rm_rf site_packages.glob("sitecustomize.py[co]")
+    rm_r(site_packages.glob("sitecustomize.py[co]"))
     (site_packages/"sitecustomize.py").atomic_write(sitecustomize)
 
     # Remove old setuptools installations that may still fly around and be
     # listed in the easy_install.pth. This can break setuptools build with
     # zipimport.ZipImportError: bad local file header
     # setuptools-0.9.8-py3.3.egg
-    rm_rf Dir["#{site_packages}/setuptools*"]
-    rm_rf Dir["#{site_packages}/distribute*"]
-    rm_rf Dir["#{site_packages}/pip[-_.][0-9]*", "#{site_packages}/pip"]
+    rm_r(Dir["#{site_packages}/setuptools*"])
+    rm_r(Dir["#{site_packages}/distribute*"])
+    rm_r(Dir["#{site_packages}/pip[-_.][0-9]*", "#{site_packages}/pip"])
 
     %w[setuptools pip wheel].each do |pkg|
       (libexec/pkg).cd do
@@ -303,7 +303,7 @@ class PythonAT38 < Formula
       end
     end
 
-    rm_rf bin.glob("{easy_install,pip{,3}}")
+    rm_r(bin.glob("{easy_install,pip{,3}}"))
     mv bin/"wheel", bin/"wheel#{version.major_minor}"
 
     # Install unversioned and major-versioned symlinks in libexec/bin.
@@ -328,18 +328,17 @@ class PythonAT38 < Formula
                     Formula["sqlite"].opt_lib], Formula["tcl-tk"].opt_lib
 
     cfg = lib_cellar/"distutils/distutils.cfg"
-
-    cfg.atomic_write <<~EOS
+    cfg.atomic_write <<~INI
       [install]
       prefix=#{HOMEBREW_PREFIX}
       [build_ext]
       include_dirs=#{include_dirs.join ":"}
       library_dirs=#{library_dirs.join ":"}
-    EOS
+    INI
   end
 
   def sitecustomize
-    <<~EOS
+    <<~PYTHON
       # This file is created by Homebrew and is executed on each python startup.
       # Don't print from here, or else python command line scripts may fail!
       # <https://docs.brew.sh/Homebrew-and-Python>
@@ -372,16 +371,16 @@ class PythonAT38 < Formula
           # explicitly set and we are not in a virtualenv:
           if 'PYTHONEXECUTABLE' not in os.environ and sys.prefix == sys.base_prefix:
               sys.executable = '#{opt_bin}/python#{version.major_minor}'
-    EOS
+    PYTHON
   end
 
   def caveats
     <<~EOS
-      Python has been installed as
+      Python is installed as
         #{HOMEBREW_PREFIX}/bin/python#{version.major_minor}
 
       Unversioned and major-versioned symlinks `python`, `python3`, `python-config`, `python3-config`, `pip`, `pip3`, etc. pointing to
-      `python#{version.major_minor}`, `python#{version.major_minor}-config`, `pip#{version.major_minor}`, etc., respectively, have been installed into
+      `python#{version.major_minor}`, `python#{version.major_minor}-config`, `pip#{version.major_minor}`, etc., respectively, are installed into
         #{opt_libexec}/bin
 
       You can install Python packages with

@@ -1,19 +1,20 @@
 class Apophenia < Formula
   desc "C library for statistical and scientific computing"
-  homepage "http://apophenia.info"
+  homepage "https://github.com/b-k/apophenia"
   url "https://github.com/b-k/apophenia/archive/refs/tags/v1.0.tar.gz"
   sha256 "c753047a9230f9d9e105541f671c4961dc7998f4402972424e591404f33b82ca"
   license "GPL-2.0-only"
+  revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "f41ec39ddf34211bf5689b608a4f6cd86b14f0933e1931a57aaf6ebfde511311"
-    sha256 cellar: :any,                 arm64_monterey: "bfa9a7f6b132f1b892a36476b75f16422b97d3dc60b312e46c4ae53f8be733f7"
-    sha256 cellar: :any,                 arm64_big_sur:  "dcae1c229f1768e8cac6f01cc1cf26c46d3773613e3d151ba2c597c196683832"
-    sha256 cellar: :any,                 ventura:        "35b4555478efe07e652b58ccdd5091f166de91f1d63d52569666e6118a46bb40"
-    sha256 cellar: :any,                 monterey:       "f1c89d71177bf8a59c85f5d74579d58d3186bf1aa352bf645c02ff4fce24da42"
-    sha256 cellar: :any,                 big_sur:        "3d9e51918d69791a400e6d422bef5523d0f2fa023b584eb7ccf66a5c76def9c9"
-    sha256 cellar: :any,                 catalina:       "4b133cfb7f2160a8b361c5359dad886468fd5042af9fa8a243e93bfe7227f9e6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "25526fc2962d8c205f7a62109a83564b5535d6fb68068a0905bd798f32f7f052"
+    sha256 cellar: :any,                 arm64_sequoia:  "45407a002d3d36f5c0e0e1b286a7097074d389691e119c42b17681e086b48473"
+    sha256 cellar: :any,                 arm64_sonoma:   "46a4119ca0d9f934fad32688b6a85ae8206a5f86f8e64b9d3680201398c1bee2"
+    sha256 cellar: :any,                 arm64_ventura:  "4cfac020f8c94bf825b0b21b2c56eb77d815d8eff4b935eecc7f69825ac7f69d"
+    sha256 cellar: :any,                 arm64_monterey: "dad0483f7c96479a293715d97dab14df9cc1fbec0378f2bf97fc17b64aa2c2e5"
+    sha256 cellar: :any,                 sonoma:         "cde422f8be856275c3fb3d2092929101bafcbbee62cb9486d1b59378b02b004a"
+    sha256 cellar: :any,                 ventura:        "104c954cb700c12c225829809d209c7c5861c57ef05a0ada3f9cb0e6e8a61935"
+    sha256 cellar: :any,                 monterey:       "a449794eaa411f25d9df192964a641bb773cbe80b0f873cd158a1dbd1e1d45c1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2980951404674b5fc9a6957d6fe7ebb8ae0ded37f3c0c444c732115f5b3f6638"
   end
 
   depends_on "gsl"
@@ -26,6 +27,13 @@ class Apophenia < Formula
     depends_on "libtool" => :build
   end
 
+  # Fix compilation with POSIX basename(3)
+  # Patches already accepted upstream, remove on next release
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/9aaa7da2cc8dab92f16744724797739088742a29/apophenia/posix-basename.diff"
+    sha256 "9d8d92c850cdb671032679e3ef46dafda96ffa6daf39769573392605cea41af3"
+  end
+
   def install
     # Regenerate configure to avoid binaries being built with flat namespace
     system "autoreconf", "--force", "--install", "--verbose" if OS.mac?
@@ -36,13 +44,13 @@ class Apophenia < Formula
   end
 
   test do
-    (testpath/"foo.csv").write <<~EOS
+    (testpath/"foo.csv").write <<~CSV
       thud,bump
       1,2
       3,4
       5,6
       7,8
-    EOS
+    CSV
 
     expected_gnuplot_output = <<~EOS
       plot '-' with lines

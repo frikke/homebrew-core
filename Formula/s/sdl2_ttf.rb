@@ -1,20 +1,25 @@
 class Sdl2Ttf < Formula
   desc "Library for using TrueType fonts in SDL applications"
   homepage "https://github.com/libsdl-org/SDL_ttf"
-  url "https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.20.2/SDL2_ttf-2.20.2.tar.gz"
-  sha256 "9dc71ed93487521b107a2c4a9ca6bf43fb62f6bddd5c26b055e6b91418a22053"
+  url "https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.24.0/SDL2_ttf-2.24.0.tar.gz"
+  sha256 "0b2bf1e7b6568adbdbc9bb924643f79d9dedafe061fa1ed687d1d9ac4e453bfd"
   license "Zlib"
 
+  # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
+  # labeled as "pre-release" on GitHub before the version is released, so it's
+  # necessary to use the `GithubLatest` strategy.
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "eb64334ebf36c5a6a5b0668ff672b3e8001cbb7c11c90dc72a0757639faed8c7"
-    sha256 cellar: :any,                 arm64_ventura:  "5f983f0da784459c3a66961a6fd04e0effc138f97348e1c56ae7cfd212fc8e71"
-    sha256 cellar: :any,                 arm64_monterey: "385e2291198fa3abc69205bdfd94f2fafec6ccfe3feff9a099b9dfb3e1b1d538"
-    sha256 cellar: :any,                 arm64_big_sur:  "6103dbe192fad39f18e2d5a32fc29ed5753990e775aa9c06cd429a9b6eaa03fb"
-    sha256 cellar: :any,                 sonoma:         "ffee2edd76bb4c736298270945a89556e814004a858c0a6461ae955f127d3bc4"
-    sha256 cellar: :any,                 ventura:        "c7c57b3c4f57695953430d6b0644f941aaee275cc39d299aac6f34b2dad4ecc2"
-    sha256 cellar: :any,                 monterey:       "53f332eeda518a32d032ec9cb4a934cd320b5923c480e6985dc15f4e68b1cce5"
-    sha256 cellar: :any,                 big_sur:        "3c3c04cd964f3372ba28b4fd885e25a6b2f54a0e29f5db936e711691db2a72de"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e6dda4ea5a025a96d47ed5db5537cee2d471042437274c83c9bb97276ac1d84b"
+    sha256 cellar: :any,                 arm64_sequoia: "15e7d2771f3011e7acc050c32642eb312e96b51596300562a9f6395669608779"
+    sha256 cellar: :any,                 arm64_sonoma:  "63163b41f4746695229e47cdf721975c8d03ea0809f924c8434389e38912e186"
+    sha256 cellar: :any,                 arm64_ventura: "50e4a60835bd4eb6437e7612f39e40f9377f555ef8046c8a465b622adfbcedaa"
+    sha256 cellar: :any,                 sonoma:        "601eca4a716530bd0758865775581bb82f581c5a728df398231a0e4ba9b3071f"
+    sha256 cellar: :any,                 ventura:       "effa9785cf42d097925fc27008e432f279aa519c11f48cfd98ee942301d15a47"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "482786481f8a3f5a8f6f147156f5af9cd192e43e2d5b6adf3a5914bcc53bc1cc"
   end
 
   head do
@@ -25,7 +30,7 @@ class Sdl2Ttf < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "freetype"
   depends_on "harfbuzz"
   depends_on "sdl2"
@@ -45,7 +50,7 @@ class Sdl2Ttf < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <SDL2/SDL_ttf.h>
 
       int main()
@@ -54,7 +59,7 @@ class Sdl2Ttf < Formula
           TTF_Quit();
           return success;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{Formula["sdl2"].opt_include}/SDL2", "-L#{lib}", "-lSDL2_ttf", "-o", "test"
     system "./test"
   end

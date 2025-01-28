@@ -1,8 +1,9 @@
 class SynergyCore < Formula
   desc "Synergy, the keyboard and mouse sharing tool"
   homepage "https://symless.com/synergy"
-  url "https://github.com/symless/synergy-core/archive/refs/tags/1.14.6.19-stable.tar.gz"
-  sha256 "01854ec932845975cd81363bed8276b95c07a607050683fc1b74b7126199de79"
+  url "https://github.com/symless/synergy/archive/refs/tags/1.15.1+r1.tar.gz"
+  version "1.15.1"
+  sha256 "42fbf26c634d2947c7efc45da8c9a153387bcdcb19c1102a4f7c4e95aad5c708"
 
   # The synergy-core/LICENSE file contains the following preamble:
   #   This program is released under the GPL with the additional exemption
@@ -31,37 +32,54 @@ class SynergyCore < Formula
   end
 
   bottle do
-    sha256                               arm64_ventura:  "334248b42a57a1e655f2f4aab7772ea3b7b77ae438cfe42623e84f7583b9174d"
-    sha256                               arm64_monterey: "b55b45badf37a0c6ff570dc9bc84c684b42bd4966eea299602c6308c0d3c568b"
-    sha256                               arm64_big_sur:  "c8870bbda127a4b699803c45a3de12f823937c5d553219b77fc5a738bb1ec942"
-    sha256                               ventura:        "a379d665374e700ec3447de68d9f51adc413d2df2b853ebb89d65ea4a83846ba"
-    sha256                               monterey:       "f0711f93ccc9180ed973f6c7168b95bc55aa91e2d45116c91e5cf97733802018"
-    sha256                               big_sur:        "05274d4b236f2d4e4e0037f3a9738ce1f297e88c5af4983db3efc098e46f0893"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a8f9f6c071c90a720430c7a827ccc6f8bea9c244bf9a71e2f94ad746b6b49892"
+    sha256                               arm64_sonoma:   "b51e183a0c07609d4b5f81e194251ce29c93fc220b8989d50e7a7ee58ac49021"
+    sha256                               arm64_ventura:  "2a7b87a5e398dd460a081cb8899bd611175c9b8ed473bc908ed8bc116ca10964"
+    sha256                               arm64_monterey: "23696daf5fc973a4b5869f68639ac971d4a2fb52da6e8b5a8636983550966ef9"
+    sha256                               sonoma:         "fe27a0f9abaf634c569222904e193b2c22eb06ec0cc607c0862663e0e60904bd"
+    sha256                               ventura:        "45f5169584dd7de08374dd0acae169f01afdebe6131f83c25d750415053b87be"
+    sha256                               monterey:       "0651ae4f922212f79badd7ce975259a6209abee9d59a0b8b7f61bbc8685936f1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8ad6a8e07bbe44eb008c620449cfeaac3e2fdfbc97b48965171ce6c114a7e10c"
   end
 
   depends_on "cmake" => :build
   depends_on "openssl@3"
   depends_on "pugixml"
-  depends_on "qt@5"
+  depends_on "qt"
+
+  on_macos do
+    depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1402
+  end
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "gdk-pixbuf"
     depends_on "glib"
     depends_on "libnotify"
+    depends_on "libx11"
+    depends_on "libxext"
+    depends_on "libxi"
+    depends_on "libxinerama"
     depends_on "libxkbfile"
+    depends_on "libxrandr"
+    depends_on "libxtst"
   end
 
-  fails_with gcc: "5" do
-    cause "synergy-core requires C++17 support"
+  fails_with :clang do
+    build 1402
+    cause "needs `std::ranges::find`"
   end
 
   def install
-    # Use the standard brew installation path.
-    inreplace "CMakeLists.txt",
-              "set (SYNERGY_BUNDLE_DIR ${CMAKE_BINARY_DIR}/bundle)",
-              "set (SYNERGY_BUNDLE_DIR ${CMAKE_INSTALL_PREFIX}/bundle)"
+    if OS.mac?
+      ENV.llvm_clang if DevelopmentTools.clang_build_version <= 1402
+      # Disable macdeployqt to prevent copying dylibs.
+      inreplace "src/gui/CMakeLists.txt",
+                /"execute_process\(COMMAND \${MACDEPLOYQT_CMD}.*\)"/,
+                '"MESSAGE (\\"Skipping macdeployqt in Homebrew\\")"'
+    elsif OS.linux?
+      # Get rid of hardcoded installation path.
+      inreplace "cmake/Packaging.cmake", "set(CMAKE_INSTALL_PREFIX /usr)", ""
+    end
 
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
                     "-DBUILD_TESTS:BOOL=OFF", "-DCMAKE_INSTALL_DO_STRIP=1",
@@ -71,6 +89,7 @@ class SynergyCore < Formula
     system "cmake", "--install", "build"
 
     if OS.mac?
+      prefix.install buildpath/"build/bundle"
       bin.install_symlink prefix/"bundle/Synergy.app/Contents/MacOS/synergy"  # main GUI program
       bin.install_symlink prefix/"bundle/Synergy.app/Contents/MacOS/synergys" # server
       bin.install_symlink prefix/"bundle/Synergy.app/Contents/MacOS/synergyc" # client
@@ -103,21 +122,38 @@ class SynergyCore < Formula
         You can then grant the 'Accessibility' permission again.
         You may need to clear this list each time you upgrade synergy-core.
       EOS
+      # On ARM, macOS is even more picky when dealing with applications not signed
+      # by a trusted certificate, and, for whatever reason, both the app bundle and
+      # the actual executable binary need to be granted the permission by the user.
+      # (On Intel macOS, only the app bundle needs to be granted the permission.)
+      #
+      # This is particularly unfortunate because the operating system will prompt
+      # the user to grant the permission to the app bundle, but will *not* prompt
+      # the user to grant the permission to the executable binary, even though the
+      # application will not actually work without doing both. Hence, this caveat
+      # message is important.
+      on_arm do
+        s += "\n" + <<~EOS
+          On ARM macOS machines, the 'Accessibility' permission must be granted to
+          both of the following two items:
+            (1) #{opt_prefix}/bundle/Synergy.app
+            (2) #{opt_bin}/synergy
+        EOS
+      end
     end
     s
   end
 
   test do
-    assert_equal shell_output("#{opt_bin}/synergys", 4),
-                 "synergys: no configuration available\n"
-    assert_equal shell_output("#{opt_bin}/synergyc", 3).split("\n")[0],
-                 "synergyc: a server address or name is required"
-    return if head?
+    assert_match(/synergys: no configuration available\n$/,
+                 shell_output("#{opt_bin}/synergys 2>&1", 4))
+    assert_match(/synergyc: a server address or name is required$/,
+                 shell_output("#{opt_bin}/synergyc 2>&1", 3).split("\n")[0])
 
     version_string = Regexp.quote(version.major_minor_patch)
-    assert_match(/synergys #{version_string}[-.0-9a-z]*, protocol version/,
-                 shell_output("#{opt_bin}/synergys --version", 3).lines.first)
-    assert_match(/synergyc #{version_string}[-.0-9a-z]*, protocol version/,
-                 shell_output("#{opt_bin}/synergyc --version", 3).lines.first)
+    assert_match(/synergys v#{version_string}[-.0-9a-z]*, protocol v/,
+                 shell_output("#{opt_bin}/synergys --version").lines.first)
+    assert_match(/synergyc v#{version_string}[-.0-9a-z]*, protocol v/,
+                 shell_output("#{opt_bin}/synergyc --version").lines.first)
   end
 end

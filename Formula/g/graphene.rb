@@ -6,6 +6,7 @@ class Graphene < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any, arm64_sequoia:  "11188e7d35c1a2c58483be14dc3ab2699d1829b8a1f4819abb00cdf566e6ce2f"
     sha256 cellar: :any, arm64_sonoma:   "06b8b2bb6dced02c4ce32a827cc279b301fde81352f64880eef15153d88f071a"
     sha256 cellar: :any, arm64_ventura:  "49970a5217fa4aaa048e4181172a9170b171531d58a31cfb4ced72a68eda386c"
     sha256 cellar: :any, arm64_monterey: "93468985e1d6a4b6ef69387b400d23ad39da4a154140a759dd3154bcfd19b9ed"
@@ -21,38 +22,31 @@ class Graphene < Formula
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => [:build, :test]
+
   depends_on "glib"
 
+  on_macos do
+    depends_on "gettext"
+  end
+
   def install
-    mkdir "build" do
-      system "meson", *std_meson_args, ".."
-      system "ninja", "-v"
-      system "ninja", "install", "-v"
-    end
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <graphene-gobject.h>
 
       int main(int argc, char *argv[]) {
       GType type = graphene_point_get_type();
         return 0;
       }
-    EOS
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    flags = %W[
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/graphene-1.0
-      -I#{lib}/graphene-1.0/include
-      -L#{lib}
-      -lgraphene-1.0
-    ]
-    system ENV.cc, "test.c", "-o", "test", *flags
-    system "./test"
+    C
+
+    flags = shell_output("pkgconf --cflags --libs glib-2.0 graphene-1.0").chomp.split
+    system ENV.cc, "test.c", *flags, "-o", "test"
   end
 end

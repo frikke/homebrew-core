@@ -1,26 +1,27 @@
 class Alp < Formula
   desc "Access Log Profiler"
   homepage "https://github.com/tkuchiki/alp"
-  url "https://github.com/tkuchiki/alp/archive/v1.0.16.tar.gz"
-  sha256 "4e90db4ddc623dedf4bb475bc169e28e077cbc838d4c8381164ba76acafed8d2"
+  url "https://github.com/tkuchiki/alp/archive/refs/tags/v1.0.21.tar.gz"
+  sha256 "cb46bbf1c8a1feace9ea23447509a7b7fad8960e9e73948fcfdf012436c64390"
   license "MIT"
   head "https://github.com/tkuchiki/alp.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7f522a7294bf7e09f48c4577a5ae6960b660a51be6157bf1ef7a63119274681a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6246b23d00fa01921e3a8e5236134a507f55b10685925b83441f55c278ba8f7a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c4c83ea9fe554ba44c47844b8f347ae995f0428299c7b70da50abfb41f88157d"
-    sha256 cellar: :any_skip_relocation, ventura:        "2069caa0d22e5417138e2c57f64d5a342223dcde89c56b819a0dba78d60b756d"
-    sha256 cellar: :any_skip_relocation, monterey:       "dc07febb0c2616570e44b10cc5891ea55e663c3f5eaec265502e2207ead5ce3c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c1980c702f5a81e13ba044de42919d0a3664f60aadad838af4f4e1bd9c00f4ad"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4bc2885dee6ce9a496126a433fcba00e3b9e70cb3181615d94a046807200c9c7"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "c8be191e741a56c44af0ade4faa8e5c5b3fd7d6ca4a2f05b057efdb0ff2b3913"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "e947c50b3cfeb2580521b828119cf5e6e1590b3596415f93a5525fc6157c0765"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c8f75372afd0b575d95b8f5d6f1f0cdda3dc9d7748974286aaa2823f3d98bc39"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "17f070fc807d0190a175d61ac599920e0af0b791d52f7831c28d6714263d0dbe"
+    sha256 cellar: :any_skip_relocation, sonoma:         "37d8da350c6ca544b05f4cf14e4a60037865958c73d6023e75f2f61000b3f572"
+    sha256 cellar: :any_skip_relocation, ventura:        "ba54691789ec295053d9a208d3ecae57fbdd176692ddee4cbbcdecbea570d0a8"
+    sha256 cellar: :any_skip_relocation, monterey:       "508bdbaf309ca746ed76d0fbc3028a5f3f8b1bacafa65ffd2a46282f1afe147a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0e1770f74c2881e2147f43cf2a182b4a5c60cd5c324120127d70c938459cd735"
   end
 
   depends_on "go" => :build
 
   def install
     ldflags = "-s -w -X main.version=#{version}"
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/alp"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/alp"
 
     generate_completions_from_executable(bin/"alp", "completion")
   end
@@ -42,7 +43,7 @@ class Alp < Formula
       {"time":"2015-09-06T06:00:43+09:00","method":"GET","uri":"/foo/bar/5xx","status":504,"body_bytes":15,"response_time":60.000}
       {"time":"2015-09-06T06:00:43+09:00","method":"GET","uri":"/req","status":200,"body_bytes":15,"response_time":"-", "request_time":0.321}
     EOS
-    system "#{bin}/alp", "json", "--file=#{testpath}/json_access.log", "--dump=#{testpath}/dump.yml"
+    system bin/"alp", "json", "--file=#{testpath}/json_access.log", "--dump=#{testpath}/dump.yml"
     assert_predicate testpath/"dump.yml", :exist?
   end
 end

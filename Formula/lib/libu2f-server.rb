@@ -13,6 +13,7 @@ class Libu2fServer < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "ba4f595c0638e3c766d45b0bae4ae189482ef6e14611073cee2c805d8ff947aa"
     sha256 cellar: :any,                 arm64_sonoma:   "02828c78b609450b8675cda154506543bdd3b6c7290af5ff8dc6031e28d1073f"
     sha256 cellar: :any,                 arm64_ventura:  "3ee5815ba1a374c9a85206466bd83b20f5de894ede219927281bf17cf4a1f415"
     sha256 cellar: :any,                 arm64_monterey: "78d60a35c880f7f993f07eb38dc6d1944082ca6325d88c6ee4f22a34fe9cb50f"
@@ -28,7 +29,7 @@ class Libu2fServer < Formula
   depends_on "check" => :build
   depends_on "gengetopt" => :build
   depends_on "help2man" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "json-c"
   depends_on "openssl@3"
 
@@ -41,14 +42,14 @@ class Libu2fServer < Formula
   def install
     ENV["LIBSSL_LIBS"] = "-lssl -lcrypto -lz"
     ENV["LIBCRYPTO_LIBS"] = "-lcrypto -lz"
-    ENV["PKG_CONFIG"] = "#{Formula["pkg-config"].opt_bin}/pkg-config"
+    ENV["PKG_CONFIG"] = "#{Formula["pkgconf"].opt_bin}/pkg-config"
 
-    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <u2f-server/u2f-server.h>
       int main()
       {
@@ -67,7 +68,7 @@ class Libu2fServer < Formula
         u2fs_global_done();
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-o", "test", "-I#{include}", "-L#{lib}", "-lu2f-server"
     system "./test"
   end

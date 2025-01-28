@@ -4,7 +4,7 @@ class Fuego < Formula
   url "https://svn.code.sf.net/p/fuego/code/trunk", revision: "1981"
   version "1.1"
   license any_of: ["GPL-3.0-only", "LGPL-3.0-only"]
-  revision 8
+  revision 13
   version_scheme 1
   head "https://svn.code.sf.net/p/fuego/code/trunk"
 
@@ -14,24 +14,31 @@ class Fuego < Formula
   end
 
   bottle do
-    sha256                               arm64_ventura:  "06890a3d1347acdd9e649ad8e4acf0550dd28433714b6209f6a0141211a8cfe9"
-    sha256                               arm64_monterey: "a8983c437ff9569fd1522caf18587ca5762b69c87f1c031883b9e1434334a646"
-    sha256                               arm64_big_sur:  "c93ac5638af3341fc303a42d53bc6d12dc0050226375c946cba49d7569c824e1"
-    sha256                               ventura:        "9e5b53ce50849ea3fc956d1331d938d63a79ce697cbdf3d40d915d0cead44dfa"
-    sha256                               monterey:       "42ea788205a9bcc7ce791f67b115eac318bfb77380b55f1f28b5d8e9fa633ff9"
-    sha256                               big_sur:        "cecaaeb1231f41adf183bb783a93a1b61c39e43b90bac0e69bb9d89ce0fdb494"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "efdaf825259a3a7c7f5198e481d76072d0ec6cff42903966fb67462b9dd7a0d1"
+    sha256                               arm64_sequoia: "13e5216438f83d46c8ee563d374ce2d1779d939e3685ddfb8dbadc4e80973603"
+    sha256                               arm64_sonoma:  "6e990c366d2f9336021ece74d5e1631138494956102841e5e604a6b191c1f835"
+    sha256                               arm64_ventura: "e46f29878cd3da3bd37ea45ed0b059d6107614db694ab42cdae6aab8e9300fb7"
+    sha256                               sonoma:        "e386d89a79e0a445169ad537a6c0355470cc627eb8dff028e63683fdb87faf4c"
+    sha256                               ventura:       "17498a162c38903e19def645d699200834edd0257faaffa506f4270bc53628b0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a636b9b22b178bf38ad82e3c488b5decc87d7124c254e3f7a16cc37bfc642cf1"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "boost"
 
+  conflicts_with "fuego-firestore", because: "both install `fuego` binaries"
+
   def install
-    system "autoreconf", "-fvi"
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules",
-                          "--with-boost=#{Formula["boost"].opt_prefix}"
+    # Work around build failure with Boost 1.85.0
+    # Issue ref: https://sourceforge.net/p/fuego/tickets/108/
+    inreplace "fuegomain/FuegoMain.cpp", ".branch_path()", ".parent_path()"
+    inreplace "smartgame/SgStringUtil.cpp", /^(\s*)(normalizedFile)\.normalize\(\);$/,
+                                            "\\1\\2 = \\2.lexically_normal();"
+
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-silent-rules",
+                          "--with-boost=#{Formula["boost"].opt_prefix}",
+                          *std_configure_args
     system "make", "install", "LIBS=-lpthread"
   end
 

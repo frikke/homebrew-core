@@ -1,28 +1,25 @@
 class Caddy < Formula
   desc "Powerful, enterprise-ready, open source web server with automatic HTTPS"
   homepage "https://caddyserver.com/"
-  url "https://github.com/caddyserver/caddy/archive/v2.7.4.tar.gz"
-  sha256 "97f687c1d9fbe275952cc932639e8f0ab90cb7177961b02078fba989b4e29c31"
+  url "https://github.com/caddyserver/caddy/archive/refs/tags/v2.9.1.tar.gz"
+  sha256 "beb52478dfb34ad29407003520d94ee0baccbf210d1af72cebf430d6d7dd7b63"
   license "Apache-2.0"
   head "https://github.com/caddyserver/caddy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "bb04f62697fc6927906e2cf9f2244b5b48ab46263da870cf8226e5e53c439ded"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c4f2e19e042547c669a8ea082922eea5f63c03ab9637c5d27e49e81f72f71a0d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c4f2e19e042547c669a8ea082922eea5f63c03ab9637c5d27e49e81f72f71a0d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c4f2e19e042547c669a8ea082922eea5f63c03ab9637c5d27e49e81f72f71a0d"
-    sha256 cellar: :any_skip_relocation, sonoma:         "9c458258202cd0be547aa509d2bf0d093e71f37832901ef1d93370ce9b076dfd"
-    sha256 cellar: :any_skip_relocation, ventura:        "92cee727d96126a084d5cb797f449a807b8c40ed70d435a3729a3444ea72b6a4"
-    sha256 cellar: :any_skip_relocation, monterey:       "92cee727d96126a084d5cb797f449a807b8c40ed70d435a3729a3444ea72b6a4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "92cee727d96126a084d5cb797f449a807b8c40ed70d435a3729a3444ea72b6a4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "58c7d710892c33d3083ef4c60f8f233759b7efd1ce8dbeeb6b02de0d8c22f642"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "36487e2468a464bd4810d86c4323d1107a6d374f573b43ea07d2b9abf4a6998a"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "36487e2468a464bd4810d86c4323d1107a6d374f573b43ea07d2b9abf4a6998a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "36487e2468a464bd4810d86c4323d1107a6d374f573b43ea07d2b9abf4a6998a"
+    sha256 cellar: :any_skip_relocation, sonoma:        "7372c7baf68a2da18554d74f44c3f386a441c115c782f89fa1107a9d44a87598"
+    sha256 cellar: :any_skip_relocation, ventura:       "7372c7baf68a2da18554d74f44c3f386a441c115c782f89fa1107a9d44a87598"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dff8317e8eb4749f085266a92ca5b3d7e6a0b6df45ea257744dbcba8a4842f19"
   end
 
   depends_on "go" => :build
 
   resource "xcaddy" do
-    url "https://github.com/caddyserver/xcaddy/archive/refs/tags/v0.3.5.tar.gz"
-    sha256 "41188931a3346787f9f4bc9b0f57db1ba59ab228113dcf0c91382e40960ee783"
+    url "https://github.com/caddyserver/xcaddy/archive/refs/tags/v0.4.4.tar.gz"
+    sha256 "5ba32eec2388638cebbe1df861ea223c35074528af6a0424f07e436f07adce72"
   end
 
   def install
@@ -33,6 +30,18 @@ class Caddy < Formula
     end
 
     generate_completions_from_executable("go", "run", "cmd/caddy/main.go", "completion")
+
+    system bin/"caddy", "manpage", "--directory", buildpath/"man"
+
+    man8.install Dir[buildpath/"man/*.8"]
+  end
+
+  def caveats
+    <<~EOS
+      When running the provided service, caddy's data dir will be set as
+        `#{HOMEBREW_PREFIX}/var/lib`
+        instead of the default location found at https://caddyserver.com/docs/conventions#data-directory
+    EOS
   end
 
   service do
@@ -40,6 +49,7 @@ class Caddy < Formula
     keep_alive true
     error_log_path var/"log/caddy.log"
     log_path var/"log/caddy.log"
+    environment_variables XDG_DATA_HOME: "#{HOMEBREW_PREFIX}/var/lib"
   end
 
   test do

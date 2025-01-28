@@ -1,8 +1,20 @@
 class Phpmyadmin < Formula
   desc "Web interface for MySQL and MariaDB"
   homepage "https://www.phpmyadmin.net"
-  url "https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz"
-  sha256 "61c763f209817d1b5d96a4c0eab65b4e36bce744f78e73bef3bebd1c07481c46"
+  url "https://files.phpmyadmin.net/phpMyAdmin/5.2.2/phpMyAdmin-5.2.2-all-languages.tar.gz"
+  sha256 "8551c8bf3b166f232d5cf64bac877472e9d0cb8f2fe1858fab24f975e7d765b6"
+  license all_of: [
+    "GPL-2.0-only",
+    "GPL-2.0-or-later",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "CC-BY-3.0",
+    "ISC",
+    "LGPL-3.0-only",
+    "MIT",
+    "MPL-2.0",
+    :public_domain,
+  ]
 
   livecheck do
     url "https://www.phpmyadmin.net/files/"
@@ -10,16 +22,15 @@ class Phpmyadmin < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3bd02506f7741f5c566ce1208327f2a2cf02e2295d4cb5cadb6f9f2c4fafb8ec"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2545dca90ee52f478275ff1a0da76cf27fcaf20fa7071f5cfe00f2c7fcdf1f7a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "83753db830be44e9d0b476e3fbb02ccabf9673364da6c9af9a15909d790acaf5"
-    sha256 cellar: :any_skip_relocation, ventura:        "15496fab9c4d8744f5d69869e0862a9c3ea957ebb1c3e62c6f02b7a8ba810169"
-    sha256 cellar: :any_skip_relocation, monterey:       "d0e69d5885b6c7a0e34214d6f3f5ef1aa982c913a239ff3e71c1b4ac6732e701"
-    sha256 cellar: :any_skip_relocation, big_sur:        "77e2cb701aaf85ea94c8e1c9b9345fb6bd6ef6f6ec51a956eed2e3d81895cd21"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3db06f5c804f3bdc48368d1d1b6460d093163fed7cd881fcdae06d14ee3c53d6"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "93d7d0a1972beb0f25710049a6a9397be080440c3f8aec1c43b151607133f6f8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "93d7d0a1972beb0f25710049a6a9397be080440c3f8aec1c43b151607133f6f8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "93d7d0a1972beb0f25710049a6a9397be080440c3f8aec1c43b151607133f6f8"
+    sha256 cellar: :any_skip_relocation, sonoma:        "82e7df63e44dff329d37ab987bdee2415dea8c4ac14fb636e80ab471860d958a"
+    sha256 cellar: :any_skip_relocation, ventura:       "82e7df63e44dff329d37ab987bdee2415dea8c4ac14fb636e80ab471860d958a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a2dea00945d920af4a076e5034ac58a13bc88821298828068a4d35da29bc96ef"
   end
 
-  depends_on "php" => :test
+  depends_on "php@8.3" => :test
 
   def install
     pkgshare.install Dir["*"]
@@ -50,8 +61,9 @@ class Phpmyadmin < Formula
   end
 
   test do
+    php = Formula["php@8.3"].opt_bin/"php"
     cd pkgshare do
-      assert_match "German", shell_output("php #{pkgshare}/index.php")
+      assert_match "German", shell_output("#{php} #{pkgshare}/index.php")
     end
   end
 end

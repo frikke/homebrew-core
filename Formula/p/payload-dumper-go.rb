@@ -1,26 +1,25 @@
 class PayloadDumperGo < Formula
   desc "Android OTA payload dumper written in Go"
   homepage "https://github.com/ssut/payload-dumper-go"
-  url "https://github.com/ssut/payload-dumper-go/archive/refs/tags/1.2.2.tar.gz"
-  sha256 "7f80f6c29ad8b835d71f361ba073988a27a33043acec37eea9d9430c1fb04b57"
+  url "https://github.com/ssut/payload-dumper-go/archive/refs/tags/1.3.0.tar.gz"
+  sha256 "d7ba33a80c539674c0b63443b8c6dd9c2040ec996323f38ffe72e024d302eb2d"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "25c0c53def464b6cceea25fa70841e56d0b9e11f3f52101443bd6032bf6958e0"
-    sha256 cellar: :any,                 arm64_monterey: "8f6b5106876e00cf046896bd48778bf29ad23f2455ff22bc005a5f4fa65c5353"
-    sha256 cellar: :any,                 arm64_big_sur:  "e984276e0f8c673ff3a588abdb8d1827c5363e7b6f466f9c3bf9988faf14ac98"
-    sha256 cellar: :any,                 ventura:        "aafd84e1b6bcd30deb07394dd19e21061cac41d80d6282e2354a1057011badb4"
-    sha256 cellar: :any,                 monterey:       "63bce864ece6c9de7ca76aaf563f75be05ac778d660567aa4fd2e98ceb5bc66b"
-    sha256 cellar: :any,                 big_sur:        "a6c501425739d78e279399cdbe86589ebb8ba0ff564d07aa7849b65ef93cba9e"
-    sha256 cellar: :any,                 catalina:       "3bf1b40363c257f4d2c761940ade539aac4e0936a2f977d4cd34bd0ac2d8da59"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "914db99626b3362a7ff898f96b91b038ea02382b44aeff589ce3e265045dd4f4"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "298d73ff6bdcbe98ec51938eda5d6df35f4a67eb48538ab3d0a8d5e7f5ededea"
+    sha256 cellar: :any,                 arm64_sonoma:  "a6be6a71b98e5cbccf85f5fd5ddf49ec28792545ebdff739a275c6c32a7ee34c"
+    sha256 cellar: :any,                 arm64_ventura: "adc25ef9cc348ff0f4e72aee84a8d73d4eecc77ec8228b8ef451a1ba52947a3c"
+    sha256 cellar: :any,                 sonoma:        "43c27225c84681b696cc133dd3027dcdb8a99434eaaae57adf9d24b10a761b09"
+    sha256 cellar: :any,                 ventura:       "9a7fe312cc474f61625712007bb096a34ec93fb165afe887cd2786c7fbd71ee1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dec1676646bcf9b015900ac1d9c7f5f1912671bdd034e511235b38c95e63cc3c"
   end
 
   depends_on "go" => :build
   depends_on "xz"
 
   def install
-    system "go", "build", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do

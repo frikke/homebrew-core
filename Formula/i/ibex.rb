@@ -1,7 +1,7 @@
 class Ibex < Formula
   desc "C++ library for constraint processing over real numbers"
-  homepage "https://web.archive.org/web/20190826220512/www.ibex-lib.org/"
-  url "https://github.com/ibex-team/ibex-lib/archive/ibex-2.8.9.tar.gz"
+  homepage "https://github.com/ibex-team/ibex-lib"
+  url "https://github.com/ibex-team/ibex-lib/archive/refs/tags/ibex-2.8.9.tar.gz"
   sha256 "fee448b3fa3929a50d36231ff2f14e5480a0b82506594861536e3905801a6571"
   license "LGPL-3.0-only"
   head "https://github.com/ibex-team/ibex-lib.git", branch: "master"
@@ -13,6 +13,7 @@ class Ibex < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any_skip_relocation, sonoma:       "05e8146b72de3a2d65cab6bafa5d24b58b95901c4d44ce609b4561773ada2cd5"
     sha256 cellar: :any_skip_relocation, ventura:      "eea592d2c1c13bde0a000ca8705cabce4e11aeabb76a30dc8baf09931b9a22dd"
     sha256 cellar: :any_skip_relocation, monterey:     "5fe0810e9f6ef9b72c7d1e9ceba7b6b9c37410dd93f9801ac37e9738ec245005"
     sha256 cellar: :any_skip_relocation, big_sur:      "dbe9f4d68e4a406bd4926d6c821887e32af2d323f1d7ecd9a729ee0957c3e120"
@@ -22,18 +23,17 @@ class Ibex < Formula
   depends_on "bison" => :build
   depends_on "cmake" => :build
   depends_on "flex" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
+  depends_on arch: :x86_64
 
   uses_from_macos "zlib"
 
   def install
     ENV.cxx11
 
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args.reject { |s| s["CMAKE_INSTALL_LIBDIR"] }
-      system "make", "SHARED=true"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args.reject { |s| s["CMAKE_INSTALL_LIBDIR"] }
+    system "cmake", "--build", "build", "--", "SHARED=true"
+    system "cmake", "--install", "build"
 
     pkgshare.install %w[examples benchs/solver]
     (pkgshare/"examples/symb01.txt").write <<~EOS

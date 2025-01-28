@@ -1,18 +1,17 @@
 class Rospo < Formula
   desc "Simple, reliable, persistent ssh tunnels with embedded ssh server"
   homepage "https://github.com/ferama/rospo"
-  url "https://github.com/ferama/rospo/archive/refs/tags/v0.11.4.tar.gz"
-  sha256 "57bc1ec5fdfc7c5456ec87ff483e8f033be38a4026cbe2045ad60f347c21cd6c"
+  url "https://github.com/ferama/rospo/archive/refs/tags/v0.13.0.tar.gz"
+  sha256 "9016ca7afacd107e5f330cac9827999cfb88ffd2c3c5750b1b20b4dc9441fbf3"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "36640d863f94bb319d6ada797d3b3a11c7fee7599f2166ff6271ea1f20c41094"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "36640d863f94bb319d6ada797d3b3a11c7fee7599f2166ff6271ea1f20c41094"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "36640d863f94bb319d6ada797d3b3a11c7fee7599f2166ff6271ea1f20c41094"
-    sha256 cellar: :any_skip_relocation, ventura:        "a024e596642072f36618942acf35064ea1d9e84663b0e34064e1c108bab16f2f"
-    sha256 cellar: :any_skip_relocation, monterey:       "a024e596642072f36618942acf35064ea1d9e84663b0e34064e1c108bab16f2f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a024e596642072f36618942acf35064ea1d9e84663b0e34064e1c108bab16f2f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "01b03aba71cbc6f63e84843d514f60c8805a019342ba694a9dc691e4da28a5a9"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f11a2d08a4cecef42916f83697ff87772fea78817570e1fc9c8e862f072d7b9e"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f11a2d08a4cecef42916f83697ff87772fea78817570e1fc9c8e862f072d7b9e"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f11a2d08a4cecef42916f83697ff87772fea78817570e1fc9c8e862f072d7b9e"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b199cd2126cb02f02e5a945b3d0427add807f1352595b5820503628f0f5809a1"
+    sha256 cellar: :any_skip_relocation, ventura:       "b199cd2126cb02f02e5a945b3d0427add807f1352595b5820503628f0f5809a1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bb8cda6b51663e37774ec54506f8c206cee6db50c65f71e5be833278fce51409"
   end
 
   depends_on "go" => :build

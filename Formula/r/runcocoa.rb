@@ -11,7 +11,7 @@ class Runcocoa < Formula
 
   # Last commit on 2012-01-08 with no releases/tags.
   # Also no license: https://github.com/michaeltyson/Commandline-Cocoa/issues/4
-  deprecate! date: "2023-02-14", because: :unmaintained
+  disable! date: "2024-02-12", because: :unmaintained
 
   def install
     bin.install "runcocoa.sh" => "runcocoa"
@@ -23,7 +23,7 @@ class Runcocoa < Formula
 
     objc_code = "[[NSFileHandle fileHandleWithStandardOutput] " \
                 "writeData:[@\"#{string}\" dataUsingEncoding:NSNEXTSTEPStringEncoding]]"
-    objc_output = pipe_output("#{bin}/runcocoa", objc_code, 0)
+    objc_output = pipe_output(bin/"runcocoa", objc_code, 0)
     assert_match string, objc_output
 
     c_code = "printf(\"#{string}\");"

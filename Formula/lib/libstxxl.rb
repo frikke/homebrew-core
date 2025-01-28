@@ -3,9 +3,11 @@ class Libstxxl < Formula
   homepage "https://stxxl.sourceforge.net/"
   url "https://downloads.sourceforge.net/project/stxxl/stxxl/1.4.1/stxxl-1.4.1.tar.gz"
   sha256 "92789d60cd6eca5c37536235eefae06ad3714781ab5e7eec7794b1c10ace67ac"
+  license "BSL-1.0"
 
   bottle do
     rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "30d099063deeb524f2ebe459a34fccb9236780abee29b1a8487f131922b015b3"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "2fa5cbb1eb4ac3bf9d3603d0eb56d2e75db5b4962ed87c625f45deb988713a6b"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "c553b5d40fc2b5c081634ce666570017b82f4c74c0f5915173bd9024d959de1c"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "e487af039d6286b34dc4aeac3c0eaba10668054b33a368e54f9cb8647834ed55"
@@ -22,9 +24,8 @@ class Libstxxl < Formula
   depends_on "cmake" => :build
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 end

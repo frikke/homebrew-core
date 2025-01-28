@@ -2,29 +2,23 @@ class Helm < Formula
   desc "Kubernetes package manager"
   homepage "https://helm.sh/"
   url "https://github.com/helm/helm.git",
-      tag:      "v3.12.3",
-      revision: "3a31588ad33fe3b89af5a2a54ee1d25bfe6eaa5e"
+      tag:      "v3.17.0",
+      revision: "301108edc7ac2a8ba79e4ebf5701b0b6ce6a31e4"
   license "Apache-2.0"
   head "https://github.com/helm/helm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "6561a5127f1e9af1077e651c8cf8023a9e95db56ecc2d7a51a507419a695c79b"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4ce1749b5cc1231a4b895bbce11a68712ce2869d8326bd503bf1f8d4ab03115f"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b52e4999e0ccc4627541cb85f484430b0fd6d4107878f4645ef50b1a91d436cc"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "487dd976e5b142eca158e999c8ed8029ea0cfb53522577c7e84a43e588794cb9"
-    sha256 cellar: :any_skip_relocation, sonoma:         "dbb265fa1e0e22c51814358e1c555dcd6caace6ad2b37de79a01cb773091b870"
-    sha256 cellar: :any_skip_relocation, ventura:        "dbcc1ca59dfd245a50372292a3f6129b91aa7bc571c2da2e7728933cd2f747fb"
-    sha256 cellar: :any_skip_relocation, monterey:       "0709a21e27cba1faa44fcf12944affa9028e51ba063f03139aa619b9fc3fc602"
-    sha256 cellar: :any_skip_relocation, big_sur:        "10d869376e491c44365447bcf83fe638fc1826092b122f316fa373693953a5e2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "608141eec9a27bc14b5593429148ac1fe78567caa44eb188f67943a6094bdd45"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f590a9aabea8fcb217e343f5c87416a59ee4157c3d46bb83518e5b45e7bb83cd"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f7664f360847c86cd14bbd77abb97a02f1e5c124121911b9a00f25adfc731ee6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "d1b9f49659cccb9f010fa212bc97b10e2411837ce75414af12dc277e08a49eb4"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2884e36e7a97b4193f0f83c2ccb2a286646e25dc9c6d5deb81676efec7aafe0d"
+    sha256 cellar: :any_skip_relocation, ventura:       "6a32f9e789ac22eaf5be9688bfc8e80972b2e44d1dd1c826d543cb6d239282fe"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8e1b834536e9cddfba62adf3dc507efe57c24a2f68b8a8a1a4de6215a326d99c"
   end
 
   depends_on "go" => :build
 
   def install
-    # Don't dirty the git tree
-    rm_rf ".brew_home"
-
     system "make", "build"
     bin.install "bin/helm"
 
@@ -40,12 +34,8 @@ class Helm < Formula
     system bin/"helm", "create", "foo"
     assert File.directory? testpath/"foo/charts"
 
-    version_output = shell_output(bin/"helm version 2>&1")
-    assert_match "GitTreeState:\"clean\"", version_output
-    if build.stable?
-      revision = stable.specs[:revision]
-      assert_match "GitCommit:\"#{revision}\"", version_output
-      assert_match "Version:\"v#{version}\"", version_output
-    end
+    version_output = shell_output("#{bin}/helm version 2>&1")
+    assert_match "GitCommit:\"#{stable.specs[:revision]}\"", version_output
+    assert_match "Version:\"v#{version}\"", version_output
   end
 end

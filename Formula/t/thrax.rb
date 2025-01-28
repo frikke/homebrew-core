@@ -3,8 +3,8 @@ class Thrax < Formula
 
   desc "Tools for compiling grammars into finite state transducers"
   homepage "https://www.openfst.org/twiki/bin/view/GRM/Thrax"
-  url "https://www.openfst.org/twiki/pub/GRM/ThraxDownload/thrax-1.3.8.tar.gz"
-  sha256 "e21c449798854f7270bb5ac723f6a8d292e149fc6bbe24fd9f345c85aabc7cd4"
+  url "https://www.openfst.org/twiki/pub/GRM/ThraxDownload/thrax-1.3.9.tar.gz"
+  sha256 "1e6ed84a747d337c28f2064348563121a439438f5cc0c4de4b587ddf779f1ae3"
   license "Apache-2.0"
   revision 1
 
@@ -14,14 +14,12 @@ class Thrax < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "cc88937f398db52f848b3658c3415073a3cc3a349448f95168ba30b22d0f1689"
-    sha256 cellar: :any,                 arm64_monterey: "da67cbb76545ecb423feca1b6a3a6e3dab7251177842ad37e22c5a3f3dbfafa2"
-    sha256 cellar: :any,                 arm64_big_sur:  "c5290fa4de107eb9d7c7a283ca01d3e646dc3d14e5add34c4e6187d418af8222"
-    sha256 cellar: :any,                 ventura:        "b3c508dac05720ff2b03cf39da71257fe16bd5b863791cb8580fff4788492ab0"
-    sha256 cellar: :any,                 monterey:       "510a3aa7dfc3782dfe81735407191ab6ecbc851710dc8d6cd402629dfaef5f53"
-    sha256 cellar: :any,                 big_sur:        "1b5fcd1dcc4ff93508ddfcef21e4b280225cb9238766bc40f0551261dd1ea158"
-    sha256 cellar: :any,                 catalina:       "da9d875ee86c08a3263d6a7a7b1e2f9465c5811da56893293f387a879a2d5530"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7710590e03ff85fbf3a348d90651ca6161f7add1a2b2d986111f7b06c6a96536"
+    sha256 cellar: :any,                 arm64_sequoia: "1eb8c3d01b8131ea4cc7040397c4eb266c02d517d9076722f322075c93521674"
+    sha256 cellar: :any,                 arm64_sonoma:  "b3bfcb2f229d5709774df18f6bd4d4915a03218b430bc4cae498cfc98b387569"
+    sha256 cellar: :any,                 arm64_ventura: "87aea2fcc77a37ff7eb3118757a6e224c8e4704a26cae719a8a123bac9b8a3bb"
+    sha256 cellar: :any,                 sonoma:        "63a97b5dfbe107ab19a9780f7fd346e421af9ecadc30a0faca9110707cafacec"
+    sha256 cellar: :any,                 ventura:       "ea2651cc17ba7837e2e6f362124c9f6c9d06034521dfd86468d4e13220fc9893"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "da7eb89d693322a62b6409eaf8d21a502d307401726f5f8563695944350ab92d"
   end
 
   # Regenerate `configure` to avoid `-flat_namespace` bug.
@@ -33,7 +31,8 @@ class Thrax < Formula
   depends_on "openfst"
   uses_from_macos "python", since: :catalina
 
-  fails_with gcc: "5"
+  # patch to build with openfst 1.8.4, notified upstream about this patch
+  patch :DATA
 
   def install
     system "autoreconf", "--force", "--install", "--verbose"
@@ -43,12 +42,36 @@ class Thrax < Formula
   end
 
   test do
-    # see http://www.openfst.org/twiki/bin/view/GRM/ThraxQuickTour
+    # see https://www.openfst.org/twiki/bin/view/GRM/ThraxQuickTour
     cp_r pkgshare/"grammars", testpath
     cd "grammars" do
-      system "#{bin}/thraxmakedep", "example.grm"
+      system bin/"thraxmakedep", "example.grm"
       system "make"
-      system "#{bin}/thraxrandom-generator", "--far=example.far", "--rule=TOKENIZER"
+      system bin/"thraxrandom-generator", "--far=example.far", "--rule=TOKENIZER"
     end
   end
 end
+
+__END__
+diff --git a/src/include/thrax/algo/stringmap.h b/src/include/thrax/algo/stringmap.h
+index f2ea7a7..6ee0a7c 100644
+--- a/src/include/thrax/algo/stringmap.h
++++ b/src/include/thrax/algo/stringmap.h
+@@ -180,7 +180,7 @@ bool StringMapCompile(internal::ColumnStringFile *csf, MutableFst<Arc> *fst,
+     const auto log_line_compilation_error = [&csf, &line]() {
+       LOG(ERROR) << "StringFileCompile: Ill-formed line " << csf->LineNumber()
+                  << " in file " << csf->Filename() << ": `"
+-                 << ::fst::StringJoin(line, "\t") << "`";
++                 << ::fst::StrJoin(line, "\t") << "`";
+     };
+     switch (line.size()) {
+       case 1: {
+@@ -225,7 +225,7 @@ bool StringMapCompile(const std::vector<std::vector<std::string>> &lines,
+   for (const auto &line : lines) {
+     const auto log_line_compilation_error = [&line]() {
+       LOG(ERROR) << "StringMapCompile: Ill-formed line: `"
+-                 << ::fst::StringJoin(line, "\t") << "`";
++                 << ::fst::StrJoin(line, "\t") << "`";
+     };
+     switch (line.size()) {
+       case 1: {

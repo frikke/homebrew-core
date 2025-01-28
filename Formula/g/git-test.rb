@@ -1,13 +1,16 @@
 class GitTest < Formula
   desc "Run tests on each distinct tree in a revision list"
   homepage "https://github.com/spotify/git-test"
-  url "https://github.com/spotify/git-test/archive/v1.0.4.tar.gz"
+  url "https://github.com/spotify/git-test/archive/refs/tags/v1.0.4.tar.gz"
   sha256 "7c2331c8dc3c815e440ffa1a4dc7a9ff8a28a0a8cbfd195282f53c3e4cb2ee00"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "fee9ffb3bdf734e1fdbc4d6b5348ee774af974bf214a778944651231d13b5d55"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "175c118c1dc9752f40074b529c3d184a8949b222f03c9db5e75a520b76e8842e"
   end
+
+  deprecate! date: "2024-03-04", because: :repo_archived
 
   def install
     bin.install "git-test"

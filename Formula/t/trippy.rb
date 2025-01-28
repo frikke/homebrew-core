@@ -1,36 +1,32 @@
 class Trippy < Formula
   desc "Network diagnostic tool, inspired by mtr"
   homepage "https://trippy.cli.rs/"
-  url "https://github.com/fujiapple852/trippy/archive/refs/tags/0.8.0.tar.gz"
-  sha256 "4b2155ca20d53ee1d29c9459a6efc4ee094658e93033a90085e39c841d02666b"
+  url "https://github.com/fujiapple852/trippy/archive/refs/tags/0.12.2.tar.gz"
+  sha256 "6f23549e5f398113ecd0d2f15c829f5ab84fcdf99dde9942c61746e72f990085"
   license "Apache-2.0"
   head "https://github.com/fujiapple852/trippy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2ca7942839c96151fee0e2abcc7d5b551fd53c75f797a96b786e11316d04baaf"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4f0ea6d43dfa05b6bdda735eb6dfac2f3e38b99f4a09694929742633fbc12f47"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7b083e2f4d9afd3c82e2d1b2e01f52e6804972e4205818c0049f6e39ea688608"
-    sha256 cellar: :any_skip_relocation, ventura:        "48e6cbda0b86865439925bd439e128b120e675ca97abf0798b9d3c4d83b9eefb"
-    sha256 cellar: :any_skip_relocation, monterey:       "cf4ce67bbe64a8cdda172993c16b9e74a08ef0ce094c9d8425b845108a1cb0e5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "452cbfe0a5557e9b8b2079bb61496d0e45f3bb0c9179873c709d0f472033be26"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d134c0706c4f73e14a541865d16968e9c86ce81f2bb48a17ebf428316c08b281"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "36d0b28c8033e6b2eb40082dee5e5588316f456cf8e34805cc8133b9aa25e68e"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "836dd4b7dd3c4ec9a548ad32df52d9cd5d54d3a9f5a75a5b8ec722fd5f37142f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "28a6e084ea6d69b4c20b3406fd409ac498cb3c7c05d6c0a3e3ace4e642c52ec2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "18e43f600bbff05025c5202fbb94b856934eadc803227345a344d9bce08a91dc"
+    sha256 cellar: :any_skip_relocation, ventura:       "d997d0a7e7d125c93db5d221d7bcdd3fbdebee268e80a688146132a4fef7d10b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "772768bf07161004287a339a0a9b346534dd6c76c58ade1d6f69a8d0502abd49"
   end
 
   depends_on "rust" => :build
 
   def install
-    system "cargo", "install", *std_cargo_args
+    system "cargo", "install", *std_cargo_args(path: "crates/trippy")
+
+    generate_completions_from_executable(bin/"trip", "--generate")
   end
 
   test do
     # https://github.com/fujiapple852/trippy#privileges
-    expected = if OS.mac?
-      "root user required to use raw sockets"
-    else
-      "capability CAP_NET_RAW is required"
-    end
-
-    output = shell_output("#{bin}/trip brew.sh 2>&1", 255)
+    expected = "Error: privileges are required"
+    output = shell_output("#{bin}/trip brew.sh 2>&1", 1)
     assert_match expected, output
 
     assert_match "trip #{version}", shell_output("#{bin}/trip --version")

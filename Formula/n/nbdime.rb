@@ -3,31 +3,22 @@ class Nbdime < Formula
 
   desc "Jupyter Notebook Diff and Merge tools"
   homepage "https://nbdime.readthedocs.io"
-  url "https://files.pythonhosted.org/packages/12/ae/4c403b94984adaa3859a829d1b99e2bd8cf65c06c6cb950111467d4cbb39/nbdime-3.2.1.tar.gz"
-  sha256 "31409a30f848ffc6b32540697e82d5a0a1b84dcc32716ca74e78bcc4b457c453"
+  url "https://files.pythonhosted.org/packages/a6/f1/4be57ecea4d55d322f05a0f89e0b73d7a8d90a16dbf01168eab3e7bf5939/nbdime-4.0.2.tar.gz"
+  sha256 "d8279f8f4b236c0b253b20d60c4831bb67843ed8dbd6e09f234eb011d36f1bf2"
   license "BSD-3-Clause"
-  revision 3
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ff0eba118717fa7d76bc276455c54707d3485f10d5a45af6b4114a7dbea7575f"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f1aa0ffa8653d215525543c85be574a0190bbd6d822f80ba8de73af8f7239fd8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7a6ba476d7ec1fd2e17859920da866c5be84fd243b9bd847805503620be2e675"
-    sha256 cellar: :any_skip_relocation, ventura:        "043c208265290f4ebcd3f53678ce7ef95892abcbee6fba0d3b6be54e18df755d"
-    sha256 cellar: :any_skip_relocation, monterey:       "216bdd40b89c5e931d4606a91d98388a32c94b5d200f1c88e88bf54750620ee7"
-    sha256 cellar: :any_skip_relocation, big_sur:        "90ff923b0931e2c37169634982c4eeb5c271a00d2e1873713b2636c55eeed743"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5bebb56e72a69a474026c39b872159de8b15a021f066aa080127dbd7489031f2"
+    sha256 cellar: :any_skip_relocation, all: "372c2579d50170bbd4f3bded9adeec40d9a29b82f7e5f982462aa0180912fb29"
   end
 
-  depends_on "rust" => :build # for rpds-py
+  depends_on "certifi"
   depends_on "jupyterlab" # only to provide jupyter-server and nbconvert
-  depends_on "python-certifi"
-  depends_on "python@3.11"
-  depends_on "pyyaml"
-  depends_on "six"
+  depends_on "python@3.13"
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/2a/53/cf0a48de1bdcf6ff6e1c9a023f5f523dfe303e4024f216feac64b6eb7f67/charset-normalizer-3.2.0.tar.gz"
-    sha256 "3bb3d25a8e6c0aedd251753a79ae98a093c7e7b471faa3aa9a93a81431987ace"
+    url "https://files.pythonhosted.org/packages/63/09/c1bc53dab74b1816a00d8d030de5bf98f724c52c1635e07681d312f20be8/charset-normalizer-3.3.2.tar.gz"
+    sha256 "f30c3cb33b24454a82faecaf01b19c18562b1e89558fb6c56de4d9118a032fd5"
   end
 
   resource "colorama" do
@@ -36,13 +27,13 @@ class Nbdime < Formula
   end
 
   resource "gitdb" do
-    url "https://files.pythonhosted.org/packages/4b/47/dc98f3d5d48aa815770e31490893b92c5f1cd6c6cf28dd3a8ae0efffac14/gitdb-4.0.10.tar.gz"
-    sha256 "6eb990b69df4e15bad899ea868dc46572c3f75339735663b81de79b06f17eb9a"
+    url "https://files.pythonhosted.org/packages/19/0d/bbb5b5ee188dec84647a4664f3e11b06ade2bde568dbd489d9d64adef8ed/gitdb-4.0.11.tar.gz"
+    sha256 "bf5421126136d6d0af55bc1e7c1af1c397a34f5b7bd79e776cd3e89785c2b04b"
   end
 
   resource "gitpython" do
-    url "https://files.pythonhosted.org/packages/95/4e/8b8aac116a00f0681117ed3c3f3fc7c93fcf85eaad53e5e6dea86f7b8d82/GitPython-3.1.35.tar.gz"
-    sha256 "9cbefbd1789a5fe9bcf621bb34d3f441f3a90c8461d377f84eda73e721d9b06b"
+    url "https://files.pythonhosted.org/packages/b6/a1/106fd9fa2dd989b6fb36e5893961f82992cf676381707253e0bf93eb1662/GitPython-3.1.43.tar.gz"
+    sha256 "35f314a9f878467f5453cc1fee295c3e18e52f1b99f10f6cf5b1682e968a9e7c"
   end
 
   resource "jupyter-server-mathjax" do
@@ -51,40 +42,36 @@ class Nbdime < Formula
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz"
-    sha256 "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
+    url "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz"
+    sha256 "55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"
   end
 
   resource "smmap" do
-    url "https://files.pythonhosted.org/packages/21/2d/39c6c57032f786f1965022563eec60623bb3e1409ade6ad834ff703724f3/smmap-5.0.0.tar.gz"
-    sha256 "c840e62059cd3be204b0c9c9f74be2c09d5648eddd4580d9314c3ecde0b30936"
+    url "https://files.pythonhosted.org/packages/88/04/b5bf6d21dc4041000ccba7eb17dd3055feb237e7ffc2c20d3fae3af62baa/smmap-5.0.1.tar.gz"
+    sha256 "dceeb6c0028fdb6734471eb07c0cd2aae706ccaecab45965ee83f11c8d3b1f62"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/31/ab/46bec149bbd71a4467a3063ac22f4486ecd2ceb70ae8c70d5d8e4c2a7946/urllib3-2.0.4.tar.gz"
-    sha256 "8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11"
-  end
-
-  def python3
-    "python3.11"
+    url "https://files.pythonhosted.org/packages/43/6d/fa469ae21497ddc8bc93e5877702dca7cb8f911e337aca7452b5724f1bb6/urllib3-2.2.2.tar.gz"
+    sha256 "dd505485549a7a552833da5e6063639d0d177c04f23bc3864e41e5dc5f612168"
   end
 
   def install
-    inreplace "pyproject.toml",
-      'requires = ["jupyterlab~=3.0", "setuptools>=40.8.0", "wheel"]',
-      'requires = ["setuptools>=40.8.0", "wheel"]'
+    # We already have jupyterlab, but don't use --no-build-isolation since
+    # hatchling adds additional build deps
+    inreplace "pyproject.toml", 'requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5"]',
+                                'requires = ["hatchling>=1.5.0"]'
 
-    virtualenv_install_with_resources
+    venv = virtualenv_install_with_resources
 
-    site_packages = Language::Python.site_packages(python3)
-    paths = %w[jupyterlab].map do |p|
-      "import site; site.addsitedir('#{Formula[p].opt_libexec/site_packages}')"
-    end
-    (libexec/site_packages/"homebrew-deps.pth").write paths.join("\n")
+    # Provide an exception to avoid dealing with `jupyterlab` dependency tree
+    site_packages = Language::Python.site_packages(venv.root/"bin/python3")
+    pth_contents = "import site; site.addsitedir('#{Formula["jupyterlab"].opt_libexec/site_packages}')\n"
+    (venv.site_packages/"homebrew-jupyterlab.pth").write pth_contents
   end
 
   test do
-    (testpath/"old.ipynb").write <<~EOS
+    (testpath/"old.ipynb").write <<~JSON
       {
        "cells": [
         {
@@ -119,8 +106,8 @@ class Nbdime < Formula
        "nbformat": 4,
        "nbformat_minor": 1
       }
-    EOS
-    (testpath/"new.ipynb").write <<~EOS
+    JSON
+    (testpath/"new.ipynb").write <<~JSON
       {
        "cells": [
         {
@@ -163,7 +150,7 @@ class Nbdime < Formula
        "nbformat": 4,
        "nbformat_minor": 1
       }
-    EOS
+    JSON
     # sadly no special exit code if files are the same
     diff_output = shell_output("#{bin}/nbdiff --no-color old.ipynb new.ipynb")
     assert_match "nbdiff old.ipynb new.ipynb", diff_output

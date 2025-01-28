@@ -3,31 +3,48 @@ class Polynote < Formula
 
   desc "Polyglot notebook with first-class Scala support"
   homepage "https://polynote.org/"
-  url "https://github.com/polynote/polynote/releases/download/0.5.2/polynote-dist.tar.gz"
-  sha256 "5dd26119e1b472fad0e0f24a43bb621a6f585f143440dbdeaf35e53d8b5bd046"
+  url "https://github.com/polynote/polynote/releases/download/0.6.1/polynote-dist.tar.gz"
+  sha256 "3d460e6929945591b6781ce11b11df8eebbfb9b6f0b3203861e70687c3eca3a1"
   license "Apache-2.0"
 
+  # Upstream marks all releases as "pre-release", so we have to use
+  # `GithubReleases` to be able to match pre-release releases until there's a
+  # "latest" release for us to be able to use the `GithubLatest` strategy.
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:[.-]\d+)+)$/i)
+    strategy :github_releases do |json, regex|
+      json.map do |release|
+        next if release["draft"] # || release["prerelease"]
+
+        match = release["tag_name"]&.match(regex)
+        next if match.blank?
+
+        match[1]
+      end
+    end
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "811cc8d34cae7dd7d978ba2f58e4feb7b9ed5c1aa1a3850da88ce2d5190e90dc"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0edb80020862e5a35d3a61f9fe2d1b73e7a36b1f4fff3847970e5d76e0d8074d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "53131cfe180688890e81eb1e8124bc00dde06537ad05925229735407d9aef193"
-    sha256 cellar: :any_skip_relocation, ventura:        "73585da59526fb84d37a5604e1a5346bcf7e891a3a6bf5460f4b2ebeb928395b"
-    sha256 cellar: :any_skip_relocation, monterey:       "fe02e612290eebc6ebc844ea9cb4261d8e932bad97993ae8ce6c7c6c9c8882e5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "184118891cf00b1b00a3e5242d31ed6bb0c617bfa0d53765372ffe1fd0da8544"
-    sha256                               x86_64_linux:   "0dcf1e96d83ab62405b09c48f796b9ffe3d729cbc6ad1701c552079d93753f3a"
+    sha256 cellar: :any, arm64_sequoia: "9b2efac6f87a4b3c29b2d12a93fffa42f2198d8836ef438ef1e56e40332601f2"
+    sha256 cellar: :any, arm64_sonoma:  "70cfaab129c7d151d28295af6ed37ce251b2a37b619cde49ec20b5325309226b"
+    sha256 cellar: :any, arm64_ventura: "b7d8fe06b593b1b8ee381b6b28d64a6202db69ddb988ac46fef84886bfac5725"
+    sha256 cellar: :any, sonoma:        "07716c02135db664f847fbb3c85676582729d19218ab3bbef44a0f6903debf52"
+    sha256 cellar: :any, ventura:       "3364fdd8e9136617db7a9a647e2175ff16e215cc18bfd85a67c007ce581cd2d3"
+    sha256               x86_64_linux:  "a62217d545dcbb8a7944defde2cade6f1dc802478f10749a688f370e19d0dc4e"
   end
 
   depends_on "numpy" # used by `jep` for Java primitive arrays
   depends_on "openjdk"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   resource "jep" do
-    url "https://files.pythonhosted.org/packages/b3/0c/d208bc8a86f032b9a9270876129aadb41fa1a4baa172d68a29c579950856/jep-4.1.1.tar.gz"
-    sha256 "5914a4d815a7e86819f55be3de840edc2d3fe0d0b3f67626e5cea73841b1d1c0"
+    url "https://files.pythonhosted.org/packages/0e/92/994ae1013446f26103e9ff71676f4c96a7a6c0a9d6baa8f12805884f7b5e/jep-4.2.2.tar.gz"
+    sha256 "4eb79d903133e468c239ba39c8bb5ade021ef202025bf1c9b34a210003e0eab9"
   end
 
   def install
-    python3 = "python3.11"
+    python3 = "python3.13"
 
     with_env(JAVA_HOME: Language::Java.java_home) do
       resource("jep").stage do
@@ -37,7 +54,7 @@ class Polynote < Formula
           ENV.append "LDFLAGS", "-Wl,-rpath,#{Formula["openjdk"].libexec}/lib/server"
         end
 
-        system python3, "-m", "pip", "install", *std_pip_args(prefix: libexec/"vendor"), "."
+        system python3, "-m", "pip", "install", *std_pip_args(prefix: libexec/"vendor", build_isolation: true), "."
       end
     end
 
@@ -46,6 +63,7 @@ class Polynote < Formula
 
     env = Language::Java.overridable_java_home_env
     env["PYTHONPATH"] = libexec/"vendor"/Language::Python.site_packages(python3)
+    env["LD_LIBRARY_PATH"] = lib
     (bin/"polynote").write_env_script libexec/"polynote.py", env
   end
 
@@ -59,13 +77,13 @@ class Polynote < Formula
     assert_match "Unknown command version", output
 
     port = free_port
-    (testpath/"config.yml").write <<~EOS
+    (testpath/"config.yml").write <<~YAML
       listen:
         host: 127.0.0.1
         port: #{port}
       storage:
         dir: #{testpath}/notebooks
-    EOS
+    YAML
 
     begin
       pid = fork do

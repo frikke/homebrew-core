@@ -2,7 +2,7 @@ class Creduce < Formula
   desc "Reduce a C/C++ program while keeping a property of interest"
   homepage "https://github.com/csmith-project/creduce"
   license "BSD-3-Clause"
-  revision 4
+  revision 5
   head "https://github.com/csmith-project/creduce.git", branch: "master"
 
   # Remove when patches are no longer needed.
@@ -28,6 +28,27 @@ class Creduce < Formula
       url "https://github.com/csmith-project/creduce/commit/8d56bee3e1d2577fc8afd2ecc03b1323d6873404.patch?full_index=1"
       sha256 "d846e2a04c211f2da9a87194181e3644324c933ec48a7327a940e4f4b692cbae"
     end
+
+    # Port to LLVM 16.0
+    # Remove with the next release
+    patch do
+      url "https://github.com/csmith-project/creduce/commit/8ab9a69caf13ce24172737e8bfd09de51a1ecb6a.patch?full_index=1"
+      sha256 "fb5dfed2f0255ea524f0c0074a5b162ae2acbcabb9ff1f31adf45ca025dd4419"
+    end
+
+    # Port to LLVM 17.0
+    # Remove with the next release
+    patch do
+      url "https://github.com/csmith-project/creduce/commit/a4f6cf3689d44513fd944b1090ca8fd6d5ae8cd5.patch?full_index=1"
+      sha256 "2752eba5204de7f0eeac215bdabc2fb02441b79cbd17e5584e021cc29b8521c5"
+    end
+
+    # Port to LLVM 18.0
+    # Remove with the next release
+    patch do
+      url "https://github.com/csmith-project/creduce/commit/98baa64699aedb943520f175a5e731582df2806f.patch?full_index=1"
+      sha256 "7a5a04ed394de464c09174997020a6cca0cc05154f58a3e855f20c8423fc8865"
+    end
   end
 
   livecheck do
@@ -36,17 +57,16 @@ class Creduce < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "7237b5dcaa9b242dbf6d802b899055e27464968a8c260843836e266def749f28"
-    sha256 cellar: :any,                 arm64_monterey: "1cea9260c4c9bb7163c3e0892ac5a43d42fe3061bfa3b1d4cf8c27c921b6aa45"
-    sha256 cellar: :any,                 arm64_big_sur:  "01a3f3bf670aa664211b14c98095d555d3a1eaddeae77a4b97beb9244fa73c66"
-    sha256 cellar: :any,                 ventura:        "08f96b6e80c46641a5131c7c2ec1cda64f7837888b2679eff86d33bb5a03382c"
-    sha256 cellar: :any,                 monterey:       "66ab9b7fc1131261676c4993d5a15f324a095016b536592180e30d641aafb257"
-    sha256 cellar: :any,                 big_sur:        "8bdeb52e5688a4cefac68a1c42f8785ff5ac246bb1f11a42b766f9bacf499905"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a4cd8463c7ec4aa2ca405acc8bccb0f7cefed61ea77693fe27d30f1a9160eddf"
+    sha256 cellar: :any,                 arm64_sequoia: "752bcd060b5ab5d04efc96dfd67d9128e6fd66a2d9b14b5e59735ba758d2d61b"
+    sha256 cellar: :any,                 arm64_sonoma:  "c489f889cd95d689d226e4965582120a96b1119eb4fb2902c481c6b9338122aa"
+    sha256 cellar: :any,                 arm64_ventura: "56cd23ed4e8cdf7a2928f740332b07eed6f3d5b8a22416cf30ab746fbecbe0a7"
+    sha256 cellar: :any,                 sonoma:        "487aebd04b8609040875fb262122692867f20507b7c71e25a8914a920521242d"
+    sha256 cellar: :any,                 ventura:       "937ef76ad140358b5458b394b8376746972ce80915e3fa91fc7b6065a94bc5ef"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "299566ba27c179eb7e3aa48dfc766b6b3bfe6a4892a929b5777aede0b4e54a05"
   end
 
   depends_on "astyle"
-  depends_on "llvm@15"
+  depends_on "llvm@18" # LLVM 19 issue: https://github.com/csmith-project/creduce/issues/276
 
   uses_from_macos "flex" => :build
   uses_from_macos "perl"
@@ -112,18 +132,18 @@ class Creduce < Formula
   end
 
   test do
-    (testpath/"test1.c").write <<~EOS
+    (testpath/"test1.c").write <<~C
       int main() {
         printf("%d\n", 0);
       }
-    EOS
-    (testpath/"test1.sh").write <<~EOS
+    C
+    (testpath/"test1.sh").write <<~BASH
       #!/usr/bin/env bash
 
       #{ENV.cc} -Wall #{testpath}/test1.c 2>&1 | grep 'Wimplicit-function-declaration'
-    EOS
+    BASH
 
     chmod 0755, testpath/"test1.sh"
-    system "#{bin}/creduce", "test1.sh", "test1.c"
+    system bin/"creduce", "test1.sh", "test1.c"
   end
 end

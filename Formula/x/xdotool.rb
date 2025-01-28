@@ -7,9 +7,12 @@ class Xdotool < Formula
   head "https://github.com/jordansissel/xdotool.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "98a105e5266606cf09039b447d0e333c97f717a9549e78ac61880b30b94e83eb"
+    sha256 cellar: :any,                 arm64_sonoma:   "721402fc77e843c3c937fa049b72489a6212bd23ad8e6d60596755ee9c5ad7be"
     sha256 cellar: :any,                 arm64_ventura:  "e97b772870557f47e08a218f6d5b799e4ed39ab167b5701c137f2219c1426275"
     sha256 cellar: :any,                 arm64_monterey: "2e59d046b4cb7d97f989a022c0775cbf3ab9f5929cd05650d50a9eed62b162c2"
     sha256 cellar: :any,                 arm64_big_sur:  "cdf3234a474044e88dcf18b5cb5e8da2c2af6da4d85eb04e8be737802baeae16"
+    sha256 cellar: :any,                 sonoma:         "2b5ff3fe92cfcd90ecdeb12e42e5ea65700b23a772f7349d12de97492d5d8590"
     sha256 cellar: :any,                 ventura:        "3990de3d762214cd1a8c4f6c0412b745728e8ca3509e6cd62040c111e38a3ec9"
     sha256 cellar: :any,                 monterey:       "ded3a6fc9f7ddc4e307a48744d2c25f2a60a752311628822c69d9f141d17ee34"
     sha256 cellar: :any,                 big_sur:        "f33aa5be05e49f700d166a13a36ecf5a1f8da3059e36f67e0cc9d7f26c3bf088"
@@ -17,7 +20,7 @@ class Xdotool < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "ffe41af3fe21135efdee19b3fabf9f459d850946dd592858a50b4cd46035f35e"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libx11"
   depends_on "libxinerama"
   depends_on "libxkbcommon"
@@ -32,6 +35,12 @@ class Xdotool < Formula
   end
 
   def install
+    # Work-around for build issue with Xcode 15.3
+    ENV.append_to_cflags "-Wno-int-conversion" if DevelopmentTools.clang_build_version >= 1500
+
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
     system "make", "PREFIX=#{prefix}", "INSTALLMAN=#{man}", "install"
   end
 
@@ -46,6 +55,6 @@ class Xdotool < Formula
   end
 
   test do
-    system "#{bin}/xdotool", "--version"
+    system bin/"xdotool", "--version"
   end
 end

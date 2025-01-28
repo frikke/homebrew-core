@@ -1,8 +1,8 @@
 class Solana < Formula
   desc "Web-Scale Blockchain for decentralized apps and marketplaces"
   homepage "https://solana.com"
-  url "https://github.com/solana-labs/solana/archive/v1.14.27.tar.gz"
-  sha256 "678395a6a4e27546f7104b8a500098d35c64ea2a80088e17413e03f44acf3cda"
+  url "https://github.com/solana-labs/solana/archive/refs/tags/v1.18.20.tar.gz"
+  sha256 "909000aab630d73c566f1573436e6a656e80528bd57a067e79e80fbe58afcd07"
   license "Apache-2.0"
   version_scheme 1
 
@@ -26,22 +26,26 @@ class Solana < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cb0d56b493bbf22ca46ed859576b6d37da7651bd380944f734a1408c92423f9d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "9b4f9c5f847e3f5677590b5ab05992d5264d498c3465a8f4f2b54034ce00f74c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3c802ec4741f1492ad251974696dcc09cae3b060c1abf1478578bbe6aeed47cd"
-    sha256 cellar: :any_skip_relocation, ventura:        "9be3807e7c41296eeeeed7fb1b20d20bf1663bd3aa51b69a9bcb8a15561e9170"
-    sha256 cellar: :any_skip_relocation, monterey:       "eb95668eebf08a5daafc7a6c206ddc18a0bd971d8563b3ae3698f2ebf6969b99"
-    sha256 cellar: :any_skip_relocation, big_sur:        "efa3812b0ca350027f9e9aaa71f62efa4604155f9b5f1b80dcc9a472fdff18f2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d900db872a99b3e8947dec0951bf42083d2ae2a2107c157d2b9baa8616f03044"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "587663fffc9f10da1338bd74511ee9997dab9283353b6f1cc57dc52e5dedca0f"
+    sha256 cellar: :any,                 arm64_sonoma:  "dc737b2805e44862c7d71a09646f65646744ae2e720767a3b8b864f8789c1b21"
+    sha256 cellar: :any,                 arm64_ventura: "f168f86719af5f2eda08655be0ca639aa8ffa24d666af60f3c350296de8ac7a0"
+    sha256 cellar: :any,                 sonoma:        "bf2095088594fdf9c04698c0b274dc4933afecfec472570a09fc05d560048ef1"
+    sha256 cellar: :any,                 ventura:       "98ecdf1700ab37071fffef07518908e80168a1b77cda03a66d18880fccb66cfc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e327904665e09bb0beb049379e085cdf2c7ecfec1af44fdfd8eb60c664777a5a"
   end
 
+  depends_on "pkgconf" => :build
   depends_on "protobuf" => :build
   depends_on "rust" => :build
 
+  depends_on "openssl@3"
+
+  uses_from_macos "llvm" => :build # for libclang
+  uses_from_macos "bzip2"
   uses_from_macos "zlib"
 
   on_linux do
-    depends_on "pkg-config" => :build
     depends_on "systemd"
   end
 
@@ -54,12 +58,16 @@ class Solana < Formula
       log-analyzer
       net-shaper
       stake-accounts
-      sys-tuner
       tokens
       watchtower
     ].each do |bin|
       system "cargo", "install", "--no-default-features", *std_cargo_args(path: bin)
     end
+
+    # Note; the solana-test-validator is installed as bin of the validator cargo project, rather than
+    # it's own dedicate project, hence why it's installed outside of the loop above
+    system "cargo", "install", "--no-default-features",
+      "--bin", "solana-test-validator", *std_cargo_args(path: "validator")
   end
 
   test do

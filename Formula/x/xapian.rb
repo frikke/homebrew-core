@@ -1,8 +1,8 @@
 class Xapian < Formula
   desc "C++ search engine library"
   homepage "https://xapian.org/"
-  url "https://oligarchy.co.uk/xapian/1.4.23/xapian-core-1.4.23.tar.xz"
-  sha256 "30d3518172084f310dab86d262b512718a7f9a13635aaa1a188e61dc26b2288c"
+  url "https://oligarchy.co.uk/xapian/1.4.27/xapian-core-1.4.27.tar.xz"
+  sha256 "bcbc99cfbf16080119c2571fc296794f539bd542ca3926f17c2999600830ab61"
   license "GPL-2.0-or-later"
   version_scheme 1
 
@@ -12,18 +12,15 @@ class Xapian < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "7e02d698795533d2fc00d8bdcb5e7c1e299153dd050b663e9d8f0dd804a8f940"
-    sha256 cellar: :any,                 arm64_ventura:  "964bcaecbc86ffc7a83bf1f51b2f80f860a2936cdecdf99aaf101f866689c26d"
-    sha256 cellar: :any,                 arm64_monterey: "71a995c4879a0c0cc02a6615de1e585d54d4b6fb95c2666b3e73f06ffb469b3b"
-    sha256 cellar: :any,                 arm64_big_sur:  "4d76db4f93a0d4bfc8697dcc6d946d045c21da7b3abd4d09225649a714ec0cbc"
-    sha256 cellar: :any,                 sonoma:         "45fd9e64ee86dc7256c954d15cb540b36a41da5486bf416218340ab7cfddff69"
-    sha256 cellar: :any,                 ventura:        "b38555358adf041578b80fe2bbfe2e7a6783362394e6aa94eebd9eed1a92176d"
-    sha256 cellar: :any,                 monterey:       "dc235c003c6c9d47846d34e91f1808b94e2eaf92067ec714a8e94d525f88111c"
-    sha256 cellar: :any,                 big_sur:        "1067cab11ff4ce022d78040b1ec29228075496a67fb0e593bb1a791bad5e45b5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1b22baed91ec43e7de0d55aabbc5fe9820a266d872be5453393f302726e6ec4c"
+    sha256 cellar: :any,                 arm64_sequoia: "fbb0be7be62378361f90292bc53d05d58811ad23501e8dccd026f2aedb51b9fc"
+    sha256 cellar: :any,                 arm64_sonoma:  "3c657fafac679443c1c69a9409a7dfbc281d3d29fb6f54989c3736bd0a3d227c"
+    sha256 cellar: :any,                 arm64_ventura: "7e2ae9e288f52938deff37d44c64c34071048cb86f7f4bee09c2061f0a5a0b7b"
+    sha256 cellar: :any,                 sonoma:        "c0f1ac0afa541a55adf7bacd15a107c92835cc3e131949f8553ccf767978aa3e"
+    sha256 cellar: :any,                 ventura:       "648ff983c9da6b823efef34fd26df56bc3eda5b3f8331bec01195f96807269ca"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "429452ca722ec4a435962d38d1309989b1c0df4b76900fcfa1ff106081513a1a"
   end
 
-  depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
   depends_on "sphinx-doc" => :build
 
   uses_from_macos "zlib"
@@ -35,21 +32,21 @@ class Xapian < Formula
   skip_clean :la
 
   resource "bindings" do
-    url "https://oligarchy.co.uk/xapian/1.4.23/xapian-bindings-1.4.23.tar.xz"
-    sha256 "e0bc8cc0ecf0568549c50b51fd59e4cffb5318d6f202afcd4465855ef5f33f7d"
-  end
+    url "https://oligarchy.co.uk/xapian/1.4.27/xapian-bindings-1.4.27.tar.xz"
+    sha256 "ba3b5e10809e579acd11bd165779ce3fd29a8904ea37968ef5b57ad97c3618ba"
 
-  # Fix -flat_namespace being used on Big Sur and later.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
-    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    livecheck do
+      formula :parent
+    end
   end
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
+    odie "bindings resource needs to be updated" if version != resource("bindings").version
+
     ENV["PYTHON"] = which(python3)
     system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"

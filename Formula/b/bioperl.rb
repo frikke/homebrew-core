@@ -4,6 +4,7 @@ class Bioperl < Formula
   url "https://cpan.metacpan.org/authors/id/C/CJ/CJFIELDS/BioPerl-1.7.8.tar.gz"
   sha256 "c490a3be7715ea6e4305efd9710e5edab82dabc55fd786b6505b550a30d71738"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
+  revision 2
   head "https://github.com/bioperl/bioperl-live.git", branch: "master"
 
   # We specifically match versions with three numeric parts because upstream
@@ -16,27 +17,26 @@ class Bioperl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "64066b3ad8017e6c5812ad3230827915b13bcc8e8557c3e052d67413e30ae7ed"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "eca523bdef4f935b8887b120307c4841372c1a349d96255cd173fb2bd4ade142"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "edad2306b7e911884abc787c59cb8ce91ae5cc59d4fad4373bade3a11fc3806a"
-    sha256 cellar: :any_skip_relocation, ventura:        "9f22f9af94fc10b847a99393c74c9a88bfaee9603487b9ec196cb66b67c4e13f"
-    sha256 cellar: :any_skip_relocation, monterey:       "2e449a33bfdec93ad0429d62ad331d41f3aefc1e7add30daf584518f941fd9a5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c876cdb3cc4f70f3251d57fe47c3fbb6ec9a303df8dbaa276f0b8072ca39d1c9"
-    sha256 cellar: :any_skip_relocation, catalina:       "631f46b74bf805d23a414d34961f8e14fe2f0be2224522dfe3eb6f73a7adbb0d"
-    sha256 cellar: :any_skip_relocation, mojave:         "a284378a572edc991e964002c99b6991d4fb37610dfcd9f6abd8587b16962896"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6baaf72a4d61a3e466ecd8c02a2943e3408d880177df58a45279c16bfe72b2f2"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2908dce831726ddab69edcb252b8b45b1d9b4ba2995bbefc6410dea49a6b230e"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d44c606e7a067575bfe21428d84fcd57c7e45daa8b2af2a2cf7b6ae766611b0c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "cce1be0687ce0d7b8cbaaaa2192dcc0ee3e624978c7e5296c2676099fb9c647e"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a79018530a34ea3fc2515bf85a4db9ed4379ccf7aeb9ef5d744d5fdb3009596e"
+    sha256 cellar: :any_skip_relocation, ventura:       "ff98f524ac97416bd3893e5decb6f4e5deb9340f27fbca59a5b8f231bd800829"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c28697f03736035682992843bd2dae185e38958cea70dde760636d5fe5661f13"
   end
 
   depends_on "cpanminus" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "perl"
 
-  uses_from_macos "zlib"
+  uses_from_macos "expat"
+  uses_from_macos "libxml2"
 
   def install
+    ENV["ALIEN_INSTALL_TYPE"] = "system"
     ENV.prepend_create_path "PERL5LIB", libexec/"lib/perl5"
-    system "cpanm", "--self-contained", "-l", libexec, "DBI" unless OS.mac?
-    system "cpanm", "--verbose", "--self-contained", "-l", libexec, "."
+    system "cpanm", "--notest", "--self-contained", "--local-lib", libexec, "DBI" unless OS.mac?
+    system "cpanm", "--notest", "--self-contained", "--local-lib", libexec, "."
     bin.env_script_all_files libexec, "PERL5LIB" => ENV["PERL5LIB"]
     libexec.glob("bin/bp_*") do |executable|
       (bin/executable.basename).write_env_script executable, PERL5LIB: ENV["PERL5LIB"]

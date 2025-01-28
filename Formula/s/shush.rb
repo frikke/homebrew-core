@@ -1,25 +1,25 @@
 class Shush < Formula
   desc "Encrypt and decrypt secrets using the AWS Key Management Service"
   homepage "https://github.com/realestate-com-au/shush"
-  url "https://github.com/realestate-com-au/shush/archive/refs/tags/v1.5.4.tar.gz"
-  sha256 "9b4c4f24fbdee1e761e67984d85c51bcb656db7e3e03406200d40ade765417a7"
+  url "https://github.com/realestate-com-au/shush/archive/refs/tags/v1.5.5.tar.gz"
+  sha256 "b759401d94b2ebcc4a5561e28e1c533f3bd19aaa75eb0a48efc53c71f864e11b"
   license "MIT"
   head "https://github.com/realestate-com-au/shush.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "95d7c795431217ecbe5a637818006a421fe5af863114a79753d1255dfb872430"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "95d7c795431217ecbe5a637818006a421fe5af863114a79753d1255dfb872430"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "95d7c795431217ecbe5a637818006a421fe5af863114a79753d1255dfb872430"
-    sha256 cellar: :any_skip_relocation, ventura:        "6381063d60b49716cb67d4c0daad0526e349efd58c84c99e7396b00458f46a47"
-    sha256 cellar: :any_skip_relocation, monterey:       "6381063d60b49716cb67d4c0daad0526e349efd58c84c99e7396b00458f46a47"
-    sha256 cellar: :any_skip_relocation, big_sur:        "6381063d60b49716cb67d4c0daad0526e349efd58c84c99e7396b00458f46a47"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fd461e6fd682fb787771b7fbdf5b55ab7dfb8a24d2a027251dbc034c6381a1f5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "38e8b3daac478d4f716b340df549741e7bd46d2fead43762a20e896357f73697"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "38e8b3daac478d4f716b340df549741e7bd46d2fead43762a20e896357f73697"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "38e8b3daac478d4f716b340df549741e7bd46d2fead43762a20e896357f73697"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2f4578b270925b1861d476ea6e55e5aed44e3d690f27c9a2118e2079f3ed1fc7"
+    sha256 cellar: :any_skip_relocation, ventura:       "2f4578b270925b1861d476ea6e55e5aed44e3d690f27c9a2118e2079f3ed1fc7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5dd8b6893291ab04f6aab2a7928e694cef9601feddc6b7bf4f59b1f54df023a3"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do

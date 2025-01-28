@@ -1,18 +1,17 @@
 class Espflash < Formula
   desc "Serial flasher utility for Espressif SoCs and modules based on esptool.py"
   homepage "https://github.com/esp-rs/espflash"
-  url "https://github.com/esp-rs/espflash/archive/refs/tags/v2.0.1.tar.gz"
-  sha256 "be6067c1404d00ff1fc9e1838b313902cb1de4ecfc8efab0e67a678a04c7c9b6"
+  url "https://github.com/esp-rs/espflash/archive/refs/tags/v3.3.0.tar.gz"
+  sha256 "5f641653d2112904a02d4c67e1fba6564a7fc23fbb34def2df8ce6ac953a4163"
   license any_of: ["MIT", "Apache-2.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b476cb351d4bc0552fd9e2cea5a37a0820f0849f37bf95004c9789045db5258d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c6ce4fa2ab7989f25c01c40769353829ae7c8016e7aa2cd5d090efb911501957"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "caef07e7fd0689fb2c1d4438a2823a8b028fb3253e688ebc82f5404356d138ed"
-    sha256 cellar: :any_skip_relocation, ventura:        "dc3fe54e282e33c4f9d1c58bdb16e70ac3c04c9b9015933583cd9013c8e83f18"
-    sha256 cellar: :any_skip_relocation, monterey:       "8219fa9476ea1d47d811631c603e33b83e0ad4d64dc2ca0307def5ab22bccb5b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "53490d057f2943e015025cfedca140b2d5b803cc084737f1ccc64ec93008a3f5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "55b5713698ca478584789341b429edf5e6c0a023e49277f5314a3f092f58a9da"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6c81a6ed6df9c49a708d7e87ab635a7e786abc835d74b2eb0fa4686122b31e7a"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1c99e0a9083f12ce47ef06a45bc895deebf5ebdc3b2e5d993dce45109f997934"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "cae222d3a510e1fd99493fc84bc30a7a883913d214dde264c5597f50e0c75d3a"
+    sha256 cellar: :any_skip_relocation, sonoma:        "c6504173907b67fc7247bfda8c0bace89f37a1852d540cfd264cab8c391a08ce"
+    sha256 cellar: :any_skip_relocation, ventura:       "558ac26ed5f9655a64e6eeecd8a207aa14c0a2cccdb31b341be1a6d5e33eee80"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "50eff44ba9819e9af58b258224a56270d72773c2f445b070ec1b1ecd69310092"
   end
 
   depends_on "rust" => :build
@@ -22,7 +21,7 @@ class Espflash < Formula
   end
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "systemd" # for libudev
   end
 

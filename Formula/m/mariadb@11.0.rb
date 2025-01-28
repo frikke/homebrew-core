@@ -1,48 +1,40 @@
 class MariadbAT110 < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://archive.mariadb.org/mariadb-11.0.3/source/mariadb-11.0.3.tar.gz"
-  sha256 "529f08a064ee7733a136ec474a4239e8ac9bd6db139b8ba70bff8a7f1303839a"
+  url "https://archive.mariadb.org/mariadb-11.0.6/source/mariadb-11.0.6.tar.gz"
+  sha256 "0189d62946c37c6db46bf1a468ba9580bcba8e80f05958ec483c3387eccf9a00"
   license "GPL-2.0-only"
 
-  livecheck do
-    url "https://downloads.mariadb.org/rest-api/mariadb/all-releases/?olderReleases=false"
-    strategy :json do |json|
-      json["releases"]&.map do |release|
-        next unless release["release_number"]&.start_with?(version.major_minor)
-        next if release["status"] != "stable"
-
-        release["release_number"]
-      end
-    end
-  end
-
   bottle do
-    sha256 arm64_ventura:  "f3106e1216631422e4603e5cd63560b1c2c2bbc7a5f7a12c80eac5e3afa240ba"
-    sha256 arm64_monterey: "2f96dc9dd3e7214a9a76ec55da25fe919a631d2fd73784e07824793290d7afae"
-    sha256 arm64_big_sur:  "ecd9a13d9ca8e83b5a423c6c779d7f0b9f975320f260840bf211122855afb6d2"
-    sha256 ventura:        "103189c91671e58c7e8bf3c1c06209185ff2057a8439ca8887d8556c9f105930"
-    sha256 monterey:       "3cc8bd1c908109ef59892791111d9b578e7089fd533498e48afc7df19d286cef"
-    sha256 big_sur:        "93aac4368ffebfb33c6c79c949698151ff53d9f8ab19cdf7a8993959ef5f660e"
-    sha256 x86_64_linux:   "e4a3f38db7368b6fa268d7ea4852a8287322a8314e6fadbf5859498dce52aac7"
+    sha256 arm64_sonoma:   "89a7b94bb9f795bbe4f842da5648232c6a974e0dd76ba69fe8a0952db13d836f"
+    sha256 arm64_ventura:  "7bddd7c137bfc4085f961af777564355dc3180d20855f958638462690cc2eda3"
+    sha256 arm64_monterey: "05de2b71a4a1959456dd3b093a2281ec73a075aa89fb8313565587b86de1ee3a"
+    sha256 sonoma:         "29b52fc34f3baafed57a2b5640555dd72bf2e1a7753ebdd4a5031312080641e8"
+    sha256 ventura:        "5f3045c31659a0cb39c53252c4bc1b5d0091e91fddd095884989ae8562ad61ba"
+    sha256 monterey:       "c6f4fbfcd81558b8982b86eb0fa60a4b024d4b0382a78a5e099afd165f9901f8"
+    sha256 x86_64_linux:   "de33515a31b8b4cd6a72c2c7bc17b64396f977573a394804cd7eabbc2448e2db"
   end
 
   keg_only :versioned_formula
 
   # See: https://mariadb.com/kb/en/changes-improvements-in-mariadb-11-0/
   # End-of-life on 2024-06-06: https://mariadb.org/about/#maintenance-policy
-  deprecate! date: "2024-06-06", because: :unsupported
+  disable! date: "2024-08-16", because: :unsupported
 
   depends_on "bison" => :build
   depends_on "cmake" => :build
   depends_on "fmt" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "groonga"
+  depends_on "lz4"
   depends_on "openssl@3"
   depends_on "pcre2"
+  depends_on "xz"
   depends_on "zstd"
 
   uses_from_macos "bzip2"
+  uses_from_macos "krb5"
+  uses_from_macos "libedit"
   uses_from_macos "libxcrypt"
   uses_from_macos "libxml2"
   uses_from_macos "ncurses"
@@ -51,19 +43,6 @@ class MariadbAT110 < Formula
   on_linux do
     depends_on "linux-pam"
     depends_on "readline" # uses libedit on macOS
-  end
-
-  fails_with gcc: "5"
-
-  # Fix libfmt usage.
-  # https://github.com/MariaDB/server/pull/2732
-  patch do
-    url "https://github.com/MariaDB/server/commit/f4cec369a392c8a6056207012992ad4a5639965a.patch?full_index=1"
-    sha256 "1851d5ae209c770e8fd1ba834b840be12d7b537b96c7efa3d4e7c9523f188912"
-  end
-  patch do
-    url "https://github.com/MariaDB/server/commit/cd5808eb8da13c5626d4bdeb452cef6ada29cb1d.patch?full_index=1"
-    sha256 "4d288f82f56c61278aefecba8a90d214810b754e234f40b338e8cc809e0369e9"
   end
 
   def install
@@ -118,11 +97,11 @@ class MariadbAT110 < Formula
 
     # Don't create databases inside of the prefix!
     # See: https://github.com/Homebrew/homebrew/issues/4975
-    rm_rf prefix/"data"
+    rm_r(prefix/"data")
 
     # Save space
-    (prefix/"mysql-test").rmtree
-    (prefix/"sql-bench").rmtree
+    rm_r(prefix/"mysql-test")
+    rm_r(prefix/"sql-bench")
 
     # Link the setup scripts into bin
     bin.install_symlink [
@@ -166,7 +145,7 @@ class MariadbAT110 < Formula
 
     unless File.exist? "#{var}/mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
-      system "#{bin}/mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
+      system bin/"mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
         "--basedir=#{prefix}", "--datadir=#{var}/mysql", "--tmpdir=/tmp"
     end
   end
@@ -194,12 +173,12 @@ class MariadbAT110 < Formula
       "--auth-root-authentication-method=normal"
     port = free_port
     fork do
-      system "#{bin}/mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
+      system bin/"mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
         "--datadir=#{testpath}/mysql", "--port=#{port}", "--tmpdir=#{testpath}/tmp"
     end
     sleep 5
     assert_match "information_schema",
       shell_output("#{bin}/mysql --port=#{port} --user=root --password= --execute='show databases;'")
-    system "#{bin}/mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
+    system bin/"mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
   end
 end

@@ -1,36 +1,40 @@
 class Tracker < Formula
   desc "Library and daemon that is an efficient search engine and triplestore"
-  homepage "https://gnome.pages.gitlab.gnome.org/tracker/"
-  url "https://download.gnome.org/sources/tracker/3.4/tracker-3.4.2.tar.xz"
-  sha256 "4e6df142a4f704878fca98ebb5a224750e5ea546aa2aaabaa726a73540bd1731"
+  homepage "https://gitlab.gnome.org/GNOME/tinysparql"
+  # pull from git tag to get submodules
+  url "https://gitlab.gnome.org/GNOME/tinysparql.git",
+      tag:      "3.6.0",
+      revision: "624ef729966f2d9cf748321bd7bac822489fa8ed"
   license all_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later"]
-  revision 2
+  revision 3
 
-  # Tracker doesn't follow GNOME's "even-numbered minor is stable" version scheme.
+  # Tracker doesn't follow GNOME's "even-numbered minor is stable" version
+  # scheme but they do appear to use 90+ minor/patch versions, which may
+  # indicate unstable versions (e.g., 1.99.0, 2.2.99.0, etc.).
   livecheck do
     url :stable
-    regex(/tracker[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    regex(/^v?(\d+(?:(?!\.9\d)\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 arm64_ventura:  "862475e57b9555c8a51d07644d70e853b615b777910dd74acfa4989b43241df2"
-    sha256 arm64_monterey: "b67fdb99fefe3db73ba4d2910ad1d52143904a3a47e00ebf39a70fa93b137f63"
-    sha256 arm64_big_sur:  "b590c4b4004f3f6b18a3200733a758fbefc2bcf47e419ed43d96379d59dc1eef"
-    sha256 ventura:        "9cddcfd7d9d46072a9a84b2d4bcfb170ed01d5f4166966eea897e50680add8b8"
-    sha256 monterey:       "b7bee6306879806dc623dcc61d38c5e78d6f1d459f7f9e83854ee79ff88ded5d"
-    sha256 big_sur:        "56a6c4203c7ecff7324e56c398fb61adc360a9a1a066290e794b9a0054738af6"
-    sha256 x86_64_linux:   "28bf2f5d9e19ef524e45475bc9ce0a0dd5af36711855ff4fb81c852023f0965a"
+    sha256 arm64_sequoia: "7bc9ae43638dc877591fddf360e63423faca1c263a80eaec7016c56c526c7891"
+    sha256 arm64_sonoma:  "97c7afc9f1177586a46d70761edd999dfb89db9e824750894dbc357dceb26a53"
+    sha256 arm64_ventura: "49f5ca10fcc3bb45bb6c82a20b5c112fefd5e8c94b81e0f1abdbe1aa80b1810c"
+    sha256 sonoma:        "85b6515fcef419b02070410794f79047fb646aa1fa12693d94b7a1b349f6cdda"
+    sha256 ventura:       "17e2d6239703864d719f29322f28d0e17b588a99b3b40dead296242c4857642d"
+    sha256 x86_64_linux:  "83e5feea79a2bc65e893cd9dd6cbc7204d30f9dd51f857ce49c6e02aa67ae89e"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "pygobject3" => :build
   depends_on "vala" => :build
+
   depends_on "dbus"
   depends_on "glib"
-  depends_on "icu4c"
+  depends_on "icu4c@76"
   depends_on "json-glib"
   depends_on "libsoup"
   depends_on "sqlite"
@@ -38,30 +42,33 @@ class Tracker < Formula
   uses_from_macos "python" => :build, since: :catalina
   uses_from_macos "libxml2"
 
+  on_macos do
+    depends_on "gettext"
+  end
+
   def install
-    args = std_meson_args + %w[
+    args = %w[
       -Dman=false
       -Ddocs=false
       -Dsystemd_user_services=false
       -Dtests=false
       -Dsoup=soup3
+      --force-fallback-for=gvdb
     ]
 
     ENV["DESTDIR"] = "/"
-    mkdir "build" do
-      system "meson", *args, ".."
-      # Disable parallel build due to error: 'libtracker-sparql/tracker-sparql-enum-types.h' file not found
-      system "ninja", "-v", "-j1"
-      system "ninja", "install", "-v"
-    end
+
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   def post_install
-    system "#{Formula["glib"].opt_bin}/glib-compile-schemas", "#{HOMEBREW_PREFIX}/share/glib-2.0/schemas"
+    system Formula["glib"].opt_bin/"glib-compile-schemas", HOMEBREW_PREFIX/"share/glib-2.0/schemas"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libtracker-sparql/tracker-sparql.h>
 
       gint main(gint argc, gchar *argv[]) {
@@ -102,9 +109,12 @@ class Tracker < Formula
 
         return 0;
       }
-    EOS
-    ENV.prepend_path "PKG_CONFIG_PATH", Formula["icu4c"].opt_lib/"pkgconfig" if OS.mac?
-    flags = shell_output("pkg-config --cflags --libs tracker-sparql-3.0").chomp.split
+    C
+
+    icu4c = deps.find { |dep| dep.name.match?(/^icu4c(@\d+)?$/) }
+                .to_formula
+    ENV.prepend_path "PKG_CONFIG_PATH", icu4c.opt_lib/"pkgconfig"
+    flags = shell_output("pkgconf --cflags --libs tracker-sparql-3.0").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

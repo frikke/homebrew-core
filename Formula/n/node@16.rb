@@ -4,49 +4,57 @@ class NodeAT16 < Formula
   url "https://nodejs.org/dist/v16.20.2/node-v16.20.2.tar.xz"
   sha256 "576f1a03c455e491a8d132b587eb6b3b84651fc8974bb3638433dd44d22c8f49"
   license "MIT"
-
-  livecheck do
-    url "https://nodejs.org/dist/"
-    regex(%r{href=["']?v?(16(?:\.\d+)+)/?["' >]}i)
-  end
+  revision 3
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "2c93285e71c38644eca48e67e3f47d5a6b59ed19277eaaf325f4ae93fb165d9e"
-    sha256                               arm64_ventura:  "fcb0196c762c1285e93d40c4fa91e57db792e2f8cbaa4459e1a5ba092322921b"
-    sha256                               arm64_monterey: "db3b1122c63407398c18d860daadb56ef6eeac042b35a932e57418d71607a6cb"
-    sha256                               arm64_big_sur:  "018ce8adf2f049cbd92cc730605862f15fdf95fc514416c7b1ec596beb82bb3b"
-    sha256 cellar: :any,                 sonoma:         "7be7d9c6006a60de09259b4b28bce6b3e1d472f1ad6994bba970b4ab0078285e"
-    sha256                               ventura:        "cf33712c50cc6a78f3de277a1a6d6c55a178ac1879b89cccaf0f4ff560fdb6bc"
-    sha256                               monterey:       "d758457ff6ca6f2d1967b869a0e54f4aa23a844378409c3b6e99d9d3160b0297"
-    sha256                               big_sur:        "dab1b8edddfcfec97f3821ebecb75802e75b9e79532ee41c582ecddfc004694d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a8b42ddd456c1c4420762fd3cb320290a5235d54f5e82d2d3f7ab8bf7d622ed1"
+    sha256 cellar: :any,                 arm64_sequoia: "b13be0d32da21d723781c78c3f5a3bdf84d86541d867c99944ce845752efb7f7"
+    sha256 cellar: :any,                 arm64_sonoma:  "77f8dc24029ff4a327a08e34ca03b9bffb2d2af3154a72d3e715dbdbd5dcc056"
+    sha256 cellar: :any,                 arm64_ventura: "4684f8478761fc02996757f54c0e8cd1f1b8f8a91919048f6759e4fa09cd2e9f"
+    sha256 cellar: :any,                 sonoma:        "510b6314af58d227186a4e19d056281935b7ada207a4119399d5b0b97501530b"
+    sha256 cellar: :any,                 ventura:       "1c4481d6303b9e416c629879cce704d61d8ca58ddf8a37cedacd8d04b212d3a6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ae8ad6360d6350f4ea98930aa626aa0448bbd264c075959c7ad7d8940109f354"
   end
 
   keg_only :versioned_formula
 
   # https://nodejs.org/en/about/releases/
-  # disable! date: "2023-09-11", because: :unsupported
+  disable! date: "2024-11-03", because: :unsupported
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "python@3.11" => :build
   depends_on "brotli"
   depends_on "c-ares"
-  depends_on "icu4c"
+  depends_on "icu4c@76"
   depends_on "libnghttp2"
   depends_on "libuv"
   depends_on "openssl@3"
 
-  uses_from_macos "python", since: :catalina
   uses_from_macos "zlib"
+
+  # node-gyp bundled in npm does not support Python 3.12.
+  on_system :linux, macos: :mojave_or_older do
+    depends_on "python@3.11"
+  end
 
   fails_with :clang do
     build 1099
     cause "Node requires Xcode CLT 11+"
   end
 
-  fails_with gcc: "5"
+  # Backport support for ICU 76+
+  patch do
+    url "https://github.com/nodejs/node/commit/81517faceac86497b3c8717837f491aa29a5e0f9.patch?full_index=1"
+    sha256 "79a5489617665c5c88651a7dc364b8967bebdea5bdf361b85572d041a4768662"
+  end
 
   def install
+    # icu4c 75+ needs C++17. Node 16 uses `-std=gnu++14` so keep GNU extensions
+    ENV.append "CXXFLAGS", "-std=gnu++17"
+    # ../deps/v8/src/base/bit-field.h:43:29: error: integer value 7 is outside
+    # the valid range of values [0, 3] for this enumeration type
+    # [-Wenum-constexpr-conversion]
+    ENV.append_to_cflags "-Wno-enum-constexpr-conversion" if DevelopmentTools.clang_build_version >= 1500
+
     python3 = "python3.11"
     # make sure subprocesses spawned by make are using our Python 3
     ENV["PYTHON"] = which(python3)
@@ -95,12 +103,15 @@ class NodeAT16 < Formula
     # make sure npm can find node
     ENV.prepend_path "PATH", opt_bin
     ENV.delete "NVM_NODEJS_ORG_MIRROR"
+    if OS.linux? || (OS.mac? && MacOS.version <= :mojave)
+      ENV.prepend_path "PATH", Formula["python@3.11"].opt_libexec/"bin"
+    end
     assert_equal which("node"), opt_bin/"node"
     assert_predicate bin/"npm", :exist?, "npm must exist"
     assert_predicate bin/"npm", :executable?, "npm must be executable"
     npm_args = ["-ddd", "--cache=#{HOMEBREW_CACHE}/npm_cache", "--build-from-source"]
-    system "#{bin}/npm", *npm_args, "install", "npm@latest"
-    system "#{bin}/npm", *npm_args, "install", "ref-napi"
+    system bin/"npm", *npm_args, "install", "npm@latest"
+    system bin/"npm", *npm_args, "install", "ref-napi"
     assert_predicate bin/"npx", :exist?, "npx must exist"
     assert_predicate bin/"npx", :executable?, "npx must be executable"
     assert_match "< hello >", shell_output("#{bin}/npx --yes cowsay hello")

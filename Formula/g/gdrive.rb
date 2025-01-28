@@ -1,36 +1,32 @@
 class Gdrive < Formula
   desc "Google Drive CLI Client"
-  homepage "https://github.com/prasmussen/gdrive"
-  url "https://github.com/prasmussen/gdrive/archive/2.1.1.tar.gz"
-  sha256 "9092cb356acf58f2938954784605911e146497a18681199d0c0edc65b833a672"
+  homepage "https://github.com/glotlabs/gdrive"
+  url "https://github.com/glotlabs/gdrive/archive/refs/tags/3.9.1.tar.gz"
+  sha256 "9aadb1b9a23d83f5aaa785960973bef1c63b85346de6be01a36e0630f2ddec1c"
   license "MIT"
-  head "https://github.com/prasmussen/gdrive.git", branch: "master"
+  head "https://github.com/glotlabs/gdrive.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "adeacb147f331a863acc3bb532aea0be7b0d761e1f82d701dfc446a2f66ce31b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c352c82a925ec14ef3e88e2483bdb7147de246226fb35fe6830e9f28eb6f6805"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f991723008683908cb3a37497348e9813314807b9000e90de1e2130f2342554d"
-    sha256 cellar: :any_skip_relocation, ventura:        "e71c7ec3ea38bab5756b2ad347143158e4eec5a492eef6ab33400033b528646e"
-    sha256 cellar: :any_skip_relocation, monterey:       "861b550af0728ddbf48274164bd7207d73349d7800dad8a4c0760ea2fecc9b9e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3d96fff9fcee61b32a8185cae41d1f5b21f36dd22f235852f283b46fcd3b066e"
-    sha256 cellar: :any_skip_relocation, catalina:       "08947085778a3414d976c4dbda157b58704c60700621348f621d74a589c68149"
-    sha256 cellar: :any_skip_relocation, mojave:         "a1f4a672700f4348173b184e04aa6da8196ad93d44efbd5122aa304c88d0cce1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2d687e4d537911f156c2f5cfd0a88fe8c44793eef89c497849e2130ab138d70e"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "597b1a565f70001989177d007d646750cc7602948deddc79c84d84a5ad4e43d4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "f46421761f47656b69c91d12f132a512c90a622f032e22979eaeaeb492158c80"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d43198708aa0d16925a7183cc028ea7356a42c2c6f25366dda2372e6310c227d"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9fcffe4b624640c73631bbbe0872e14e60f8e4d26bcb38bc15d4d01e6236ec6f"
+    sha256 cellar: :any_skip_relocation, sonoma:         "2389051617cde44c9144ddf5c0696dea4a7cd16f8c940c6b50366bc762d10ae6"
+    sha256 cellar: :any_skip_relocation, ventura:        "1e67b9d2936b20f5460fe4a2117b56d34fc49fa0c5b25edb8b2db2159deb7036"
+    sha256 cellar: :any_skip_relocation, monterey:       "36ff90fdf725f1615e6546897b9c4c3d78d47d4ceffc98f4d5e13af00b6ba303"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "048b5454b4d9390a1258ca0c9c731aa8a8e5ba871ccb20e7691b1f9486862bab"
   end
 
-  depends_on "go" => :build
-
-  patch do
-    url "https://github.com/prasmussen/gdrive/commit/faa6fc3dc104236900caa75eb22e9ed2e5ecad42.patch?full_index=1"
-    sha256 "ee7ebe604698aaeeb677c60d973d5bd6c3aca0a5fb86f6f925c375a90fea6b95"
-  end
+  depends_on "rust" => :build
 
   def install
-    system "go", "build", *std_go_args, "-mod=readonly"
-    doc.install "README.md"
+    system "cargo", "install", *std_cargo_args
   end
 
   test do
     assert_match version.to_s, shell_output("#{bin}/gdrive version")
+    assert_match "Usage: gdrive <COMMAND>", shell_output("#{bin}/gdrive 2>&1", 2)
+    assert_match "Error: No accounts found", shell_output("#{bin}/gdrive account list 2>&1", 1)
   end
 end

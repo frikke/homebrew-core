@@ -16,16 +16,13 @@ class Bashdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2706d30e58de057c15e572fb267c1fb4a96d47635cc5be190aa895a208c623cb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f53afdb7dc83b30c3347c729b38ee0da913198c9c5afc6e67727e36960602f1e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f53afdb7dc83b30c3347c729b38ee0da913198c9c5afc6e67727e36960602f1e"
-    sha256 cellar: :any_skip_relocation, ventura:        "c612daaca5bebdc050bf47317b91069423b6bbf3a5b21c1391372ff7f5acb33d"
-    sha256 cellar: :any_skip_relocation, monterey:       "d48fff200662804b52e9688a80e8931f56a5033235903b9ce35cb8908f8ba61a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e49b34af9e621c91f6a101bfe327182f956f7b25b48d9fc7804e5d8ea0277263"
-    sha256 cellar: :any_skip_relocation, catalina:       "0ab6de48ce871bc7b6abc582154b425350a70b7f2ecadd3b303c7a91dafc3c41"
-    sha256 cellar: :any_skip_relocation, mojave:         "0ab6de48ce871bc7b6abc582154b425350a70b7f2ecadd3b303c7a91dafc3c41"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "0ab6de48ce871bc7b6abc582154b425350a70b7f2ecadd3b303c7a91dafc3c41"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f53afdb7dc83b30c3347c729b38ee0da913198c9c5afc6e67727e36960602f1e"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8f2ec4abf07b97ccf17dd28f503864ff00ea05049a9b844de637612b85478aa7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8f2ec4abf07b97ccf17dd28f503864ff00ea05049a9b844de637612b85478aa7"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "8f2ec4abf07b97ccf17dd28f503864ff00ea05049a9b844de637612b85478aa7"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a66264c4831ecc61cf6ea6fbebfa335cf2152742017132ca9309068a0870b8ac"
+    sha256 cellar: :any_skip_relocation, ventura:       "a66264c4831ecc61cf6ea6fbebfa335cf2152742017132ca9309068a0870b8ac"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8f2ec4abf07b97ccf17dd28f503864ff00ea05049a9b844de637612b85478aa7"
   end
 
   depends_on "autoconf" => :build # due to patch
@@ -37,12 +34,8 @@ class Bashdb < Formula
   patch :DATA
 
   def install
-    system "autoreconf", "--verbose", "--install", "--force"
-    system "./configure", "--with-bash=#{HOMEBREW_PREFIX}/bin/bash",
-                          "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
-
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--with-bash=#{HOMEBREW_PREFIX}/bin/bash", *std_configure_args
     system "make", "install"
   end
 

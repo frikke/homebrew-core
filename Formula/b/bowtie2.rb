@@ -1,18 +1,19 @@
 class Bowtie2 < Formula
   desc "Fast and sensitive gapped read aligner"
   homepage "https://bowtie-bio.sourceforge.net/bowtie2/index.shtml"
-  url "https://github.com/BenLangmead/bowtie2/archive/v2.5.1.tar.gz"
-  sha256 "3fe00f4f89b5dd85fd9317e2168ec93f30dbb75d7950a08516c767d21eca7c27"
+  url "https://github.com/BenLangmead/bowtie2/archive/refs/tags/v2.5.4.tar.gz"
+  sha256 "841a6a60111b690c11d1e123cb5c11560b4cd1502b5cee7e394fd50f83e74e13"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6a5f45f3bf45cffefc8598581d5547169d8e07f6e3c1efd31898e36582eebff0"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "60d96c890b137f91f46544d867f98186d03592848e2e77939c8af952c5b39047"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8421e1f412403865337c4a9af25a7144ee89d691367864ff91440d7faa73a420"
-    sha256 cellar: :any_skip_relocation, ventura:        "594c8dcbfbb4acdc5628a75eca10e691dbf7fa52602a26295618d6291705c73d"
-    sha256 cellar: :any_skip_relocation, monterey:       "e59ed1f423747d14edd5cc80c1f5985f622e00b17babfd7343e7e2fd1e730468"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f9e5eeb5344bc134741c981997984622105ee104e7bcdc301e86a289b98ba9b2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "825b7afefdf1fe78b37362eda6e6706e3c850c955fdd01fba714232ff187051d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "3f8eca3ff38d6b573a73c160da0b80a8d20d29a5d11c07ad0c3de51f30986636"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "539b0d025ccf750ab75234c6b1ce0cbe2db9cd1cb3aac64e645ed2703d3f93d4"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2f0ea46f0fb6351e20c753a488ab35b8af656b025dcd8529cf489391afa53a5d"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "27fbcb3ea2f44568313fc80d900018727c376ce862a2e107540d73a5e118d7f9"
+    sha256 cellar: :any_skip_relocation, sonoma:         "0851d07d8a4a57897ea4b2262d88073d35060638e297fd8ce3ca9b26eb510ceb"
+    sha256 cellar: :any_skip_relocation, ventura:        "65d7c4f3afd8c3437222126d750ea55f6bb4214907072f97ff1bae4c26788465"
+    sha256 cellar: :any_skip_relocation, monterey:       "76a63cb64ac6060cdeb35bf4e64e2dca18525ec103a8956e38fe6a9487aba434"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "574eeb3b13bb869e57844bea2fac0eaf789b708096e7b94d5f14b604655b78a9"
   end
 
   uses_from_macos "perl"
@@ -29,7 +30,7 @@ class Bowtie2 < Formula
   end
 
   test do
-    system "#{bin}/bowtie2-build",
+    system bin/"bowtie2-build",
            "#{pkgshare}/example/reference/lambda_virus.fa", "lambda_virus"
     assert_predicate testpath/"lambda_virus.1.bt2", :exist?,
                      "Failed to create viral alignment lambda_virus.1.bt2"

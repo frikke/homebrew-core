@@ -3,39 +3,44 @@ class CryticCompile < Formula
 
   desc "Abstraction layer for smart contract build systems"
   homepage "https://github.com/crytic/crytic-compile"
-  url "https://files.pythonhosted.org/packages/41/75/84439a30acb3bcdba67cf3a63d1bb041b58661b796dcdb205cc2203c73b2/crytic-compile-0.3.4.tar.gz"
-  sha256 "f4bbabe616d09dcae73c3cd4140b719845ff67993c0159ec0de7d4e20642725d"
+  url "https://files.pythonhosted.org/packages/e7/32/dfacd10aedde8576594566c53de75904b4d99abbf5e256ac6de8d3baae18/crytic_compile-0.3.8.tar.gz"
+  sha256 "dd8841701cfabf132ffff8b59e8dac32f5fafe369ec8b14b855f2f70565f11ad"
   license "AGPL-3.0-only"
   head "https://github.com/crytic/crytic-compile.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "41ff861719eb6cef6add9dbbe41504a4ee2dfde9d9c901110f32adc7fd7d9996"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "78ca96c94df6c1979e04d9b9700b8c3ee7f64e33f0a2774ed67a3686226529be"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d75aaea9d3a159b14928ea27025cb489939cef779694b77656e03dd57e8ea386"
-    sha256 cellar: :any_skip_relocation, ventura:        "134bf16837b48d808139381d83375b1ae0a55cd3b49e1b6cbcf33216dd5d6323"
-    sha256 cellar: :any_skip_relocation, monterey:       "14796a097a735cadbbbf01ffe2d9fb2f002b4d5b88dee3b79333197d0ef1396e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4d7a4f5f941967b3e92ce441df5dbfaa9027a67cc4673e968c9ff2a81eb40575"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "91b3920f61e02d5d3e6f75396e7337f34938ddadfa093a05299b35b83b3e66dd"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f7fb34f6bee0ab4a899f1b3bbec182ca72e2e30fef9bfec69c2636bccd1bffbd"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "272d2f3f209dc65a1a165e7f6fcf619d16b4bbf278a3a0d34252c37291b4e3d8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "de1c70a68e51a86b97959b63089f7853ccf8f6ca55630241af891919d556d55d"
+    sha256 cellar: :any_skip_relocation, sonoma:        "8dad1e8401b47e4129542bdcb407086a4184cdf77845acb50be85b2767a9387d"
+    sha256 cellar: :any_skip_relocation, ventura:       "31f5a9231ab385be2527f803c4d5c82cafffb9f944be33419d248c124da971ee"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2cf608d327b581dc8ffd158e6877fbbc9ce2be31b1e206861011408ba04953a4"
   end
 
-  depends_on "python@3.11"
-  depends_on "solc-select"
+  depends_on "python@3.13"
 
   resource "cbor2" do
-    url "https://files.pythonhosted.org/packages/d9/69/de486293f5211d2e8fe1a19854e69f2811a18448162c52b48c67f8fbcac3/cbor2-5.4.6.tar.gz"
-    sha256 "b893500db0fe033e570c3adc956af6eefc57e280026bd2d86fd53da9f1e594d7"
+    url "https://files.pythonhosted.org/packages/e4/aa/ba55b47d51d27911981a18743b4d3cebfabccbb0598c09801b734cec4184/cbor2-5.6.5.tar.gz"
+    sha256 "b682820677ee1dbba45f7da11898d2720f92e06be36acec290867d5ebf3d7e09"
+  end
+
+  resource "packaging" do
+    url "https://files.pythonhosted.org/packages/d0/63/68dbb6eb2de9cb10ee4c9c14a0148804425e13c4fb20d61cce69f53106da/packaging-24.2.tar.gz"
+    sha256 "c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"
   end
 
   resource "pycryptodome" do
-    url "https://files.pythonhosted.org/packages/b9/05/0e7547c445bbbc96c538d870e6c5c5a69a9fa5df0a9df3e27cb126527196/pycryptodome-3.18.0.tar.gz"
-    sha256 "c9adee653fc882d98956e33ca2c1fb582e23a8af7ac82fee75bd6113c55a0413"
+    url "https://files.pythonhosted.org/packages/13/52/13b9db4a913eee948152a079fe58d035bd3d1a519584155da8e786f767e6/pycryptodome-3.21.0.tar.gz"
+    sha256 "f7787e0d469bdae763b876174cf2e6c0f7be79808af26b1da96f1a64bcf47297"
+  end
+
+  resource "solc-select" do
+    url "https://files.pythonhosted.org/packages/60/a0/2a2bfbbab1d9bd4e1a24e3604c30b5d6f84219238f3c98f06191faf5d019/solc-select-1.0.4.tar.gz"
+    sha256 "db7b9de009af6de3a5416b80bbe5b6d636bf314703c016319b8c1231e248a6c7"
   end
 
   def install
     virtualenv_install_with_resources
-    site_packages = Language::Python.site_packages("python3.11")
-    solc_select = Formula["solc-select"].opt_libexec
-    (libexec/site_packages/"homebrew-solc-select.pth").write solc_select/site_packages
   end
 
   test do
@@ -45,7 +50,7 @@ class CryticCompile < Formula
     end
 
     resource("testdata").stage do
-      system bin/"crytic-compile", "variable-0.8.0.sol-0.8.15-compact.zip", \
+      system bin/"crytic-compile", "variable-0.8.0.sol-0.8.15-compact.zip",
              "--export-format=solc", "--export-dir=#{testpath}/export"
     end
 

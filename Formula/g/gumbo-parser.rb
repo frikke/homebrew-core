@@ -1,23 +1,17 @@
 class GumboParser < Formula
   desc "C99 library for parsing HTML5"
-  homepage "https://github.com/google/gumbo-parser"
-  url "https://github.com/google/gumbo-parser/archive/v0.10.1.tar.gz"
-  sha256 "28463053d44a5dfbc4b77bcf49c8cee119338ffa636cc17fc3378421d714efad"
+  homepage "https://codeberg.org/gumbo-parser/gumbo-parser"
+  url "https://codeberg.org/gumbo-parser/gumbo-parser/archive/0.13.0.tar.gz"
+  sha256 "7ad2ee259f35e8951233e4c9ad80968fb880f20d8202cb9c48f0b65f67d38e61"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "dcfdbc776b1c99ced008e359753b09a8b8074dd2cd9eabad4d8941cb3516d56b"
-    sha256 cellar: :any,                 arm64_monterey: "4a6e3a1bf98e9e1cae366ca87ca1edd454565ae058d654bd15f2ca363f7a3fb4"
-    sha256 cellar: :any,                 arm64_big_sur:  "9812d6af063b978c1314c5bc6f1eedcb34d9e395174ba9b68932feb69ed3f2e0"
-    sha256 cellar: :any,                 ventura:        "a9042d2c69a6063a6b8f9c0f5ea0f5f77df66ef22fddeb0b1b04a163df1184fc"
-    sha256 cellar: :any,                 monterey:       "15cc63bc7c0a91adbcbf51b50ec0be98a3a2d3ef2b495f4c6c3506ed4565ac9d"
-    sha256 cellar: :any,                 big_sur:        "917387609673137f253bc7f1effcb26a710c8a315f4d194de0bed0c6e21fc3b2"
-    sha256 cellar: :any,                 catalina:       "c922c8ec4425cef96e3283bace0ffda97cdd5f4946ca151da69045c6ce80ef06"
-    sha256 cellar: :any,                 mojave:         "aa6ed085625f40a65ecead082bd711dcb16af9aed6f74372edb7dc19e44fba5c"
-    sha256 cellar: :any,                 high_sierra:    "ed0957fe59981b55c1baf149022a5b0f3a163f1a6eb6e03e402da2f018406b9f"
-    sha256 cellar: :any,                 sierra:         "7c911b3f74827405abdf92cb6f6265cf7185043af4101d851eb68c5e69ea71e6"
-    sha256 cellar: :any,                 el_capitan:     "56f5446eb431b628655748659a8a7479466e00addf7d90070464364a3f3cafa9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7ae8a4b287fcbedb1cd48eeb3c26a257b2829401e23c0026dafb04461dcf07ae"
+    sha256 cellar: :any,                 arm64_sequoia: "d8e1aab75de31c09b003bfabdf9e1dcd5f8416b58cecac9d7c1cd24cc8de9717"
+    sha256 cellar: :any,                 arm64_sonoma:  "06d89a5fd5021a5217254a3be2b89ab7c67a01814043df4fe073578df0980bc3"
+    sha256 cellar: :any,                 arm64_ventura: "eb6f09225d057ba68927c42c3c9e0f6f52de37a41f895fd22923fa024c74d526"
+    sha256 cellar: :any,                 sonoma:        "145e843822f4a67cece0704eedd7f5e6c0f7baffa0b7a99d66e70a77eb1a3b7e"
+    sha256 cellar: :any,                 ventura:       "69dcb8188354001bfa3303a16e450304082900376acef548f3c1aaa647e9df29"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "027fd9b2bf818a7966cb874991ba3ef8279e63e7f45a3ddfe04a5898848c09ca"
   end
 
   depends_on "autoconf" => :build
@@ -26,15 +20,12 @@ class GumboParser < Formula
 
   def install
     system "./autogen.sh"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include "gumbo.h"
 
       int main() {
@@ -42,7 +33,7 @@ class GumboParser < Formula
         gumbo_destroy_output(&kGumboDefaultOptions, output);
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-L#{lib}", "-lgumbo", "-o", "test"
     system "./test"
   end

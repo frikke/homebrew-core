@@ -11,9 +11,12 @@ class Ftgl < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "a14fb054d0fbc1e6e11904e32c02be573d3db1c72981a6badbfc61f2f214d5cb"
+    sha256 cellar: :any,                 arm64_sonoma:   "4dbee18442898c2c431d5ea8de6c67170906763eb4e4eb6775735809c34bee86"
     sha256 cellar: :any,                 arm64_ventura:  "9c7cd41984f3696dd61d7ecd78c32f68f35121a1f7f8f0b2d0a9ccb2825016c2"
     sha256 cellar: :any,                 arm64_monterey: "ed10911135d6af44315967a7fe2d81e5bf1bac34347274a49545ab777bb12c86"
     sha256 cellar: :any,                 arm64_big_sur:  "85368ec5c37bb2cffd87cd30775a78956708c71749f8da56239fd93e57cf576d"
+    sha256 cellar: :any,                 sonoma:         "8d04c4e2fedf981269b941a69634b3fe4bcc0a3f54730c58c186823b0c7c5958"
     sha256 cellar: :any,                 ventura:        "184d35152ccbbee8771edbed5f40d34a8864704d4d90812f2c8f247ce79e5608"
     sha256 cellar: :any,                 monterey:       "fd4e1c8a08042ce2a0f96f79e899815009fd56cafbf550f88a9eb9685ff84b7d"
     sha256 cellar: :any,                 big_sur:        "1b39e663c0bedd0b915dd60c99c5f1acdfb3ae9717cd832134de15fd48736673"
@@ -25,11 +28,16 @@ class Ftgl < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "a53d8292298b4c6974e04fd8ab744860aec65b58149a704d9e2dad61aba0c4f6"
   end
 
+  depends_on "pkgconf" => :test
   depends_on "freetype"
 
   on_linux do
+    depends_on "mesa"
     depends_on "mesa-glu"
   end
+
+  # build patch to fix type mismatch
+  patch :DATA
 
   def install
     # If doxygen is installed, the docs may still fail to build.
@@ -38,10 +46,7 @@ class Ftgl < Formula
 
     # Skip building the example program by failing to find GLUT (MacPorts)
     # by setting --with-glut-inc and --with-glut-lib
-    args = %W[
-      --disable-debug
-      --disable-dependency-tracking
-      --prefix=#{prefix}
+    args = %w[
       --disable-freetypetest
       --with-glut-inc=/dev/null
       --with-glut-lib=/dev/null
@@ -49,8 +54,45 @@ class Ftgl < Formula
 
     args << "--with-gl-inc=#{Formula["mesa-glu"].opt_include}" if OS.linux?
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
 
     system "make", "install"
   end
+
+  test do
+    (testpath/"test.c").write <<~C
+      #include <FTGL/ftgl.h>
+      #include <stdio.h>
+
+      int main() {
+        FTGLfont *font = ftglCreatePixmapFont(NULL);
+
+        ftglSetFontFaceSize(font, 72, 72);
+
+        ftglDestroyFont(font);
+        printf("Font object created and destroyed successfully.\\n");
+
+        return 0;
+      }
+    C
+
+    pkgconf_flags = shell_output("pkgconf --cflags --libs ftgl").chomp.split
+    system ENV.cc, "test.c", "-o", "test", *pkgconf_flags
+    system "./test"
+  end
 end
+
+__END__
+diff --git a/src/FTVectoriser.cpp b/src/FTVectoriser.cpp
+index ea5c571..e0c4e2d 100644
+--- a/src/FTVectoriser.cpp
++++ b/src/FTVectoriser.cpp
+@@ -166,7 +166,7 @@ void FTVectoriser::ProcessContours()
+     for(int i = 0; i < ftContourCount; ++i)
+     {
+         FT_Vector* pointList = &outline.points[startIndex];
+-        char* tagList = &outline.tags[startIndex];
++        char* tagList = reinterpret_cast<char*>(&outline.tags[startIndex]);
+
+         endIndex = outline.contours[i];
+         contourLength =  (endIndex - startIndex) + 1;

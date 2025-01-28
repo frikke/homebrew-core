@@ -1,20 +1,19 @@
 class Hbase < Formula
   desc "Hadoop database: a distributed, scalable, big data store"
   homepage "https://hbase.apache.org"
-  url "https://www.apache.org/dyn/closer.lua?path=hbase/2.5.5/hbase-2.5.5-bin.tar.gz"
-  mirror "https://archive.apache.org/dist/hbase/2.5.5/hbase-2.5.5-bin.tar.gz"
-  sha256 "e67d717e96d17980f92d9afb948b9368d13fe2422a3b1f6e978e39b20d6d4df7"
+  url "https://www.apache.org/dyn/closer.lua?path=hbase/2.6.1/hbase-2.6.1-bin.tar.gz"
+  mirror "https://archive.apache.org/dist/hbase/2.6.1/hbase-2.6.1-bin.tar.gz"
+  sha256 "76e6eeff822593cd8db4d11c2adf2e2db707f27f351277313af9193b09369150"
   # We bundle hadoop-lzo which is GPL-3.0-or-later
   license all_of: ["Apache-2.0", "GPL-3.0-or-later"]
 
   bottle do
-    sha256 arm64_ventura:  "6400435842e8f2edf816b9af23f4ab9c00b5639f859cf5ef3a5cc68e26b30123"
-    sha256 arm64_monterey: "c32b8a50722f8b35055fe7c2d62ff956cf770532d113afe18838038569fd1c4f"
-    sha256 arm64_big_sur:  "5fdb6328e82f98cc6173dece2d4b34cd0e2d79bf05098885ef80d2ffff570275"
-    sha256 ventura:        "390a07e142a55cbb2d78a3926e77f6f70bc8b558a90a593539f42e6c0d7ed300"
-    sha256 monterey:       "fe466790727db6fc4fd1a422f2590c0f00f6398d0bd75f9c229d8fddef704ddd"
-    sha256 big_sur:        "39a385d2b54c451a95b4bc6fe6c79a8aa76fbf6c34430206e7d6b0c3d02a182a"
-    sha256 x86_64_linux:   "34cf7f2964351131831637df7425c3d785a383a0c3772f32ddff4bae98dede85"
+    sha256 arm64_sequoia: "ef9abda0df4a73dc7dc79fc84bafb0458a28bd9214152f2c94724b40ebb3a6b5"
+    sha256 arm64_sonoma:  "2e29b17434154655014f2748b84333fade9c3a147ad0283cbe2dae9ec90659b6"
+    sha256 arm64_ventura: "29e6c268eae626c43cf0c0e56ade1fbbdf30a69368f05dc3c615db1a3164c431"
+    sha256 sonoma:        "47438928d3738dc6e906ea0665bc851d1795ffa865fb66b5938395cde0833ea4"
+    sha256 ventura:       "c33cf0818f374ef77bcfc09ce58a1eb7ccaea69dadf24aaeebdd99e79a8ec043"
+    sha256 x86_64_linux:  "d779413909edc9803f495fcb53eee1414e0f98f8b4496761df4350fdb6e4e767"
   end
 
   depends_on "ant" => :build
@@ -24,7 +23,7 @@ class Hbase < Formula
   uses_from_macos "netcat" => :test
 
   resource "hadoop-lzo" do
-    url "https://github.com/cloudera/hadoop-lzo/archive/0.4.14.tar.gz"
+    url "https://github.com/cloudera/hadoop-lzo/archive/refs/tags/0.4.14.tar.gz"
     sha256 "aa8ddbb8b3f9e1c4b8cc3523486acdb7841cd97c002a9f2959c5b320c7bb0e6c"
 
     patch do
@@ -42,7 +41,7 @@ class Hbase < Formula
 
   def install
     java_home = Language::Java.java_home("11")
-    rm_f Dir["bin/*.cmd", "conf/*.cmd"]
+    rm(Dir["bin/*.cmd", "conf/*.cmd"])
     libexec.install %w[bin conf lib hbase-webapps]
 
     # Some binaries have really generic names (like `test`) and most seem to be
@@ -161,12 +160,12 @@ class Hbase < Formula
     ENV["HBASE_CONF_DIR"] = testpath/"conf"
     ENV["HBASE_PID_DIR"]  = testpath/"pid"
 
-    system "#{bin}/start-hbase.sh"
+    system bin/"start-hbase.sh"
     sleep 15
     begin
       assert_match "Zookeeper", pipe_output("nc 127.0.0.1 #{port} 2>&1", "stats")
     ensure
-      system "#{bin}/stop-hbase.sh"
+      system bin/"stop-hbase.sh"
     end
   end
 end

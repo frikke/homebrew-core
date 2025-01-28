@@ -1,40 +1,42 @@
 class OpenMesh < Formula
   desc "Generic data structure to represent and manipulate polygonal meshes"
-  homepage "https://openmesh.org/"
-  url "https://www.openmesh.org/media/Releases/9.0/OpenMesh-9.0.tar.bz2"
-  sha256 "69311a75b6060993b07fef005b328ea62178c13fbb0c44773874137231510218"
+  homepage "https://www.graphics.rwth-aachen.de/software/openmesh/"
+  url "https://www.graphics.rwth-aachen.de/media/openmesh_static/Releases/11.0/OpenMesh-11.0.0.tar.bz2"
+  sha256 "9d22e65bdd6a125ac2043350a019ec4346ea83922cafdf47e125a03c16f6fa07"
   license "BSD-3-Clause"
-  head "https://www.graphics.rwth-aachen.de:9000/OpenMesh/OpenMesh.git", branch: "master"
+  head "https://gitlab.vci.rwth-aachen.de:9000/OpenMesh/OpenMesh.git", branch: "master"
 
   livecheck do
-    url "https://www.openmesh.org/download/"
+    url "https://www.graphics.rwth-aachen.de/software/openmesh/download/"
     regex(/href=.*?OpenMesh[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "36d3182e03a2d69226203c13d3579fcc67faca7637fd8c437351e33012ed968b"
-    sha256 cellar: :any,                 arm64_monterey: "04e362ff1d3d9dc04399cf018ca9d19330693094b2de00f66ce60dbb2afd9aed"
-    sha256 cellar: :any,                 arm64_big_sur:  "ef9bdabb86ef70f589a16a33d0074bf4f22f1c5ae13bd66d78723e52df2ed921"
-    sha256 cellar: :any,                 ventura:        "62f264ab93c9f611bacd9dc5007e635a49c056285953d9d94beb810b4472aa9a"
-    sha256 cellar: :any,                 monterey:       "913221efd242346fa16b5e36313cbc614e9e397fd64a7dc21038012ef1bb4400"
-    sha256 cellar: :any,                 big_sur:        "02040786c707f555cb3fe98ab34445f4034f4dcfc4ede94002207983be2e3767"
-    sha256 cellar: :any,                 catalina:       "dafbe1a80d05a5e75477303dbc69d936a5bc366a8b20beaa52ecda864c796625"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ce084fa027dba1d790612441f726eba166950f5c89b52beb8341c8d40bc932f7"
+    sha256 cellar: :any,                 arm64_sequoia:  "1b1e1f2436c2eef35ba7c5a9ad38c1a95a621faca514d4e82ef1e57d668d0494"
+    sha256 cellar: :any,                 arm64_sonoma:   "34a5323c42111f78314efc77e19b9b5f595718155a22e480f75d0f559666c581"
+    sha256 cellar: :any,                 arm64_ventura:  "c3766a3a3366ce1da776285750738811d5b38e752d1d487fcd4fca2f0249dc84"
+    sha256 cellar: :any,                 arm64_monterey: "6ffaa80496d44e94d4ae6be0cd21e8ddfa23b5dadf9349284d65af6bebc2e45d"
+    sha256 cellar: :any,                 sonoma:         "daad3b91c4ca6a713f80298891ca0287bba5118d9b2da41b209e626625b9cf86"
+    sha256 cellar: :any,                 ventura:        "6c3376d904fd088a04933218be444ade532aa7dce3e956586445115f45efc776"
+    sha256 cellar: :any,                 monterey:       "f7b5afee5b4b8f473457bcd29919e3dc4c1691ff168a271812a996323d5c4d15"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "51111fc385d889eaee7e24daa21f468f830be446aa9fa27a6675220d65340862"
   end
 
   depends_on "cmake" => :build
 
   def install
-    ENV.cxx11
-
-    mkdir "build" do
-      system "cmake", "..", "-DBUILD_APPS=OFF", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
-      system "make", "install"
-    end
+    args = %W[
+      -DBUILD_APPS=OFF
+      -DCMAKE_CXX_STANDARD=14
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <iostream>
       #include <OpenMesh/Core/IO/MeshIO.hh>
       #include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
@@ -70,13 +72,13 @@ class OpenMesh < Formula
           return 0;
       }
 
-    EOS
+    CPP
     flags = %W[
       -I#{include}
       -L#{lib}
       -lOpenMeshCore
       -lOpenMeshTools
-      --std=c++11
+      -std=c++14
       -Wl,-rpath,#{lib}
     ]
     system ENV.cxx, "test.cpp", "-o", "test", *flags

@@ -1,9 +1,8 @@
 class Hof < Formula
   desc "Flexible data modeling & code generation system"
   homepage "https://hofstadter.io/"
-  url "https://github.com/hofstadter-io/hof.git",
-      tag:      "v0.6.8",
-      revision: "112659fe982a3efbe0acdb151c659e0b8b2e081f"
+  url "https://github.com/hofstadter-io/hof/archive/refs/tags/v0.6.10.tar.gz"
+  sha256 "87703d19a23121a4b617f1359aed9616dceb6c79718245861835b61ccff7e1eb"
   license "Apache-2.0"
   head "https://github.com/hofstadter-io/hof.git", branch: "_dev"
 
@@ -15,13 +14,13 @@ class Hof < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a2ec0beb3aeb76431ec6291dc649f6e306498979957bd1e26cc69aff4a43ec99"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a2ec0beb3aeb76431ec6291dc649f6e306498979957bd1e26cc69aff4a43ec99"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a2ec0beb3aeb76431ec6291dc649f6e306498979957bd1e26cc69aff4a43ec99"
-    sha256 cellar: :any_skip_relocation, ventura:        "15a46e02722ff5b6da468434960d2b7f102502ff28a00a9e787d8029ab294731"
-    sha256 cellar: :any_skip_relocation, monterey:       "15a46e02722ff5b6da468434960d2b7f102502ff28a00a9e787d8029ab294731"
-    sha256 cellar: :any_skip_relocation, big_sur:        "15a46e02722ff5b6da468434960d2b7f102502ff28a00a9e787d8029ab294731"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3774eb841173eb8615417658f1c0c1588ad2ca86ce8ffa3766337890b1ec8214"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8e5275eb22672ae3f0bcf884becc77d6b34eda2b7ba84ffd3fe562fddbc3d5e5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8e5275eb22672ae3f0bcf884becc77d6b34eda2b7ba84ffd3fe562fddbc3d5e5"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "8e5275eb22672ae3f0bcf884becc77d6b34eda2b7ba84ffd3fe562fddbc3d5e5"
+    sha256 cellar: :any_skip_relocation, sonoma:        "96a01bb5adfdee2ac9d77baf10cdbd99682f95e487ea6fc9b0a0be59d3492c19"
+    sha256 cellar: :any_skip_relocation, ventura:       "96a01bb5adfdee2ac9d77baf10cdbd99682f95e487ea6fc9b0a0be59d3492c19"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1649592d767a8d06f0db43de77032c854168d2626ba0113650942c1d3221e935"
   end
 
   depends_on "go" => :build
@@ -33,27 +32,26 @@ class Hof < Formula
     ldflags = %W[
       -s -w
       -X github.com/hofstadter-io/hof/cmd/hof/verinfo.Version=#{version}
-      -X github.com/hofstadter-io/hof/cmd/hof/verinfo.Commit=#{Utils.git_head}
+      -X github.com/hofstadter-io/hof/cmd/hof/verinfo.Commit=#{tap.user}
       -X github.com/hofstadter-io/hof/cmd/hof/verinfo.BuildDate=#{time.iso8601}
       -X github.com/hofstadter-io/hof/cmd/hof/verinfo.GoVersion=#{Formula["go"].version}
       -X github.com/hofstadter-io/hof/cmd/hof/verinfo.BuildOS=#{os}
       -X github.com/hofstadter-io/hof/cmd/hof/verinfo.BuildArch=#{arch}
     ]
 
-    ENV["CGO_ENABLED"] = "0"
     ENV["HOF_TELEMETRY_DISABLED"] = "1"
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/hof"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/hof"
 
     generate_completions_from_executable(bin/"hof", "completion")
   end
 
   test do
     ENV["HOF_TELEMETRY_DISABLED"] = "1"
-    # upstream bug report, https://github.com/hofstadter-io/hof/issues/257
-    # assert_match "v#{version}", shell_output("#{bin}/hof version")
+
+    assert_match version.to_s, shell_output("#{bin}/hof version")
 
     system bin/"hof", "mod", "init", "brew.sh/brewtest"
-    assert_predicate testpath/"cue.mod", :exist?
+    assert_path_exists testpath/"cue.mod"
     assert_match 'module: "brew.sh/brewtest"', (testpath/"cue.mod/module.cue").read
   end
 end

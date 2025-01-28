@@ -1,19 +1,28 @@
 class Joshuto < Formula
   desc "Ranger-like terminal file manager written in Rust"
   homepage "https://github.com/kamiyaa/joshuto"
-  url "https://github.com/kamiyaa/joshuto/archive/refs/tags/v0.9.5.tar.gz"
-  sha256 "14155a02cfeb0993a4906635a3c121589451e155e067d1c0d1673abdd1494ca8"
   license "LGPL-3.0-or-later"
   head "https://github.com/kamiyaa/joshuto.git", branch: "main"
 
+  stable do
+    url "https://github.com/kamiyaa/joshuto/archive/refs/tags/v0.9.8.tar.gz"
+    sha256 "877d841b2e26d26d0f0f2e6f1dab3ea2fdda38c345abcd25085a3f659c24e013"
+
+    # rust 1.80 build patch
+    patch do
+      url "https://github.com/kamiyaa/joshuto/commit/1245124fcd264e25becfd75258840708d7b8b4bb.patch?full_index=1"
+      sha256 "089a7b5ab92aafa6ed9472328c0ad4401db415cc1b08e102c0751430f0f61465"
+    end
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b0fa5caad0bb515343b50a5b71284bac2ef80fa1e20d45e946c5de2827a57ac7"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4b03edb2446a540b08c27d2479f57adc879f1ed88ce0df4938a278a1bed6337b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e7ed4e863b3abbee175c615e364e1fabbcaceb4965e31ff59bb950c41f1dc608"
-    sha256 cellar: :any_skip_relocation, ventura:        "623f1906e443bc94b46ffd9e45ddc33f1dc187facdac07b92a0ab34bebd956fe"
-    sha256 cellar: :any_skip_relocation, monterey:       "4aa2f3762feadd6fecb14d428696f1345cb44a33ca4a58201884dccfd084fd41"
-    sha256 cellar: :any_skip_relocation, big_sur:        "51bd053858f7a35857b16c4c22584786a3e1664c71d663eaf18808e5290d4c52"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "31b3d66a76fd106b2419e14b5de5635ba3b1500956de864a765c837da471d62f"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "05358a2a7b19b860ee8a0f96183f86587d0db37bb0d3caded154c7cf92c09f42"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ce1ddf54bfdc995486062ed770d1c80f1343c6df4f15bd120fb05ea57633b383"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f514471db634eef5bc7be735708cb9a3d3adc731c0bd17536b9bdf659a2db118"
+    sha256 cellar: :any_skip_relocation, sonoma:        "87d5f791245b275fef1e0ea33481a5ead7ce2ee3ff8b3335d48ccc1ea767e552"
+    sha256 cellar: :any_skip_relocation, ventura:       "e1bf0abd5d2379a4611cf2860282f8d456816c57c103ba59af215499e4a67a95"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4f5fd70baa48a4e36ac7c6be47c6c4517ddd39af97e88509cd3e0dad8f6efcdc"
   end
 
   depends_on "rust" => :build
@@ -21,6 +30,8 @@ class Joshuto < Formula
   def install
     system "cargo", "install", *std_cargo_args
     pkgetc.install Dir["config/*.toml"]
+
+    generate_completions_from_executable(bin/"joshuto", "completions")
   end
 
   test do

@@ -28,6 +28,7 @@ class W3m < Formula
   end
 
   bottle do
+    sha256 arm64_sequoia:  "df1fa11c7bee916e98b1dee448030ab78a7ce622c1a3a1a3ef7937a5898ea3f5"
     sha256 arm64_sonoma:   "efae67d8d635d8f05a27fc9ae4e75156bffa465828735428e3dfb6d1a117b6eb"
     sha256 arm64_ventura:  "fc4a77c30411f61b24a69be7ac380d6f79d3e9617c47f18f9c26e9c7a5ae11ef"
     sha256 arm64_monterey: "f987092472928a6f55bc65930ca911de4415f312cf9c9b8f3662baf4058b4b05"
@@ -39,7 +40,7 @@ class W3m < Formula
     sha256 x86_64_linux:   "1835ec7faed90c796e7290a5b6271dda1ac6b2bdb15ce577367852ad92681c39"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "bdw-gc"
   depends_on "openssl@3"
 
@@ -52,8 +53,8 @@ class W3m < Formula
   end
 
   def install
-    # Work around configure issues with Xcode 12
-    ENV.append "CFLAGS", "-Wno-implicit-function-declaration"
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1200
 
     system "./configure", "--prefix=#{prefix}",
                           "--disable-image",

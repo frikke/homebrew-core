@@ -2,8 +2,8 @@ class Flux < Formula
   desc "Lightweight scripting language for querying databases"
   homepage "https://www.influxdata.com/products/flux/"
   url "https://github.com/influxdata/flux.git",
-      tag:      "v0.194.3",
-      revision: "d8995bbfb3ad23bbd166a4daaea7a5d9e967dce6"
+      tag:      "v0.195.2",
+      revision: "c2433e6a9351b50e9c1c7de8a52a72176e08b845"
   license "MIT"
   head "https://github.com/influxdata/flux.git", branch: "master"
 
@@ -13,32 +13,41 @@ class Flux < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "9fd5f5a00b55f3f3440f9210d48ce155a9f965fff7728d0336c8ef5b8a725c77"
-    sha256 cellar: :any,                 arm64_monterey: "61551fb9307b35168d1897e5aabb75c5f8d47c5ebe4d6f2864d566c312e7720d"
-    sha256 cellar: :any,                 arm64_big_sur:  "201a77449a44cbc675c6601437d855ef1480d6338bb31296d6903f8c5d2aad13"
-    sha256 cellar: :any,                 ventura:        "d5d78c9fa3f721964cd9631c0fedb46b3967d28347d5e058c3618016ad1e25db"
-    sha256 cellar: :any,                 monterey:       "0c2c8661e17b95573a8733981e7bc503c4dbb72f4b30b43bce905bf8e9c71301"
-    sha256 cellar: :any,                 big_sur:        "7afbaf738fc20a543cda526aec0eb5f0ab0c446f224c7dc85a76475c6f31b819"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ddccd7824b7152dd2931eb11f66643261a21feef071eceb9a572658be9319c32"
+    sha256 cellar: :any,                 arm64_sequoia:  "9d6a8a7113bff0d3fad44e9e52b80ef4bf4660c771ee42dad7cc210cf2288f8c"
+    sha256 cellar: :any,                 arm64_sonoma:   "5d6804ec22c6a4e3d6a62dff38610d848880ae1e761e67b7911f2098b4ce1b97"
+    sha256 cellar: :any,                 arm64_ventura:  "1fbb64166d19183afaa136cb4d2a9bace5e0bd30406ffecf1aa0463e57ab008d"
+    sha256 cellar: :any,                 arm64_monterey: "50a5fb7f388d21ae20ced7ba4f9b8b8a7c5c6b322416786a5d7f5232480b54eb"
+    sha256 cellar: :any,                 sonoma:         "62ba74293ea0038e39caa8fcda02fee03bf8fbeee7a2575e87a7e1dfb63b2bea"
+    sha256 cellar: :any,                 ventura:        "885fdb467e7e27b997ea219c972e674794a333b1c9d9e86436d043669c71d601"
+    sha256 cellar: :any,                 monterey:       "e4b79e24f763168081efc0b25bfbe1cb21fd8807c70207ceb365950a66d747c2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5e1b70709a8013fe55aa0d613b3ba05f2830cd43c8c0b1f2e599f3f3844d3a04"
   end
 
   depends_on "go" => :build
   depends_on "rust" => :build
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
   end
+
+  conflicts_with "fantom", because: "both install `flux` binaries"
 
   # NOTE: The version here is specified in the go.mod of influxdb.
   # If you're upgrading to a newer influxdb version, check to see if this needs upgraded too.
   resource "pkg-config-wrapper" do
-    url "https://github.com/influxdata/pkg-config/archive/v0.2.12.tar.gz"
+    url "https://github.com/influxdata/pkg-config/archive/refs/tags/v0.2.12.tar.gz"
     sha256 "23b2ed6a2f04d42906f5a8c28c8d681d03d47a1c32435b5df008adac5b935f1a"
 
     livecheck do
       url "https://raw.githubusercontent.com/influxdata/flux/v#{LATEST_VERSION}/go.mod"
       regex(/pkg-config\s+v?(\d+(?:\.\d+)+)/i)
     end
+  end
+
+  # rust 1.83.0 build patch, upstream pr ref, https://github.com/influxdata/flux/pull/5516
+  patch do
+    url "https://github.com/influxdata/flux/commit/08b6cb784759242fd1455f1d28e653194745c0c6.patch?full_index=1"
+    sha256 "3c40b88897c1bd34c70f277e13320148cbee44b8ac7b8029be6bf4f541965302"
   end
 
   def install

@@ -1,46 +1,40 @@
 class Codequery < Formula
   desc "Code-understanding, code-browsing or code-search tool"
-  homepage "https://github.com/ruben2020/codequery"
-  url "https://github.com/ruben2020/codequery/archive/refs/tags/v0.26.0.tar.gz"
-  sha256 "5972a5778159835e37f5c9114a90f1be4756f27487d9074d2fb3464625a0ced2"
+  homepage "https://ruben2020.github.io/codequery/"
+  url "https://github.com/ruben2020/codequery/archive/refs/tags/v1.0.0.tar.gz"
+  sha256 "b0776adeae2963f197e3b9a57eb7ca405542da5f6413e06063e8d68f8246baa8"
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "bb8601cb33c79b6fa462b4279138e60901a5bf4828441e6eb2c3ef0b7969bfcf"
-    sha256 cellar: :any,                 arm64_monterey: "6dfb4a9564a48f8e371194fee1cc66850804dbe05304fac055f1238c4c16af32"
-    sha256 cellar: :any,                 arm64_big_sur:  "8e61eb2e4bda1efe140f20516772ed6e192b6f932df86c3401c9de5e2f6dc39b"
-    sha256 cellar: :any,                 ventura:        "b97d3a2af1846992e6594d2ad553c7c72ff218fed7fcc4c6a9457a36fb7538b5"
-    sha256 cellar: :any,                 monterey:       "8f07b88f92a60578753b89cd5202a41e908faf36b4ac73d5ff73fa2aab628589"
-    sha256 cellar: :any,                 big_sur:        "f2ddf6373596c5c563c4d0d120bb45b50c0a4f94865be50410f3a57b3b303338"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c42a8a16ffec8983454e4f8c5485efb10f936781a1afdc683ed899c8deab558b"
+    sha256 cellar: :any,                 arm64_sonoma:   "4e4fb0e6e4d1171bff615afc316580b9fa839da228349d9ceae861da9f184004"
+    sha256 cellar: :any,                 arm64_ventura:  "7f2b375faf1d458989b42e8b03a4aa57599f54038e941752f50e18925ae4c43b"
+    sha256 cellar: :any,                 arm64_monterey: "3f13a8eb9bfbd76b95c2a9f93759b9667574df9fd949e9332d268b3e3f699406"
+    sha256 cellar: :any,                 sonoma:         "7d4ab5fa8902cc12ce5c8f72f808b8dab4399b3caa281ed04bc286ae0689e4fc"
+    sha256 cellar: :any,                 ventura:        "9b959ddfdcb5bbfcf3ab2a09f07ef279e76db150230c8c8a5ef7a8ab7ad00c8c"
+    sha256 cellar: :any,                 monterey:       "00a3a640de5c64f871865d155bba13485269d2d1c2ec4a68a13367ef789e6d90"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "02ad5e72b9b38a66604f6e1be788b94309e844276297037e402cfed743e25b80"
   end
 
   depends_on "cmake" => :build
-  depends_on "ninja" => :build
-  depends_on "qt@5"
-
-  fails_with gcc: "5"
+  depends_on "qt"
+  depends_on "sqlite"
 
   def install
-    args = std_cmake_args
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
-    share.install "test"
-    mkdir "build" do
-      system "cmake", "..", "-G", "Ninja", *args
-      system "ninja"
-      system "ninja", "install"
-    end
+    pkgshare.install "test"
   end
 
   test do
     # Copy test files as `cqmakedb` gets confused if we just symlink them.
-    test_files = (share/"test").children
-    cp test_files, testpath
+    cp (pkgshare/"test").children, testpath
 
-    system "#{bin}/cqmakedb", "-s", "./codequery.db",
-                              "-c", "./cscope.out",
-                              "-t", "./tags",
-                              "-p"
+    system bin/"cqmakedb", "-s", "./codequery.db",
+                           "-c", "./cscope.out",
+                           "-t", "./tags",
+                           "-p"
     output = shell_output("#{bin}/cqsearch -s ./codequery.db -t info_platform")
     assert_match "info_platform", output
   end

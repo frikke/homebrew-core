@@ -1,10 +1,9 @@
 class Nim < Formula
   desc "Statically typed compiled systems programming language"
   homepage "https://nim-lang.org/"
-  url "https://nim-lang.org/download/nim-2.0.0.tar.xz"
-  sha256 "bd6101d840036fb78e93a69df6cf3f9fd0c21cd754b695ff84a3b4add8ed0af7"
+  url "https://nim-lang.org/download/nim-2.2.0.tar.xz"
+  sha256 "ce9842849c9760e487ecdd1cdadf7c0f2844cafae605401c7c72ae257644893c"
   license "MIT"
-  revision 1
   head "https://github.com/nim-lang/Nim.git", branch: "devel"
 
   livecheck do
@@ -13,13 +12,12 @@ class Nim < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0fa727208bc8516c1ceb20e97e22f1a50778c0d18a3af2e15ed3b02fdea802fc"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d5ca3ffeed48e550e054b884725b944384886f33e2ff2306f313fdebe6675abe"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b6c6b719a85143914667bd94fa1668bf686eec8b9a7108d27ea0799c4a128ff7"
-    sha256 cellar: :any_skip_relocation, ventura:        "8d2ec4fadd66ca1e3759085601a13b8cef5d711352531ed8fbe7d9bcf5542564"
-    sha256 cellar: :any_skip_relocation, monterey:       "f414b4a3b42193367b565b90d039ea8e1c3676f25be558f0aef5d6efe4dfb9cc"
-    sha256 cellar: :any_skip_relocation, big_sur:        "abf94332c36c652b8b5e78ef62f11033dec8b12f2c1025df8ca4384fd1ff7752"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "19a3b3e6b6e4379f21eb7ff18d8a49e9f601ceaaaa276dafbc4afb3fae715f8f"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bfc74fb77b48f05f8feefd2e643359efadeeaa4eec0a2d94882564aee1563e47"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7ae2f159bb433847dc9e26b1ef7b0f9b31afa9f095c88bb54b899fa265b6fa95"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "008118534506dcc73df8daca97ee8437bdbe74cc9201055fe6565c6b26bfe9e0"
+    sha256 cellar: :any_skip_relocation, sonoma:        "01a4e5222e2aaf6708da811abc90381923c8c4fcf843fd5d7ab84225f591a1c8"
+    sha256 cellar: :any_skip_relocation, ventura:       "e85c4c1bda5a6a82059f7fa562e4ed875793c4f2122e6cf9f707bd7d7cffef47"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5bb0465231f57d4156acc2fef0671a1fdfb86735e38063ad2e02d98a6d1d7a93"
   end
 
   depends_on "help2man" => :build
@@ -27,6 +25,8 @@ class Nim < Formula
   on_linux do
     depends_on "openssl@3"
   end
+
+  conflicts_with "atlas", "mongodb-atlas-cli", because: "both install `atlas` executable"
 
   def install
     if build.head?

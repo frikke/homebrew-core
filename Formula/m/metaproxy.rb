@@ -4,7 +4,7 @@ class Metaproxy < Formula
   url "https://ftp.indexdata.com/pub/metaproxy/metaproxy-1.21.0.tar.gz"
   sha256 "874223a820b15ee2626240c378eee71e31a4e6d3498a433c94409c949e654fae"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 6
 
   # The homepage doesn't link to the latest source file, so we have to check
   # the directory listing page directly.
@@ -14,20 +14,22 @@ class Metaproxy < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "2c39998f77952b5a09b6869f82895af7be109ad7bcf85235e2687302b7e7da7e"
-    sha256 cellar: :any,                 arm64_monterey: "dcad5af967b3aea05d0c2716abb421e398458ae45424f8b4f5b5cb6bdab66762"
-    sha256 cellar: :any,                 arm64_big_sur:  "75ef8bba6fdf29e2ff25ede0180e33ccaf5ecdf77057ace160055d61c9a02b88"
-    sha256 cellar: :any,                 ventura:        "53a9d7795665a872e74651f9600428d53b63605028d850b3c9cda02686ddff30"
-    sha256 cellar: :any,                 monterey:       "b08581aa2833dca73cf699fd4c9910a575cf097113f8d78655cff7f680fa57b0"
-    sha256 cellar: :any,                 big_sur:        "6316f51dfc9500d525be283e8d0c02724a9ab7270cc31ae5a200fb5d7b631c0a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4c45c4c7615c434ea2276608fc8df307554652f95d3a80060ca54aa592b6b4f9"
+    sha256 cellar: :any,                 arm64_sequoia: "b1eea2b79dd905c1fcc7b5d1c3daaec3dbb29ae98a36a68ea71128283e0d58b9"
+    sha256 cellar: :any,                 arm64_sonoma:  "0cb4b412383eb9e632b41098897d8c505ad2018afb37155ddcf4cf9e7fe9c680"
+    sha256 cellar: :any,                 arm64_ventura: "0c1a59097b9950126974696be1aabcf0d2c3959708cefba9d2158f97219f6bf3"
+    sha256 cellar: :any,                 sonoma:        "7a1adea81cd7b58bfa798904b4796b53c99fb99ebd8daf14729b3671a81e923f"
+    sha256 cellar: :any,                 ventura:       "94c153a802f50a3b4c5e1e76df4688e7a1ae54ae305623f359e624dca063af29"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "eaa7e3c1c3515d207a783e401edce6689990c08c649df23a57c3d7ffb5c1a695"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "boost"
+  depends_on "yaz"
   depends_on "yazpp"
 
-  fails_with gcc: "5"
+  uses_from_macos "libxml2"
+  uses_from_macos "libxslt"
 
   def install
     # Match C++ standard in boost to avoid undefined symbols at runtime
@@ -40,7 +42,7 @@ class Metaproxy < Formula
 
   # Test by making metaproxy test a trivial configuration file (etc/config0.xml).
   test do
-    (testpath/"test-config.xml").write <<~EOS
+    (testpath/"test-config.xml").write <<~XML
       <?xml version="1.0"?>
       <metaproxy xmlns="http://indexdata.com/metaproxy" version="1.0">
         <start route="start"/>
@@ -60,8 +62,8 @@ class Metaproxy < Formula
           </route>
         </routes>
       </metaproxy>
-    EOS
+    XML
 
-    system "#{bin}/metaproxy", "-t", "--config", "#{testpath}/test-config.xml"
+    system bin/"metaproxy", "-t", "--config", testpath/"test-config.xml"
   end
 end

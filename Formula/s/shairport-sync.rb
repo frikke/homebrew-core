@@ -1,8 +1,8 @@
 class ShairportSync < Formula
   desc "AirTunes emulator that adds multi-room capability"
   homepage "https://github.com/mikebrady/shairport-sync"
-  url "https://github.com/mikebrady/shairport-sync/archive/4.3.1.tar.gz"
-  sha256 "9a0044eb7c940dc8dba42de90439386929926b83f821b916db03bc308fdaf189"
+  url "https://github.com/mikebrady/shairport-sync/archive/refs/tags/4.3.6.tar.gz"
+  sha256 "f100ed80938ff63d305a260b0f0dd32d012ea9b64884b2802d46d862923439b8"
   license "MIT"
   head "https://github.com/mikebrady/shairport-sync.git", branch: "master"
 
@@ -12,18 +12,17 @@ class ShairportSync < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "395e548f70d74ce527521bf81f1c2c3c9c4218dc8418900144b6035020033654"
-    sha256 arm64_monterey: "356dc1fd2cbb0221498c78d1b7fc9571071b07e766420f21d06bb5f3d9c08270"
-    sha256 arm64_big_sur:  "26fc233ac20725b95a9a71363d24e7b33ae99fe5f65fff70ebc8f759ec205164"
-    sha256 ventura:        "b8157c97cc8a9e77b8e3a96a6382a9136d0fcb63dc8b80b7b1baf39f93ee59f2"
-    sha256 monterey:       "d60c8c7d19d6bb11bec2796413665a45b62a1dcb0476486b0b6ded5fdb08afbc"
-    sha256 big_sur:        "7f3f60c24cc19201f61664b6e8b02e409db6e6276f2b1fb09bf2194c20e83031"
-    sha256 x86_64_linux:   "d98553f2430fe8e4e7d7aac8d2df3b2cb115c174435fd178a5172c3c95289901"
+    sha256 arm64_sequoia: "8245d8d79770aa181e906101f1ef2a96fecb2c2b9c68e19625d52e6e2cda5fb3"
+    sha256 arm64_sonoma:  "d43445d6cd3d5b13f391e05a066a4738f8ac6f50264c6849a978d34e2a8aa08a"
+    sha256 arm64_ventura: "60d52799c5c80dea86014ff3d4ec9abf7120d6582321d26db2197db6ab11dada"
+    sha256 sonoma:        "2d430533cbb4e4cdb4fabb82250377f1631927e0717e6168db956d0910a4ecb4"
+    sha256 ventura:       "b46a6f87a5fd48f6ca100d3db896e5bf8c269c44fd142f8edf368b4d8bb47bbf"
+    sha256 x86_64_linux:  "3717504ad42bd41555583b64254368295e6b16d9f7b496cffc7d407071f24899"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libao"
   depends_on "libconfig"
   depends_on "libdaemon"
@@ -33,7 +32,7 @@ class ShairportSync < Formula
   depends_on "pulseaudio"
 
   def install
-    system "autoreconf", "-fvi"
+    system "autoreconf", "--force", "--install", "--verbose"
     args = %W[
       --with-libdaemon
       --with-ssl=openssl
@@ -45,13 +44,12 @@ class ShairportSync < Formula
       --with-metadata
       --with-piddir=#{var}/run
       --sysconfdir=#{etc}/shairport-sync
-      --prefix=#{prefix}
     ]
     if OS.mac?
       args << "--with-dns_sd" # Enable bonjour
       args << "--with-os=darwin"
     end
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 

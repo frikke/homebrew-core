@@ -1,29 +1,28 @@
 class Duck < Formula
   desc "Command-line interface for Cyberduck (a multi-protocol file transfer tool)"
   homepage "https://duck.sh/"
-  url "https://dist.duck.sh/duck-src-8.6.0.39818.tar.gz"
-  sha256 "2c61b56ff076f0c99822d720f8d4b5f6615cbb5fca1949442a019c0116a9a08d"
+  url "https://dist.duck.sh/duck-src-9.1.2.42722.tar.gz"
+  sha256 "13f496860b36358dedbbba1d45d40758566b9ec8f657e789bcdcac1a66f3b72c"
   license "GPL-3.0-only"
   head "https://github.com/iterate-ch/cyberduck.git", branch: "master"
 
   livecheck do
     url "https://dist.duck.sh/"
-    regex(/href=.*?duck-src[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    regex(/href=.*?duck(?:-src)?[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "11074899873ce51533839720a556438efae7cc6c3a89387e9ee446ac7b48fc11"
-    sha256 cellar: :any, arm64_monterey: "33695f088369881f75fe101d404b2c1b03097840afa1e1673682be312cc89069"
-    sha256 cellar: :any, arm64_big_sur:  "fef8a4d373fee31472552fbdfaeeadaef467fc93364587e32457a7ef270cb24e"
-    sha256 cellar: :any, ventura:        "a5853e0216a47a7d24e9fe87cbf1f840b020a909f0bfee7ada72949b97908c48"
-    sha256 cellar: :any, monterey:       "f41b298b82b271c5c9f4d43cbb23b04e3535d51b778caf65010027a71e4e467b"
-    sha256 cellar: :any, big_sur:        "379788fda9cb45021204e0f84c5c6ca5c5b85235e515c6b2160314628b031244"
-    sha256               x86_64_linux:   "2b94608495c243347c26ceda7d2c4f7c5327f94814a70a35308c085a89a3b0c5"
+    sha256 cellar: :any, arm64_sequoia: "de5427ed1c9db98edd4c633d948b8a1a8d488077e28cfca013159785d7cb4c96"
+    sha256 cellar: :any, arm64_sonoma:  "d18bdc35d038bc7a8667c10b41a9c9b8367b553adaf2920b0c1b52a64950f38d"
+    sha256 cellar: :any, arm64_ventura: "5a345c332e1f280810bccbc6b1e78cbd7676032e29a23b4c3b522c82221958c4"
+    sha256 cellar: :any, sonoma:        "6b9f64369e33d5c0a580990eb0ea3d18c9f37698842f30e2dcbb9bdd8479a754"
+    sha256 cellar: :any, ventura:       "05b443e05dab27348dc8d331b1e79c3e65570d15fd8bf69569942bd40c0e1bd3"
+    sha256               x86_64_linux:  "eeb0cfd0629c64025dc5dda88b9be7059254da331d53c0ae5bd8f7ece093f485"
   end
 
   depends_on "ant" => :build
   depends_on "maven" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on xcode: ["13.1", :build]
   depends_on "openjdk"
 
@@ -33,16 +32,23 @@ class Duck < Formula
   on_linux do
     depends_on "alsa-lib"
     depends_on "freetype"
+    depends_on "giflib"
+    depends_on "harfbuzz"
+    depends_on "jpeg-turbo"
+    depends_on "libpng"
     depends_on "libx11"
     depends_on "libxext"
     depends_on "libxi"
     depends_on "libxrender"
     depends_on "libxtst"
+    depends_on "little-cms2"
   end
 
+  conflicts_with "duckscript", because: "both install `duck` binaries"
+
   resource "jna" do
-    url "https://github.com/java-native-access/jna/archive/refs/tags/5.13.0.tar.gz"
-    sha256 "526bff8ffcbc2067a7403f55b01ad8d7a781c098abca79c4ea6c9e80198bb5fd"
+    url "https://github.com/java-native-access/jna/archive/refs/tags/5.15.0.tar.gz"
+    sha256 "30f857756ea29870c8a0c7eff5f0e0b38fdd01c1f26bd9b0f4af02a7d3643179"
   end
 
   resource "rococoa" do
@@ -117,17 +123,17 @@ class Duck < Formula
       end
     end
 
-    # Set MACOSX_DEPLOYMENT_TARGET to avoid linker errors when building rococoa.
-    xcconfig = buildpath/"Overrides.xcconfig"
-    xcconfig.write <<~EOS
-      OTHER_LDFLAGS = -headerpad_max_install_names
-      VALID_ARCHS=#{Hardware::CPU.arch}
-      MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}
-    EOS
-    ENV["XCODE_XCCONFIG_FILE"] = xcconfig
-
     resource("rococoa").stage do
       next unless OS.mac?
+
+      # Set MACOSX_DEPLOYMENT_TARGET to avoid linker errors when building rococoa.
+      xcconfig = buildpath/"Overrides.xcconfig"
+      xcconfig.write <<~EOS
+        OTHER_LDFLAGS = -headerpad_max_install_names
+        VALID_ARCHS=#{Hardware::CPU.arch}
+        MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}
+      EOS
+      ENV["XCODE_XCCONFIG_FILE"] = xcconfig
 
       cd "rococoa/rococoa-core" do
         xcodebuild "VALID_ARCHS=#{Hardware::CPU.arch}", "-project", "rococoa.xcodeproj"
@@ -156,7 +162,7 @@ class Duck < Formula
 
       # Remove the `*.tbd` files. They're not needed, and they cause codesigning issues.
       buildpath.glob("JavaNativeFoundation.framework/**/JavaNativeFoundation.tbd").map(&:unlink)
-      rm_rf libdir/"JavaNativeFoundation.framework"
+      rm_r(libdir/"JavaNativeFoundation.framework")
       libdir.install buildpath/"JavaNativeFoundation.framework"
 
       rm libdir/shared_library("librococoa")
@@ -175,7 +181,7 @@ class Duck < Formula
   end
 
   test do
-    system "#{bin}/duck", "--download", "https://ftp.gnu.org/gnu/wget/wget-1.19.4.tar.gz", testpath/"test"
+    system bin/"duck", "--download", "https://ftp.gnu.org/gnu/wget/wget-1.19.4.tar.gz", testpath/"test"
     assert_equal (testpath/"test").sha256, "93fb96b0f48a20ff5be0d9d9d3c4a986b469cb853131f9d5fe4cc9cecbc8b5b5"
   end
 end

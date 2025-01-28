@@ -1,19 +1,20 @@
 class Brogue < Formula
   desc "Roguelike game"
   homepage "https://sites.google.com/site/broguegame/"
-  url "https://github.com/tmewett/BrogueCE/archive/refs/tags/v1.12.tar.gz"
-  sha256 "aeed3f6ca0f4e352137b0196e9dddbdce542a9e99dda9effd915e018923cd428"
+  url "https://github.com/tmewett/BrogueCE/archive/refs/tags/v1.14.1.tar.gz"
+  sha256 "0fe39782c029068b4d3f9f21cc13974ced56fdd9b192e6ca972f8e13cf726f20"
   license "AGPL-3.0-or-later"
   head "https://github.com/tmewett/BrogueCE.git", branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "b3fb81412edaad2c3447f2500430162487f422c8e6e48acf887fb029a8aa40f2"
-    sha256 arm64_monterey: "f545e3d7758f956956599d3cb01dbfd230349ab70b4751b9398973e26dbeec52"
-    sha256 arm64_big_sur:  "886aa3d64dd77d365d4c8ce311ab0a0194c5f3c876c51887b626d148307b6a14"
-    sha256 ventura:        "31081da4bd41c4471fc2579095688435b1011a5def3c466ac722bf3b636906fa"
-    sha256 monterey:       "cccb038be8fffad521143a7dd87e9b94a5aacbce8462e6b1317a8f1ff8714463"
-    sha256 big_sur:        "4f8184e978f64e2b3c3dddb5af5721fe1ecb3431f69a1c85e3673eb024733d43"
-    sha256 x86_64_linux:   "83b284e5c9b8d58756ac33e743d56b9bac827cfab5e965070a24dc5b6b849e1d"
+    sha256 arm64_sequoia:  "b2d2a8e6b65866cfbfba2eea171268017cb44f234dfdd85bd1943b5edcb8827f"
+    sha256 arm64_sonoma:   "4d5ec621a099c5016345730c32c48664cab885537d7633f00fa39fe930b905da"
+    sha256 arm64_ventura:  "1aec31252a24b39d4be968077507a343210733dfd068f31331e7dc7f5909a3a7"
+    sha256 arm64_monterey: "630b47e808445a9b131293d6e5637889d20c7168634981bd557b7df079d8c0d9"
+    sha256 sonoma:         "0dc69856645329fa45cd9011a59c84260b00f05ad5fbe2a2e22f0f6ce2544f9b"
+    sha256 ventura:        "9c7ee6f9de30fa3507aad6c3fbe863d0c5beea2e06ffdf34774974a83b4903b1"
+    sha256 monterey:       "b84fd290fb2f6e5ed03f24df0cf85e0ec4b3c094e9af51271dc8ae2ad23ae0b2"
+    sha256 x86_64_linux:   "024fae31f907fa7176729178e4b7e442d9f5ea9a978be5bffaa8bf20c5c50006"
   end
 
   depends_on "sdl2"
@@ -32,10 +33,10 @@ class Brogue < Formula
     libexec.install "bin/brogue", "bin/keymap.txt", "bin/assets"
 
     # Use var directory to save highscores and replay files across upgrades
-    (bin/"brogue").write <<~EOS
+    (bin/"brogue").write <<~SHELL
       #!/bin/bash
       cd "#{var}/brogue" && exec "#{libexec}/brogue" "$@"
-    EOS
+    SHELL
   end
 
   def post_install
@@ -50,6 +51,6 @@ class Brogue < Formula
   end
 
   test do
-    system "#{bin}/brogue", "--version"
+    system bin/"brogue", "--version"
   end
 end

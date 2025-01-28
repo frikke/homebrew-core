@@ -1,14 +1,17 @@
 class Gravity < Formula
   desc "Embeddable programming language"
   homepage "https://marcobambini.github.io/gravity/"
-  url "https://github.com/marcobambini/gravity/archive/0.8.5.tar.gz"
+  url "https://github.com/marcobambini/gravity/archive/refs/tags/0.8.5.tar.gz"
   sha256 "5ef70c940cd1f3fec5ca908fb10af60731750d62ba39bee08cb4711b72917e1d"
   license "MIT"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "3b9deeeaa076effc41b7d65f16d152e75895327bb4692061afc8b86acc5c25fa"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "1938bccfa92b1139af3b20ffd2acab61f7860bfaa0a08ddb233b365db300e59c"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "a3e27f2ccdad0ad0ea5b4c51406aa149a830647be7746fc5a331aa55ac537be8"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "fd8ad02be9b28d88e59d71b34ec0e57e11f8647654de9787a01529ab2740f527"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "45bbef2a6a44492360953457a4bcedc14d5158d5ae654dac143d4acf6a0ceccd"
+    sha256 cellar: :any_skip_relocation, sonoma:         "ea10a43302c779b73aa7480c707b0b76a51582a9b17b81ffb912ba447ab4aec3"
     sha256 cellar: :any_skip_relocation, ventura:        "31be6d870c1a1def84a678ffc2201d2a846eabf208aaad97ffca0e6065a72f26"
     sha256 cellar: :any_skip_relocation, monterey:       "106785af925ee88415030eede30c8eadc5cdd590cdfdf992d8c2d3ea4fb7ae27"
     sha256 cellar: :any_skip_relocation, big_sur:        "b3ac70acf8c191279d44ca6ee217677922dbbebd47ce4aeafb08279e25a54c58"

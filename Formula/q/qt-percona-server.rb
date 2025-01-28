@@ -1,27 +1,25 @@
 class QtPerconaServer < Formula
   desc "Qt SQL Database Driver"
   homepage "https://www.qt.io/"
-  url "https://download.qt.io/official_releases/qt/6.5/6.5.1/submodules/qtbase-everywhere-src-6.5.1.tar.xz"
-  sha256 "db56fa1f4303a1189fe33418d25d1924931c7aef237f89eea9de58e858eebfed"
+  url "https://download.qt.io/official_releases/qt/6.7/6.7.3/submodules/qtbase-everywhere-src-6.7.3.tar.xz"
+  sha256 "8ccbb9ab055205ac76632c9eeddd1ed6fc66936fc56afc2ed0fd5d9e23da3097"
   license any_of: ["GPL-2.0-only", "GPL-3.0-only", "LGPL-3.0-only"]
+  revision 1
 
   livecheck do
     formula "qt"
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "b32e9ae3cc043307ee278c449f2eb76ef85caa0c30d1c0d315cf73e9eb9c85c4"
-    sha256 cellar: :any,                 arm64_monterey: "d918f5098cfa4131ad417aaf36fb5da2ab6e7edb016b279813634b9b74dd9244"
-    sha256 cellar: :any,                 arm64_big_sur:  "da23de68a5f0a33c3c18224c028d2ec45ab36efe215defc3b78ac1fe8dd9350f"
-    sha256 cellar: :any,                 ventura:        "6c7216393f5536a33a069ee2171d8d6b9b1098361d2892335bebed73d4a66427"
-    sha256 cellar: :any,                 monterey:       "05d9e0fb047abbe171ecd16a3f923a10a9e286f0852b0cedb0bd5a6f747f97bb"
-    sha256 cellar: :any,                 big_sur:        "b1905ee3be1127084423f54c4c958869497c7e744ee786ca6ab9cfe41531215f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "efc913d411945f1b3e8e314aee4ef92bfdf6aa216615adec6dc9e041f482aa8f"
+    sha256 cellar: :any,                 arm64_sonoma:  "1ddef630fd535a78863fe590869c44ae945fa5440eafcb8a47b1147a5d56d3cf"
+    sha256 cellar: :any,                 arm64_ventura: "de8893b2e841a762a7b9dae8933b5f28bd1872e7504e09b2432a0ecf24cd71e3"
+    sha256 cellar: :any,                 sonoma:        "91e25ff4c6ba990382dd7c97e015163bef458660d7e45c0febe7f335eb1b5698"
+    sha256 cellar: :any,                 ventura:       "1dec6aa1e06b02ae44355af80b74287c5855d8101e74a274006b735a529f0c92"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "428c6d820ad63f8121c706c2570c6d227e108ea7eba62a85fbb67eb924d2d5f8"
   end
 
   depends_on "cmake" => [:build, :test]
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   depends_on "percona-server"
   depends_on "qt"
@@ -29,10 +27,8 @@ class QtPerconaServer < Formula
   conflicts_with "qt-mysql", "qt-mariadb",
     because: "qt-mysql, qt-mariadb, and qt-percona-server install the same binaries"
 
-  fails_with gcc: "5"
-
   def install
-    args = std_cmake_args + %W[
+    args = %W[
       -DCMAKE_STAGING_PREFIX=#{prefix}
 
       -DFEATURE_sql_ibase=OFF
@@ -42,18 +38,19 @@ class QtPerconaServer < Formula
       -DFEATURE_sql_psql=OFF
       -DFEATURE_sql_sqlite=OFF
 
-      -DMySQL_LIBRARY=#{Formula["percona-server"].opt_lib}/#{shared_library("libperconaserverclient")}
+      -DMySQL_LIBRARY=#{Formula["percona-server"].opt_lib/shared_library("libperconaserverclient")}
     ]
+    # Workaround for missing libraries failure in CI dependent tests when `percona-server`
+    # is unlinked due to conflict handling but not re-linked before linkage test
+    args << "-DCMAKE_INSTALL_RPATH=#{Formula["percona-server"].opt_lib}" if OS.linux?
 
-    cd "src/plugins/sqldrivers" do
-      system "cmake", "-S", ".", "-B", "build", *args
-      system "cmake", "--build", "build"
-      system "cmake", "--install", "build"
-    end
+    system "cmake", "-S", "src/plugins/sqldrivers", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"CMakeLists.txt").write <<~EOS
+    (testpath/"CMakeLists.txt").write <<~CMAKE
       cmake_minimum_required(VERSION 3.16.0)
       project(test VERSION 1.0.0 LANGUAGES CXX)
       set(CMAKE_CXX_STANDARD 17)
@@ -66,7 +63,7 @@ class QtPerconaServer < Formula
           main.cpp
       )
       target_link_libraries(test PRIVATE Qt6::Core Qt6::Sql)
-    EOS
+    CMAKE
 
     (testpath/"test.pro").write <<~EOS
       QT       += core sql
@@ -78,7 +75,7 @@ class QtPerconaServer < Formula
       SOURCES += main.cpp
     EOS
 
-    (testpath/"main.cpp").write <<~EOS
+    (testpath/"main.cpp").write <<~CPP
       #include <QCoreApplication>
       #include <QtSql>
       #include <cassert>
@@ -90,7 +87,7 @@ class QtPerconaServer < Formula
         assert(db.isValid());
         return 0;
       }
-    EOS
+    CPP
 
     system "cmake", "-DCMAKE_BUILD_TYPE=Debug", testpath
     system "make"

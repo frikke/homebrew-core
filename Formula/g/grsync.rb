@@ -3,31 +3,42 @@ class Grsync < Formula
   homepage "https://www.opbyte.it/grsync/"
   url "https://downloads.sourceforge.net/project/grsync/grsync-1.3.1.tar.gz"
   sha256 "33cc0e25daa62e5ba7091caea3c83a8dc74dc5d7721c4501d349f210c4b3c6d3"
-  license "GPL-2.0"
+  license "GPL-2.0-only"
+  revision 1
 
   bottle do
-    sha256 arm64_ventura:  "39d381a9ac5afe877312853cd7ec9a2cb6c5460adedd76d12011e6a88d1eb59a"
-    sha256 arm64_monterey: "32671b0162b77e802079651b54d04dfa60fba61615e4392c93e905c219c5d705"
-    sha256 arm64_big_sur:  "62d904f3e87bc6e4d5af9714f07ca04a726656fd137dddec7690c334a084e78f"
-    sha256 ventura:        "90a7e58480143733b0a103edf01a995774d2cf380c317988967c575357b6f241"
-    sha256 monterey:       "34f6b19b970ece35695bd8642aa5fb8834476596de6915ac2174a849e1038dd5"
-    sha256 big_sur:        "7974e843681ed6e904617ff9f33c15109a001b7eda1afebfa4b5976b29ae5254"
-    sha256 x86_64_linux:   "3802fa7c04a31a45f1be977efd420e45feb0ddcf91c4c1c423b7223b9e3eb5bb"
+    sha256 arm64_sequoia:  "7acba4db4f6cd2ad09e1cffff1f7c0d24c46cbc611c8ed9c7e78a604b746b2cf"
+    sha256 arm64_sonoma:   "abf6159ff6f8b96053d162b2022ed8609af8c059c79348ae5557c28afeecc562"
+    sha256 arm64_ventura:  "3330a2f548559889d4d2cc138d79e5bd39f00aea3c14525912fd5f6c1c20136d"
+    sha256 arm64_monterey: "adb21b8016cdf6604a4d2ab0a8231769c08c19eb59f030e45229397f8bb71560"
+    sha256 sonoma:         "17172832ac98aded38af454786303dc8f9d3b61e90470a4330a7774ae5885dd4"
+    sha256 ventura:        "2049a7ee4bb92a609351d65b0c16adc5bee3f81cdfa580ade205dfcef48d8b4d"
+    sha256 monterey:       "e6eb367af3e6e6cd9d08aeb7089bf2842422c9c727df241f11fce7a2239a3d64"
+    sha256 x86_64_linux:   "e69fa72c81515369642531c0e5fc7febe6953d082721eb5b1e839c0f7a72a597"
   end
 
   depends_on "intltool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gettext"
+  depends_on "glib"
   depends_on "gtk+3"
+  depends_on "pango"
 
   uses_from_macos "perl" => :build
 
-  def install
-    ENV.prepend_path "PERL5LIB", Formula["intltool"].libexec/"lib/perl5" unless OS.mac?
+  on_macos do
+    depends_on "at-spi2-core"
+    depends_on "cairo"
+    depends_on "gdk-pixbuf"
+    depends_on "harfbuzz"
+  end
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-unity",
-                          "--prefix=#{prefix}"
+  on_linux do
+    depends_on "perl-xml-parser" => :build
+  end
+
+  def install
+    system "./configure", "--disable-unity", *std_configure_args
     chmod "+x", "install-sh"
     system "make", "install"
   end
@@ -35,6 +46,6 @@ class Grsync < Formula
   test do
     # running the executable always produces the GUI, which is undesirable for the test
     # so we'll just check if the executable exists
-    assert_predicate bin/"grsync", :exist?
+    assert_path_exists bin/"grsync"
   end
 end

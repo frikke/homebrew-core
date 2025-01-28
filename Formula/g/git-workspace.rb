@@ -1,43 +1,61 @@
 class GitWorkspace < Formula
   desc "Sync personal and work git repositories from multiple providers"
   homepage "https://github.com/orf/git-workspace"
-  url "https://github.com/orf/git-workspace/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "fa89f047bdf5654cc5090cd72fcf0c599cce4182ae0db42bf7eea8c89f387d47"
+  url "https://github.com/orf/git-workspace/archive/refs/tags/v1.9.0.tar.gz"
+  sha256 "d5e2a5a0a568c46b408f82f981ea3672066d4496755fc14837e553e451c69f2d"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "cf8a85240ef63473754e3b0e35b209a29933b69b869e8496930742372ff30d4b"
-    sha256 cellar: :any,                 arm64_monterey: "5ac102a439b3bd585443706aa5007ea6de52bdcb51cd96492e19273bd5b6d3b4"
-    sha256 cellar: :any,                 arm64_big_sur:  "d1478ec957a2eb18150917f35dbe4dc808adb5d3844e62cda73cb77cade5113d"
-    sha256 cellar: :any,                 ventura:        "c21822111578c48341b68fab63d9859326a9e895a0c588716ab1da86fb21dc44"
-    sha256 cellar: :any,                 monterey:       "d45cc54c40cd65837b0d80f8807743cbd65397d074281a30d5f5cba12162f62a"
-    sha256 cellar: :any,                 big_sur:        "b42260ce3fd93089ae0fa86bc2353de252cfc0a746fa86d2aaf857d5d80bbf4d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8b156efac1e9c4f361210d9c4213c4e793e428a22d0d5dc65d9760be0c1b5096"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "9e68614e31ed33fb7426fbe05bb570d6fef5c156bc78a19c483e9962c5da2297"
+    sha256 cellar: :any,                 arm64_sonoma:  "faf1482a2590678aa304276e8289eec0c1b29b1d255e1448625e7750b7c5b160"
+    sha256 cellar: :any,                 arm64_ventura: "499f183b650efc68eb9b6cd71535995996d3cbf0a4e6e514fc3e1ce435b1a5d9"
+    sha256 cellar: :any,                 sonoma:        "21ed41579cc1a10a68ede6d9c826f547b0907bfb9b412b6ba9ae936cc1aa541f"
+    sha256 cellar: :any,                 ventura:       "83521f5a7cb8977584dc9b4d666070fc53034a532fa4b5cfb3e21a0f2315a225"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ff145909e4bca229a0f1e7eb91f3225f0a113f1c3db32c0f7a96c5455098f8f6"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
   depends_on "libgit2"
+  depends_on "libssh2"
+  depends_on "openssl@3"
 
   def install
-    ENV["LIBGIT2_SYS_USE_PKG_CONFIG"] = "1"
+    ENV["LIBGIT2_NO_VENDOR"] = "1"
+    ENV["LIBSSH2_SYS_USE_PKG_CONFIG"] = "1"
+    # Ensure the correct `openssl` will be picked up.
+    ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
+    ENV["OPENSSL_NO_VENDOR"] = "1"
+
     system "cargo", "install", *std_cargo_args
+  end
+
+  def check_binary_linkage(binary, library)
+    binary.dynamically_linked_libraries.any? do |dll|
+      next false unless dll.start_with?(HOMEBREW_PREFIX.to_s)
+
+      File.realpath(dll) == File.realpath(library)
+    end
   end
 
   test do
     ENV["GIT_WORKSPACE"] = Pathname.pwd
     ENV["GITHUB_TOKEN"] = "foo"
-    system "#{bin}/git-workspace", "add", "github", "foo"
+    system bin/"git-workspace", "add", "github", "foo"
     assert_match "provider = \"github\"", File.read("workspace.toml")
     output = shell_output("#{bin}/git-workspace update 2>&1", 1)
     assert_match "Error fetching repositories from Github user/org foo", output
 
-    linkage_with_libgit2 = (bin/"git-workspace").dynamically_linked_libraries.any? do |dll|
-      next false unless dll.start_with?(HOMEBREW_PREFIX.to_s)
-
-      File.realpath(dll) == (Formula["libgit2"].opt_lib/shared_library("libgit2")).realpath.to_s
+    linked_libraries = [
+      Formula["libgit2"].opt_lib/shared_library("libgit2"),
+      Formula["libssh2"].opt_lib/shared_library("libssh2"),
+      Formula["openssl@3"].opt_lib/shared_library("libssl"),
+    ]
+    linked_libraries << (Formula["openssl@3"].opt_lib/shared_library("libcrypto")) if OS.mac?
+    linked_libraries.each do |library|
+      assert check_binary_linkage(bin/"git-workspace", library),
+             "No linkage with #{library.basename}! Cargo is likely using a vendored version."
     end
-
-    assert linkage_with_libgit2, "No linkage with libgit2! Cargo is likely using a vendored version."
   end
 end

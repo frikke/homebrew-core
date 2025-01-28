@@ -3,44 +3,37 @@ class Grokmirror < Formula
 
   desc "Framework to smartly mirror git repositories"
   homepage "https://github.com/mricon/grokmirror"
-  url "https://files.pythonhosted.org/packages/b0/ef/ffad6177d84dafb7403ccaca2fef735745d5d43200167896a2068422ae89/grokmirror-2.0.11.tar.gz"
-  sha256 "6bc1310dc9a0e97836201e6bb14ecbbee332b0f812b9ff345a8386cb267c908c"
+  url "https://files.pythonhosted.org/packages/26/91/af8831185ef4e5bef5d210039ab67abdc8c27a09a585d3963a10cf774789/grokmirror-2.0.12.tar.gz"
+  sha256 "5264b6b2030bcb48ff5610173dacaba227b77b6ed39b17fc473bed91d4eb218b"
   license "GPL-3.0-or-later"
-  revision 2
   head "https://github.com/mricon/grokmirror.git", branch: "master"
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9b98b7d2ae38776e116471d4aa93752179dd6cf0178ca2c963dab1a5ce149af8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5cd1c6f82c4b6786747aadd7c66a184874290c6ebaf2140900b23c6fa4a62917"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9e71ad6585d8fdbe72e5dd132cf4d20482002c569f3fb9ce83e0be0efc8b7f75"
-    sha256 cellar: :any_skip_relocation, ventura:        "acae5a92fa6062106d7abe579db63da6e252a7c90173a2d76c9521aaa2ee46c3"
-    sha256 cellar: :any_skip_relocation, monterey:       "c8a222768f1fa3ded6b38fea8c5963d27e4ce80d496fbaaf8f26f1c8b2be18dd"
-    sha256 cellar: :any_skip_relocation, big_sur:        "99ce644f6574c85120f619b503f80f729d82d1472d6e53d54edb15640bd0a94b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3749e3ddcf48a04513d603e2d533c998fde630c106117a11c506450b39c8af81"
+    sha256 cellar: :any_skip_relocation, all: "5adc01ef7c8e80615d09b0057ef894a8916af6dbf600539583c53aa3e216db03"
   end
 
-  depends_on "python-certifi"
-  depends_on "python@3.11"
+  depends_on "certifi"
+  depends_on "python@3.13"
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/2a/53/cf0a48de1bdcf6ff6e1c9a023f5f523dfe303e4024f216feac64b6eb7f67/charset-normalizer-3.2.0.tar.gz"
-    sha256 "3bb3d25a8e6c0aedd251753a79ae98a093c7e7b471faa3aa9a93a81431987ace"
+    url "https://files.pythonhosted.org/packages/f2/4f/e1808dc01273379acc506d18f1504eb2d299bd4131743b9fc54d7be4df1e/charset_normalizer-3.4.0.tar.gz"
+    sha256 "223217c3d4f82c3ac5e29032b3f1c2eb0fb591b72161f86d93f5719079dae93e"
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz"
-    sha256 "814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"
+    url "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz"
+    sha256 "12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz"
-    sha256 "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
+    url "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz"
+    sha256 "55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/31/ab/46bec149bbd71a4467a3063ac22f4486ecd2ceb70ae8c70d5d8e4c2a7946/urllib3-2.0.4.tar.gz"
-    sha256 "8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11"
+    url "https://files.pythonhosted.org/packages/ed/63/22ba4ebfe7430b76388e7cd448d5478814d3032121827c12a2cc287e2260/urllib3-2.2.3.tar.gz"
+    sha256 "e7d814a81dad81e6caf2ec9fdedb284ecc9c73076b62654547cc64ccdcae26e9"
   end
 
   def install
@@ -58,7 +51,7 @@ class Grokmirror < Formula
       system "git", "config", "--bool", "core.bare", "true"
       mv testpath/"repos/repo/.git", testpath/"repos/repo.git"
     end
-    rm_rf testpath/"repos/repo"
+    rm_r(testpath/"repos/repo")
 
     system bin/"grok-manifest", "-m", testpath/"manifest.js.gz", "-t", testpath/"repos"
     system "gzip", "-d", testpath/"manifest.js.gz"

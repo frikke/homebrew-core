@@ -1,37 +1,37 @@
 class Libzzip < Formula
   desc "Library providing read access on ZIP-archives"
   homepage "https://github.com/gdraheim/zziplib"
-  url "https://github.com/gdraheim/zziplib/archive/v0.13.72.tar.gz"
-  sha256 "93ef44bf1f1ea24fc66080426a469df82fa631d13ca3b2e4abaeab89538518dc"
+  url "https://github.com/gdraheim/zziplib/archive/refs/tags/v0.13.78.tar.gz"
+  sha256 "feaeee7c34f18aa27bd3da643cc6a47d04d2c41753a59369d09102d79b9b0a31"
   license any_of: ["LGPL-2.0-or-later", "MPL-1.1"]
-  revision 1
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any,                 arm64_sonoma:   "6e4b8f01f66f4c21a3b6467e1dfebad5e5a204db29b4dc13b448adc0e754419d"
-    sha256 cellar: :any,                 arm64_ventura:  "ee5a0f4f19686b63534c718d9c61d75a2a3b1f2ef3b4bcd6be5615536cc84c5d"
-    sha256 cellar: :any,                 arm64_monterey: "ac7b8f35398634a9092daddca8a30508bfdb1925407f8c8f6fcdd6e69e43f9ef"
-    sha256 cellar: :any,                 arm64_big_sur:  "e2594d07e6b05062c3c28341225052a5ca2f4bd3dc900fc20f3e94190273d548"
-    sha256 cellar: :any,                 sonoma:         "29059d07df1a98967e48d507db2693c936b0b348d9bfdbf832cd66f96c4bb0f8"
-    sha256 cellar: :any,                 ventura:        "5feaf45ca387319476e60f2e6bfd8ff2c9dda497df6c809186166e5af098bd22"
-    sha256 cellar: :any,                 monterey:       "7b2db8ae12f457c61a4191acf807936608aa4cb8b036560e534d83b50602fd67"
-    sha256 cellar: :any,                 big_sur:        "d7a969de7fb5d84796d73f5bda8c53fe044c2808caece9a5f6e20e40201c3860"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1faea53bbda32778a2056db47a71ea16c02c476382770fa2c928663fc869734a"
+    sha256 cellar: :any,                 arm64_sequoia:  "be7a20cbb58b97c8e21592d1388b80b0d87cf4fbe26ea63cb86b60ae17795d71"
+    sha256 cellar: :any,                 arm64_sonoma:   "dfe584a561bf184555dd1cb0f5fce07d900a466444cdde7d968e756abcd03c79"
+    sha256 cellar: :any,                 arm64_ventura:  "830a5c48de37071f87aabff06fef3bbd19e9ffacb06a550621eb3ec38858f730"
+    sha256 cellar: :any,                 arm64_monterey: "59aed17c6a583e3a6d7b9d500c0eff2cd79e6f9c8c8e7f9a96b55152b0a0b5ab"
+    sha256 cellar: :any,                 sonoma:         "193c19913f3d8f32c917dc5bec67cb7d6b5faed07c9342f8d03f54d2eed23b90"
+    sha256 cellar: :any,                 ventura:        "95b6daea1b5be5ca6101f342874d207aef6c8b8186970438cadb144f9c33564b"
+    sha256 cellar: :any,                 monterey:       "b81fae11a942992eb933f8d9ee2391727363009ec9dbc5521b07546606031f5c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e595cd977c07fdbde35b70ab99fd3f65f1f919c436d999506eb8117f875d0d99"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => :build
 
+  uses_from_macos "python" => :build
   uses_from_macos "zip" => :test
   uses_from_macos "zlib"
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args, "-DZZIPTEST=OFF", "-DZZIPSDL=OFF", "-DCMAKE_INSTALL_RPATH=#{rpath}"
-      system "make", "man"
-      system "make", "install"
-    end
+    args = %W[
+      -DZZIPTEST=OFF
+      -DZZIPSDL=OFF
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

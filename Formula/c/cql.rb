@@ -1,16 +1,19 @@
 class Cql < Formula
   desc "Decentralized SQL database with blockchain features"
   homepage "https://covenantsql.io"
-  url "https://github.com/CovenantSQL/CovenantSQL/archive/v0.8.1.tar.gz"
+  url "https://github.com/CovenantSQL/CovenantSQL/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "73abb65106e5045208aa4a7cda56bc7c17ba377557ae47d60dad39a63f9c88a6"
   license "Apache-2.0"
   head "https://github.com/CovenantSQL/CovenantSQL.git", branch: "develop"
 
   bottle do
     rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "6ea4a0d072fb6b236bdb26357b95284f657ddfe7e4eca59274b267a14c5692b8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "c03c9a76a84d78e47afb1a032404aed4f24da0496af2910b9df0870c9938bc16"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "9c8e9a72ff6ac7a64ad0d7cfb5919ebbe5fda03e57db8d5241e87470226546c2"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "6f3d16b39545a07b7811657ed8de92063b3f4fc13f96e8b092be420ff80d0ed6"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a5f446cb406f5aafce83406573b0a808f718e4e8b3df3d112692b824d4912e45"
+    sha256 cellar: :any_skip_relocation, sonoma:         "09ba7649987d1e9ff1cf09c6a9f092fd2dad9f869e081a0f138f9b5cb6c40fc0"
     sha256 cellar: :any_skip_relocation, ventura:        "3fcb9c1f88fcf471a71342c7b339f1f5da89003b4ca0f205780422d3ee705cf2"
     sha256 cellar: :any_skip_relocation, monterey:       "29676dd87b84617809ee42f862ddbeabb56a52df5ddffa4acc9e8fe807e7244a"
     sha256 cellar: :any_skip_relocation, big_sur:        "ba7c4a2af433caab8ca7d413629cb7a7f16c603bbe982029b0b9cf651e58b3d5"
@@ -36,7 +39,7 @@ class Cql < Formula
       -X github.com/CovenantSQL/CovenantSQL/conf.RoleTag=C
       -X github.com/CovenantSQL/CovenantSQL/utils/log.SimpleLog=Y
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags), "-tags", "sqlite_omit_load_extension", "./cmd/cql"
+    system "go", "build", *std_go_args(ldflags:), "-tags", "sqlite_omit_load_extension", "./cmd/cql"
 
     bash_completion.install "bin/completion/cql-completion.bash"
     zsh_completion.install "bin/completion/_cql"

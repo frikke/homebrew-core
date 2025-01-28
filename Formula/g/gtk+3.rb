@@ -1,8 +1,8 @@
 class Gtkx3 < Formula
   desc "Toolkit for creating graphical user interfaces"
   homepage "https://gtk.org/"
-  url "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.38.tar.xz"
-  sha256 "ce11decf018b25bdd8505544a4f87242854ec88be054d9ade5f3a20444dd8ee7"
+  url "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.43.tar.xz"
+  sha256 "7e04f0648515034b806b74ae5d774d87cffb1a2a96c468cb5be476d51bf2f3c7"
   license "LGPL-2.0-or-later"
 
   livecheck do
@@ -11,15 +11,14 @@ class Gtkx3 < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "b079594552eccc9b13b01d55022811bf9acc981e62d0c107ad9d393a05dc4ef6"
-    sha256 arm64_ventura:  "12d42f5ba7caa43a83aba5babfee4cc745d8a12a58e108af642f366f2ca37d8f"
-    sha256 arm64_monterey: "9c57deb4a8e1360dfd057a58a24e6c7b4ce621ebd5916386cb8c4cd359691763"
-    sha256 arm64_big_sur:  "ce48bef582169d1f45bfa828b80214c9dd5204573699d2d97e631d29bdfcda27"
-    sha256 sonoma:         "9f283bf5b2b118d771aa7ef628b8798e527a7d499f225587295866c8a2dc39cb"
-    sha256 ventura:        "87f200d7945307fcb47cb2ea31da643d571c898b752e2e2ddecd62c1c4c64b51"
-    sha256 monterey:       "e0a18e7ae38a7ea9d5705e787fa01f3d4215c836e170f060662b85c1c0dd50cf"
-    sha256 big_sur:        "ad9c04a5ce0db0751cf1a485d60ec963aae7039c9332e0bcc972e06daacc8cc5"
-    sha256 x86_64_linux:   "84b8d60884ca0e11d3d86785415dd9d1d426c4900e9f3b62c71e0dc0ad0b2745"
+    sha256 arm64_sequoia:  "abbf588f64811f61c3e36cedabbc6d3cbe1187124e15c34362dd73b7fc9fb3ce"
+    sha256 arm64_sonoma:   "b3981b071d6b1214820c5be272256d1058a5f7db57fccb70da713516e2bad714"
+    sha256 arm64_ventura:  "b28221d07db5b16ce517acde4a9bdf2527f1c7f95e98a203278655f1149063d4"
+    sha256 arm64_monterey: "a026a7b6e8b6004a4090552abfb8eb458571773edcab0f3c71fd2cdb7eca0c3f"
+    sha256 sonoma:         "29584c089bc640848b755eabac8ece8cbc230e969423f612d87848e40e28d84e"
+    sha256 ventura:        "9bf9fe10db6c816825cc6e3f2a139201520f727755e539cf0a62907712571429"
+    sha256 monterey:       "3096c62e650b6807fbf37495da07f5113b91f82be3a627ae75c4684167c35d5e"
+    sha256 x86_64_linux:   "880cff997f0d940867b79dee4f87f22c8fa03adc377c2f793f85c72818a8cad6"
   end
 
   depends_on "docbook" => :build
@@ -28,23 +27,39 @@ class Gtkx3 < Formula
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => [:build, :test]
-  depends_on "atk"
+  depends_on "pkgconf" => [:build, :test]
+
+  depends_on "at-spi2-core"
+  depends_on "cairo"
+  depends_on "fribidi"
   depends_on "gdk-pixbuf"
   depends_on "glib"
   depends_on "gsettings-desktop-schemas"
+  depends_on "harfbuzz"
   depends_on "hicolor-icon-theme"
   depends_on "libepoxy"
   depends_on "pango"
 
   uses_from_macos "libxslt" => :build # for xsltproc
 
+  on_macos do
+    depends_on "gettext"
+  end
+
   on_linux do
     depends_on "cmake" => :build
-    depends_on "at-spi2-atk"
-    depends_on "cairo"
+
+    depends_on "fontconfig"
     depends_on "iso-codes"
+    depends_on "libx11"
+    depends_on "libxdamage"
+    depends_on "libxext"
+    depends_on "libxfixes"
+    depends_on "libxi"
+    depends_on "libxinerama"
     depends_on "libxkbcommon"
+    depends_on "libxrandr"
+    depends_on "wayland"
     depends_on "wayland-protocols"
     depends_on "xorgproto"
   end
@@ -78,19 +93,20 @@ class Gtkx3 < Formula
   def post_install
     system "#{Formula["glib"].opt_bin}/glib-compile-schemas", "#{HOMEBREW_PREFIX}/share/glib-2.0/schemas"
     system bin/"gtk3-update-icon-cache", "-f", "-t", "#{HOMEBREW_PREFIX}/share/icons/hicolor"
-    system "#{bin}/gtk-query-immodules-3.0 > #{HOMEBREW_PREFIX}/lib/gtk-3.0/3.0.0/immodules.cache"
+    system bin/"gtk-query-immodules-3.0 > #{HOMEBREW_PREFIX}/lib/gtk-3.0/3.0.0/immodules.cache"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gtk/gtk.h>
 
       int main(int argc, char *argv[]) {
         gtk_disable_setlocale();
         return 0;
       }
-    EOS
-    flags = shell_output("pkg-config --cflags --libs gtk+-3.0").chomp.split
+    C
+
+    flags = shell_output("pkgconf --cflags --libs gtk+-3.0").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
     # include a version check for the pkg-config files

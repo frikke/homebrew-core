@@ -1,12 +1,13 @@
 class Libcec < Formula
   desc "Control devices with TV remote control and HDMI cabling"
-  homepage "http://libcec.pulse-eight.com/"
-  url "https://github.com/Pulse-Eight/libcec/archive/libcec-6.0.2.tar.gz"
+  homepage "https://libcec.pulse-eight.com/"
+  url "https://github.com/Pulse-Eight/libcec/archive/refs/tags/libcec-6.0.2.tar.gz"
   sha256 "090696d7a4fb772d7acebbb06f91ab92e025531c7c91824046b9e4e71ecb3377"
   license "GPL-2.0-or-later"
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "04b0eba59ea6e85ed61dbd833df3097ca8fea728bc736794a30f515b5c1180e6"
     sha256 cellar: :any,                 arm64_sonoma:   "4ae97897b594a5f39f8e87beec34fe49aa3c6d9e9ba78c0a98b856b039ddfe89"
     sha256 cellar: :any,                 arm64_ventura:  "c7aff3833ac339327e1881340d289cae6864dddca9ed4237d50c401856a9bf56"
     sha256 cellar: :any,                 arm64_monterey: "b888e7cd72aaa5312697203f0146f4352e42439fc625c4e6798ef90e930c3402"
@@ -23,7 +24,7 @@ class Libcec < Formula
   uses_from_macos "ncurses"
 
   resource "p8-platform" do
-    url "https://github.com/Pulse-Eight/platform/archive/p8-platform-2.1.0.1.tar.gz"
+    url "https://github.com/Pulse-Eight/platform/archive/refs/tags/p8-platform-2.1.0.1.tar.gz"
     sha256 "064f8d2c358895c7e0bea9ae956f8d46f3f057772cb97f2743a11d478a0f68a0"
   end
 
@@ -34,7 +35,7 @@ class Libcec < Formula
     # - `CMAKE_INSTALL_LIBDIR=lib` is interpreted as path relative to build dir
     # - `CMAKE_INSTALL_LIBDIR=#{lib}` breaks pkg-config and cmake config files
     # - Setting no value uses UseMultiArch.cmake to set platform-specific paths
-    # To avoid theses issues, we can specify the type of input as STRING
+    # To avoid these issues, we can specify the type of input as STRING
     cmake_args = std_cmake_args.map do |s|
       s.gsub "-DCMAKE_INSTALL_LIBDIR=", "-DCMAKE_INSTALL_LIBDIR:STRING="
     end

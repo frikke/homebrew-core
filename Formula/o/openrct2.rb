@@ -2,28 +2,28 @@ class Openrct2 < Formula
   desc "Open source re-implementation of RollerCoaster Tycoon 2"
   homepage "https://openrct2.io/"
   url "https://github.com/OpenRCT2/OpenRCT2.git",
-      tag:      "v0.4.6",
-      revision: "b40b5da5a570155298335e276839a41588337b5d"
+      tag:      "v0.4.18",
+      revision: "8c19879e6f0cb13a63569a20f6ccaf0d9c739b39"
   license "GPL-3.0-only"
   head "https://github.com/OpenRCT2/OpenRCT2.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "df51696476437df5af49a0755f922980dc77b7f718c30c7acc41e7687d3d642d"
-    sha256 cellar: :any, arm64_monterey: "afe6bb0c3a677b1a78a4b521d0ee82b15c6d8896e85ed681b5d3ddc3990f6dab"
-    sha256 cellar: :any, arm64_big_sur:  "73210c0f7679527a8351793507e5ed96e586e11a6f627dea35b85d421c4aaaee"
-    sha256 cellar: :any, ventura:        "740c9900c72268bf5761b53940155b55eba9a860b3514c91b6fff0a08492a390"
-    sha256 cellar: :any, monterey:       "9b1569c5e1c2422912bb3170a5f95378a3e2e6d1d4ea9ea9379e399ec3e5505f"
-    sha256 cellar: :any, big_sur:        "84a3d5a9a7c135e5d33a0769a5c4c79e2281d66e1d54eb50859b1ea2be49f67b"
-    sha256               x86_64_linux:   "89076f1b729d47de34afbe3932c5b964338e234fb70859b67eb82c09d1d25662"
+    sha256 cellar: :any, arm64_sequoia: "a0d33950d824e1fd2a8fe54d2228021454ffb055502575ebcfbb9a5ae0a73128"
+    sha256 cellar: :any, arm64_sonoma:  "041169077a1238481b811f7adcccaee5601c55317a01e6e9ffac2609f73cd450"
+    sha256 cellar: :any, arm64_ventura: "557d7e96e17a485d4eb7001a0fd4a5c845708818bf298c9a3e3939b6e75ba5e0"
+    sha256 cellar: :any, sonoma:        "572eba332c707b94c5e2de08d17b75622f10186a6206f4d4b14df1366e48088d"
+    sha256 cellar: :any, ventura:       "f7285ec45d7e287eca9bd7212a64ee98e539bc75c64d312ac25d8eb1f73fdbca"
+    sha256               x86_64_linux:  "d2768df4e844578690792a3a5dabd4530526d7cebf208c67e98420d3f2f4c6c0"
   end
 
   depends_on "cmake" => :build
   depends_on "nlohmann-json" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "duktape"
   depends_on "flac"
   depends_on "freetype"
-  depends_on "icu4c"
+  depends_on "icu4c@76"
   depends_on "libogg"
   depends_on "libpng"
   depends_on "libvorbis"
@@ -33,22 +33,22 @@ class Openrct2 < Formula
   depends_on "sdl2"
   depends_on "speexdsp"
 
+  uses_from_macos "zlib"
+
   on_linux do
     depends_on "curl"
     depends_on "fontconfig"
     depends_on "mesa"
   end
 
-  fails_with gcc: "5" # C++17
-
   resource "title-sequences" do
-    url "https://github.com/OpenRCT2/title-sequences/releases/download/v0.4.6/title-sequences.zip"
-    sha256 "24a189cdaf1f78fb6d6caede8f1ab3cedf8ab9f819cd2260a09b2cce4c710d98"
+    url "https://github.com/OpenRCT2/title-sequences/releases/download/v0.4.14/title-sequences.zip"
+    sha256 "140df714e806fed411cc49763e7f16b0fcf2a487a57001d1e50fce8f9148a9f3"
   end
 
   resource "objects" do
-    url "https://github.com/OpenRCT2/objects/releases/download/v1.3.11/objects.zip"
-    sha256 "bf85d88e4fb11ca2e5915567390898747dc2459b3c7a057bdc32b829c91780b4"
+    url "https://github.com/OpenRCT2/objects/releases/download/v1.4.12/objects.zip"
+    sha256 "6417dad971674e5cf39bf56e83e04e4086547145e3fac696f163037fe841e7be"
   end
 
   def install
@@ -56,23 +56,25 @@ class Openrct2 < Formula
     (buildpath/"data/title").install resource("title-sequences")
     (buildpath/"data/object").install resource("objects")
 
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args,
-                            "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{MacOS.version}",
-                            "-DWITH_TESTS=OFF",
-                            "-DDOWNLOAD_TITLE_SEQUENCES=OFF",
-                            "-DDOWNLOAD_OBJECTS=OFF",
-                            "-DMACOS_USE_DEPENDENCIES=OFF",
-                            "-DDISABLE_DISCORD_RPC=ON"
-      system "make", "install"
-    end
+    args = [
+      "-DWITH_TESTS=OFF",
+      "-DDOWNLOAD_TITLE_SEQUENCES=OFF",
+      "-DDOWNLOAD_OBJECTS=OFF",
+      "-DMACOS_USE_DEPENDENCIES=OFF",
+      "-DDISABLE_DISCORD_RPC=ON",
+    ]
+    args << "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{MacOS.version}" if OS.mac?
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
     # By default macOS build only looks up data in app bundle Resources
     libexec.install bin/"openrct2"
-    (bin/"openrct2").write <<~EOS
+    (bin/"openrct2").write <<~BASH
       #!/bin/bash
       exec "#{libexec}/openrct2" "$@" "--openrct2-data-path=#{pkgshare}"
-    EOS
+    BASH
   end
 
   test do

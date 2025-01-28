@@ -1,19 +1,18 @@
 class Mycorrhiza < Formula
   desc "Lightweight wiki engine with hierarchy support"
   homepage "https://mycorrhiza.wiki"
-  url "https://github.com/bouncepaw/mycorrhiza/archive/refs/tags/v1.14.0.tar.gz"
-  sha256 "6448fe7fa6198cb3346f63d0857d5f364d0aa8fafbdc95f56ef39fbe774bbabc"
+  url "https://github.com/bouncepaw/mycorrhiza/archive/refs/tags/v1.15.1.tar.gz"
+  sha256 "92b56606cb2e8b1afe086b86e68355a7aa6202bf77514ca6f07b32f7f143f4c4"
   license "AGPL-3.0-only"
   head "https://github.com/bouncepaw/mycorrhiza.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a764a6c7bedfe24668b9e58f06038971b3894eacf65cc9957984b3de68d0bfeb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "146772e8ec9484112fddc8f855259d8eda45de1aa1bad71350668e1e2cfcf221"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fc21b6672244098dc8dfb6ccde5d40193c1b2deb7903c27e040c58f0b9386c36"
-    sha256 cellar: :any_skip_relocation, ventura:        "a2d9ea795d54f472db53b27195f85ecf14ed542876b1bb165c546d256011f5d4"
-    sha256 cellar: :any_skip_relocation, monterey:       "9b6a1d405d5e20e68ceefc6c04105853e10ea7dd1fc1262edd2a72787f471eb2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "14b094f251e1568925e66101c9769accdc26c92aacc9b3b4aac86f60568b4130"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "21ae4bcb8b6bdf669d6d5ed49727759bd104e4156c8d60a9dd20a1b996ef4966"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "239a63df7669042934cce4e4a36dac583b4f08ba351a7a2cc5a77d61ff2c71f9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d3c5d525c9adde1458160625aead01aaf7970eaa664a7fcd0eda201782f98f30"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "a6a3e9bf597543fd047bcbd528fb294968626a43913e2b5ecb832e0a65c4f03f"
+    sha256 cellar: :any_skip_relocation, sonoma:        "50902c67ef7688b2af218cb42a5e219d8b6ad1dbe73adb8eb5d4f9d7ce7ca1f2"
+    sha256 cellar: :any_skip_relocation, ventura:       "babe0cd8e1a5328ee92a0ab611b8b1824e967857ac752295a6cd7ee658bb1ab6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e7ac1d896d58f658da09c6590400fe8fe65a4ee61083bbe724a9a4705d0a6745"
   end
 
   depends_on "go" => :build

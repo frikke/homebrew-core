@@ -1,44 +1,58 @@
 class AwsSdkCpp < Formula
   desc "AWS SDK for C++"
   homepage "https://github.com/aws/aws-sdk-cpp"
-  # aws-sdk-cpp should only be updated every 5 releases on multiples of 5
-  url "https://github.com/aws/aws-sdk-cpp.git",
-      tag:      "1.11.165",
-      revision: "197a6dfde08071bec386518eb1aa1631903d198d"
+  url "https://github.com/aws/aws-sdk-cpp/archive/refs/tags/1.11.480.tar.gz"
+  sha256 "7d6a2e4ba851d773236745ac399a5120bcb04e8122e45b589742bd45ebc72a7f"
   license "Apache-2.0"
   head "https://github.com/aws/aws-sdk-cpp.git", branch: "main"
 
+  livecheck do
+    throttle 15
+  end
+
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "7ab287da08c582ce095a23886423f8facff50fca62d9e15cf1a5dcae8643131d"
-    sha256 cellar: :any,                 arm64_ventura:  "4c26a01a85cbfa93422ccb38438eb02ed77b7ada2fc2e4f449e4646bbafbfae6"
-    sha256 cellar: :any,                 arm64_monterey: "7edf044d56420d357c0c4b3ec00d258b33c8d23af718a0cb95079888206bc1cb"
-    sha256 cellar: :any,                 arm64_big_sur:  "3f1c2fce79920bf49dfb95f27a5e318647f16071c245b7ee9fa7217c577ba33c"
-    sha256 cellar: :any,                 sonoma:         "dd0d0c3fcf1e7e45accf2796a22aaa2f59b3dc0c58da5a2d0a22449f1d578ba2"
-    sha256 cellar: :any,                 ventura:        "d00cdfabdb9f6ad1a99577c4626d6f5f42eda656539d5e79de52bf80143147cb"
-    sha256 cellar: :any,                 monterey:       "54e5e2d397fa40cdad44327565bb9249dec2cc5f02d493570fa24e99f992133d"
-    sha256 cellar: :any,                 big_sur:        "9fb5fa7cddd12297f983da3c0bfa3a53463a4196ba4a30cac1203e086098c9a0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4e2cc3df1efa8500026f318731112a0caa3b5c9d5293dbf8bf375564c5aeca84"
+    sha256 cellar: :any,                 arm64_sequoia: "71b15e826f962515dd14adeb876ab95d633ccd4d284bb15aac2094a061f5e4eb"
+    sha256 cellar: :any,                 arm64_sonoma:  "0db2abbe798907acb6cc5846c1d8346646a08b7d635d93f49ba37dded71abe6c"
+    sha256 cellar: :any,                 arm64_ventura: "c1c83718cbf49352b98dd04e3fe68bcd05e353d649ece3c564b0a5a6120725c5"
+    sha256 cellar: :any,                 sonoma:        "37df18081f54c2079e6a40dadc84c45f9941e34c1a86d5e6f25b2216a61f2100"
+    sha256 cellar: :any,                 ventura:       "1102038dc9539dce0a076ef0f7b6f69752898605645ffacad7e5cf3137a986e0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "96226da9e716bb42689c1baa5406636b9353574276a718f86036d13b46b1793f"
   end
 
   depends_on "cmake" => :build
-  uses_from_macos "curl"
+  depends_on "aws-c-auth"
+  depends_on "aws-c-common"
+  depends_on "aws-c-event-stream"
+  depends_on "aws-c-http"
+  depends_on "aws-c-io"
+  depends_on "aws-c-s3"
+  depends_on "aws-crt-cpp"
 
-  fails_with gcc: "5"
+  uses_from_macos "curl"
+  uses_from_macos "zlib"
 
   def install
-    ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath}"
     # Avoid OOM failure on Github runner
     ENV.deparallelize if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"].present?
 
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DENABLE_TESTING=OFF"
+    linker_flags = ["-Wl,-rpath,#{rpath}"]
+    # Avoid overlinking to aws-c-* indirect dependencies
+    linker_flags << "-Wl,-dead_strip_dylibs" if OS.mac?
+
+    args = %W[
+      -DBUILD_DEPS=OFF
+      -DCMAKE_MODULE_PATH=#{Formula["aws-c-common"].opt_lib}/cmake
+      -DCMAKE_SHARED_LINKER_FLAGS=#{linker_flags.join(" ")}
+      -DENABLE_TESTING=OFF
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
-
-    lib.install Dir[lib/"mac/Release/*"].select { |f| File.file? f }
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <aws/core/Version.h>
       #include <iostream>
 
@@ -46,7 +60,7 @@ class AwsSdkCpp < Formula
           std::cout << Aws::Version::GetVersionString() << std::endl;
           return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cpp", "-L#{lib}", "-laws-cpp-sdk-core", "-o", "test"
     system "./test"
   end

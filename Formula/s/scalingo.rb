@@ -1,18 +1,17 @@
 class Scalingo < Formula
   desc "CLI for working with Scalingo's PaaS"
   homepage "https://doc.scalingo.com/cli"
-  url "https://github.com/Scalingo/cli/archive/1.29.1.tar.gz"
-  sha256 "70cf9399434c9f8a46bd0fd46fee345e1bb83b8f7691d4288e0e29ccf9422ec3"
+  url "https://github.com/Scalingo/cli/archive/refs/tags/1.34.0.tar.gz"
+  sha256 "76120c14d13065df48ddfb628aab0b59d9f32be43516607c1ecf3d258bc692f9"
   license "BSD-4-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f703bd10dc1738365538b17c124903dbb603f87ca1da92bae5bbc85858b4d043"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f703bd10dc1738365538b17c124903dbb603f87ca1da92bae5bbc85858b4d043"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f703bd10dc1738365538b17c124903dbb603f87ca1da92bae5bbc85858b4d043"
-    sha256 cellar: :any_skip_relocation, ventura:        "fff22d294129fcb0070e0445948d11f1c5f02eb90317b5f3bbbd51d88bccec92"
-    sha256 cellar: :any_skip_relocation, monterey:       "fff22d294129fcb0070e0445948d11f1c5f02eb90317b5f3bbbd51d88bccec92"
-    sha256 cellar: :any_skip_relocation, big_sur:        "fff22d294129fcb0070e0445948d11f1c5f02eb90317b5f3bbbd51d88bccec92"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "26f488d2e378d02a685efbf6402e83997e127f784eae4facdfa224ea64f56a00"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1ccfca4d80c75ff9ae1d09c5ccd1282ed7b7d085887bc20fef18534f65c12b84"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1ccfca4d80c75ff9ae1d09c5ccd1282ed7b7d085887bc20fef18534f65c12b84"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1ccfca4d80c75ff9ae1d09c5ccd1282ed7b7d085887bc20fef18534f65c12b84"
+    sha256 cellar: :any_skip_relocation, sonoma:        "512bf0121d3fb2c40ed08117c635a5aa221323bbdb90bdca786e29fc2774ba35"
+    sha256 cellar: :any_skip_relocation, ventura:       "512bf0121d3fb2c40ed08117c635a5aa221323bbdb90bdca786e29fc2774ba35"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e3638077a67aaeaa879eca09ed286a8e64ab5cc2f5fdf7b5aa82360d3486834b"
   end
 
   depends_on "go" => :build

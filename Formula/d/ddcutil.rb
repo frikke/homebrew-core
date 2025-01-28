@@ -1,8 +1,8 @@
 class Ddcutil < Formula
   desc "Control monitor settings using DDC/CI and USB"
   homepage "https://www.ddcutil.com"
-  url "https://www.ddcutil.com/tarballs/ddcutil-1.4.2.tar.gz"
-  sha256 "c06c136617911e2e6919fe9607d84677c9bfa4b3a69e5618ad2e5d77e408b404"
+  url "https://www.ddcutil.com/tarballs/ddcutil-2.1.4.tar.gz"
+  sha256 "e14fe282ab60c36af0cae844915d695983c8c8d644b7637a8655c9f5b0d4c91c"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,12 +11,13 @@ class Ddcutil < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "81ca3a36ff15b916ecc97d115224adbfcb9f50388b4cc89559a4596e654ee6a6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "b7d388702cb206684a9ff7486862ed5530fb04d41dd0629d987743ef050ce4be"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "glib"
   depends_on "i2c-tools"
+  depends_on "jansson"
   depends_on "kmod"
   depends_on "libdrm"
   depends_on "libusb"
@@ -25,7 +26,7 @@ class Ddcutil < Formula
   depends_on "systemd"
 
   def install
-    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make"
     system "make", "install"
   end

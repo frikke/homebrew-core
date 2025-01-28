@@ -1,47 +1,43 @@
 class Muparser < Formula
   desc "C++ math expression parser library"
   homepage "https://github.com/beltoforion/muparser"
-  url "https://github.com/beltoforion/muparser/archive/v2.3.4.tar.gz"
-  sha256 "0c3fa54a3ebf36dda0ed3e7cd5451c964afbb15102bdbcba08aafb359a290121"
+  url "https://github.com/beltoforion/muparser/archive/refs/tags/v2.3.5.tar.gz"
+  sha256 "20b43cc68c655665db83711906f01b20c51909368973116dfc8d7b3c4ddb5dd4"
   license "BSD-2-Clause"
   head "https://github.com/beltoforion/muparser.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "6b959115733d494a5a6cb3256853e368313eda71d1df964ae2b67496e092f55d"
-    sha256 cellar: :any,                 arm64_monterey: "c2514a95c8f9e08c8c9792ecbc78397fd1c8e52069cf16fdaf87d9cc1cfc8de5"
-    sha256 cellar: :any,                 arm64_big_sur:  "36f09677be96fe1f60945c6d16c0bbe48b51d898443420f6360d07c478c1127c"
-    sha256 cellar: :any,                 ventura:        "f1312db2dadecaabd79c4539f9d19dfbbcff6320ac1e3f019dc2696938eebcfb"
-    sha256 cellar: :any,                 monterey:       "091cad450a37fbe0b51d83a0302260eca95f872d6d272811df0b82319f37d822"
-    sha256 cellar: :any,                 big_sur:        "646599aca3fac21f7e0d0f9f3c02d28dae9f03bae2130d3866e7953125ee9779"
-    sha256 cellar: :any,                 catalina:       "dce05e4517b703b8d41d7477fb64585b20d26cdf83e1bc1e591555e2246f6826"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a22a520b128642ade29eded38b0c9e33c20ddbdcc6055f8522409a48b416df04"
+    sha256 cellar: :any,                 arm64_sequoia: "1113ea6b1913855729476842599df799790e20a1932e14e6c4f824c8e7d10235"
+    sha256 cellar: :any,                 arm64_sonoma:  "31cff23ae8fd7aa82a5a48747d305fe3d9d85c9c5e49d4f9b36bd749fad54e20"
+    sha256 cellar: :any,                 arm64_ventura: "797c7bed4369fdc9336cb94511fa3d8247d050a2cfbe0cdd5570d9da5aefc236"
+    sha256 cellar: :any,                 sonoma:        "96aa82b24e90335059f9a56126cacdd66da217e135d4abe03efc06348233ffa2"
+    sha256 cellar: :any,                 ventura:       "45f32d38274e9b064eda6ea30418f5aea0a2a5c05ce914a40dde1025da321191"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ae8f1d67d9c9a08de1664583ae14fcb4778cc0bb3e3ab171dd98fca1ee990b74"
   end
 
   depends_on "cmake" => :build
 
   def install
     ENV.cxx11 if OS.linux?
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args, "-DENABLE_OPENMP=OFF"
-      system "make", "install"
-    end
+
+    system "cmake", "-S", ".", "-B", "build", "-DENABLE_OPENMP=OFF", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <iostream>
-      #include "muParser.h"
+      #include <muParser.h>
 
-      double MySqr(double a_fVal)
-      {
+      double MySqr(double a_fVal) {
         return a_fVal*a_fVal;
       }
 
-      int main(int argc, char* argv[])
-      {
+      int main() {
         using namespace mu;
-        try
-        {
+
+        try {
           double fVal = 1;
           Parser p;
           p.DefineVar("a", &fVal);
@@ -53,17 +49,15 @@ class Muparser < Formula
             fVal = a;  // Change value of variable a
             std::cout << p.Eval() << std::endl;
           }
-        }
-        catch (Parser::exception_type &e)
-        {
+        } catch (Parser::exception_type &e) {
           std::cout << e.GetMsg() << std::endl;
         }
+
         return 0;
       }
-    EOS
-    system ENV.cxx, "-std=c++11", "-I#{include}",
-           testpath/"test.cpp", "-L#{lib}", "-lmuparser",
-           "-o", testpath/"test"
+    CPP
+
+    system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", "-I#{include}", "-L#{lib}", "-lmuparser"
     system "./test"
   end
 end

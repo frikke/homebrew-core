@@ -1,9 +1,8 @@
 class FleetCli < Formula
   desc "Manage large fleets of Kubernetes clusters"
   homepage "https://github.com/rancher/fleet"
-  url "https://github.com/rancher/fleet.git",
-      tag:      "v0.8.0",
-      revision: "23e1c146755af159dafd3c88d4b92094772c99fc"
+  url "https://github.com/rancher/fleet/archive/refs/tags/v0.11.3.tar.gz"
+  sha256 "9a04cb2c55dcb92b6e106b93b280306c5fb1822c706251a8adc902a635c4be32"
   license "Apache-2.0"
   head "https://github.com/rancher/fleet.git", branch: "master"
 
@@ -13,29 +12,31 @@ class FleetCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b8d903156e240b12bb182b3e18c31bdcffccdf4158026f955ed9ddbb36194b63"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "1ffdec2c6d54ce43c5cbb4aa183ef557ea637828c38f9c4d7da0683e19b8afed"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "499ff70f541d13ad028753e0f8bd4eabd3b281ad96a72074bc1e3c7572b26c7d"
-    sha256 cellar: :any_skip_relocation, ventura:        "8f11675beabad67f72243eafbadaa0a12b67888dcc189ba950ea1c83f1e0e180"
-    sha256 cellar: :any_skip_relocation, monterey:       "97e5ebb6b8c604dad59a89ca92d5ddeb7f6ca7c8524be15b4e80bed935c3bdf5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "db2c0f7183f1c07707cef37efbd679da78910018950e8806ca0d28e40a235b16"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "631b04127f7e76c2502a2400d9d34a9b87d1be1b3387f77257787d89ff64694b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d3303eddc34af622cc034637ee6f74fd526da6c8f1141fd5f6345cd661aab7ed"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "481c39309005157035346e2a055e6a600fc9b0b0c19746a3b7a6264d2abed7cc"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "daca1a7367664ee09b0faa2e61446535f30e3aba42700a0c873ceab94827db26"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1b4e8a2cde47e2ebf1f8d7220af39f7734c0a52a213916b7deb52a1e5e41ca6e"
+    sha256 cellar: :any_skip_relocation, ventura:       "e3878296140618866af9bb4e8592cebbab6e84da55d6ff0f82a6716d2fa06cc6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "027fc6f75560910ac1e1be13436d473a2df18c4732ae8404317984c0a94a40a9"
   end
 
   depends_on "go" => :build
 
   def install
     ldflags = %W[
+      -s -w
       -X github.com/rancher/fleet/pkg/version.Version=#{version}
-      -X github.com/rancher/fleet/pkg/version.GitCommit=#{Utils.git_short_head}
+      -X github.com/rancher/fleet/pkg/version.GitCommit=#{tap.user}
     ]
-    system "go", "build", *std_go_args(output: bin/"fleet", ldflags: ldflags), "./cmd/fleetcli"
+    system "go", "build", *std_go_args(output: bin/"fleet", ldflags:), "./cmd/fleetcli"
 
-    generate_completions_from_executable(bin/"fleet", "completion", base_name: "fleet")
+    generate_completions_from_executable(bin/"fleet", "completion")
   end
 
   test do
     system "git", "clone", "https://github.com/rancher/fleet-examples"
     assert_match "kind: Deployment", shell_output("#{bin}/fleet test fleet-examples/simple 2>&1")
+
+    assert_match version.to_s, shell_output("#{bin}/fleet --version")
   end
 end

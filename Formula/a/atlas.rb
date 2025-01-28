@@ -1,22 +1,25 @@
 class Atlas < Formula
   desc "Database toolkit"
   homepage "https://atlasgo.io/"
-  url "https://github.com/ariga/atlas/archive/v0.14.0.tar.gz"
-  sha256 "43a1c770e4638d9b09ee61d9547aae848c24629693bced3c578228b26fef18b7"
+  # Upstream may not mark patch releases as latest on GitHub; it is fine to ship them.
+  # See https://github.com/ariga/atlas/issues/1090#issuecomment-1225258408
+  url "https://github.com/ariga/atlas/archive/refs/tags/v0.30.0.tar.gz"
+  sha256 "aa01d568af8c46cfc4467d3b09320586d51267f41460f6c31f5a1519b5e2087f"
   license "Apache-2.0"
   head "https://github.com/ariga/atlas.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6484a7c998b4552ced59ba8370c46ddea95a0c0698969144e75dc9c92e8ebef5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f4a8a66ba0e16c56b287743813ec9d000297502bb8fbd28c45086824680728a1"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d22cfca2c5a50f2bf27d1e4c883ebec17edbafd7b0aa3f80669ce72342d65580"
-    sha256 cellar: :any_skip_relocation, ventura:        "88cc86ae8d45668e4192f2d1ac7781208d1820ccb84fc3d67bd56fed1494d057"
-    sha256 cellar: :any_skip_relocation, monterey:       "f07bfb36aa832dbe095d266e947e6ecc50781c7a42efcb0993a09fac2777ddee"
-    sha256 cellar: :any_skip_relocation, big_sur:        "803351dffe325f34ef368734e4bad0e567bdd872d8c13ea45b9246e2dd373ee6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3323eb6c52eaa02901c0bb1f45b445a8f8e074471f77c42506c3b077111afd3a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8c447b525d7fd5beba2fa5da2b0aaf3ae2c19eac8dda06d9b062bbd88b14bb93"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "935034c10dd28f3a87cc0d5973bcd488df713b0500e05051e9b1884b8b2ca54f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "adf0f6ce533a8debbe454e210a20e2c42311d6ad77aaa85f874626eceeda4c21"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2d4da3dd70cbf787728dd4ea06c8cd155eee07222fb7c6f4eaa50880c9d4d553"
+    sha256 cellar: :any_skip_relocation, ventura:       "b654ce40a5200e06693d02e4d7b74c5cc9224c15733a45f9fab899a4e45a8136"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c188954a4259cc8e25804dc0b91989e1e28796b04ae74f2460e862a2d310859f"
   end
 
   depends_on "go" => :build
+
+  conflicts_with "mongodb-atlas-cli", "nim", because: "both install `atlas` executable"
 
   def install
     ldflags = %W[
@@ -24,7 +27,7 @@ class Atlas < Formula
       -X ariga.io/atlas/cmd/atlas/internal/cmdapi.version=v#{version}
     ]
     cd "./cmd/atlas" do
-      system "go", "build", *std_go_args(ldflags: ldflags)
+      system "go", "build", *std_go_args(ldflags:)
     end
 
     generate_completions_from_executable(bin/"atlas", "completion")

@@ -1,8 +1,8 @@
 class Bgpq4 < Formula
   desc "BGP filtering automation for Cisco, Juniper, BIRD and OpenBGPD routers"
   homepage "https://github.com/bgp/bgpq4"
-  url "https://github.com/bgp/bgpq4/archive/refs/tags/1.11.tar.gz"
-  sha256 "0e5325633f607e00262a6b96d1d246a9d27b4b869bbcf582a46e8a43c5fa4e18"
+  url "https://github.com/bgp/bgpq4/archive/refs/tags/1.15.tar.gz"
+  sha256 "30fea8d6274af6e3fba30497b977a924c79de326ae2211e490362dc7282403d6"
   license "BSD-2-Clause"
   head "https://github.com/bgp/bgpq4.git", branch: "main"
 
@@ -12,13 +12,14 @@ class Bgpq4 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9b5c9a1871de533c0d74a3052489400ced52e49e6e99475e258a6442e0a4041e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "417f0f9521bd293a97185c7f792987e9a4fb0b5d8b7a92b54b571f24a9658878"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "31d0cbfc96c55a284a9532853d086127bfa521789c729a326bd5bb3408108411"
-    sha256 cellar: :any_skip_relocation, ventura:        "3ffbdc6135d1e5a964933b27d6f3d46f576ae9dd797c0d14657b139c5b5703ca"
-    sha256 cellar: :any_skip_relocation, monterey:       "7b5aa6a92d074e95581a838ffee72d444566e3a234060a5097933f666b725f5a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "54aea55941a349a5f272e684d4edab343e99f955f295f80ce5ab7574ed0eb733"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3bc9b45b4b4af4e3f171006c2d967907aa43bba2e9d024ed072f559493edbf8a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "fe14d23c24fdc8be81ab6e291e8483e66a1c022939ec06603ce326da41393b78"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "67e3fce3c562c29ba7ea02ab532a49cd7d3be4a9a3f54db774235a2d9b68baf9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0ef09ee512c779d161c92064f799d213300a00a72ce268f02b05652268afdf53"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d508f0b6fbf454288a745c659235deab354cbf63c1eda932dd589827b8ba3e24"
+    sha256 cellar: :any_skip_relocation, sonoma:         "054b4627828599a8f3518c4cd47914f895b7c652b537cef8c9115940fc6dc3f6"
+    sha256 cellar: :any_skip_relocation, ventura:        "6b1e57ac908e87d8b348fe0d2dc70fd0bd5c178caf8dc5a041bad4cd48088ab9"
+    sha256 cellar: :any_skip_relocation, monterey:       "0d4dfeaa2caa2c39c6daa71d8f679fc18102c1c13caa14faa984e956eeb6820f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1170e29b65fbd8f5eacb9ae2fa7ed9a1cf7408ef35095c17c95e38635cebb4c2"
   end
 
   depends_on "autoconf" => :build

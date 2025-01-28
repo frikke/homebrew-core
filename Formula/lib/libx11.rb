@@ -1,23 +1,22 @@
 class Libx11 < Formula
   desc "X.Org: Core X11 protocol client library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libX11-1.8.6.tar.gz"
-  sha256 "5ff0d26c94d82ebb94a944b9f1f55cd01b9713fd461fe93f62f3527ce14ad94e"
+  url "https://www.x.org/archive/individual/lib/libX11-1.8.10.tar.gz"
+  sha256 "b7a1a90d881bb7b94df5cf31509e6b03f15c0972d3ac25ab0441f5fbc789650f"
   license "MIT"
 
   bottle do
-    sha256 arm64_sonoma:   "deac131d507c6f21ee96567f070a61426d429232161f36077382b381b884abca"
-    sha256 arm64_ventura:  "12634191390f2feaad802e2c98dbee1274f688d1348ba7319462340defe2d07d"
-    sha256 arm64_monterey: "4899cff98c20b47226c7817b898132f9c9c68da2cb4b7b5176efc442a0030bde"
-    sha256 arm64_big_sur:  "5411fb6d4c702ee5413af825418e6157ca45f3d855710bcfc644bb0476cd207a"
-    sha256 sonoma:         "6e1cb8e6d2c5fe3bd9c10911c581188dcb26a0dc40c2402f52d3e72e8b4197ca"
-    sha256 ventura:        "da763d80a33ebfbac8064a9528d9e7ccde2a4527dc48f80a003166c7dd4021bf"
-    sha256 monterey:       "2c4826ba65ab97f4d201a5624cc675fbefd563a831fab866c8966b32c89f3e17"
-    sha256 big_sur:        "e321aa3d735de0a2f4f7b2d5c6dde6184cc8590c348c3d1dd773fac892db6ecd"
-    sha256 x86_64_linux:   "6b4be1e7e026639d80f2541fc72cf0caf8b15670efdab3abc1cd4b291f486910"
+    sha256 arm64_sequoia:  "c6f87c76459254b07fff761beac4092db78f520edc26b0fb489b5f9c6b767fa5"
+    sha256 arm64_sonoma:   "5467d41501260e483586e9b05ed3137393f7faf7d49901c31bbeb0b25bd7caf5"
+    sha256 arm64_ventura:  "144c9ca0fd07301773ec072adf505ba73a2c2561ad211cc7067b98b92034cb72"
+    sha256 arm64_monterey: "f323202b5650d3114a7215bcf8017cc144140c49baf122501a8bc31d3b24bfa7"
+    sha256 sonoma:         "ae4c27d75532011351ec195f21e63640a1df4393a66985bf5078df0a446fee73"
+    sha256 ventura:        "220bce8f5d80d6894f7e25d02c32f1a3ec1d4d3f0ecf5f4ba619de7a80986a1a"
+    sha256 monterey:       "0989016905547b3899a956bbb45a95b6dc50fffab2af5afd6685486bea03281f"
+    sha256 x86_64_linux:   "12f965d5b1d09327b0040b9e0f385ca5d4db9ceb29f8c89e6fcbe6e98ecf71c6"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "util-macros" => :build
   depends_on "xtrans" => :build
   depends_on "libxcb"
@@ -38,13 +37,13 @@ class Libx11 < Formula
       --enable-specs=no
     ]
 
-    system "./configure", *std_configure_args, *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <X11/Xlib.h>
       #include <stdio.h>
       int main() {
@@ -74,7 +73,7 @@ class Libx11 < Formula
 
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lX11", "-o", "test", "-I#{include}"
     system "./test"
   end

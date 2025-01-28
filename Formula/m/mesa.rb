@@ -3,141 +3,171 @@ class Mesa < Formula
 
   desc "Graphics Library"
   homepage "https://www.mesa3d.org/"
-  license "MIT"
-  revision 1
+  url "https://archive.mesa3d.org/mesa-24.2.8.tar.xz"
+  sha256 "999d0a854f43864fc098266aaf25600ce7961318a1e2e358bff94a7f53580e30"
+  license all_of: [
+    "MIT",
+    "Apache-2.0", # include/{EGL,GLES*,vk_video,vulkan}, src/egl/generate/egl.xml, src/mapi/glapi/registry/gl.xml
+    "BSD-2-Clause", # src/asahi/lib/dyld_interpose.h, src/getopt/getopt*, src/util/xxhash.h
+    "BSD-3-Clause", # src/compiler/glsl/float64.glsl, src/util/softfloat.*
+    "BSL-1.0", # src/c11, src/gallium/auxiliary/gallivm/f.cpp
+    "HPND", # src/mesa/x86/assyntax.h
+    "HPND-sell-variant", # src/loader/loader_{dri,dri3,wayland}_helper.*, src/vulkan/wsi/wsi_common_display.*
+    "ICU", # src/glx/*
+    "MIT-Khronos-old", # src/compiler/spirv/{GLSL.*,OpenCL.std.h,spirv.core.grammar.json,spirv.h}
+    "SGI-B-2.0", # src/glx/*
+    :public_domain, # src/util/{dbghelp.h,u_atomic.h,sha1}, src/util/perf/gpuvis_trace_utils.h
+    { "GPL-1.0-or-later" => { with: "Linux-syscall-note" } }, # include/drm-uapi/sync_file.h
+    { "GPL-2.0-only" => { with: "Linux-syscall-note" } }, # include/drm-uapi/{d3dkmthk.h,dma-buf.h,etnaviv_drm.h}
+  ]
   head "https://gitlab.freedesktop.org/mesa/mesa.git", branch: "main"
 
-  stable do
-    # TODO: Check if we can use unversioned `llvm` at version bump.
-    url "https://mesa.freedesktop.org/archive/mesa-22.3.6.tar.xz"
-    sha256 "4ec8ec65dbdb1ee9444dba72970890128a19543a58cf05931bd6f54f124e117f"
-
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/f0a40cf7d70ee5a25639b91d9a8088749a2dd04e/mesa/fix-build-on-macOS.patch"
-      sha256 "a9b646e48d4e4228c3e06d8ca28f65e01e59afede91f58d4bd5a9c42a66b338d"
-    end
-  end
-
   bottle do
-    sha256 arm64_sonoma:   "a8764d6e6d6750f9f9b627364d15a694d7ee2e2457d547347f120c92f279dafc"
-    sha256 arm64_ventura:  "df893b97b1c0460423a0e502281bb18761e6e0700902fb6707ab4346cb8ce184"
-    sha256 arm64_monterey: "c48b72bc09cefa4569a81eb625921a6d90bfaf8b234de5895bbefd638e7252c7"
-    sha256 arm64_big_sur:  "7dd6a62f76a806bd3e1d8412851bf10b91b4c8b581203ce94930884c3a7dc832"
-    sha256 sonoma:         "dad3751ed010f406a2da13a50350e9c32def51c7fc450157dc57f50632352329"
-    sha256 ventura:        "cdb0eae3f365ae073ec6b54bb05fbb98e6d3662b57909e30839c5d18e42ffbce"
-    sha256 monterey:       "0f48ffa01370e27b0eedad929d4fff5a39e9329feb10e9e7f741394ff9a8a2e7"
-    sha256 big_sur:        "dbe917f2856aa021b0f92818e861e63b972946001a02e60fc537d297ff41f521"
-    sha256 x86_64_linux:   "4b57f13f3c984072442d60c959db7952958532fde89ea0bfb629696028925b41"
+    sha256 arm64_sequoia: "59d25f8ac493c61555438878dd9488b3ec7ede62aacc7306f689a6997c32cf14"
+    sha256 arm64_sonoma:  "9924126d64e4933dbdddd6fcf94bcf3d03552e4b0c5e83d402adf6e7c195f49d"
+    sha256 arm64_ventura: "126e0420f890a18fca9007e5c84e78c757144467c204b54695e9c100309991de"
+    sha256 sonoma:        "f06a41a3cdfda318809abeff6441638e49897f8260f26f1895b1ac226d9f9ae9"
+    sha256 ventura:       "6eb15ed0640b9324b26b24659c36a6669fb823b463791d75dd7dcf3ffc885ec1"
+    sha256 x86_64_linux:  "85a6f29e14a8b813b6c7f8edade7bb850e630656220682f6f4c137bd5f44152f"
   end
 
   depends_on "bison" => :build # can't use from macOS, needs '> 2.3'
+  depends_on "libyaml" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
-  depends_on "pygments" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python@3.13" => :build
   depends_on "xorgproto" => :build
 
   depends_on "expat"
   depends_on "libx11"
   depends_on "libxcb"
-  depends_on "libxdamage"
   depends_on "libxext"
+  depends_on "libxfixes"
+  depends_on "libxrandr"
 
   uses_from_macos "flex" => :build
-  uses_from_macos "ncurses"
+  uses_from_macos "llvm"
   uses_from_macos "zlib"
-
-  on_macos do
-    depends_on "gettext"
-  end
 
   on_linux do
     depends_on "elfutils"
     depends_on "glslang"
     depends_on "gzip"
+    depends_on "libclc"
     depends_on "libdrm"
     depends_on "libva"
     depends_on "libvdpau"
-    depends_on "libxfixes"
-    depends_on "libxrandr"
+    depends_on "libxml2" # not used on macOS
     depends_on "libxshmfence"
     depends_on "libxv"
     depends_on "libxxf86vm"
-    depends_on "llvm@15" # TODO: Change to `uses_from_macos` when this is unversioned.
     depends_on "lm-sensors"
+    depends_on "spirv-llvm-translator"
+    depends_on "spirv-tools"
+    depends_on "valgrind"
     depends_on "wayland"
     depends_on "wayland-protocols"
+    depends_on "zstd"
   end
 
-  fails_with gcc: "5"
-
-  resource "Mako" do
-    url "https://files.pythonhosted.org/packages/05/5f/2ba6e026d33a0e6ddc1dddf9958677f76f5f80c236bd65309d280b166d3e/Mako-1.2.4.tar.gz"
-    sha256 "d60a3903dc3bb01a18ad6a89cdbe2e4eadc69c0bc8ef1e3773ba53d44c3f7a34"
+  resource "mako" do
+    url "https://files.pythonhosted.org/packages/fa/0b/29bc5a230948bf209d3ed3165006d257e547c02c3c2a96f6286320dfe8dc/mako-1.3.6.tar.gz"
+    sha256 "9ec3a1583713479fae654f83ed9fa8c9a4c16b7bb0daba0e6bbebff50c0d983d"
   end
 
-  resource "MarkupSafe" do
-    url "https://files.pythonhosted.org/packages/95/7e/68018b70268fb4a2a605e2be44ab7b4dd7ce7808adae6c5ef32e34f4b55a/MarkupSafe-2.1.2.tar.gz"
-    sha256 "abcabc8c2b26036d62d4c746381a6f7cf60aafcc653198ad678306986b09450d"
+  resource "markupsafe" do
+    url "https://files.pythonhosted.org/packages/b2/97/5d42485e71dfc078108a86d6de8fa46db44a1a9295e89c5d6d4a06e23a62/markupsafe-3.0.2.tar.gz"
+    sha256 "ee55d3edf80167e48ea11a923c7386f4669df67d7994554387f84e7d8b0a2bf0"
   end
 
-  resource "glxgears.c" do
-    url "https://gitlab.freedesktop.org/mesa/demos/-/raw/caac7be425a185e191224833375413772c4aff8d/src/xdemos/glxgears.c"
-    sha256 "344a03aff01708350d90603fd6b841bccd295157670f519b459bbf3874acf847"
+  resource "packaging" do
+    url "https://files.pythonhosted.org/packages/d0/63/68dbb6eb2de9cb10ee4c9c14a0148804425e13c4fb20d61cce69f53106da/packaging-24.2.tar.gz"
+    sha256 "c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"
   end
 
-  resource "gl_wrap.h" do
-    url "https://gitlab.freedesktop.org/mesa/demos/-/raw/ddc35ca0ea2f18c5011c5573b4b624c128ca7616/src/util/gl_wrap.h"
-    sha256 "41f5a84f8f5abe8ea2a21caebf5ff31094a46953a83a738a19e21c010c433c88"
+  resource "ply" do
+    url "https://files.pythonhosted.org/packages/e5/69/882ee5c9d017149285cab114ebeab373308ef0f874fcdac9beb90e0ac4da/ply-3.11.tar.gz"
+    sha256 "00c7c1aaa88358b9c765b6d3000c6eec0ba42abca5351b095321aef446081da3"
+  end
+
+  resource "pyyaml" do
+    url "https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz"
+    sha256 "d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"
+  end
+
+  def python3
+    "python3.13"
   end
 
   def install
-    venv_root = buildpath/"venv"
-    venv = virtualenv_create(venv_root, "python3.11")
+    venv = virtualenv_create(buildpath/"venv", python3)
+    venv.pip_install resources.reject { |r| OS.mac? && r.name == "ply" }
+    ENV.prepend_path "PYTHONPATH", venv.site_packages
+    ENV.prepend_path "PATH", venv.root/"bin"
 
-    %w[Mako MarkupSafe].each do |res|
-      venv.pip_install resource(res)
-    end
-
-    ENV.prepend_path "PATH", "#{venv_root}/bin"
-
-    args = ["-Db_ndebug=true"]
-
-    if OS.linux?
+    args = %w[
+      -Db_ndebug=true
+      -Dosmesa=true
+    ]
+    if OS.mac?
+      args << "-Dgallium-drivers=softpipe"
+    else
       args += %w[
-        -Dplatforms=x11,wayland
-        -Dglx=auto
         -Ddri3=enabled
-        -Dgallium-drivers=auto
-        -Dgallium-omx=disabled
         -Degl=enabled
+        -Dgallium-extra-hud=true
+        -Dgallium-nine=true
+        -Dgallium-omx=disabled
+        -Dgallium-opencl=icd
+        -Dgallium-va=enabled
+        -Dgallium-vdpau=enabled
+        -Dgallium-xa=enabled
         -Dgbm=enabled
-        -Dopengl=true
         -Dgles1=enabled
         -Dgles2=enabled
-        -Dvalgrind=disabled
+        -Dglx=dri
+        -Dintel-clc=enabled
+        -Dlmsensors=enabled
+        -Dllvm=enabled
+        -Dmicrosoft-clc=disabled
+        -Dopengl=true
+        -Dplatforms=x11,wayland
+        -Dshared-glapi=enabled
         -Dtools=drm-shim,etnaviv,freedreno,glsl,nir,nouveau,lima
+        -Dvalgrind=enabled
+        -Dvideo-codecs=vc1dec,h264dec,h264enc,h265dec,h265enc
+        -Dvulkan-drivers=amd,intel,intel_hasvk,swrast,virtio
+        -Dvulkan-layers=device-select,intel-nullhw,overlay
       ]
+      if Hardware::CPU.intel?
+        args << "-Dgallium-drivers=r300,r600,radeonsi,nouveau,virgl,svga,softpipe,llvmpipe,i915,iris,crocus,zink"
+      end
+      # Strip executables/libraries/object files to reduce their size
+      args << "-Dstrip=true"
     end
 
     system "meson", "setup", "build", *args, *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
+
+    prefix.install "docs/license.rst"
     inreplace lib/"pkgconfig/dri.pc" do |s|
       s.change_make_var! "dridriverdir", HOMEBREW_PREFIX/"lib/dri"
-    end
-
-    if OS.linux?
-      # Strip executables/libraries/object files to reduce their size
-      system("strip", "--strip-unneeded", "--preserve-dates", *(Dir[bin/"**/*", lib/"**/*"]).select do |f|
-        f = Pathname.new(f)
-        f.file? && (f.elf? || f.extname == ".a")
-      end)
     end
   end
 
   test do
+    resource "glxgears.c" do
+      url "https://gitlab.freedesktop.org/mesa/demos/-/raw/878cd7fb84b7712d29e5d1b38355ed9c5899a403/src/xdemos/glxgears.c"
+      sha256 "af7927d14bd9cc989347ad0c874b35c4bfbbe9f408956868b1c5564391e21eed"
+    end
+
+    resource "gl_wrap.h" do
+      url "https://gitlab.freedesktop.org/mesa/demos/-/raw/ddc35ca0ea2f18c5011c5573b4b624c128ca7616/src/util/gl_wrap.h"
+      sha256 "41f5a84f8f5abe8ea2a21caebf5ff31094a46953a83a738a19e21c010c433c88"
+    end
+
     %w[glxgears.c gl_wrap.h].each { |r| resource(r).stage(testpath) }
     flags = %W[
       -I#{include}

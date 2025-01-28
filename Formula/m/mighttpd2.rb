@@ -1,18 +1,18 @@
 class Mighttpd2 < Formula
   desc "HTTP server"
   homepage "https://kazu-yamamoto.github.io/mighttpd2/"
-  url "https://hackage.haskell.org/package/mighttpd2-4.0.3/mighttpd2-4.0.3.tar.gz"
-  sha256 "1a43390e921ab1b1b473d5bf65b2dcf27d0a8466e3243c2dab5d0c3de32bf9e1"
+  # TODO: Check if `cborg` allow-newer workarounds can be removed
+  url "https://hackage.haskell.org/package/mighttpd2-4.0.8/mighttpd2-4.0.8.tar.gz"
+  sha256 "cad7a92e3f9ce636d0099b226e080d0102a2498b9ef9d0abfc6b24e24f1d127b"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "14ce8d8f29c64398617a7c0559f9a6e6918d462257656f4b5fe4eb2ac796dce7"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "1f18f2da847b14b72375b9ab0a95af7baf2b839d382f37f07a1543721710a1d6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d7fbe2af8cad585cf43584f39078f5b5ba00cddea477ee35813cda64961cac1a"
-    sha256 cellar: :any_skip_relocation, ventura:        "9274fce540911647838ea0f26304a60f4e3dcf82480e9f06bb24c74e92399888"
-    sha256 cellar: :any_skip_relocation, monterey:       "fce6e11a2aa622fb038e83c5334257cad896246cde293b8ea4fcf10c8e6a8f0a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d4b833ec3f97ecc2c53f343df423521606ffbe44a813e891e0b94e1c4fca6179"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cc8d692ca461d3f352302f9dfecebc2bac125dd7296db177c53f4bee5e92f895"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8c8f8195c36bbea691d3faf56681c1a9ec10932a550d9854342d41a78427c1ca"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c7ea8b3e622834bff079b88311cb158ee882dd195136973eab5fdafdb0b798dc"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "594c27cc4bb9feec025e53492bd863f03a622beb0ed5efab87e0d35d3e02f129"
+    sha256 cellar: :any_skip_relocation, sonoma:        "f614b9817495f3a71a5bd712bf6d72668e13f0ede9bc682e25c85eebb2372f4d"
+    sha256 cellar: :any_skip_relocation, ventura:       "04e1a56bce1760a82b6845e1ed2b864d984182d8015c3c641a32e6e3262f7d80"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "686df4669d80d3e379576984ffe0dfbe07197f286dc944045d7bab7ee6e26137"
   end
 
   depends_on "cabal-install" => :build
@@ -21,12 +21,16 @@ class Mighttpd2 < Formula
   uses_from_macos "zlib"
 
   def install
+    # Workaround to build with GHC 9.12, remove after https://github.com/well-typed/cborg/pull/339
+    # is merged and available on Hackage or if `cborg` is willing to provide a metadata revision
+    args = ["--allow-newer=serialise:base,serialise:ghc-prim,cborg:base,cborg:ghc-prim"]
+
     system "cabal", "v2-update"
-    system "cabal", "v2-install", "-ftls", *std_cabal_v2_args
+    system "cabal", "v2-install", "--flags=tls", *args, *std_cabal_v2_args
   end
 
   test do
-    system "#{bin}/mighty-mkindex"
-    assert (testpath/"index.html").file?
+    system bin/"mighty-mkindex"
+    assert_predicate testpath/"index.html", :file?
   end
 end

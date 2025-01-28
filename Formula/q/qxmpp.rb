@@ -1,27 +1,39 @@
 class Qxmpp < Formula
   desc "Cross-platform C++ XMPP client and server library"
   homepage "https://github.com/qxmpp-project/qxmpp/"
-  url "https://github.com/qxmpp-project/qxmpp/archive/v1.5.5.tar.gz"
-  sha256 "b25fba89432c4fd72489d1844f683bfbf4e5aa4cfcfda7a982d6019f8e4529f8"
+  url "https://github.com/qxmpp-project/qxmpp/archive/refs/tags/v1.9.3.tar.gz"
+  sha256 "6331561ae5cdbd7f850e4e886b8f42796d630a69b94252cae87fd67edb7adf7e"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "d099f396096a909f44fb368053dd8bea3caa4ee14dbfd67e466ef2f4fa532971"
-    sha256 cellar: :any,                 arm64_monterey: "49e28d8d0daf588b67a846ae5f26338bfd3de47605058ea544b8fffbd7b07515"
-    sha256 cellar: :any,                 arm64_big_sur:  "efd1db85c3eab76aeb8b4c3de5c220dc677d4481662b52b2663afdd0a9f8e30b"
-    sha256 cellar: :any,                 ventura:        "47b877829b1edf3aa0d2f7737b51beb216e8634212ef9cebf7301601354bb185"
-    sha256 cellar: :any,                 monterey:       "ab94082c06216ca413b8f7ae6a9309947c8eb924f87032be24fd662ba0c2d0c1"
-    sha256 cellar: :any,                 big_sur:        "435ebcc39eb2007d64392da737c15fc0fa065f68692afce5f9aa54c271ddae4d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "68e2781798b80f1a83c0d82ef845fe1df06a0e5fa45716d8195a716d42036453"
+    sha256 cellar: :any,                 arm64_sonoma:  "74c1d0171dbecca9959ec4b578e261a76d7ba38e1f3b85cb2f8872edd304f264"
+    sha256 cellar: :any,                 arm64_ventura: "4104e0270cefe016bfe0582c9ff698e586ed97d746d08c64499307c7bad87895"
+    sha256 cellar: :any,                 sonoma:        "d6e5850d7638aca9dd9f12400f36a88880f166a8e014daf6ec78e519f7105fa1"
+    sha256 cellar: :any,                 ventura:       "1671c757b011278a346eda14b7ddf335679a572dc595cee5eeff4ce170c50e61"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bf76b9782a3fb11b9b76b1780e73cfd7e392692cced5f411f2fd073c9fb075bf"
   end
 
   depends_on "cmake" => :build
   depends_on xcode: :build
   depends_on "qt"
 
-  fails_with gcc: "5"
+  on_macos do
+    depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1400
+  end
+
+  fails_with :clang do
+    build 1400
+    cause "Requires C++20"
+  end
+
+  fails_with :gcc do
+    version "9"
+    cause "Requires C++20"
+  end
 
   def install
+    ENV.llvm_clang if OS.mac? && DevelopmentTools.clang_build_version <= 1400
+
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
@@ -42,13 +54,13 @@ class Qxmpp < Formula
       QMAKE_RPATHDIR += #{lib}
     EOS
 
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <QXmppQt6/QXmppClient.h>
       int main() {
         QXmppClient client;
         return 0;
       }
-    EOS
+    CPP
 
     system "#{Formula["qt"].bin}/qmake", "test.pro"
     system "make"

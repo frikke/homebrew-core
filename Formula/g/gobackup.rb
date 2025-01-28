@@ -1,19 +1,18 @@
 class Gobackup < Formula
   desc "CLI tool for backup your databases, files to cloud storages"
   homepage "https://gobackup.github.io"
-  url "https://github.com/gobackup/gobackup/archive/v2.6.0.tar.gz"
-  sha256 "79c265bcd8342a713b145052781b55cffd55536244b9ce23ff241769a4b0eb83"
+  url "https://github.com/gobackup/gobackup/archive/refs/tags/v2.14.0.tar.gz"
+  sha256 "87ad4c89cf1cee047d9c1e68559322653dda62c830408066c954d07c40ebcc90"
   license "MIT"
   head "https://github.com/gobackup/gobackup.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b7c558e3d238b0db24d3b2b7f45b9f10538e384216cbca2649146a2431d4a2a7"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b7c558e3d238b0db24d3b2b7f45b9f10538e384216cbca2649146a2431d4a2a7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b7c558e3d238b0db24d3b2b7f45b9f10538e384216cbca2649146a2431d4a2a7"
-    sha256 cellar: :any_skip_relocation, ventura:        "e0bc9130100c19c83e1330c806dd5bd68ec4e49ff4ec8b89d5c2956e1ceb4cda"
-    sha256 cellar: :any_skip_relocation, monterey:       "e0bc9130100c19c83e1330c806dd5bd68ec4e49ff4ec8b89d5c2956e1ceb4cda"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e0bc9130100c19c83e1330c806dd5bd68ec4e49ff4ec8b89d5c2956e1ceb4cda"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "70875c7af6467dfbf3aedbd88390bf34f0d44081a1571c481a7d633238791192"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b4c4cd8178fd7b42c5efe4cdb0a8af8eae612c3dc2cccb3d396c759979f87033"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b4c4cd8178fd7b42c5efe4cdb0a8af8eae612c3dc2cccb3d396c759979f87033"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b4c4cd8178fd7b42c5efe4cdb0a8af8eae612c3dc2cccb3d396c759979f87033"
+    sha256 cellar: :any_skip_relocation, sonoma:        "4793fc54b645330b80fc5a8df570c495372322b40d9107bfa2c2630cddd6543b"
+    sha256 cellar: :any_skip_relocation, ventura:       "4793fc54b645330b80fc5a8df570c495372322b40d9107bfa2c2630cddd6543b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d8f9c4843e273d3f385b9ce369864b2ac568d9ad2ff7da1ba920063bae4fa2fe"
   end
 
   depends_on "go" => :build
@@ -34,8 +33,7 @@ class Gobackup < Formula
     assert_match version.to_s, shell_output("#{bin}/gobackup -v")
 
     config_file = testpath/"gobackup.yml"
-
-    config_file.write <<~EOS
+    config_file.write <<~YAML
       models:
         test:
           storages:
@@ -45,7 +43,7 @@ class Gobackup < Formula
           archive:
             includes:
               - #{config_file}
-    EOS
+    YAML
 
     out = shell_output("#{bin}/gobackup perform -c #{config_file}").chomp
     assert_match "succeeded", out

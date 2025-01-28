@@ -1,11 +1,12 @@
 class Libdmtx < Formula
   desc "Data Matrix library"
   homepage "https://libdmtx.sourceforge.net/"
-  url "https://github.com/dmtx/libdmtx/archive/v0.7.7.tar.gz"
+  url "https://github.com/dmtx/libdmtx/archive/refs/tags/v0.7.7.tar.gz"
   sha256 "7aa62adcefdd6e24bdabeb82b3ce41a8d35f4a0c95ab0c4438206aecafd6e1a1"
   license "BSD-2-Clause"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "2727b03def8ebe1d6ce7c7a0960845bbef9142169cf2b10cd66afc5c4a7eb3e0"
     sha256 cellar: :any,                 arm64_sonoma:   "86a00d977a1da4337be67a2745ba22e81d8d18bd1dc78e38cec708725dd4c6c1"
     sha256 cellar: :any,                 arm64_ventura:  "8b618efa0c3059ac26262d016e74fdd1d8e2e9507fba28a614fae2435011eddf"
     sha256 cellar: :any,                 arm64_monterey: "561f25578f3a60d6d122900a35d3a8e55745f74caeead32bbaa91f9cd0681a65"
@@ -23,8 +24,8 @@ class Libdmtx < Formula
   depends_on "libtool" => :build
 
   def install
-    system "autoreconf", "-fiv"
-    system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args
     system "make"
     system "make", "install"
   end

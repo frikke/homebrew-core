@@ -7,6 +7,7 @@ class Yafc < Formula
   revision 5
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "2f0f7381029703774be13824194784dc2e84478fbb5680abd7d856366de3db57"
     sha256 cellar: :any,                 arm64_sonoma:   "f2c0733bdc6d9842bc5dd1400fa1e9a4a2d5af3f0ca8578caf32bca5b46ae2ec"
     sha256 cellar: :any,                 arm64_ventura:  "79f180267773ebe99148b9e55e1fce873dfe7b1b8aa14050191a5cab8ad93145"
     sha256 cellar: :any,                 arm64_monterey: "0b779fe68332dfaf1182fd343aad750a2346f95c9d5019e0e9245ae60a2fc4e1"
@@ -18,7 +19,7 @@ class Yafc < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "6dc9c9ee718893b94e236db36df97740b59378591bd881a95fec98c9da8bdf88"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libssh"
   depends_on "openssl@3"
   depends_on "readline"

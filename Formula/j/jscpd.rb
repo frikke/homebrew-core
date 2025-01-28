@@ -1,26 +1,26 @@
-require "language/node"
-
 class Jscpd < Formula
   desc "Copy/paste detector for programming source code"
   homepage "https://github.com/kucherenko/jscpd"
-  url "https://registry.npmjs.org/jscpd/-/jscpd-3.5.10.tgz"
-  sha256 "6f42fba5d2935f5068af0798545bb60c4bde5b64346061e7286e51cfe703de0c"
+  url "https://registry.npmjs.org/jscpd/-/jscpd-4.0.5.tgz"
+  sha256 "e284fc35166ee0cd5f0db3d5c15b8e9bf8bbc2914d498f361c65e259cf15ae67"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e51ad448745846c94b3c51ec46d753c43059b732cf9e1fb94971d5c3a0e32bc5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e51ad448745846c94b3c51ec46d753c43059b732cf9e1fb94971d5c3a0e32bc5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e51ad448745846c94b3c51ec46d753c43059b732cf9e1fb94971d5c3a0e32bc5"
-    sha256 cellar: :any_skip_relocation, ventura:        "423d5ece361e23e2c768e51265446c3d5d394193284cde28eac3e3eb5374391a"
-    sha256 cellar: :any_skip_relocation, monterey:       "423d5ece361e23e2c768e51265446c3d5d394193284cde28eac3e3eb5374391a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "423d5ece361e23e2c768e51265446c3d5d394193284cde28eac3e3eb5374391a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e51ad448745846c94b3c51ec46d753c43059b732cf9e1fb94971d5c3a0e32bc5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "e98285802ac160668e23cd901cec1b45ff0d66fbbaa7e9e4ea1798b317dcf180"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "541ad78931d710438b9489495ff9c534354286e397e20b9c5998af960512d04c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "541ad78931d710438b9489495ff9c534354286e397e20b9c5998af960512d04c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "541ad78931d710438b9489495ff9c534354286e397e20b9c5998af960512d04c"
+    sha256 cellar: :any_skip_relocation, sonoma:         "2e76cf1e82fe5ae1995207ff03b8ef0856452f10febcb7b00305897b8e20bc8a"
+    sha256 cellar: :any_skip_relocation, ventura:        "2e76cf1e82fe5ae1995207ff03b8ef0856452f10febcb7b00305897b8e20bc8a"
+    sha256 cellar: :any_skip_relocation, monterey:       "2e76cf1e82fe5ae1995207ff03b8ef0856452f10febcb7b00305897b8e20bc8a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3659994d220039eff175732b7ba2d5cd3c0213e6ff2d4129e2b9b3b93611efe1"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 

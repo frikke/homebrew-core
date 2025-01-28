@@ -1,47 +1,50 @@
 class Sheldon < Formula
   desc "Fast, configurable, shell plugin manager"
   homepage "https://sheldon.cli.rs"
-  # TODO: check if we can use unversioned `libgit2` at version bump.
-  # See comments below for steps.
-  url "https://github.com/rossmacarthur/sheldon/archive/refs/tags/0.7.3.tar.gz"
-  sha256 "cf8844dce853156d076a6956733420ad7a9365e16a928e419b11de8bc634fc67"
   license any_of: ["Apache-2.0", "MIT"]
   revision 2
   head "https://github.com/rossmacarthur/sheldon.git", branch: "trunk"
 
-  bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "118dc8ee031a0b2b159c66e6dbbbbd42fe407270220e5ff07de1a764dd5acdf4"
-    sha256 cellar: :any,                 arm64_monterey: "db0e38c468d5745f301fb3d90ef2f4aba554cd2e6aba7b7468349789aa25c892"
-    sha256 cellar: :any,                 arm64_big_sur:  "189fdb36ea4f1f1d95b69a6e246364bc860a6d596064f22b753fa1edd1fb12d0"
-    sha256 cellar: :any,                 ventura:        "d30c78b96cc49ee5074dcdb9bbd75e2b81305a2f940f83ea863ee8be12ef3b22"
-    sha256 cellar: :any,                 monterey:       "cb515d97b3b15a9b0b41620a7790b117f0618159bed8dbaad5199e3c2d1039d2"
-    sha256 cellar: :any,                 big_sur:        "70aced1caac7e5f67181cbf2ea32afdb73ada5be882049a9e1a94993bf8f9112"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b5b623285df6357937868aeb66dfb6b7d610deb01686e52d84fc351d62ecb9a6"
+  stable do
+    url "https://github.com/rossmacarthur/sheldon/archive/refs/tags/0.8.0.tar.gz"
+    sha256 "71c6c27b30d1555e11d253756a4fce515600221ec6de6c06f9afb3db8122e5b5"
+
+    # libgit2 1.9 patch, upstream pr ref, https://github.com/rossmacarthur/sheldon/pull/192
+    patch do
+      url "https://github.com/rossmacarthur/sheldon/commit/7a195493252ca908b88b5ddd82dd0fe5ce4ab811.patch?full_index=1"
+      sha256 "45432a98ab2e8dbd772e083a826e883ee0a2de3958bda2ea518b31fab91cd9f0"
+    end
   end
 
-  depends_on "pkg-config" => :build
+  bottle do
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "1850ceffe1ef0fcba2b1aac07221a9269b63a60d1bb51820ba06aed90d92393d"
+    sha256 cellar: :any,                 arm64_sonoma:  "5acd3bd5f1a97a9c2e1cf24864404ddc565ed3fa88a0ff57578a73cc4a9bbb6a"
+    sha256 cellar: :any,                 arm64_ventura: "883964af1f657a480c7acf478eba931dd962d440d078426d90170d14bc16fbab"
+    sha256 cellar: :any,                 sonoma:        "e8059857164d2809f5c4e3ba1c785c20c4e03dd283a52d437a561dc6010d2c26"
+    sha256 cellar: :any,                 ventura:       "0de5177015a9be8bda748768364b17bfbe1f2cb47e6b7d2439fe143e8c493d42"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "135d4a23da11bf70b86fba244b4c2efe4f7bfad83067d282fc8c8718b8ee5647"
+  end
+
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
-  depends_on "curl"
-  # To check for `libgit2` version:
-  # 1. Search for `libgit2-sys` version at https://github.com/rossmacarthur/sheldon/blob/#{version}/Cargo.lock
-  # 2. If the version suffix of `libgit2-sys` is newer than +1.6.*, then:
-  #    - Migrate to the corresponding `libgit2` formula.
-  #    - Change the `LIBGIT2_SYS_USE_PKG_CONFIG` env var below to `LIBGIT2_NO_VENDOR`.
-  #      See: https://github.com/rust-lang/git2-rs/commit/59a81cac9ada22b5ea6ca2841f5bd1229f1dd659.
-  depends_on "libgit2@1.6"
+  depends_on "libgit2"
+  depends_on "libssh2"
   depends_on "openssl@3"
 
+  # curl-config on ventura builds do not report http2 feature,
+  # see discussions in https://github.com/Homebrew/homebrew-core/pull/197727
+  # FIXME: We should be able to use macOS curl on Ventura, but `curl-config` is broken.
+  uses_from_macos "curl", since: :sonoma
+
   def install
-    # Ensure the declared `openssl@3` dependency will be picked up.
-    # https://docs.rs/openssl/latest/openssl/#manual
+    ENV["LIBGIT2_NO_VENDOR"] = "1"
+    ENV["LIBSSH2_SYS_USE_PKG_CONFIG"] = "1"
+    # Ensure the correct `openssl` will be picked up.
     ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
     ENV["OPENSSL_NO_VENDOR"] = "1"
 
-    # Replace vendored `libgit2` with our formula
-    inreplace "Cargo.toml", /features = \["vendored-libgit2"\]/, "features = []"
-    ENV["LIBGIT2_SYS_USE_PKG_CONFIG"] = "1"
-
-    system "cargo", "install", *std_cargo_args
+    system "cargo", "install", "--no-default-features", *std_cargo_args
 
     bash_completion.install "completions/sheldon.bash" => "sheldon"
     zsh_completion.install "completions/sheldon.zsh" => "_sheldon"
@@ -57,15 +60,18 @@ class Sheldon < Formula
 
   test do
     touch testpath/"plugins.toml"
-    system "#{bin}/sheldon", "--config-dir", testpath, "--data-dir", testpath, "lock"
-    assert_predicate testpath/"plugins.lock", :exist?
+    system bin/"sheldon", "--config-dir", testpath, "--data-dir", testpath, "lock"
+    assert_path_exists testpath/"plugins.lock"
 
-    [
-      Formula["libgit2@1.6"].opt_lib/shared_library("libgit2"),
-      Formula["curl"].opt_lib/shared_library("libcurl"),
+    libraries = [
+      Formula["libgit2"].opt_lib/shared_library("libgit2"),
+      Formula["libssh2"].opt_lib/shared_library("libssh2"),
       Formula["openssl@3"].opt_lib/shared_library("libssl"),
       Formula["openssl@3"].opt_lib/shared_library("libcrypto"),
-    ].each do |library|
+    ]
+    libraries << (Formula["curl"].opt_lib/shared_library("libcurl")) if OS.linux?
+
+    libraries.each do |library|
       assert check_binary_linkage(bin/"sheldon", library),
              "No linkage with #{library.basename}! Cargo is likely using a vendored version."
     end

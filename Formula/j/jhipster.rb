@@ -1,32 +1,33 @@
-require "language/node"
-
 class Jhipster < Formula
   desc "Generate, develop and deploy Spring Boot + Angular/React applications"
   homepage "https://www.jhipster.tech/"
-  url "https://registry.npmjs.org/generator-jhipster/-/generator-jhipster-7.9.4.tgz"
-  sha256 "6d24c81e0cb3218d42f7c39d2f95ed6870ac1deb99ce43a61f37d98046f9f8a2"
+  url "https://registry.npmjs.org/generator-jhipster/-/generator-jhipster-8.8.0.tgz"
+  sha256 "2636cccb29f9e9e2e62166ff7a6d4a720b4c4ed072a17e4636ae74bdd167a4d5"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "94c8be9ac8e7b6016531321ceb2be0c1626499d59a74f1195539917c594c32fb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "94c8be9ac8e7b6016531321ceb2be0c1626499d59a74f1195539917c594c32fb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "94c8be9ac8e7b6016531321ceb2be0c1626499d59a74f1195539917c594c32fb"
-    sha256 cellar: :any_skip_relocation, ventura:        "9cf8133bece2718e287b3c01ff6f068b07bc57ff56648e0e56fe724f3a93572f"
-    sha256 cellar: :any_skip_relocation, monterey:       "9cf8133bece2718e287b3c01ff6f068b07bc57ff56648e0e56fe724f3a93572f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9cf8133bece2718e287b3c01ff6f068b07bc57ff56648e0e56fe724f3a93572f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "94c8be9ac8e7b6016531321ceb2be0c1626499d59a74f1195539917c594c32fb"
+    sha256 cellar: :any,                 arm64_sequoia: "3a0bf87a412f2bac43e6f89802b5979ec081108f0f82e187a67b852af0cdf4e5"
+    sha256 cellar: :any,                 arm64_sonoma:  "3a0bf87a412f2bac43e6f89802b5979ec081108f0f82e187a67b852af0cdf4e5"
+    sha256 cellar: :any,                 arm64_ventura: "3a0bf87a412f2bac43e6f89802b5979ec081108f0f82e187a67b852af0cdf4e5"
+    sha256 cellar: :any,                 sonoma:        "6ed7bc430493cc6d7ffff92f315c83c5cb8bc2ed576f3b7782f2ce51993c9ad2"
+    sha256 cellar: :any,                 ventura:       "6ed7bc430493cc6d7ffff92f315c83c5cb8bc2ed576f3b7782f2ce51993c9ad2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e55cf6edfc5cc945d0276e4e6cacf15227921e1199ae849602702bfde03ee451"
   end
 
   depends_on "node"
   depends_on "openjdk"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install Dir["#{libexec}/bin/*"]
     bin.env_script_all_files libexec/"bin", Language::Java.overridable_java_home_env
   end
 
   test do
-    assert_match "execution is complete", shell_output("#{bin}/jhipster info")
+    output = shell_output("#{bin}/jhipster info 2>&1")
+    assert_match "JHipster configuration not found", output
+    assert_match "execution is complete", output
+
+    assert_match version.to_s, shell_output("#{bin}/jhipster --version")
   end
 end

@@ -1,26 +1,25 @@
 class Autoconf < Formula
   desc "Automatic configure script builder"
-  homepage "https://www.gnu.org/software/autoconf"
-  url "https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.gz"
-  mirror "https://ftpmirror.gnu.org/autoconf/autoconf-2.71.tar.gz"
-  sha256 "431075ad0bf529ef13cb41e9042c542381103e80015686222b8a9d4abef42a1c"
+  homepage "https://www.gnu.org/software/autoconf/"
+  url "https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.gz"
+  mirror "https://ftpmirror.gnu.org/autoconf/autoconf-2.72.tar.gz"
+  sha256 "afb181a76e1ee72832f6581c0eddf8df032b83e2e0239ef79ebedc4467d92d6e"
   license all_of: [
     "GPL-3.0-or-later",
     "GPL-3.0-or-later" => { with: "Autoconf-exception-3.0" },
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d1f283e7df08b15468f8c02ac670824df9721d63567e382fea5f88b75f5e1092"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a3d366c98b0da7a0a4f352eef49af9d612ac7aea4ffe420d49ff12bd90007415"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a3d366c98b0da7a0a4f352eef49af9d612ac7aea4ffe420d49ff12bd90007415"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6279cc6294da77a87b2e08783f39a97e8678bde9b3e2899685879cabee6d2945"
-    sha256 cellar: :any_skip_relocation, sonoma:         "a474f30e4ba1946cf73d08aa5e6cab7f093cd1dfb36a698104f3593e07e4f17d"
-    sha256 cellar: :any_skip_relocation, ventura:        "e4f6fbea9807075da1452887f2ce0468e42ea14587ba3e6dd5e7a9929f399d18"
-    sha256 cellar: :any_skip_relocation, monterey:       "de8f4aa4123d307ad8bb11b1c685538224dc39939085fd00af928c5099c4202d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0aa64f171bac19ce6ac0c0ca697f30658db78cf175550dfde3dbda907b7f2500"
-    sha256 cellar: :any_skip_relocation, catalina:       "258a94bef23057c52818adf64d682af20bc6e09b46eac135047e2b87fc8206c7"
-    sha256 cellar: :any_skip_relocation, mojave:         "e94578bf4b4832baef1c9bbb40cb4da5fdbd9c66be5ed8d070f78be5f0cca618"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9f9a73292e64f19ec504459ee7f8b7f11f1e472d18252499705a9fc289c43f85"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "b1d110e2efd457a5e56c4469f2d6741109d542801a401fe08b750d0614581a9a"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "c3674a4dfa3794e022b1adbcd9c954c91192d38822080c7162d073d6609b903a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c3674a4dfa3794e022b1adbcd9c954c91192d38822080c7162d073d6609b903a"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c3674a4dfa3794e022b1adbcd9c954c91192d38822080c7162d073d6609b903a"
+    sha256 cellar: :any_skip_relocation, sequoia:        "a0d9eae5c0acae66c817cba6c01e872d475cd756ea6af10a7e72be27e5b80d02"
+    sha256 cellar: :any_skip_relocation, sonoma:         "32c6ff07058a61e7fada66d171fee246502fcd1f5b98b65a1ef5b0acfcfa28c2"
+    sha256 cellar: :any_skip_relocation, ventura:        "32c6ff07058a61e7fada66d171fee246502fcd1f5b98b65a1ef5b0acfcfa28c2"
+    sha256 cellar: :any_skip_relocation, monterey:       "ab03a9de5759022fd4c341a085adc41ef34b00829a21d5f98a76538ce7ec4908"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "55e5cfc7d6f3d91895fe5a345b2158498f8e96b05574b073edf667de4122413d"
   end
 
   depends_on "m4"
@@ -39,7 +38,7 @@ class Autoconf < Formula
     system "./configure", "--prefix=#{prefix}", "--with-lispdir=#{elisp}"
     system "make", "install"
 
-    rm_f info/"standards.info"
+    rm(info/"standards.info")
   end
 
   test do

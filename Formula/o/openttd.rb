@@ -1,30 +1,36 @@
 class Openttd < Formula
   desc "Simulation game based upon Transport Tycoon Deluxe"
   homepage "https://www.openttd.org/"
-  url "https://cdn.openttd.org/openttd-releases/13.4/openttd-13.4-source.tar.xz"
-  sha256 "2a1deba01bfe58e2188879f450c3fa4f3819271ab49bf348dd66545f040d146f"
+  url "https://cdn.openttd.org/openttd-releases/14.1/openttd-14.1-source.tar.xz"
+  sha256 "2c14c8f01f44148c4f2c88c169a30abcdb002eb128a92b9adb76baa76b013494"
   license "GPL-2.0-only"
   head "https://github.com/OpenTTD/OpenTTD.git", branch: "master"
 
   livecheck do
     url "https://cdn.openttd.org/openttd-releases/latest.yaml"
-    regex(/version:\s*?v?(\d+(?:\.\d+)+)/i)
+    strategy :yaml do |yaml|
+      yaml["latest"]&.map do |item|
+        next if item["name"] != "stable"
+
+        item["version"]&.to_s
+      end
+    end
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "32f2e7021a484af00d0d5884864d35d83d0f8a67831ca2ba02966b0970bf43c2"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "48610f296bb2633b043e2a623e8503ed59b67867469c502a4a0c3d5b34561c79"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ea285a23cd2736976db458c96132be25391bef4c563285e5653371674c002e54"
-    sha256 cellar: :any_skip_relocation, ventura:        "35830f4068b0bd0b789162ca0c85c16d67b17605ed6a7d714f6b11a1a4deefe2"
-    sha256 cellar: :any_skip_relocation, monterey:       "4a45055d7982167909e1e97e1e1858330b16c06489a02b825e6a525227ed76e3"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4f23a6a378b56e2c4116ffc0246ce322a5bbe45c254451a67566e5b8f034cac9"
-    sha256                               x86_64_linux:   "ebd05557f82edd927eb5820578036e1299c731dc8eadedbbe03e6d11a5a6cac3"
+    rebuild 1
+    sha256 cellar: :any, arm64_sequoia: "9bf761325d3daef0e00c49a0342f01c6644eeb8e02e4e5ea2a0e97ff9e082bb3"
+    sha256 cellar: :any, arm64_sonoma:  "ae5d3950fa4f5657138cb1065b1cdbabb002e45bb477c36043b222337309adba"
+    sha256 cellar: :any, arm64_ventura: "96fc8bd75124c582c395b096510ac5a5181011324e864245405868b986e5c98a"
+    sha256 cellar: :any, sonoma:        "21fe8f3bdf5dc3a72cb9611b803ded25636c2810011e92473ea746e8a408aa47"
+    sha256 cellar: :any, ventura:       "ec77cc4c95af77799c2633ad0a923407d1bdc41b1f01f64c19c02e49fa4474a1"
+    sha256               x86_64_linux:  "3f9df17a1ca7f18ea2c30b5de7c02658d9dee44dbdf1561d34c9c58fe6043906"
   end
 
   depends_on "cmake" => :build
   depends_on "libpng"
   depends_on "lzo"
-  depends_on macos: :high_sierra # needs C++17
+  depends_on macos: :catalina # needs C++20
   depends_on "xz"
 
   uses_from_macos "zlib"
@@ -33,13 +39,9 @@ class Openttd < Formula
     depends_on "fluid-synth"
     depends_on "fontconfig"
     depends_on "freetype"
-    depends_on "icu4c"
-    depends_on "mesa"
-    depends_on "mesa-glu"
+    depends_on "mesa" # no linkage as dynamically loaded by SDL2
     depends_on "sdl2"
   end
-
-  fails_with gcc: "5"
 
   resource "opengfx" do
     url "https://cdn.openttd.org/opengfx-releases/7.1/opengfx-7.1-all.zip"
@@ -47,7 +49,13 @@ class Openttd < Formula
 
     livecheck do
       url "https://cdn.openttd.org/opengfx-releases/latest.yaml"
-      regex(/version:\s*?v?(\d+(?:\.\d+)+)/i)
+      strategy :yaml do |yaml|
+        yaml["latest"]&.map do |item|
+          next if item["name"] != "stable"
+
+          item["version"]&.to_s
+        end
+      end
     end
   end
 
@@ -57,7 +65,13 @@ class Openttd < Formula
 
     livecheck do
       url "https://cdn.openttd.org/openmsx-releases/latest.yaml"
-      regex(/version:\s*?v?(\d+(?:\.\d+)+)/i)
+      strategy :yaml do |yaml|
+        yaml["latest"]&.map do |item|
+          next if item["name"] != "stable"
+
+          item["version"]&.to_s
+        end
+      end
     end
   end
 
@@ -67,15 +81,23 @@ class Openttd < Formula
 
     livecheck do
       url "https://cdn.openttd.org/opensfx-releases/latest.yaml"
-      regex(/version:\s*?v?(\d+(?:\.\d+)+)/i)
+      strategy :yaml do |yaml|
+        yaml["latest"]&.map do |item|
+          next if item["name"] != "stable"
+
+          item["version"]&.to_s
+        end
+      end
     end
   end
 
   def install
     # Disable CMake fixup_bundle to prevent copying dylibs
     inreplace "cmake/PackageBundle.cmake", "fixup_bundle(", "# \\0"
+    # Have CMake use our FIND_FRAMEWORK setting
+    inreplace "CMakeLists.txt", "set(CMAKE_FIND_FRAMEWORK LAST)", ""
 
-    args = std_cmake_args
+    args = std_cmake_args(find_framework: "FIRST")
     unless OS.mac?
       args << "-DCMAKE_INSTALL_BINDIR=bin"
       args << "-DCMAKE_INSTALL_DATADIR=#{share}"

@@ -11,13 +11,13 @@ class Walkmod < Formula
   end
 
   # DTD files no longer exist, upstream issue report, https://github.com/walkmod/walkmod-core/issues/108
-  deprecate! date: "2023-05-24", because: :unmaintained
+  disable! date: "2024-02-22", because: :unmaintained
 
   depends_on "openjdk"
 
   def install
     # Remove windows files
-    rm_f Dir["bin/*.bat"]
+    rm(Dir["bin/*.bat"])
     libexec.install Dir["*"]
     (bin/"walkmod").write_env_script libexec/"bin/walkmod", JAVA_HOME: Formula["openjdk"].opt_prefix
   end

@@ -1,13 +1,14 @@
 class Sbtenv < Formula
   desc "Command-line tool for managing sbt environments"
   homepage "https://github.com/sbtenv/sbtenv"
-  url "https://github.com/sbtenv/sbtenv/archive/version/0.0.24.tar.gz"
+  url "https://github.com/sbtenv/sbtenv/archive/refs/tags/version/0.0.24.tar.gz"
   sha256 "f483769e5467c718c9de72baa4eb3c679315e4f4a9ac02bb636996a63c28e3d5"
   license "MIT"
   head "https://github.com/sbtenv/sbtenv.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "47196c92dcfbb7aabc5e2ad084fb93cb49cc346499906504699c80169b94a311"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "6e5520ead3c64eb3f68e1bbc7e54ee271aaf36b1bc2b442b9514269df90a7047"
   end
 
   def install

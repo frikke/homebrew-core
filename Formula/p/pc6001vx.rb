@@ -1,39 +1,44 @@
 class Pc6001vx < Formula
   desc "PC-6001 emulator"
-  homepage "http://eighttails.seesaa.net/"
-  url "https://eighttails.up.seesaa.net/bin/PC6001VX_4.1.3_src.tar.gz"
-  sha256 "264f135ad89f443b8b103169ca28e95ba488f2ce627c6dc3791e0230587be0d9"
+  # http://eighttails.seesaa.net/ gives 405 error
+  homepage "https://github.com/eighttails/PC6001VX"
+  url "https://eighttails.up.seesaa.net/bin/PC6001VX_4.2.10_src.tar.gz"
+  sha256 "82dfae60462770b1497a6131d9420cc32fb23beb44733c98f8e97eaa8df39a26"
   license "LGPL-2.1-or-later"
-  revision 1
   head "https://github.com/eighttails/PC6001VX.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "0ee9f1581e3f9aa34d71b0a6b6e876eb4cc8a5d4da0112b7dc1720066522847e"
-    sha256 cellar: :any,                 arm64_monterey: "67d0d28536684298cd3039c211422983f1a8b9ac5050660fa3c828f7d6cfc51e"
-    sha256 cellar: :any,                 arm64_big_sur:  "9498d150ffac273597ad7efdd01220bc31a90c8a8b62031a5623507b7d82cece"
-    sha256 cellar: :any,                 ventura:        "434cf93c1ee8698062a7123acc56a422d3d5899638808c9bfeb00872d253c32f"
-    sha256 cellar: :any,                 monterey:       "f27093a85a256425a2acac1fa4293da1101cef25f7a74edc693c75cd6bec39c8"
-    sha256 cellar: :any,                 big_sur:        "b8e5990242a9331cda7e78c1b1d3d4117909284f33bb973ab5f1460b7ddbe108"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b212c77721d4e4f67fe1f00b00e64718cf6b859c6a753c54e04139b491c68bf5"
+    sha256 cellar: :any,                 arm64_sonoma:  "89277f30e85f0c53b33f4af245efe70e12620d8135d5c6bf96b85847b8577eff"
+    sha256 cellar: :any,                 arm64_ventura: "f5eba22f7175f65796d9a1f69b5c1d6af1e0b571a09b0a142f278ddcb07320f9"
+    sha256 cellar: :any,                 sonoma:        "0f6e6d416491e74e23b8ea156b98e161879c81aed4dd48c70f16c1d474e5fae3"
+    sha256 cellar: :any,                 ventura:       "9b5ef2f68413dd80f20a9605ce7954bd696711e706fa3b5f89c4e0bcda96ffff"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7e936c5feed6738d8cb60c4b6a94ce0652beba32c096eded43a7a994625dab1e"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "ffmpeg"
   depends_on "qt"
+  depends_on "sdl2"
 
-  fails_with gcc: "5" # ffmpeg is compiled with GCC
+  on_macos do
+    depends_on "gettext"
+  end
+
+  on_linux do
+    depends_on "libx11"
+  end
 
   def install
     mkdir "build" do
       system "qmake", "PREFIX=#{prefix}",
-                                 "QMAKE_CXXFLAGS=#{ENV.cxxflags}",
-                                 "CONFIG+=no_include_pwd",
-                                 ".."
+                      "QMAKE_CXXFLAGS=#{ENV.cxxflags}",
+                      "CONFIG+=no_include_pwd",
+                      ".."
       system "make"
 
       if OS.mac?
         prefix.install "PC6001VX.app"
-        bin.write_exec_script "#{prefix}/PC6001VX.app/Contents/MacOS/PC6001VX"
+        bin.write_exec_script prefix/"PC6001VX.app/Contents/MacOS/PC6001VX"
       else
         bin.install "PC6001VX"
       end
@@ -41,16 +46,24 @@ class Pc6001vx < Formula
   end
 
   test do
-    ENV["QT_QPA_PLATFORM"] = "minimal" unless OS.mac?
+    # Set QT_QPA_PLATFORM to minimal to avoid error:
+    # "This application failed to start because no Qt platform plugin could be initialized."
+    ENV["QT_QPA_PLATFORM"] = "minimal" if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+    # locales aren't set correctly within the testing environment
+    ENV["LC_ALL"] = "en_US.UTF-8"
+
     user_config_dir = testpath/".pc6001vx4"
     user_config_dir.mkpath
-    pid = fork do
-      exec bin/"PC6001VX"
-    end
-    sleep 15
-    assert_predicate user_config_dir/"pc6001vx.ini",
-                     :exist?, "User config directory should exist"
+    pid = spawn bin/"PC6001VX"
+    sleep 30
+    sleep 45 if OS.mac? && Hardware::CPU.intel?
+    assert_path_exists user_config_dir/"rom", "User config directory should exist"
   ensure
+    # the first SIGTERM signal closes a window which spawns another immediately
+    # after 5 seconds, send a second SIGTERM signal to ensure the process is fully stopped
     Process.kill("TERM", pid)
+    sleep 5
+    Process.kill("TERM", pid)
+    Process.wait(pid)
   end
 end

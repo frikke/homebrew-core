@@ -1,10 +1,9 @@
 class Clipboard < Formula
   desc "Cut, copy, and paste anything, anywhere, all from the terminal"
   homepage "https://getclipboard.app"
-  url "https://github.com/Slackadays/Clipboard/archive/refs/tags/0.8.1.tar.gz"
-  sha256 "f7ceb2dbb76bc094ac8afbef97bdef0f1a9451ca7dd1a4a181f3b2a859a2f094"
+  url "https://github.com/Slackadays/Clipboard/archive/refs/tags/0.10.0.tar.gz"
+  sha256 "741717ee505a7852fab5c69740b019e2b33f81d948232894ce294ed0a55e70fb"
   license "GPL-3.0-or-later"
-  revision 1
   head "https://github.com/Slackadays/Clipboard.git", branch: "main"
 
   livecheck do
@@ -13,24 +12,23 @@ class Clipboard < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e8feed1743d3e55ee1e67c1b8085f3cf3a4412e695147426fd3a6339b12e9d8d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "231181f3c2a24bc0dd02798b450dd7833f3615ebcbfdd0c53ebc54465ab297cb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7f8ca9e02c1d1382b380ed7dc07543a383a4089fa21de7424e56a335af62a4fa"
-    sha256 cellar: :any_skip_relocation, ventura:        "db42eb5e14ceb1eec15a4a1d77d4c1f0a94f5ac5c28a125863f0899aabd9c403"
-    sha256 cellar: :any_skip_relocation, monterey:       "cd70f44184dea81283be87d4b90a0c7c2631dc6fe214e8bd73ca4258231dc7a5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d02ded9cabcd024303d12b648383e15183089e56a2bd22254b1d0f2a693abbb0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8341584cc82f252d3c52fa056d33b2219254265e46b81b0e25b41b8f70e94efb"
+    sha256 cellar: :any,                 arm64_sequoia: "4133bfd9353d194c8b0597eaab4640752c07d53027c733ed1c1056b84a1f74c3"
+    sha256 cellar: :any,                 arm64_sonoma:  "f479da9e04d1fe86620fe54f9149d90b4d15eb6945a44380193bd190333e9497"
+    sha256 cellar: :any,                 arm64_ventura: "d0415d6ed62ac9d27c7d360ca0d97ba7114c430c4c54fcca252cb3bbae73e39c"
+    sha256 cellar: :any,                 sonoma:        "c551b2ece1d81249476f06ee13336c52a948fdf469b02b02b892a16bab58862d"
+    sha256 cellar: :any,                 ventura:       "da3319d484d5bff0daff721c5236718d7dc65dd31e2b4352beee5aa4f70e2c91"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1d390684f0efa26d3fe4a5a5b93f98daaf10c678cf1b0a638ae52aeca7ec1ebb"
   end
 
   depends_on "cmake" => :build
+  depends_on "pkgconf" => :build
+  depends_on "openssl@3"
 
   on_macos do
     depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1300
   end
 
   on_linux do
-    depends_on "pkg-config" => :build
     depends_on "wayland-protocols" => :build
     depends_on "alsa-lib"
     depends_on "libx11"
@@ -50,7 +48,7 @@ class Clipboard < Formula
     #   https://github.com/Slackadays/Clipboard/issues/147
     ENV.O3
 
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "-S", ".", "-B", "build", "-DCMAKE_OSX_ARCHITECTURES=#{Hardware::CPU.arch}", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end

@@ -1,41 +1,37 @@
-require "language/node"
-
 class Zx < Formula
   desc "Tool for writing better scripts"
   homepage "https://github.com/google/zx"
-  url "https://registry.npmjs.org/zx/-/zx-7.2.3.tgz"
-  sha256 "2644e2e596dc2e60f0a37491a342301594f07e073495da14665fa244e9b01aac"
+  url "https://registry.npmjs.org/zx/-/zx-8.3.0.tgz"
+  sha256 "b2f96100b863355511425d5f116df9e62f8e364a597cb03fa603931f7260d436"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "543e21439f8c31d8aab38fdff7e374aad1d8f36cc9ad16b474162294d78dca2b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "543e21439f8c31d8aab38fdff7e374aad1d8f36cc9ad16b474162294d78dca2b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "543e21439f8c31d8aab38fdff7e374aad1d8f36cc9ad16b474162294d78dca2b"
-    sha256 cellar: :any_skip_relocation, ventura:        "655673ef365dc41ce93cc8d421f1a80fde74070e1a6d8dd11de54944df89abe0"
-    sha256 cellar: :any_skip_relocation, monterey:       "655673ef365dc41ce93cc8d421f1a80fde74070e1a6d8dd11de54944df89abe0"
-    sha256 cellar: :any_skip_relocation, big_sur:        "655673ef365dc41ce93cc8d421f1a80fde74070e1a6d8dd11de54944df89abe0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "543e21439f8c31d8aab38fdff7e374aad1d8f36cc9ad16b474162294d78dca2b"
+    sha256 cellar: :any_skip_relocation, all: "05f1f69292ec5b531e6eda6d9af88cd2643ccfdcdc0f166858e0467312a09093"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
+
+    # Make the bottles uniform
+    inreplace_file = libexec/"lib/node_modules/zx/node_modules/@types/node/process.d.ts"
+    inreplace inreplace_file, "/usr/local/bin", "#{HOMEBREW_PREFIX}/bin"
   end
 
   test do
-    (testpath/"test.mjs").write <<~EOS
+    (testpath/"test.mjs").write <<~JAVASCRIPT
       #!/usr/bin/env zx
 
       let name = YAML.parse('foo: bar').foo
       console.log(`name is ${name}`)
       await $`touch ${name}`
-    EOS
+    JAVASCRIPT
 
     output = shell_output("#{bin}/zx #{testpath}/test.mjs")
     assert_match "name is bar", output
-    assert_predicate testpath/"bar", :exist?
+    assert_path_exists testpath/"bar"
 
     assert_match version.to_s, shell_output("#{bin}/zx --version")
   end

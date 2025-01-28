@@ -1,24 +1,21 @@
 class Dhall < Formula
   desc "Interpreter for the Dhall language"
   homepage "https://dhall-lang.org/"
-  # TODO: Switch `ghc@9.2` to `ghc` once cborg has a new release that supports
-  # ghc-prim 0.9.0. PR ref: https://github.com/well-typed/cborg/pull/304
-  url "https://hackage.haskell.org/package/dhall-1.41.2/dhall-1.41.2.tar.gz"
-  sha256 "6a9a026e698e5c1a1e103fcb376e8494615b03ef2450f0b6c5e6b43877cea592"
+  url "https://hackage.haskell.org/package/dhall-1.42.2/dhall-1.42.2.tar.gz"
+  sha256 "9a907dd95f4eefee9110f8090d83021371b6b301da315b5b2911c766e0c67b3b"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "9bd22495a7d8b81a550fbd182496f2e7fa796e79558a2c1cb668fda63396ac20"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b0d383f1b6828cb41310c8c7d88484fa95ac7ea051c315d402ee13fdcb4a863f"
-    sha256 cellar: :any_skip_relocation, ventura:        "d541205feb74cf43260416c54dfbbe7bc6a4130b027b4a13d801bfbdc92d3e53"
-    sha256 cellar: :any_skip_relocation, monterey:       "04fc6b4a5ac1365e1d57bd89c6d00247a7303923a40956a70320c8f15d85b41c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "349ecbc7401b06007bc18efb4101199c034bb48c6662652290520fbe13da79f7"
-    sha256 cellar: :any_skip_relocation, catalina:       "772a5632c8e01fdbf03e6bccf478f819ce6f0a89fdbfada1afdee95024f3fab7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4898dd03625a01a790749847dcc6cb641543689a755d9b8a043a4d51c01762df"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6904e323b779154ef9aa1563882e8e3cac9d22416d1ff28c3a5701248a2ffbf4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d8a0875538c1eb6776b4a68e35228ac8012593d08df5e9b158b139345f52a8f6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f9c27c1448e7ea747a4e43dea0691cfeb1f4b607ce711765a791991ba5213e0c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9a9eacd1dfa079788283348ba238c3afbc66cae36d4af2eb48019d4b945261a1"
+    sha256 cellar: :any_skip_relocation, ventura:       "55434b1c01bf6bf9b264fced924a31aa852523884f2c23826e1a69af74c3b83f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "07be1250410bbcaba21dc5084057529554497b52d942793f4165893a85cabd27"
   end
 
   depends_on "cabal-install" => :build
-  depends_on "ghc@9.2" => :build
+  depends_on "ghc@9.10" => :build
 
   uses_from_macos "ncurses"
   uses_from_macos "zlib"

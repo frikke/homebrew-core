@@ -11,9 +11,12 @@ class Ndiff < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "a23ac16ac1bda1aa63ff7e64c8a101bc5a1bb1dfda6ee25ad6e6aac1eae3e2b9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "4b4c46a18f21ebab95fba30b75734e9cc3e9e392909961e8901e43624faf2f74"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "731436f80a687a2e5d2a2d2a53bd338164bbcf828cd01297e14683caf4c93e22"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "731436f80a687a2e5d2a2d2a53bd338164bbcf828cd01297e14683caf4c93e22"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c7c14877b300c9a36d4047b883e773397f819f60718b9e13d17ca4359b317541"
+    sha256 cellar: :any_skip_relocation, sonoma:         "4b4c46a18f21ebab95fba30b75734e9cc3e9e392909961e8901e43624faf2f74"
     sha256 cellar: :any_skip_relocation, ventura:        "731436f80a687a2e5d2a2d2a53bd338164bbcf828cd01297e14683caf4c93e22"
     sha256 cellar: :any_skip_relocation, monterey:       "731436f80a687a2e5d2a2d2a53bd338164bbcf828cd01297e14683caf4c93e22"
     sha256 cellar: :any_skip_relocation, big_sur:        "409ac74964648efd98d55c7b07ffcb90066e23b08a50b495b4e43183fd3a9aef"
@@ -28,6 +31,9 @@ class Ndiff < Formula
   conflicts_with "cern-ndiff", "nmap", because: "both install `ndiff` binaries"
 
   def install
+    # workaround for newer clang
+    ENV.append_to_cflags "-Wno-implicit-int" if DevelopmentTools.clang_build_version >= 1403
+
     ENV.deparallelize
     # Install manually as the `install` make target is crufty
     system "./configure", "--prefix=.", "--mandir=."
@@ -39,6 +45,6 @@ class Ndiff < Formula
   end
 
   test do
-    system "#{bin}/ndiff", "--help"
+    system bin/"ndiff", "--help"
   end
 end

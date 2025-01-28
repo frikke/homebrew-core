@@ -1,31 +1,22 @@
 class ZshSyntaxHighlighting < Formula
   desc "Fish shell like syntax highlighting for zsh"
   homepage "https://github.com/zsh-users/zsh-syntax-highlighting"
-  url "https://github.com/zsh-users/zsh-syntax-highlighting.git",
-      tag:      "0.7.1",
-      revision: "932e29a0c75411cb618f02995b66c0a4a25699bc"
+  url "https://github.com/zsh-users/zsh-syntax-highlighting/archive/refs/tags/0.8.0.tar.gz"
+  sha256 "5981c19ebaab027e356fe1ee5284f7a021b89d4405cc53dc84b476c3aee9cc32"
   license "BSD-3-Clause"
   head "https://github.com/zsh-users/zsh-syntax-highlighting.git", branch: "master"
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "6fe3b10bfcf04804bce3dd26147214e9e162c4441434e0357dbee8b277a4eeb3"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "bdd9350c88caf637d8c8e5b036d6913952ec9ac3480d633bc346b2e5c988ec48"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "bdd9350c88caf637d8c8e5b036d6913952ec9ac3480d633bc346b2e5c988ec48"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "aebae47a0461de83530eb59106818889fc1a1a0e3cec2ddcefe629c3c8c172bd"
-    sha256 cellar: :any_skip_relocation, sonoma:         "831f6514312ac3044e362eaa6f9c5a28beb5fa62b798fee3372e9c085257a461"
-    sha256 cellar: :any_skip_relocation, ventura:        "ce55800da8e7546b38c17e715c1497cf35069cd76d15da779ae1a12c10173e02"
-    sha256 cellar: :any_skip_relocation, monterey:       "ce55800da8e7546b38c17e715c1497cf35069cd76d15da779ae1a12c10173e02"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0f75f5893a2179a2b1990bfb1a8e28ff3cf312dde3e11504504e9c32aed91725"
-    sha256 cellar: :any_skip_relocation, catalina:       "8b240a93c28b0c190c427afee55b80a0195dc0ed0cdb2ec956871330e0b2f3a5"
-    sha256 cellar: :any_skip_relocation, mojave:         "ab57b09a3770c0497b1704ca86bbd285d9bcab439316c0bd7f72ab72e8597d92"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "f8e941c6208a3b895a174be341a9ef2c114a3d5efeb0e86b421825b2aee0b943"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "069a8cb00d623b12e284e1ee3e68adc1eea62068bf9743798a734806317e3984"
+    sha256 cellar: :any_skip_relocation, all: "3cfaa693dab68d9a576ad1ad0a018e12b250a057963263733f6fcc9b4c4ce8a6"
   end
 
   uses_from_macos "zsh" => [:build, :test]
 
   def install
+    # Make the bottles uniform (modifying a comment with /usr/local path)
+    inreplace "highlighters/main/main-highlighter.zsh", "/usr/local/bin", "#{HOMEBREW_PREFIX}/bin"
+
     system "make", "install", "PREFIX=#{prefix}"
   end
 

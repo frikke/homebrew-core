@@ -1,19 +1,18 @@
 class Hexyl < Formula
   desc "Command-line hex viewer"
   homepage "https://github.com/sharkdp/hexyl"
-  url "https://github.com/sharkdp/hexyl/archive/v0.13.1.tar.gz"
-  sha256 "a4b3009aa7210f7d80f91d6b01543d1544586c4509247f01e028f1a56781056d"
+  url "https://github.com/sharkdp/hexyl/archive/refs/tags/v0.16.0.tar.gz"
+  sha256 "52853b4edede889b40fd6ff132e1354d957d1f26ee0c26ebdea380f8ce82cb0b"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/sharkdp/hexyl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b93fa28a29a7a0c2805eeb8edb4376fb603164271afb86a4c4e4c49b709e86b1"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "be47c1fb56bedd308995fd3237810cdffe0c7a3082511ec2c26945691ff88027"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8e11d55f97ce14bd95816ab657a5c3c03d3c3d3787ebbe3383cb0926035d64ef"
-    sha256 cellar: :any_skip_relocation, ventura:        "80eceabf20efb94166dd01b6a7806704c37503d3e73e99e600f41559ce968538"
-    sha256 cellar: :any_skip_relocation, monterey:       "7cea9f2c4578595bfb9fbc0774144ef21d1840eaddde29961dba1d936d0f323a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3558dae5138227ee363ccd715fa73a22c9a9bb21804f1d43f84877cf652889f8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5bb38b2d67aaf522cf2b002eee87af133b0760ede5f18082dbf7013c0e4d52b6"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "97598fb11f5c1a101081183f3a00864973d5349402864db0e2c694a48c079f97"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "21cada0c4349bfc09a426f2616e4f881ef42d6625d46120d65f95394e2e36fb2"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "779a6fdb3c0f2e6510bd57178035273a0f9646f5040d7a5f62c71b6acfe40242"
+    sha256 cellar: :any_skip_relocation, sonoma:        "61036a4e637cedfd6552216797444bf1bf0cbd1d2904fa45be32ac595cfbcb78"
+    sha256 cellar: :any_skip_relocation, ventura:       "42429a6a91e2d1f963559a9c618397be4ab0fbd70e206c599e49acab065cdff4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "84ad345fa48b2ea4a6e62145423924a9f4112f10b1cfd1f765bdb7b3531d56c5"
   end
 
   depends_on "pandoc" => :build

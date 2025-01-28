@@ -1,15 +1,18 @@
 class GnuComplexity < Formula
   desc "Measures complexity of C source"
-  homepage "https://www.gnu.org/software/complexity"
+  homepage "https://www.gnu.org/software/complexity/"
   url "https://ftp.gnu.org/gnu/complexity/complexity-1.13.tar.xz"
   mirror "https://ftpmirror.gnu.org/complexity/complexity-1.13.tar.xz"
   sha256 "80a625a87ee7c17fed02fb39482a7946fc757f10d8a4ffddc5372b4c4b739e67"
   license "GPL-3.0-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "cd060b26ae921fe515fb597c86e07eb82c0cad595d8eab8547cd421db5a249e3"
+    sha256 cellar: :any,                 arm64_sonoma:   "8e32f6384e57c2e21cce940fc39b2be2257b0a200367a48f85aee626988a9863"
     sha256 cellar: :any,                 arm64_ventura:  "c61d3b1a378d7debac6a79e092b3828b68b455d0b555edcb02129b34945947b1"
     sha256 cellar: :any,                 arm64_monterey: "d88523c95f66d61eab621059d46a31cae7da8964042c28499e49def45ddb6d40"
     sha256 cellar: :any,                 arm64_big_sur:  "7561dae8dcc2422a456727c8fc7b9e8e2719fca7934f26118c32bb455f376ef5"
+    sha256 cellar: :any,                 sonoma:         "0b3ec86fc33aa631f44dd91525ff27e9b2c992e43acbf0ef1a1e71b4a78763be"
     sha256 cellar: :any,                 ventura:        "4bef537bbe2199465336c8f1dcbd0c862564eb13cf2680d53671075cd6bda92e"
     sha256 cellar: :any,                 monterey:       "288719f321641b768497edfae38f1ac88499b5274ce8ada8ea1c5cd30239078c"
     sha256 cellar: :any,                 big_sur:        "82574a778a6b6ba218cd98fbd173bb7c15f4253fd871349abf8c1c322cbe99c7"
@@ -28,6 +31,10 @@ class GnuComplexity < Formula
   end
 
   def install
+    odie "check if autoreconf line can be removed" if version > "1.13"
+    # regenerate since the files were generated using automake 1.16.1
+    system "autoreconf", "--force", "--install", "--verbose"
+
     # Fix errors in opts.h. Borrowed from Debian:
     # https://salsa.debian.org/debian/complexity/-/blob/master/debian/rules
     cd "src" do
@@ -40,7 +47,7 @@ class GnuComplexity < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       void free_table(uint32_t *page_dir) {
           // The last entry of the page directory is reserved. It points to the page
           // table itself.
@@ -59,7 +66,7 @@ class GnuComplexity < Formula
           }
           free_frame((page_frame_t)page_dir);
       }
-    EOS
+    C
     system bin/"complexity", "-t", "3", "./test.c"
   end
 end

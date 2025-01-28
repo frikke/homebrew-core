@@ -3,13 +3,15 @@ class Crash < Formula
   homepage "https://www.crashub.org/"
   url "https://search.maven.org/remotecontent?filepath=org/crashub/crash.distrib/1.3.2/crash.distrib-1.3.2.tar.gz"
   sha256 "9607a84c34b01e5df999ac5bde6de2357d2a0dfb7c5c0ce2a5aea772b174ef01"
+  license "LGPL-2.1-or-later"
 
   livecheck do
     url "https://github.com/crashub/crash"
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "d53855b2b1ebbce661c375de30be8fac5b586385927c1f10dea03625532b3746"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "f2b6a3446992c7b2b38b4db049afc77e08c1eeaa3780d12686e298d4f705420b"
   end
 
   resource "docs" do

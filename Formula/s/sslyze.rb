@@ -33,11 +33,13 @@ class Sslyze < Formula
     end
   end
 
+  # Original deprecation date: 2023-10-24
+  disable! date: "2024-04-05", because: "uses deprecated `openssl@1.1`"
+
   depends_on "pyinvoke" => :build
   depends_on "rust" => :build # for cryptography
   depends_on "openssl@1.1"
   depends_on "pycparser"
-  depends_on "python-typing-extensions"
   depends_on "python@3.11"
 
   uses_from_macos "libffi", since: :catalina
@@ -57,7 +59,7 @@ class Sslyze < Formula
     sha256 "cf95adb0d1671fc38d8c43dd921ad5814a735e7d9b4d9e437c088002863854fd"
   end
 
-  resource "pyOpenSSL" do
+  resource "pyopenssl" do
     url "https://files.pythonhosted.org/packages/af/6e/0706d5e0eac08fcff586366f5198c9bf0a8b46f0f45b1858324e0d94c295/pyOpenSSL-23.0.0.tar.gz"
     sha256 "c1cc5f86bcacefc84dada7d31175cae1b1518d5f60d3d0bb595a67822a868a6f"
   end

@@ -1,9 +1,10 @@
 class OcamlFindlib < Formula
   desc "OCaml library manager"
   homepage "http://projects.camlcity.org/projects/findlib.html"
-  url "http://download.camlcity.org/download/findlib-1.9.6.tar.gz"
-  sha256 "2df996279ae16b606db5ff5879f93dbfade0898db9f1a3e82f7f845faa2930a2"
+  url "http://download.camlcity.org/download/findlib-1.9.8.tar.gz"
+  sha256 "662c910f774e9fee3a19c4e057f380581ab2fc4ee52da4761304ac9c31b8869d"
   license "MIT"
+  revision 1
 
   livecheck do
     url "http://download.camlcity.org/download/"
@@ -11,16 +12,12 @@ class OcamlFindlib < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "27f8601cdaa2e36271662c1284a30353c6b1c22f45ef7ccc3a7a4a1a73b60d6c"
-    sha256 arm64_ventura:  "bac75b12905f7138e93455ef3c4599fd417448dccafec8cbf5cc63b7192b63c7"
-    sha256 arm64_monterey: "3b7dc9a49293c982c8b8fbb4bd3a979b652d9bf48b6ae6a915fe734960acb2d3"
-    sha256 arm64_big_sur:  "259a336b537993add90ebef09bc6473dfa39426ee80292d443307f36e77e8ac4"
-    sha256 sonoma:         "86ddb1564581e10c8f1c59bad5fae8126411a12cc0218eb3af2835557913f7e7"
-    sha256 ventura:        "c9731166502de936c4897ce2f9c50b0432ac81f53dd904569ef406a4ac7bcbae"
-    sha256 monterey:       "716c17abb924c7958ebad686f456cd3c19842ba334875ae0a91f1392df756815"
-    sha256 big_sur:        "d6e7046fbe14735edb44ce83654736a476357344009fe7fd497416ade6374c47"
-    sha256 catalina:       "ef1c177401fad930e6912ae5103326dc673913e0ec16d1bd730bcc6ba5a43cf8"
-    sha256 x86_64_linux:   "c319106538e9f3e0faecd3900c1ebd105ad9b39645e0952ed5cd14de9b8ef2e4"
+    sha256 arm64_sequoia: "9364a3bfccbfa17b1de67b0811237748181251ca875105e010deca7c8b8c7c38"
+    sha256 arm64_sonoma:  "45a15d80b15f259a02a9665646a85ec6844445670e3b7f083ab1bcd447b2d480"
+    sha256 arm64_ventura: "70d057e89961c844b0a54234a7630f0e73ef9654bda57da6da9ac98bd4ea6e26"
+    sha256 sonoma:        "7d40608def1547faa7db079f9d6e8e1bb84ecd22bb3b51af0562416eae5b580d"
+    sha256 ventura:       "9953fc46d00a4952c6f5982e241743aee3a1587abbaaa2ab084e3c1a07f5f94a"
+    sha256 x86_64_linux:  "2aada46fd1e1d708cbb09f084dc896e26d35869ea8fdfd2830fb0d31caeb0b27"
   end
 
   depends_on "ocaml"
@@ -44,7 +41,11 @@ class OcamlFindlib < Formula
                               "OCAML_CORE_STDLIB=#{lib}/ocaml"
 
     # Avoid conflict with ocaml-num package
-    rm_rf Dir[lib/"ocaml/num", lib/"ocaml/num-top"]
+    rm_r(Dir[lib/"ocaml/num", lib/"ocaml/num-top"])
+
+    # Save extra findlib.conf to work around https://github.com/Homebrew/homebrew-test-bot/issues/805
+    libexec.mkpath
+    cp etc/"findlib.conf", libexec/"findlib.conf"
   end
 
   test do

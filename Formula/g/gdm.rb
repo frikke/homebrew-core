@@ -1,17 +1,17 @@
-require "language/go"
-
 class Gdm < Formula
   desc "Go Dependency Manager (gdm)"
   homepage "https://github.com/sparrc/gdm"
-  url "https://github.com/sparrc/gdm/archive/1.4.tar.gz"
+  url "https://github.com/sparrc/gdm/archive/refs/tags/1.4.tar.gz"
   sha256 "2ac8800319d922fe2816e57f30e23ddd9a11ce2e93294c533318b9f081debde4"
   license "Unlicense"
   head "https://github.com/sparrc/gdm.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "028f91a50ebe55cb07330ad0044a7dfc3200ede8b34e714bada58ca66bae39e4"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "d8c01e7222d46005257a757c00fb6dbf6e476be44502d4cee0d7afc2b759b801"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "45fa20615c4ff168b2753f538d396a9a92cc851ead7eab94c2a21faac5bee814"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "684b0b0f11a168b38500f0e9c4e8419bf39979501014f5e4a5177be2ac5352f1"
+    sha256 cellar: :any_skip_relocation, sonoma:         "8999aeae4fe6ecdb78a9633b510c46ec8a219936493d543c1832123306b1cc6f"
     sha256 cellar: :any_skip_relocation, ventura:        "9ccfb93348ed299dfa37bb416202514672c7933189d438593b57a629169d2f88"
     sha256 cellar: :any_skip_relocation, monterey:       "4ee869fe61efff2e95c1979ee051a5209d2fae0ca4b74585b678c9fdcce5f9d8"
     sha256 cellar: :any_skip_relocation, big_sur:        "fc0e6626aec33649015a5808dd6c2b2d5b73051ff71231c6b482bba9e599efc1"
@@ -24,11 +24,11 @@ class Gdm < Formula
   end
 
   # https://github.com/sparrc/gdm/issues/29
-  deprecate! date: "2023-06-27", because: :unmaintained
+  disable! date: "2024-02-20", because: :unmaintained
 
   depends_on "go"
 
-  go_resource "golang.org/x/tools" do
+  resource "golang.org/x/tools" do
     url "https://go.googlesource.com/tools.git",
         revision: "6f233b96dfbc53e33b302e31b88814cf74697ff6"
   end
@@ -39,7 +39,7 @@ class Gdm < Formula
     mkdir_p buildpath/"src/github.com/sparrc"
     ln_sf buildpath, buildpath/"src/github.com/sparrc/gdm"
 
-    Language::Go.stage_deps resources, buildpath/"src"
+    resources.each { |r| (buildpath/"src"/r.name).install r }
 
     cd "src/github.com/sparrc/gdm" do
       system "go", "build", *std_go_args(ldflags: "-X main.Version=#{version}")

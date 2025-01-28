@@ -1,8 +1,8 @@
 class Ospray < Formula
   desc "Ray-tracing-based rendering engine for high-fidelity visualization"
   homepage "https://www.ospray.org/"
-  url "https://github.com/ospray/ospray/archive/refs/tags/v2.12.0.tar.gz"
-  sha256 "268b16952b2dd44da2a1e40d2065c960bc2442dd09b63ace8b65d3408f596301"
+  url "https://github.com/ospray/ospray/archive/refs/tags/v3.2.0.tar.gz"
+  sha256 "2c8108df2950bc5d1bc2a62f74629233dbe4f36e3f6a8ea032907d4a3fdc6750"
   license "Apache-2.0"
   head "https://github.com/ospray/ospray.git", branch: "master"
 
@@ -12,38 +12,38 @@ class Ospray < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "6f5fecb1c05c875d50e53dafd400703614e36839614b86261bdb98ac3e38d823"
-    sha256 cellar: :any, arm64_monterey: "3e0664c0b539c4f47c2b42706fee64d32c14cac1241de144e8d114f3f72a35cf"
-    sha256 cellar: :any, arm64_big_sur:  "7a24a8a3c4c554d02b59d03b9d7751d6448173a762d3ae8ed4b06c11126204bb"
-    sha256 cellar: :any, ventura:        "90e4b25add8ab1ce3ca89279244b1c6253014fc70e038adbb4f73a8a59a8ff35"
-    sha256 cellar: :any, monterey:       "7f2130305e1c5f3a86a8cba185e8d5f203f306fb678476eb3022db59bb48c949"
-    sha256 cellar: :any, big_sur:        "30ea6004307fb11e32af4bc28e20332e7d6d1c53dcf001f500552fc5c685fb2b"
+    sha256 cellar: :any, arm64_sequoia:  "53dc5d5d174208c9983057f7adb43813e67acbc4aefb4d65d363c13b89998113"
+    sha256 cellar: :any, arm64_sonoma:   "970fe14d8a918196943fd2ff352432fe55d02c2ffb903a97637c0cd8a7d13ac2"
+    sha256 cellar: :any, arm64_ventura:  "0d1c6ded545f4cb342648e3a604468d476b37bf749dfc19a3eae74b76804bf63"
+    sha256 cellar: :any, arm64_monterey: "34df9ae68fdd19cdb8cb85074678fd4ed0f259e3ef0f1e9582d015d5d520a7d6"
+    sha256 cellar: :any, sonoma:         "a72ff4404280c926f33548561b8252863557e9305eeab39c99c102371bf56b5f"
+    sha256 cellar: :any, ventura:        "a073623de4aaa0e7d97d579b83b882ed03cf9f7030fac1c928862bc2346daa14"
+    sha256 cellar: :any, monterey:       "e0260bfe736f2dcca20e488902e28b41a4322535e928cafa888f11b3d19db7e2"
   end
 
   depends_on "cmake" => :build
   depends_on "embree"
   depends_on "ispc"
-  depends_on macos: :mojave # Needs embree bottle built with SSE4.2.
   depends_on "tbb"
 
   resource "rkcommon" do
-    url "https://github.com/ospray/rkcommon/archive/refs/tags/v1.11.0.tar.gz"
-    sha256 "9cfeedaccdefbdcf23c465cb1e6c02057100c4a1a573672dc6cfea5348cedfdd"
+    url "https://github.com/ospray/rkcommon/archive/refs/tags/v1.14.0.tar.gz"
+    sha256 "5aef75afc8d4fccf9e70df4cbdf29a1b28b39ee51b5588b94b83a14c6a166d83"
   end
 
   resource "openvkl" do
-    url "https://github.com/openvkl/openvkl/archive/refs/tags/v1.3.2.tar.gz"
-    sha256 "7704736566bf17497a3e51c067bd575316895fda96eccc682dae4aac7fb07b28"
-
-    # Fix CMake install location.
-    # Remove when https://github.com/openvkl/openvkl/pull/18 is merged.
-    patch do
-      url "https://github.com/openvkl/openvkl/commit/67fcc3f8c34cf1fc7983b1acc4752eb9e2cfe769.patch?full_index=1"
-      sha256 "f68aa633772153ec13c597de2328e1a3f2d64e0bcfd15dc374378d0e1b1383ee"
-    end
+    url "https://github.com/openvkl/openvkl/archive/refs/tags/v2.0.1.tar.gz"
+    sha256 "0c7faa9582a93e93767afdb15a6c9c9ba154af7ee83a6b553705797be5f8af62"
   end
 
   def install
+    # Work around an Xcode 15 linker issue which causes linkage against LLVM's
+    # libunwind due to it being present in a library search path.
+    if DevelopmentTools.clang_build_version >= 1500
+      ENV.remove "HOMEBREW_LIBRARY_PATHS",
+                 Formula["ispc"].deps.map(&:to_formula).find { |f| f.name.match? "^llvm" }.opt_lib
+    end
+
     resources.each do |r|
       r.stage do
         args = %W[
@@ -68,7 +68,7 @@ class Ospray < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <ospray/ospray.h>
       int main(int argc, const char **argv) {
@@ -77,7 +77,7 @@ class Ospray < Formula
         ospShutdown();
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lospray"
     system "./a.out"

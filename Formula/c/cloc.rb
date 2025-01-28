@@ -1,21 +1,20 @@
 class Cloc < Formula
   desc "Statistics utility to count lines of code"
   homepage "https://github.com/AlDanial/cloc/"
-  url "https://github.com/AlDanial/cloc/archive/v1.98.tar.gz"
-  sha256 "475b3075966adbe70d649e1cb2e0290cb20def6d90ef04068f45ae1a8d527b5f"
+  url "https://github.com/AlDanial/cloc/archive/refs/tags/v2.02.tar.gz"
+  sha256 "ce436edb633a06f0ee408e858f8536d0564e8404e656767b3669eb629bf95bf8"
   license "GPL-2.0-or-later"
   head "https://github.com/AlDanial/cloc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "9ed6bb07c303e30311fac3c0ae3c3fade7e98c7a1bc6b52375981704ba8a91b7"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b86f2230a60a795cc2c73929ec55eaf8a229dc32102e78f8f3f89bfae66e67a6"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b86f2230a60a795cc2c73929ec55eaf8a229dc32102e78f8f3f89bfae66e67a6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e28712c9265e3ce00d1490ef5642a630e9db3d9d0bf5ce2b6cc9ee0b1ee63efd"
-    sha256 cellar: :any_skip_relocation, sonoma:         "999b461c68045268aaaf780d42648d5c4b8f33e4660d31addef7438e02d64b83"
-    sha256 cellar: :any_skip_relocation, ventura:        "360f86ea4535f09afa252352769f437a7f33c69022d9a704977a27105aaf5bb5"
-    sha256 cellar: :any_skip_relocation, monterey:       "360f86ea4535f09afa252352769f437a7f33c69022d9a704977a27105aaf5bb5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "7dc58a78ee07a69d1ef2abedeab7fd6ac0e355fbc46a06755617d18af44e79a5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "99c68879794e4bd5060bda197765c87c1fe1b4aec1210991322b8dc00f4d1875"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "16542660d181d13fc91f1466d7eb10ee2fe59def1e07003219b95ea297ffb108"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d5c78fcf0db5b52e2909c757749f4c540f91c00d9acc539500d0497a42c0ecc5"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "fc419786fe93816ad32d5c9cb1ca8b9b746312561e63da3cb8ae023df4a6d863"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "fc419786fe93816ad32d5c9cb1ca8b9b746312561e63da3cb8ae023df4a6d863"
+    sha256 cellar: :any_skip_relocation, sonoma:         "2c80b3d16087ac35012b01041cae6d3559b5c986fc462b147311fac34b1f67d9"
+    sha256 cellar: :any_skip_relocation, ventura:        "ab94f03bef5f9bd5c921e6c31d50cba4d5c0c94447b82b7d36f04117beac363d"
+    sha256 cellar: :any_skip_relocation, monterey:       "ab94f03bef5f9bd5c921e6c31d50cba4d5c0c94447b82b7d36f04117beac363d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "70d559760697510aa1b248cd8ba072bcaac08f46230c2b24f7f16fe2de015163"
   end
 
   uses_from_macos "perl"
@@ -90,12 +89,12 @@ class Cloc < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       int main(void) {
         return 0;
       }
-    EOS
+    C
 
     assert_match "1,C,0,0,4", shell_output("#{bin}/cloc --csv .")
   end

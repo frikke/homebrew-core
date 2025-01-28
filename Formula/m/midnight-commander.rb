@@ -1,9 +1,9 @@
 class MidnightCommander < Formula
   desc "Terminal-based visual file manager"
   homepage "https://www.midnight-commander.org/"
-  url "https://www.midnight-commander.org/downloads/mc-4.8.30.tar.xz"
-  mirror "https://ftp.osuosl.org/pub/midnightcommander/mc-4.8.30.tar.xz"
-  sha256 "5ebc3cb2144b970c5149fda556c4ad50b78780494696cdf2d14a53204c95c7df"
+  url "https://www.midnight-commander.org/downloads/mc-4.8.33.tar.xz"
+  mirror "https://ftp.osuosl.org/pub/midnightcommander/mc-4.8.33.tar.xz"
+  sha256 "cae149d42f844e5185d8c81d7db3913a8fa214c65f852200a9d896b468af164c"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -12,13 +12,12 @@ class MidnightCommander < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "6c9997cc0e3abe409b02fc2f5b834e5c805d4c01bace1b1e8930dbf5bda9974d"
-    sha256 arm64_monterey: "e87079b81d73cb205be44d7b37761d004dae2edb14d62fe3791e34a2ac27fd38"
-    sha256 arm64_big_sur:  "b63985ce7b866b053613f2847d2b68f3145d8807d6e9ca49bb08757676f4c627"
-    sha256 ventura:        "83f00b049d08761da7b730ab73cf05acfbb03c2982b17abdbd59d810c3a6aab5"
-    sha256 monterey:       "5f996907eea175493f1a42d8bf88e6eb3f0ef3d2d456b1c3480b2a8092adc8e2"
-    sha256 big_sur:        "a9fa1931be3b67b41358cb328304781010fd8d5984c5337a13749aafe8b1f2f0"
-    sha256 x86_64_linux:   "f901b34e155fff6a4cb2acc7e011ec2ad88d03d3129b8db7815db432eb0a8b0a"
+    sha256 arm64_sequoia: "c6914462166922365c2a56c49d4fc8bb3eb051d3022e67072e7fac0832e8121d"
+    sha256 arm64_sonoma:  "5b4c29d7bff65c72443cc3ae9e004d0af04c38392819c432f1bded428324b549"
+    sha256 arm64_ventura: "471749bae6d5735af1b5a8922700e74ef4f4f256b2e8b60ce5786a7148f51a7d"
+    sha256 sonoma:        "d6e4cf2c8b3f9f9bef3a7a0f3a066a378c1f4c1b4bd05c3b455f20b0bfc09792"
+    sha256 ventura:       "bd3a2cca7f5e7a5a19ce29ef376fdb01a6802a76d07daae05bf9bf7527edf08a"
+    sha256 x86_64_linux:  "512a595e57bbdea41c7b80ef305023874b21d7d77a8f63ce6218af3afa0863c4"
   end
 
   head do
@@ -29,36 +28,39 @@ class MidnightCommander < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "glib"
   depends_on "libssh2"
   depends_on "openssl@3"
   depends_on "s-lang"
 
+  on_macos do
+    depends_on "diffutils"
+    depends_on "gettext"
+  end
+
   conflicts_with "minio-mc", because: "both install an `mc` binary"
 
   def install
-    args = %W[
-      --disable-debug
-      --disable-dependency-tracking
+    args = %w[
       --disable-silent-rules
-      --prefix=#{prefix}
       --without-x
       --with-screen=slang
       --enable-vfs-sftp
     ]
 
-    # Fix compilation bug on macOS 10.13 by pretending we don't have utimensat()
-    # https://github.com/MidnightCommander/mc/pull/130
-    ENV["ac_cv_func_utimensat"] = "no" if MacOS.version >= :high_sierra
     system "./autogen.sh" if build.head?
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
 
-    inreplace share/"mc/syntax/Syntax", Superenv.shims_path, "/usr/bin" if OS.mac?
+    if OS.mac?
+      inreplace share/"mc/syntax/Syntax", Superenv.shims_path, "/usr/bin"
+      bin.env_script_all_files(libexec/"bin", PATH: "#{Formula["diffutils"].opt_bin}:$PATH")
+    end
   end
 
   test do
-    assert_match "GNU Midnight Commander", shell_output("#{bin}/mc --version")
+    assert_match version.to_s, shell_output("#{bin}/mc --version")
   end
 end

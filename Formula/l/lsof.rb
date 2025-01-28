@@ -1,18 +1,17 @@
 class Lsof < Formula
   desc "Utility to list open files"
   homepage "https://github.com/lsof-org/lsof"
-  url "https://github.com/lsof-org/lsof/archive/refs/tags/4.98.0.tar.gz"
-  sha256 "80308a614508814ac70eb2ae1ed2c4344dcf6076fa60afc7734d6b1a79e62b16"
-  license "Zlib"
+  url "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.4.tar.gz"
+  sha256 "90d02ae35cd14341bfb04ce80e0030767476b0fc414a0acb115d49e79b13d56c"
+  license "lsof"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "fa116c39661d0d7b685897977dd5d90c384557baeb7dbeef0ab261cc8bd36e74"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d5b2be9ee891a5cb62e3e2d68c6513d9a7b27fa414acae729242a1abdbe93135"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "90d939a92133f1221f24d45c5406412959aa38aeac6c3a884ba3dc7b9fbf6f84"
-    sha256 cellar: :any_skip_relocation, ventura:        "0019c79578d74d752cf0589ff83c1b8b21a073327deb58b310ba59e9e46c4b09"
-    sha256 cellar: :any_skip_relocation, monterey:       "c33f6a2ff078b538a77c1fa0475b1d409d7196dadfffab16b90d38a13d4ed38f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "badaa07907718d5b13096cbfd3654afd65f36dc96ba0f7b382aa8ddd448a689d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bb3f15624b78349297ca7a081f14b93a26a7f08d5cb78eda0c268ffbede36f4f"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "036464108e88a5a4dad168d55f6723cba3d08596af58cebf3ade61aefea71483"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d50c9dfb75c471b274c2511d0f58991ef9322e55767cc0aab21c5498a79a1ae9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "03d4db66c9789321451d318f624429d10ecb8eb4e6a6f8673a7cfa77d0417901"
+    sha256 cellar: :any_skip_relocation, sonoma:        "6b39fb2ccf6675270d8c3ab4e4e28b25622b5416b6772e53c59bb8c49f72bb06"
+    sha256 cellar: :any_skip_relocation, ventura:       "140084e5e184dc4a3543bee49fb67183a440c998d28c8f9c1ac3089b02f557f7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "888180a7668c87bd0f636a1c3699e4221c1fcf2ffc9def34538f7687def47a09"
   end
 
   keg_only :provided_by_macos
@@ -26,11 +25,7 @@ class Lsof < Formula
       ENV["LSOF_INCLUDE"] = MacOS.sdk_path/"usr/include"
 
       # Source hardcodes full header paths at /usr/include
-      inreplace %w[
-        dialects/darwin/kmem/dlsof.h
-        dialects/darwin/kmem/machine.h
-        dialects/darwin/libproc/machine.h
-      ], "/usr/include", MacOS.sdk_path/"usr/include"
+      inreplace "lib/dialects/darwin/machine.h", "/usr/include", MacOS.sdk_path/"usr/include"
     else
       ENV["LSOF_INCLUDE"] = HOMEBREW_PREFIX/"include"
     end
@@ -48,7 +43,7 @@ class Lsof < Formula
 
   test do
     (testpath/"test").open("w") do
-      system "#{bin}/lsof", testpath/"test"
+      system bin/"lsof", testpath/"test"
     end
   end
 end

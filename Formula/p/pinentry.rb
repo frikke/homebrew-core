@@ -1,10 +1,11 @@
 class Pinentry < Formula
   desc "Passphrase entry dialog utilizing the Assuan protocol"
   homepage "https://www.gnupg.org/related_software/pinentry/"
-  url "https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.1.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/pinentry/pinentry-1.2.1.tar.bz2"
-  sha256 "457a185e5a85238fb945a955dc6352ab962dc8b48720b62fc9fa48c7540a4067"
+  url "https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.3.1.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/pinentry/pinentry-1.3.1.tar.bz2"
+  sha256 "bc72ee27c7239007ab1896c3c2fae53b076e2c9bd2483dc2769a16902bce8c04"
   license "GPL-2.0-only"
+  revision 1
 
   livecheck do
     url "https://gnupg.org/ftp/gcrypt/pinentry/"
@@ -12,28 +13,29 @@ class Pinentry < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "fa4fa34495942dc9cc4255c8486eae7e93d84854f9f09543063ff79e2240c271"
-    sha256 cellar: :any,                 arm64_ventura:  "bf9663328a2b2d04479530fd7aa6053a3bf83c2f33ba1258d8eaafb94bb84060"
-    sha256 cellar: :any,                 arm64_monterey: "5a929b4926da533a676b19d3cb1225b796a4046e08fd922a9784422b67dff29d"
-    sha256 cellar: :any,                 arm64_big_sur:  "6648d2c2231940d6d1543f934045c6d172a68cbec3653ff70ca63c4281f047ae"
-    sha256 cellar: :any,                 sonoma:         "53e6d1f37f718b1b3ba483d0780d663c13ba92eb3a3dc3757704b30fbc29979b"
-    sha256 cellar: :any,                 ventura:        "b2f9200f41078da0b832121d708367b3c42116c11bf306851580f16541cc145f"
-    sha256 cellar: :any,                 monterey:       "14dd6cb2c084a534214607f68d0876035f8e8aaeb452c374aa41adbe0231511a"
-    sha256 cellar: :any,                 big_sur:        "51144f3f5a2eacd6c13e34d44975d025981c38c1815dc4d7cbd062ddbe23e12a"
-    sha256 cellar: :any,                 catalina:       "df23306e11505b962ab871fd30f1cd6e1694440ede2a9692a68e4ae2da1569c0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d75a7ffda7ba40c207144f82620c9bbfef7b52bad50d9b3bf4addc3235783978"
+    sha256 cellar: :any,                 arm64_sequoia:  "1d5fc3eb19d7e41caa4a8b61530e7040d0f3fbffb812ca24e116d6b247a0dadc"
+    sha256 cellar: :any,                 arm64_sonoma:   "d657fb607715d8f374bb50e79be0a1bb129bf1f0cfb0f706dc0688d10058ee89"
+    sha256 cellar: :any,                 arm64_ventura:  "5dc139b14332cfb907a8179e28d36a501266686699ce387f48452b060a21ebb3"
+    sha256 cellar: :any,                 arm64_monterey: "829c5388c7fc1c40eaeba29199ae97ebd727bc2df2f143f1a6818f07b79dff12"
+    sha256 cellar: :any,                 sonoma:         "6eb6f95ae8513f179cb658043457e39dbed3b95bbf1a7bb8aece3158d2fd4299"
+    sha256 cellar: :any,                 ventura:        "1a750d73932b1c874887b38e186ad2017a36f230f3306983575bfa8b35c25e0d"
+    sha256 cellar: :any,                 monterey:       "4bed735f12804f39955128939408210a31a8d0fd0b7d61f309779daa66053692"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d3e303a0b8099dedac66bbc95a0fdc3cfda679e594e60972d99eb3025c6f79fb"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libassuan"
   depends_on "libgpg-error"
 
+  uses_from_macos "ncurses"
+
   on_linux do
+    depends_on "glib"
     depends_on "libsecret"
   end
 
   def install
-    # Workaround for Xcode 14.3+
+    # Fix compile with newer Clang
     ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
 
     args = %w[
@@ -52,7 +54,7 @@ class Pinentry < Formula
   end
 
   test do
-    system "#{bin}/pinentry", "--version"
-    system "#{bin}/pinentry-tty", "--version"
+    system bin/"pinentry", "--version"
+    system bin/"pinentry-tty", "--version"
   end
 end

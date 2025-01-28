@@ -1,8 +1,8 @@
 class Alluxio < Formula
   desc "Open Source Memory Speed Virtual Distributed Storage"
   homepage "https://www.alluxio.io/"
-  url "https://downloads.alluxio.io/downloads/files/2.9.3/alluxio-2.9.3-bin.tar.gz"
-  sha256 "c71abc5e852d37cfd6b1dea076f056c6997e3f60fbb940bf005acb3a6354a369"
+  url "https://downloads.alluxio.io/downloads/files/2.9.5/alluxio-2.9.5-bin.tar.gz"
+  sha256 "a85fb49654599f813661f9b8fc68d507774746258c607af33b9b2b12f16feaba"
   license "Apache-2.0"
 
   livecheck do
@@ -11,13 +11,14 @@ class Alluxio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c38d5e85079041c189c0fe008618802ee1a87f2efb94f1b3d0be35c23e27ec01"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c38d5e85079041c189c0fe008618802ee1a87f2efb94f1b3d0be35c23e27ec01"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c38d5e85079041c189c0fe008618802ee1a87f2efb94f1b3d0be35c23e27ec01"
-    sha256 cellar: :any_skip_relocation, ventura:        "f32a22feeccef5d59267a8936b1bc400996e96bd0a8f935eccf30fa8afb74722"
-    sha256 cellar: :any_skip_relocation, monterey:       "f32a22feeccef5d59267a8936b1bc400996e96bd0a8f935eccf30fa8afb74722"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f32a22feeccef5d59267a8936b1bc400996e96bd0a8f935eccf30fa8afb74722"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c38d5e85079041c189c0fe008618802ee1a87f2efb94f1b3d0be35c23e27ec01"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "93b9cc8998810d417c0b5524006f19802f6e0cf1abe6872ea7da8953f454c96c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "3d18718fb624fd2db394d87aaca2d4a35b81530e6c78f85970a08fc8c8cb9f74"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3d18718fb624fd2db394d87aaca2d4a35b81530e6c78f85970a08fc8c8cb9f74"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3d18718fb624fd2db394d87aaca2d4a35b81530e6c78f85970a08fc8c8cb9f74"
+    sha256 cellar: :any_skip_relocation, sonoma:         "3a6e404c0c07fc013a139a7ac6e4020b82b15ed3a0d162e3ad2ebddbd3810979"
+    sha256 cellar: :any_skip_relocation, ventura:        "3a6e404c0c07fc013a139a7ac6e4020b82b15ed3a0d162e3ad2ebddbd3810979"
+    sha256 cellar: :any_skip_relocation, monterey:       "3a6e404c0c07fc013a139a7ac6e4020b82b15ed3a0d162e3ad2ebddbd3810979"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "13898f6e04b21f80fe62ce9bdeff3b46b13e855324870471b1810255ec37b520"
   end
 
   # Alluxio requires Java 8 or Java 11
@@ -35,7 +36,7 @@ class Alluxio < Formula
     bin.env_script_all_files libexec/"bin", Language::Java.overridable_java_home_env("11")
     chmod "+x", Dir["#{libexec}/bin/*"]
 
-    rm_rf Dir["#{etc}/alluxio/*"]
+    rm_r(Dir["#{etc}/alluxio/*"])
 
     (etc/"alluxio").install libexec/"conf/alluxio-env.sh.template" => "alluxio-env.sh"
     ln_sf "#{etc}/alluxio/alluxio-env.sh", "#{libexec}/conf/alluxio-env.sh"

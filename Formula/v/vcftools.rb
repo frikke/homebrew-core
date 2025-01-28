@@ -3,12 +3,15 @@ class Vcftools < Formula
   homepage "https://vcftools.github.io/"
   url "https://github.com/vcftools/vcftools/releases/download/v0.1.16/vcftools-0.1.16.tar.gz"
   sha256 "dbfc774383c106b85043daa2c42568816aa6a7b4e6abc965eeea6c47dde914e3"
-  license "LGPL-3.0"
+  license "LGPL-3.0-only"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "c7e2211951604cd7cb290190f4085fa8386da11ce4691be960966704664594b7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "789091f23f949c8bb834001543ac748948ea8f6005f32e0a889f574a6db58cc8"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "b7e5d8712d69c3b8635ee3a626d21c512483e3f87272a36e1629eaa0ede2c12d"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "e3a70236094425a28dcebf4a60b84cc793c2e55e4198d0f40f25005cb8c33f86"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "02952054dace13adf39f6621591af9c8c33598334dda6c43948fab1e43916239"
+    sha256 cellar: :any_skip_relocation, sonoma:         "447b5bf17b277ae1508b7a9622c12c7b81b705a8d831edf6df56eeedb63a8898"
     sha256 cellar: :any_skip_relocation, ventura:        "2841d9ffad2417761e6c116d810512694112942d28f2c650b55ec91dc661e65a"
     sha256 cellar: :any_skip_relocation, monterey:       "8a571823e4f66cb7bd7bf3e8ad91129c5e3ed844f4d9d1f4f4eaca60eb19b23e"
     sha256 cellar: :any_skip_relocation, big_sur:        "fd610cf54b51ec2ec429edfab36b2cf1b3eb14787ab0ef5ff9d805def8c48cb0"
@@ -20,14 +23,13 @@ class Vcftools < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "12d75148c3b77914e113d975b122966b5936d05870330f66dc7aa6dc81def2f0"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "htslib"
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--with-pmdir=lib/perl5/site_perl"
+    system "./configure", "--disable-silent-rules",
+                          "--with-pmdir=lib/perl5/site_perl",
+                          *std_configure_args
     system "make", "install"
 
     bin.env_script_all_files(libexec/"bin", PERL5LIB: lib/"perl5/site_perl")
@@ -39,6 +41,7 @@ class Vcftools < Formula
       #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
       1	1	.	A	C	10	PASS	.
     EOS
-    system "#{bin}/vcf-validator", "test.vcf"
+
+    system bin/"vcf-validator", "test.vcf"
   end
 end

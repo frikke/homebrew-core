@@ -1,8 +1,8 @@
 class Oniguruma < Formula
   desc "Regular expressions library"
   homepage "https://github.com/kkos/oniguruma/"
-  url "https://github.com/kkos/oniguruma/releases/download/v6.9.8/onig-6.9.8.tar.gz"
-  sha256 "28cd62c1464623c7910565fb1ccaaa0104b2fe8b12bcd646e81f73b47535213e"
+  url "https://github.com/kkos/oniguruma/releases/download/v6.9.10/onig-6.9.10.tar.gz"
+  sha256 "2a5cfc5ae259e4e97f86b68dfffc152cdaffe94e2060b770cb827238d769fc05"
   license "BSD-2-Clause"
   head "https://github.com/kkos/oniguruma.git", branch: "master"
 
@@ -12,16 +12,12 @@ class Oniguruma < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "bc261ce80c20b2554c44b63a50e61724284b95012a59dfd37a1c792e8eee5dad"
-    sha256 cellar: :any,                 arm64_ventura:  "ce1351a948c52a2d0fb08e3c1eba5c1cd8ac22abb9c348299fb7b95a81e7a56d"
-    sha256 cellar: :any,                 arm64_monterey: "6c66f5d4198bfd9d9be019f4f40d19f4c68676df9eb0702f450ec818ef43d3e9"
-    sha256 cellar: :any,                 arm64_big_sur:  "0c9cd371a4baa9cf7322d3083aaf3d6c77f0d676a3ad2db6c80ee5e19c89367a"
-    sha256 cellar: :any,                 sonoma:         "ee496d3cb34473148ed75492015c4773a8fd5ae0467078a4a5f1b7360770ffd0"
-    sha256 cellar: :any,                 ventura:        "877e5ee7b7af6f8c219ce3525526f7608adb89cec960759aa4f9d1a5d290661d"
-    sha256 cellar: :any,                 monterey:       "680427d257a0ec9851f736e09c07ca3a808710ce57635024d8ddf31543c8c6db"
-    sha256 cellar: :any,                 big_sur:        "2abcc410df54889260ec1dc5cdb93cbe22ee01d4df5bff97d2ab43b4aaad3afb"
-    sha256 cellar: :any,                 catalina:       "000bae49a7219387f2a94e2c675113d241217702cde7f424e3590d7350270dc3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e3e431432a920a795798426fe7a32b5536909947d8a23970c4274029b8d03607"
+    sha256 cellar: :any,                 arm64_sequoia: "7d6ab71fff646664b91e8ff91744696ec775357787dbc1a28e45d52759662e8d"
+    sha256 cellar: :any,                 arm64_sonoma:  "86beadf2205c134bfc642be07b663476532c10591743461c2c64bc85be51afc8"
+    sha256 cellar: :any,                 arm64_ventura: "b0c3bbabe91edecb282b400150f05ba77360b5ea0a5950df70f0ae53b79d3d68"
+    sha256 cellar: :any,                 sonoma:        "174fa500f45c9421915e22c34f51abc2849cbce2c05b64f013e4949bf2edd7e0"
+    sha256 cellar: :any,                 ventura:       "38ea1c89b9e4fe235788557ce0eaa3812d5287c66b217fe798a95f436c241918"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "49eb885ab9a80ce30edc0aaa5f531fc0079a17e5cf41c2b6c34be0e53e763993"
   end
 
   depends_on "autoconf" => :build
@@ -29,7 +25,7 @@ class Oniguruma < Formula
   depends_on "libtool" => :build
 
   def install
-    system "autoreconf", "-vfi"
+    system "autoreconf", "--force", "--install", "--verbose"
     system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
     system "make"
     system "make", "install"

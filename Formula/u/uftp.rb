@@ -1,8 +1,8 @@
 class Uftp < Formula
   desc "Secure, reliable, efficient multicast file transfer program"
   homepage "https://uftp-multicast.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/uftp-multicast/source-tar/uftp-5.0.1.tar.gz"
-  sha256 "f0435fbc8e9ffa125e05600cb6c7fc933d7d587f5bae41b257267be4f2ce0e61"
+  url "https://downloads.sourceforge.net/project/uftp-multicast/source-tar/uftp-5.0.3.tar.gz"
+  sha256 "cb8668c19b1f10bc63a16ffa893e205dc3ec86361037d477d8003260ebc40080"
   license "GPL-3.0-or-later" => { with: "openvpn-openssl-exception" }
 
   livecheck do
@@ -11,15 +11,14 @@ class Uftp < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "e62bde780e31b0969be51009065d1538dcd0005faa72b5763d6377f73c9806c3"
-    sha256 cellar: :any,                 arm64_monterey: "419327bcf6a91fd632ae4760b3a2d6106c38faa9c88b531af321a4ada30c8c10"
-    sha256 cellar: :any,                 arm64_big_sur:  "1637d53cf74b59de04fb159100a40a68e0f2eb697d5d762cb4fed3910c64b724"
-    sha256 cellar: :any,                 ventura:        "fae25917793047496dc4cffcc9c56a3d3adfb6095d9bf9e43052c7aa83b3b27e"
-    sha256 cellar: :any,                 monterey:       "46c192edc8c39d3d42a255d1bfce9e6a4caecbdb2a8a973b7796caed331a8e64"
-    sha256 cellar: :any,                 big_sur:        "19cbee73d08382f5d52e5fa3c4dc5f2b227653bd17427d9dfe7ebcc531fc0eb5"
-    sha256 cellar: :any,                 catalina:       "f6a4cbcb1b447a5477eb21984fdf0d05394a9a9b16e07c36e3f04dbbfc6065e0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6b7469a4e9370f1f60272d22187d80419d90f52302b7d87923a1f54e6694ced3"
+    sha256 cellar: :any,                 arm64_sequoia:  "a06f88677a1fc1815127a1e75dcc3855a46f70b9e23333883a23f9635095b466"
+    sha256 cellar: :any,                 arm64_sonoma:   "24937667b9315c47cc2ddda94564cda1e1d96cc023c38ecf73be04d14ce3f451"
+    sha256 cellar: :any,                 arm64_ventura:  "2b988c5f0d11e5c32152fcdd31b760f5d76ad87518e17b08bef428de1637c68f"
+    sha256 cellar: :any,                 arm64_monterey: "7d5a837843772eb893e746c3cba51dc03fcd976ebfef1ffd51823a6e880e5bcb"
+    sha256 cellar: :any,                 sonoma:         "767d6bb0732fc7caf62d2a83cefd46e505ab1f26a1fe37fd74121716bae96945"
+    sha256 cellar: :any,                 ventura:        "427b1ac8f16271a483e972b4a1ef5721d7bf0f200a9d4e49f42151dab276273a"
+    sha256 cellar: :any,                 monterey:       "1ae379b34875e8a2deab485dbfc9716606ecba8f34267f979eb10e36ca474745"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dd8ee6610e199b5cd9fbc20357597205bce8d7a9c92937e45ab0287ee11aa3fc"
   end
 
   depends_on "openssl@3"
@@ -39,6 +38,6 @@ class Uftp < Formula
   end
 
   test do
-    system "#{bin}/uftp_keymgt"
+    system bin/"uftp_keymgt"
   end
 end

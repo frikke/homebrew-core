@@ -2,7 +2,7 @@ class PariSeadataBig < Formula
   desc "Additional modular polynomial data for PARI/GP"
   homepage "https://pari.math.u-bordeaux.fr/packages.html"
   url "https://pari.math.u-bordeaux.fr/pub/pari/packages/seadata-big.tar"
-  # Refer to http://pari.math.u-bordeaux.fr/packages.html#packages for most recent package date
+  # Refer to https://pari.math.u-bordeaux.fr/packages.html#packages for most recent package date
   version "20170418"
   sha256 "7c4db2624808a5bbd2ba00f8b644a439f0508532efd680a247610fdd5822a5f2"
   license "GPL-2.0-or-later"
@@ -18,7 +18,8 @@ class PariSeadataBig < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ad28655dc8e08ca7dd3aa0f0fd327da56e8801e76fb4a76373d0714dcd30e85f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "d2610054b7d6eb25f170e25a782db3f92ca8c0b252022b8486765b408b376a7c"
   end
 
   depends_on "pari"

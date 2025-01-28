@@ -1,21 +1,11 @@
 class Nmap < Formula
   desc "Port scanning utility for large networks"
   homepage "https://nmap.org/"
+  url "https://nmap.org/dist/nmap-7.95.tar.bz2"
+  sha256 "e14ab530e47b5afd88f1c8a2bac7f89cd8fe6b478e22d255c5b9bddb7a1c5778"
   license :cannot_represent
   revision 1
   head "https://svn.nmap.org/nmap/"
-
-  # TODO: Remove stable block in next release.
-  stable do
-    url "https://nmap.org/dist/nmap-7.94.tar.bz2"
-    sha256 "d71be189eec43d7e099bac8571509d316c4577ca79491832ac3e1217bc8f92cc"
-
-    # Fix build with Lua 5.4. Remove in next release.
-    patch do
-      url "https://github.com/nmap/nmap/commit/b9263f056ab3acd666d25af84d399410560d48ac.patch?full_index=1"
-      sha256 "088d426dc168b78ee4e0450d6b357deef13e0e896b8988164ba2bb8fd8b8767c"
-    end
-  end
 
   livecheck do
     url "https://nmap.org/dist/"
@@ -23,16 +13,12 @@ class Nmap < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 arm64_sonoma:   "a2e968804393cf5dadff37cdf5c9fa3e6a1b0c1454ed93ed54807e76cb95072a"
-    sha256 arm64_ventura:  "aa642e107f9b1fb16d729c695610cc8aa6812d67c3509f3fb5d1edb1a34dfa00"
-    sha256 arm64_monterey: "6a5c8706843e47e4f7628ae22f8c944ff64a597e11bea98b1c098551d33d10a1"
-    sha256 arm64_big_sur:  "afde313363e967039eea3c63362dfe38b30372a24283a19fb8fd5db254e722c4"
-    sha256 sonoma:         "525e002a6320e185cc4fa1d34b80d3e6988d171e0b856fa801df23d70f204d3e"
-    sha256 ventura:        "631de555fe12ba7e1bd5ab64bffa7230b1a199be1ceb2f4f55b41e86447a9f65"
-    sha256 monterey:       "9b434cc856194b8ea128ddd9ef20a5aa4e2bad768d6332a68a9daef7a5d95236"
-    sha256 big_sur:        "62a6dfc9eb7b925bd2cbeb65be00f80f59ba109351ff70215cb5b652c92f32e7"
-    sha256 x86_64_linux:   "118dd698850f64fb06e40ac242dc5f88b921871f60b0306ffad253c78ca49e5a"
+    sha256 arm64_sequoia: "61a83d0390628d2667adca2335d9093a2f6d11a9501f40ed81c56fef82577ad4"
+    sha256 arm64_sonoma:  "b941d7bcbce3fa7461e4f3a94bc3d1946c7247cb1d82920a9ad786ac5dc067d2"
+    sha256 arm64_ventura: "12d9ac8855eff87666c8cc692a7e9613d7a2080621743f63e35a45bd72568b44"
+    sha256 sonoma:        "dfff65ad50c56d3dcfce4b68ebad5f23fb3b6483607e73670b2dff61a0c9ee02"
+    sha256 ventura:       "068b0bcd068851948112d96628e786e81e7e7845c470e07b26b20e05aa6cc1cd"
+    sha256 x86_64_linux:  "e38545d94571c213618d438533e315ef0dda379bcac8fb903dc172af8fc0067b"
   end
 
   depends_on "liblinear"
@@ -40,7 +26,7 @@ class Nmap < Formula
   # Check supported Lua version at https://github.com/nmap/nmap/tree/master/liblua.
   depends_on "lua"
   depends_on "openssl@3"
-  depends_on "pcre"
+  depends_on "pcre2"
 
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
@@ -60,7 +46,7 @@ class Nmap < Formula
 
     args = %W[
       --with-liblua=#{Formula["lua"].opt_prefix}
-      --with-libpcre=#{Formula["pcre"].opt_prefix}
+      --with-libpcre=#{Formula["pcre2"].opt_prefix}
       --with-openssl=#{Formula["openssl@3"].opt_prefix}
       --with-libpcap=#{libpcap_path}
       --without-nmap-update

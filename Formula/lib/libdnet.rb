@@ -1,8 +1,8 @@
 class Libdnet < Formula
   desc "Portable low-level networking library"
   homepage "https://github.com/ofalk/libdnet"
-  url "https://github.com/ofalk/libdnet/archive/libdnet-1.16.4.tar.gz"
-  sha256 "7df1f0a3db9cf03b48cf50ab273fd6a20c1be99eb9344b9663fe3fd9ed9dab65"
+  url "https://github.com/ofalk/libdnet/archive/refs/tags/libdnet-1.18.0.tar.gz"
+  sha256 "a4a82275c7d83b85b1daac6ebac9461352731922161f1dcdcccd46c318f583c9"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,33 +11,31 @@ class Libdnet < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "464798028d72aaa6111b3adb7af9f59fff1ca2ae3ab586783af3f63c4f720d7a"
-    sha256 cellar: :any,                 arm64_ventura:  "2b4e6240f02055231150af7fff3fc0cd6ef978a5dd3e781bad9fe8c659a8ad43"
-    sha256 cellar: :any,                 arm64_monterey: "1e64aebcc8dfdd50b1e14caef6ea9949b74146c59dbf771b1c5a14cc57ce8d8a"
-    sha256 cellar: :any,                 arm64_big_sur:  "6d4fea190da54068b6a233e215bbad8ce34ad63be02ad25d3438fa1579e5e4bf"
-    sha256 cellar: :any,                 sonoma:         "68f7b95bfb7fbb8a81deae1a8cfbb01cbead264af433802ba015d95dd897a4e3"
-    sha256 cellar: :any,                 ventura:        "ae71f5ddf8b8be40d02780276f2518747ed7f9587dae74d5ffdf4489d5cafc45"
-    sha256 cellar: :any,                 monterey:       "08ebc0f4899e74aef420bce8d4c6aab333a4920957763cbcfd20100a6759a6cd"
-    sha256 cellar: :any,                 big_sur:        "0d67a4d1892a14efca8a1b6205de86939d2b3cb900633c2419c0a3d13a90cf36"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e916f0d7b6cc35892197e9c7ed48e4f7c87a70c23147f6f7c1f1dd848d8ceca7"
+    sha256 cellar: :any,                 arm64_sequoia:  "e135b6343bf2e3a75c50e48663806ac62e315fd4cb8502e5e277bbf9b6e9f31a"
+    sha256 cellar: :any,                 arm64_sonoma:   "d35b638124bc8708333c6d2db7958d11a29cdb4da95492586ce24b387b8d0e9b"
+    sha256 cellar: :any,                 arm64_ventura:  "e00bca472fb8213147b83b87fd4df39acd20a50c0d35814f1d8ae1b50b0070d2"
+    sha256 cellar: :any,                 arm64_monterey: "8ffb26e94d885f4091d9c3b93628e21dc795a12e53069b880cb69e93b0f2e47d"
+    sha256 cellar: :any,                 sonoma:         "92dfd382f45ba91995439a36df8289d9e16e7c27b1557be332c5eaf7b1626fbe"
+    sha256 cellar: :any,                 ventura:        "110beea72752872b45e6533cb1ecb27cadf330f1912de6e42fd65d8a45afb584"
+    sha256 cellar: :any,                 monterey:       "339dc34fbcb96bfcad077e02d7ee58b3c3ace1281688338d1b728705b4523bb9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cde1b26c6ac0ae9caf126bc85ece887d50cfd7e9aa32c6a734b56da7dafa720b"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   def install
     # autoreconf to get '.dylib' extension on shared lib
     ENV.append_path "ACLOCAL_PATH", "config"
-    system "autoreconf", "-ivf"
+    system "autoreconf", "--force", "--install", "--verbose"
 
-    args = std_configure_args - ["--disable-debug"]
-    system "./configure", *args, "--mandir=#{man}", "--disable-check"
+    system "./configure", "--mandir=#{man}", "--disable-check", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/dnet-config", "--version"
+    system bin/"dnet-config", "--version"
   end
 end

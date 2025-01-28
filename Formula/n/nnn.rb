@@ -1,19 +1,19 @@
 class Nnn < Formula
   desc "Tiny, lightning fast, feature-packed file manager"
   homepage "https://github.com/jarun/nnn"
-  url "https://github.com/jarun/nnn/archive/v4.9.tar.gz"
-  sha256 "9e25465a856d3ba626d6163046669c0d4010d520f2fb848b0d611e1ec6af1b22"
+  url "https://github.com/jarun/nnn/archive/refs/tags/v5.0.tar.gz"
+  sha256 "31e8fd85f3dd7ab2bf0525c3c0926269a1e6d35a5343a6714315642370d8605a"
   license "BSD-2-Clause"
   head "https://github.com/jarun/nnn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "aedf2b937bfbc61834f9373386907ef9aef7e2c5582ee8b7fb189557937067de"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a325f22a8f7d399aaa7d24cc7e92e72f26afbbdf122fae72fb4d4f435987142b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5e49a1963570a2bf1ac43bd44a88a417dddd383c2cbe0636c7d331aa9726d143"
-    sha256 cellar: :any_skip_relocation, ventura:        "d44bae7e9592cf3deeba0be69df4e7a79cb98aed93270ec16126fe12fc5d8189"
-    sha256 cellar: :any_skip_relocation, monterey:       "6c5fbf8f266297f31e77e288dc8b1844854ac5e2ca5de6306951b41fde18327a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8e218da4b7158b4d7e14a1fcc95d26d2448e308e45a131d4e8b7540c1735c2c5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a85922f41bf36871d8f31755c1d0de81011bff8de457350e7f3b2fbe1e881672"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "b779d56e7e4b37a45f6ee35a094de4f7bd421f7c4468daa4b5bceb2c45e627bc"
+    sha256 cellar: :any,                 arm64_sonoma:  "4de486092ffb8baf66e4134ca7932208bff0eab3a1f5ec7066727b10f4abcf2d"
+    sha256 cellar: :any,                 arm64_ventura: "5f34f95c87192ede70063f4e5d6ea3ed89284e5af05e1bfe6eedc2a4d2a93173"
+    sha256 cellar: :any,                 sonoma:        "ecdfa7050c0d271f5310f33640f449c42de687dbbc1a4327299d261a60944f09"
+    sha256 cellar: :any,                 ventura:       "8038dc7a4cdf73e5283f4bfa466b0f5dcbc0dcf67df28bed6866426ca2084ce9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0d0686c85db1f495303f9998a382a5d88911c12f0e663eab48b20a1ccecbbb11"
   end
 
   depends_on "gnu-sed"
@@ -23,7 +23,7 @@ class Nnn < Formula
   def install
     system "make", "install", "PREFIX=#{prefix}"
 
-    bash_completion.install "misc/auto-completion/bash/nnn-completion.bash"
+    bash_completion.install "misc/auto-completion/bash/nnn-completion.bash" => "nnn"
     zsh_completion.install "misc/auto-completion/zsh/_nnn"
     fish_completion.install "misc/auto-completion/fish/nnn.fish"
 

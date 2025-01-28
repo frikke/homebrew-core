@@ -1,46 +1,67 @@
 class Flint < Formula
   desc "C library for number theory"
   homepage "https://flintlib.org/"
-  url "https://flintlib.org/flint-2.9.0.tar.gz"
-  sha256 "2fc090d51033c93208e6c10d406397a53c983ae5343b958eb25f72a57a4ce76a"
-  license "LGPL-2.1-or-later"
-  head "https://github.com/wbhart/flint2.git", branch: "trunk"
+  url "https://github.com/flintlib/flint/releases/download/v3.1.3-p1/flint-3.1.3-p1.tar.gz"
+  sha256 "96637ba9de43397d06657deefe8e6dee9d226992b5526bb1c9a9d563b983e027"
+  license "LGPL-3.0-or-later"
+  head "https://github.com/flintlib/flint.git", branch: "main"
 
   livecheck do
-    url "https://flintlib.org/downloads.html"
-    regex(/href=.*?flint[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+(?:[._-]?p\d+)?)$/i)
+    strategy :github_latest
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "8f7dbbc531e8d64fa8c92c8bf767ab46314143ba084d486520b080a6dda5fcd6"
-    sha256 cellar: :any,                 arm64_monterey: "be89510010a3268664926b3b400a6bfb04c68bbc49e1458db1ade0d394cbc585"
-    sha256 cellar: :any,                 arm64_big_sur:  "c1ba1710148d555a57c7b0ae9623c5799af577c3cdafb8286f57bd623eb93528"
-    sha256 cellar: :any,                 ventura:        "ebb8795940d7d8d89f0ec7746804c4b2ebb4da8ba00fd6dc513aa2a1f5827797"
-    sha256 cellar: :any,                 monterey:       "9f90ceb53de5d8d10c75074ab6aa4b8d634bc532b9e3afc91b61c8e0e849518e"
-    sha256 cellar: :any,                 big_sur:        "1337e5c2c7937e5a4d86946c2d15741d55fa7a0b54b99ea552cdec1e18807ce2"
-    sha256 cellar: :any,                 catalina:       "3149763887d901d8f4c322b8bdac03c1118c285dfd72df588facadf02e24ebb3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4449052b84499bc199348182c456d61bd4f1ce6d1ac4020a74d045d0b670bc8b"
+    sha256 cellar: :any,                 arm64_sequoia:  "a113c53749915d1b0e588a44db20e403f06d0fd62e6fb8f26bbc68de3c35d8fd"
+    sha256 cellar: :any,                 arm64_sonoma:   "74da020f9e6587c8899bda2034e1d94cf4d8b28dde5344c186dcbc45d4d10dab"
+    sha256 cellar: :any,                 arm64_ventura:  "ee89cff4b2e4a55c4c1b23b4435a5cb6d3e38bfb7cceaad86cb2d306d92ee86d"
+    sha256 cellar: :any,                 arm64_monterey: "f5efdb8826a3bd80de599455dc0aca0dd478276d4edbcde06e80f985cf9688ff"
+    sha256 cellar: :any,                 sonoma:         "8c60de59b79be3ab9aa996c3b1b65566751956e24bd47122bb14c7f575f87458"
+    sha256 cellar: :any,                 ventura:        "ac40ea9c126354efbd805a2a1d817e38e26c23410abfd9e189790e9c0fc60f11"
+    sha256 cellar: :any,                 monterey:       "daf2a177ea8b8b83cc10bf7d9f8719b60c128b335b74fb48b54ca73dca109f1d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "999413efcfa5455b771d5fe28356fb36515c41b243bda6f4206240e2dbb3295d"
   end
 
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "gmp"
   depends_on "mpfr"
-  depends_on "ntl"
+  uses_from_macos "m4" => :build
 
   def install
+    # to build against NTL
     ENV.cxx11
+
+    system "./bootstrap.sh" if build.head?
+
     args = %W[
       --with-gmp=#{Formula["gmp"].prefix}
       --with-mpfr=#{Formula["mpfr"].prefix}
-      --with-ntl=#{Formula["ntl"].prefix}
-      --prefix=#{prefix}
     ]
-    system "./configure", *args
+
+    if Hardware::CPU.intel?
+      # enable/disable avx{2,512}
+      # Because flint doesn't use CPUID at runtime
+      # we cannot rely on -march options
+      if build.bottle?
+        # prevent avx{2,512} in case we are building on a machine that supports it
+        args << "--enable-arch=#{Hardware.oldest_cpu}"
+      elsif Hardware::CPU.avx2?
+        # TODO: enable avx512 support
+        args << "--enable-avx2"
+      end
+    end
+
+    system "./configure", *args, *std_configure_args
+
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<-EOS
+    (testpath/"test.c").write <<~C
       #include <stdlib.h>
       #include <stdio.h>
       #include "flint.h"
@@ -89,7 +110,7 @@ class Flint < Formula
 
           return EXIT_SUCCESS;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}/flint", "-L#{lib}", "-L#{Formula["gmp"].lib}",
            "-lflint", "-lgmp", "-o", "test"
     system "./test", "2"

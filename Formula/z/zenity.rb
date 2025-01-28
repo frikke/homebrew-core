@@ -1,29 +1,34 @@
 class Zenity < Formula
   desc "GTK+ dialog boxes for the command-line"
   homepage "https://wiki.gnome.org/Projects/Zenity"
-  url "https://download.gnome.org/sources/zenity/3.44/zenity-3.44.2.tar.xz"
-  sha256 "3fb5b8b1044d3d129262d3c54cf220eb7f76bc21bd5ac6d96ec115cd3518300e"
+  url "https://download.gnome.org/sources/zenity/4.0/zenity-4.0.3.tar.xz"
+  sha256 "b429d97b87bd9ce7fb72ac0b78df534725d8ad39817ddca6a4ca2ee5381b08de"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 arm64_sonoma:   "34af05184f94c54f654baf863998055bff3794e9e2cd2317a19abf63062f339f"
-    sha256 arm64_ventura:  "c0b0ac6cec4da4681d28476a5bfd07c0f84e4f073a2d24a6ebe27193ff1a5ebd"
-    sha256 arm64_monterey: "145ec5865fcc3a89b28452ed75b85caa7d01bfca48817c57c812ebcebdcd429d"
-    sha256 arm64_big_sur:  "e3d87028cdb1e46a8eb9dbb73644b79d6f04b31fa2e2da7389194c3710b2c8ed"
-    sha256 sonoma:         "442a5d047a6573a51402ed067a055f7e49d04998bb5274651b56488b7ade0f86"
-    sha256 ventura:        "f0c1669993685f85c6dbf4c43300199bc8bc52dfb0f73e36ab15bfc4dac00a3b"
-    sha256 monterey:       "6a763e9bcdd607de9a97a0ec0f8a97712b47c5f08c216e3bf04a19b09140d7e2"
-    sha256 big_sur:        "644ff4070c986e618f1f9d4eb75dc4cca5eff5f573d3a7cfb0d6ab3a5400ee0f"
-    sha256 x86_64_linux:   "9dda53018379e140debc4d58d1ed640af76f454f536c4ada4753e9039d84e31f"
+    sha256 arm64_sequoia: "4f153b28658b7ff4ac99ef77031d0f400e2f0b37f53f86a71011b6939ee0db26"
+    sha256 arm64_sonoma:  "d4a16c2b2fe9ec7097c61417db73813b6b2e53fa9c21413e7f4226d74c9248d3"
+    sha256 arm64_ventura: "0014365867ccb6ecfb231509a454655a5a2704889d059665dfb53c91c799fd2b"
+    sha256 sonoma:        "6dceb146aea04c1cf0df90c6bee53a8a34938ba299e3b001f431509656ff6074"
+    sha256 ventura:       "2a15e51a58f5554dffbb3a06fbe106b4e9362d02b9340031d7e5c003dc92958a"
+    sha256 x86_64_linux:  "ac173dea0b73c96fd5b9ae4c4abaee499ab44299bd9e479e5e5ebd97d683f4ce"
   end
 
   depends_on "gettext" => :build
+  depends_on "help2man" => :build
   depends_on "itstool" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "glib"
-  depends_on "gtk+3"
+  depends_on "gtk4"
+  depends_on "libadwaita"
+  depends_on "pango"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     ENV["DESTDIR"] = "/"
@@ -31,6 +36,10 @@ class Zenity < Formula
     system "meson", "setup", "build", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
+  end
+
+  def post_install
+    system Formula["gtk4"].opt_bin/"gtk4-update-icon-cache", "-f", "-t", HOMEBREW_PREFIX/"share/icons/hicolor"
   end
 
   test do

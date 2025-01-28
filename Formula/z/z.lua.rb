@@ -1,18 +1,21 @@
 class ZLua < Formula
   desc "New cd command that helps you navigate faster by learning your habits"
   homepage "https://github.com/skywind3000/z.lua"
-  url "https://github.com/skywind3000/z.lua/archive/1.8.16.tar.gz"
-  sha256 "28e6c9d03792efc45d7ae822b23d59d2ea3e2d4f3a12f37bdee5a797a2903d59"
+  url "https://github.com/skywind3000/z.lua/archive/refs/tags/1.8.20.tar.gz"
+  sha256 "3d5afb8d617e956ac7385e2cd5082991630705566ddc0871295404e16a05445c"
   license "MIT"
   head "https://github.com/skywind3000/z.lua.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "519898201455e344fb16a32b50e5cfafcb2a7b59011ac8167d90e51c3d31d18d"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "bdc00251d242da7b480b8cd81e8f029cb105cb63cb9afc358ea1586c6ecd1195"
   end
 
   depends_on "lua"
 
   def install
+    # Avoid using Cellar paths at runtime. This breaks when z.lua is upgraded.
+    inreplace "z.lua.plugin.zsh", /^(ZLUA_SCRIPT=").*"$/, "\\1#{opt_pkgshare}/z.lua\""
     pkgshare.install "z.lua", "z.lua.plugin.zsh", "init.fish"
     doc.install "README.md", "LICENSE"
   end

@@ -2,19 +2,18 @@ class Goreleaser < Formula
   desc "Deliver Go binaries as fast and easily as possible"
   homepage "https://goreleaser.com/"
   url "https://github.com/goreleaser/goreleaser.git",
-      tag:      "v1.20.0",
-      revision: "56c9d09a1b925e2549631c6d180b0a1c2ebfac82"
+      tag:      "v2.6.1",
+      revision: "b6bb03ddc28d6de71a37012107cda26af53cc116"
   license "MIT"
   head "https://github.com/goreleaser/goreleaser.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6cdea60885877f4f97fb6dcf13778977880f7fc52f576a04e2291498d8ce7045"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6cdea60885877f4f97fb6dcf13778977880f7fc52f576a04e2291498d8ce7045"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6cdea60885877f4f97fb6dcf13778977880f7fc52f576a04e2291498d8ce7045"
-    sha256 cellar: :any_skip_relocation, ventura:        "5b14419848553fde2488870e0e9acaa02ccf4378b3a2bf4f1a188767b0be278c"
-    sha256 cellar: :any_skip_relocation, monterey:       "5b14419848553fde2488870e0e9acaa02ccf4378b3a2bf4f1a188767b0be278c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5b14419848553fde2488870e0e9acaa02ccf4378b3a2bf4f1a188767b0be278c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2fe97b9007a06c1257c033fddb848c022c267f1dd5a1ba062b205d405df5a3cb"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e220ebb96ab30da01105ffffee33b137205c6275861d3e31baf8adf3ca35dfdd"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e220ebb96ab30da01105ffffee33b137205c6275861d3e31baf8adf3ca35dfdd"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e220ebb96ab30da01105ffffee33b137205c6275861d3e31baf8adf3ca35dfdd"
+    sha256 cellar: :any_skip_relocation, sonoma:        "efb6c1cdc92ff036a48edbdc1b0230745c6530363df9dc4cd10511723c498b58"
+    sha256 cellar: :any_skip_relocation, ventura:       "efb6c1cdc92ff036a48edbdc1b0230745c6530363df9dc4cd10511723c498b58"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3aa549e92ac3a292f4d35e7437d2685b22786e162b77cc665b69291700b7f38f"
   end
 
   depends_on "go" => :build
@@ -27,7 +26,7 @@ class Goreleaser < Formula
       -X main.builtBy=homebrew
     ]
 
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
 
     # Install shell completions
     generate_completions_from_executable(bin/"goreleaser", "completion")
@@ -35,7 +34,7 @@ class Goreleaser < Formula
 
   test do
     assert_match version.to_s, shell_output("#{bin}/goreleaser -v 2>&1")
-    assert_match "config created", shell_output("#{bin}/goreleaser init --config=.goreleaser.yml 2>&1")
+    assert_match "thanks for using GoReleaser!", shell_output("#{bin}/goreleaser init --config=.goreleaser.yml 2>&1")
     assert_predicate testpath/".goreleaser.yml", :exist?
   end
 end

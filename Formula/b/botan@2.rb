@@ -1,36 +1,37 @@
 class BotanAT2 < Formula
   desc "Cryptographic algorithms and formats library in C++"
   homepage "https://botan.randombit.net/"
-  url "https://botan.randombit.net/releases/Botan-2.19.3.tar.xz"
-  sha256 "dae047f399c5a47f087db5d3d9d9e8f11ae4985d14c928d71da1aff801802d55"
+  url "https://botan.randombit.net/releases/Botan-2.19.5.tar.xz"
+  sha256 "dfeea0e0a6f26d6724c4af01da9a7b88487adb2d81ba7c72fcaf52db522c9ad4"
   license "BSD-2-Clause"
   head "https://github.com/randombit/botan.git", branch: "release-2"
 
-  livecheck do
-    url :homepage
-    regex(/href=.*?Botan[._-]v?(2(?:\.\d+)+)\.t/i)
-  end
-
   bottle do
-    sha256 arm64_ventura:  "db87e45ec9a5f29624c37869d7f85f194d882df98857cd5998b3cf6945c6a668"
-    sha256 arm64_monterey: "264a52093b9e5766f7355a02d7edc225950cbf7934beedad55fba151993e9d10"
-    sha256 arm64_big_sur:  "04571b6d81d868fd8c2ace48c8880ea2b8a706c1497783df4a191179aaf08136"
-    sha256 ventura:        "671661b12c35740b7dfdd3c1fd5685e0c395169c6004dce01f36dd6810b17708"
-    sha256 monterey:       "f89027a21ad80555283428ebab8849168e643bdf22c7df8155024b5a128d515e"
-    sha256 big_sur:        "5a55196bc320904ac4195f49211ee897776efa44c677e85a9e8f30e85e54eec0"
-    sha256 x86_64_linux:   "b001bf81ca13d97035ee74a7192c41eb68cd573110bacc56f1ed58686a23bda4"
+    rebuild 1
+    sha256 arm64_sequoia: "1104641a2c34fa2c1212ad9002fc1a2089a75be4c9fb66ad655a1680c8428ad0"
+    sha256 arm64_sonoma:  "c65820f897ce8748cc5b74e9537a7bcbc4842f161f36557f5b6858b409b32c63"
+    sha256 arm64_ventura: "31a49478cd103522bee1b3e216145c3ba149f93e586a824b9d1b4ed4a2a196ae"
+    sha256 sonoma:        "2bb57c57173cd293cc738dda60c02bcd2d7ddffad9f6e5d0b170245c03feaeff"
+    sha256 ventura:       "51ecbd410373905c81df9ab8cf43b39076c77d255bd00e797a09c0a8243422bd"
+    sha256 x86_64_linux:  "9fd91b5d569739ca97a8130d374d0d289a1d5f6a4b7e9cea90014ec714b52181"
   end
 
   keg_only :versioned_formula
 
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11"
+  # Botan2 is currently scheduled to reach end of life at the end of 2024
+  # Ref: https://botan.randombit.net/#releases
+  deprecate! date: "2024-12-31", because: :unsupported
+
+  depends_on "pkgconf" => :build
+  depends_on "python@3.13"
   depends_on "sqlite"
 
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
 
-  fails_with gcc: "5"
+  def python3
+    which("python3.13")
+  end
 
   def install
     ENV.cxx11
@@ -43,7 +44,7 @@ class BotanAT2 < Formula
       --with-sqlite3
     ]
 
-    system "python3.11", "configure.py", *args
+    system python3, "configure.py", *args
     system "make", "install"
   end
 

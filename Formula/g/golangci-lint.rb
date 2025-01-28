@@ -2,21 +2,18 @@ class GolangciLint < Formula
   desc "Fast linters runner for Go"
   homepage "https://golangci-lint.run/"
   url "https://github.com/golangci/golangci-lint.git",
-        tag:      "v1.54.2",
-        revision: "411e0bbbd3096aa0ee2b924160629bdf2bc81d40"
+        tag:      "v1.63.4",
+        revision: "c1149695535fda62f6b574bc55dfbc333693647e"
   license "GPL-3.0-only"
   head "https://github.com/golangci/golangci-lint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "11c955587b8819cf77a9be780aa0f62a64d2648ee43c969c9479d5fd8d4b68cd"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "07edf7a5e23476aefe3335b50cd64f832727cf11cf5b9e2a0dcdc4ea3048cd93"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3fb53fc61c0cd0ee3767af0a852a2a2427f158963035644d2e779bceceacd6bc"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c100d0152d236cb58d6b65b48cb39f81998c7f899ae7d2f602f06d2937f44d55"
-    sha256 cellar: :any_skip_relocation, sonoma:         "629dfe829fb1d12195b0d83f68b45edb6dd53acd152e9386f130f243e7cf8498"
-    sha256 cellar: :any_skip_relocation, ventura:        "84414ae2013dabbd5455a3c82afa2ffab6f33db96c26726648259e0430b46459"
-    sha256 cellar: :any_skip_relocation, monterey:       "c09ce554becbf3b814ecb1fa230d52261e702737fb7811770cb7a410ea0c10a9"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5cffa8de5cea7c1437d65fa3e317281a44325e4cf5588b5d761a71e009f0381a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "44cc80a846825756cdd3a3984e2c04f955f7a596b505bdaef43b5c8a1c906bb6"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5f801972eabdf0c0a70cb4b0bf5378cd88ef907d4830976fd29a1f45da552baa"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "349f2f14928ce64e6d43e84c036dbfe4c5bc6d15b7e109851251d1d2059a6943"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e5f35688e0aac5af460b25050fa4f3eb7aff564425b0ce20455192a3e9187198"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b9d13988a5dbb44b57813567b8d695400eb2ff82e74be003a7544dd6ff9dfd8e"
+    sha256 cellar: :any_skip_relocation, ventura:       "7d3b7f3940d85094c2974b22c2c7b017aa7112276342da60e7e6ca2c7c73c067"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b481a71083b84be79173fbc6479ff35117f43120299c0bc9ef6ae892ba2e9ef2"
   end
 
   depends_on "go"
@@ -29,7 +26,7 @@ class GolangciLint < Formula
       -X main.date=#{time.iso8601}
     ]
 
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/golangci-lint"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/golangci-lint"
 
     generate_completions_from_executable(bin/"golangci-lint", "completion")
   end
@@ -39,12 +36,12 @@ class GolangciLint < Formula
     assert_match(/golangci-lint has version #{version} built with go(.*) from/, str_version)
 
     str_help = shell_output("#{bin}/golangci-lint --help")
-    str_default = shell_output("#{bin}/golangci-lint")
+    str_default = shell_output(bin/"golangci-lint")
     assert_equal str_default, str_help
     assert_match "Usage:", str_help
     assert_match "Available Commands:", str_help
 
-    (testpath/"try.go").write <<~EOS
+    (testpath/"try.go").write <<~GO
       package try
 
       func add(nums ...int) (res int) {
@@ -54,7 +51,7 @@ class GolangciLint < Formula
         clear(nums)
         return
       }
-    EOS
+    GO
 
     args = %w[
       --color=never

@@ -1,28 +1,26 @@
 class Zrepl < Formula
   desc "One-stop ZFS backup & replication solution"
   homepage "https://zrepl.github.io"
-  url "https://github.com/zrepl/zrepl/archive/v0.6.0.tar.gz"
-  sha256 "0bf1dcf634a43af81cd9a0d7b9ae65f63a5938c35d3e6cd804177c8db52929f4"
+  url "https://github.com/zrepl/zrepl/archive/refs/tags/v0.6.1.tar.gz"
+  sha256 "263c82501b75a1413f8a298c1d67d7e940c1b0cb967979790773237e2a30adbd"
   license "MIT"
   head "https://github.com/zrepl/zrepl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "6963d08943d68b307e91facaa6f6bc3e3a90ca009912135530eed2eee7300064"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f43f61ea51db0d619e1be5e889e00f2237dc40c8529cf7bb470ae84bc6628ffb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "78b4b5efe5764faedaed4b66d6099be51f35b78f3ae62348e143cc51b8109a31"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f69fbb9c9aeaa2dbc2f1cebdeaec0f9108c40b9d74615d80afa5ffcfb03648ad"
-    sha256 cellar: :any_skip_relocation, sonoma:         "693efec55de02ba98889cdb8c3418896d1fbc3d96249f573890f30998938bb83"
-    sha256 cellar: :any_skip_relocation, ventura:        "4ff1d78151426b9f1f5a3149e12f4d55a1a0ae23ebb7fb2cb8a10a6164be3c01"
-    sha256 cellar: :any_skip_relocation, monterey:       "cf954a340c8e55c54dcaf13cc928551c579f306138c673a0c66cbfc6d83053e3"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0e72ac1fb2b5fdf3a2711e2363e0ef999feeb742f21c64f4966632f5f0700d25"
-    sha256 cellar: :any_skip_relocation, catalina:       "bde1dbd82033d10cc2d23df40c8a7b33a0db666763b3c0e82ce9735691bd9d6f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "825c2d421d4690af7640e7444eab42a8e252a9a2644848b1241c908335c21e43"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "467d9021d507942a4f74a1c64983a1a216e3215110b67ca591101a1350a93928"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "cb2b36b880afd2cf11fc4bbb7e2f544f40287e180bdd06c47da63be1c9bb2970"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "aedcf0ebb00175cef1e063bddb652c1d291c5c388a90878ec95719cd5ed93a04"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3c301f823c74d52657a946000964f3b4a3089a0a914deb6cf68f69d150ee057c"
+    sha256 cellar: :any_skip_relocation, sonoma:         "b96ec21a1745a2b7eac7265f8db9e342c6ec01ddc2c7e3a9b7d7c24f2cbe0687"
+    sha256 cellar: :any_skip_relocation, ventura:        "d09931af39605cdf1215017138bda34463802609db9c72cf61a22d9918b323c4"
+    sha256 cellar: :any_skip_relocation, monterey:       "80344778b7d3a7007e38e86e066541a53796b318673eba51d869095e49935a3c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "67d6e26dd731da07445fa18d19f25c41c5ca41e48d9c829f92e1f7f487143fd2"
   end
 
   depends_on "go" => :build
 
   resource "homebrew-sample_config" do
-    url "https://raw.githubusercontent.com/zrepl/zrepl/master/config/samples/local.yml"
+    url "https://raw.githubusercontent.com/zrepl/zrepl/refs/tags/v0.6.1/config/samples/local.yml"
     sha256 "f27b21716e6efdc208481a8f7399f35fd041183783e00c57f62b3a5520470c05"
   end
 
@@ -49,7 +47,7 @@ class Zrepl < Formula
   test do
     resources.each do |r|
       r.verify_download_integrity(r.fetch)
-      assert_equal "", shell_output("#{bin}/zrepl configcheck --config #{r.cached_download}")
+      assert_empty shell_output("#{bin}/zrepl configcheck --config #{r.cached_download}")
     end
   end
 end

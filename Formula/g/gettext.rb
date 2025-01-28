@@ -1,35 +1,41 @@
 class Gettext < Formula
   desc "GNU internationalization (i18n) and localization (l10n) library"
   homepage "https://www.gnu.org/software/gettext/"
-  url "https://ftp.gnu.org/gnu/gettext/gettext-0.21.1.tar.gz"
-  mirror "https://ftpmirror.gnu.org/gettext/gettext-0.21.1.tar.gz"
-  mirror "http://ftp.gnu.org/gnu/gettext/gettext-0.21.1.tar.gz"
-  sha256 "e8c3650e1d8cee875c4f355642382c1df83058bd5a11ee8555c0cf276d646d45"
+  url "https://ftp.gnu.org/gnu/gettext/gettext-0.23.1.tar.gz"
+  mirror "https://ftpmirror.gnu.org/gettext/gettext-0.23.1.tar.gz"
+  mirror "http://ftp.gnu.org/gnu/gettext/gettext-0.23.1.tar.gz"
+  sha256 "52a578960fe308742367d75cd1dff8552c5797bd0beba7639e12bdcda28c0e49"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_sonoma:   "f26633ef6addce56c288a62b844ac3fb629aaa90ae936dd4130500003d0fa6af"
-    sha256 arm64_ventura:  "28c5b06e66800aa2d460336d001379e35e664310d12638de35a1b0f2b9a44913"
-    sha256 arm64_monterey: "356b52e24b883af3ef092d13b6727b76e0137154c2c9eb42fe7c272bb7d3edec"
-    sha256 arm64_big_sur:  "90da957f7b8ad3d47fff7045a684060168e0433631921463fbbff09b5dc4b772"
-    sha256 sonoma:         "c387ad29be189757420e9e774d7697f705f0b44c80c63cb43cef4ce67b1caa8a"
-    sha256 ventura:        "fd7e48065cf73e37dfdf4c5cb789a14b93cf58ac06060814a60c94b87d8f26e6"
-    sha256 monterey:       "9318777367eae475e9ea226d2bcbd19ef8281d1dd2af3a92c20c00246677145b"
-    sha256 big_sur:        "95086fa8b1b6a913ca7ef3a7c7c49e147823c26ba239003f9140cfe1252587ba"
-    sha256 catalina:       "aba2b94f406a9d8784bb08f9763440297c645a7ea99f4c4dbfeccb325053322a"
-    sha256 x86_64_linux:   "991579fa170ca491fd6332844b570095978961a9764e57f00180002d471cf3b8"
+    sha256 arm64_sequoia: "9179f473099573a8c4a42f70e39f1a36376914d6b634e0975b5cb514dcecb4ee"
+    sha256 arm64_sonoma:  "f3b350830a3da3a44f3981838651accad39c14a3bd0ceac8d4a3c94eb7b24c02"
+    sha256 arm64_ventura: "2e98d7dae6dce086135060db70e767c5bfb0bcb8d190eea5f0a4c192315f2b0f"
+    sha256 sonoma:        "89b1b668765938504ce64f991cf6b81fc96765f5dec84bbf64c007c3d811b8fe"
+    sha256 ventura:       "fffb8da1a3258ca710829d0b9cf048d2a3434625e3fc202d845b0238ccc16d0f"
+    sha256 x86_64_linux:  "a3f66e4195312f949e9b94b12de4d888945150b3e4dccfcb67403fde034ed073"
   end
+
+  depends_on "libunistring"
 
   uses_from_macos "libxml2"
   uses_from_macos "ncurses"
 
+  on_linux do
+    depends_on "acl"
+  end
+
   def install
+    # macOS iconv implementation is slightly broken since Sonoma.
+    # This is also why we skip `make check`.
+    # upstream bug report, https://savannah.gnu.org/bugs/index.php?66541
+    ENV["am_cv_func_iconv_works"] = "yes" if OS.mac? && MacOS.version == :sequoia
+
     args = [
+      "--with-libunistring-prefix=#{Formula["libunistring"].opt_prefix}",
       "--disable-silent-rules",
       "--with-included-glib",
       "--with-included-libcroco",
-      "--with-included-libunistring",
-      "--with-included-libxml",
       "--with-emacs",
       "--with-lispdir=#{elisp}",
       "--disable-java",
@@ -49,11 +55,6 @@ class Gettext < Formula
     else
       "--with-libxml2-prefix=#{Formula["libxml2"].opt_prefix}"
     end
-
-    # Sonoma iconv() has a regression w.r.t. transliteration, which happens to
-    # break gettext's configure check. Force it.
-    # Reported to Apple as FB13163914
-    args << "am_cv_func_iconv_works=y" if OS.mac? && MacOS.version == :sonoma
 
     system "./configure", *std_configure_args, *args
     system "make"

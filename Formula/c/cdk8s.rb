@@ -1,30 +1,29 @@
-require "language/node"
-
 class Cdk8s < Formula
   desc "Define k8s native apps and abstractions using object-oriented programming"
   homepage "https://cdk8s.io/"
-  url "https://registry.npmjs.org/cdk8s-cli/-/cdk8s-cli-2.93.0.tgz"
-  sha256 "1b8c0c36ba0987884898a4d304b1c6d410943c374dde0511e4da2b98c3bc6563"
+  url "https://registry.npmjs.org/cdk8s-cli/-/cdk8s-cli-2.198.306.tgz"
+  sha256 "7758ce28b0abe676d578e971c7f052e4792ed983bf086ada58d0d957a9d841e5"
   license "Apache-2.0"
+  head "https://github.com/cdk8s-team/cdk8s-cli.git", branch: "2.x"
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "82b4f8426000e31c3f393e1b07e94e574a4336b07e2383e46393a45fac3f8705"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "82b4f8426000e31c3f393e1b07e94e574a4336b07e2383e46393a45fac3f8705"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "82b4f8426000e31c3f393e1b07e94e574a4336b07e2383e46393a45fac3f8705"
-    sha256 cellar: :any_skip_relocation, ventura:        "74903a6b9d0d9554b308bba015e964b2a9b73a954db160ad3dee3ffdd2d65fb2"
-    sha256 cellar: :any_skip_relocation, monterey:       "74903a6b9d0d9554b308bba015e964b2a9b73a954db160ad3dee3ffdd2d65fb2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "74903a6b9d0d9554b308bba015e964b2a9b73a954db160ad3dee3ffdd2d65fb2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "82b4f8426000e31c3f393e1b07e94e574a4336b07e2383e46393a45fac3f8705"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c65ab77f24880540adc4f8231d7094fa6108070c7ce332f4e4ed6062a336ac4c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c65ab77f24880540adc4f8231d7094fa6108070c7ce332f4e4ed6062a336ac4c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c65ab77f24880540adc4f8231d7094fa6108070c7ce332f4e4ed6062a336ac4c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "44e4d5c702c8090beae42bd04c14a3a845b794fde75430c0e87e84bf07be00ab"
+    sha256 cellar: :any_skip_relocation, ventura:       "44e4d5c702c8090beae42bd04c14a3a845b794fde75430c0e87e84bf07be00ab"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c65ab77f24880540adc4f8231d7094fa6108070c7ce332f4e4ed6062a336ac4c"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
-    assert_match "Cannot initialize a project in a non-empty directory",
-      shell_output("#{bin}/cdk8s init python-app 2>&1", 1)
+    output = shell_output("#{bin}/cdk8s init python-app 2>&1", 1)
+    assert_match "Initializing a project from the python-app template", output
   end
 end

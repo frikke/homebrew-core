@@ -1,19 +1,17 @@
 class Dict < Formula
   desc "Dictionary Server Protocol (RFC2229) client"
   homepage "https://dict.org/bin/Dict"
-  url "https://downloads.sourceforge.net/project/dict/dictd/dictd-1.13.1/dictd-1.13.1.tar.gz"
-  sha256 "e4f1a67d16894d8494569d7dc9442c15cc38c011f2b9631c7f1cc62276652a1b"
+  url "https://downloads.sourceforge.net/project/dict/dictd/dictd-1.13.3/dictd-1.13.3.tar.gz"
+  sha256 "192129dfb38fa723f48a9586c79c5198fc4904fec1757176917314dd073f1171"
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura:  "bf7cb1eff5364cef0a00a5c711fb42e498a4be1bcb3ebcbde5538b56e956de11"
-    sha256 arm64_monterey: "2c04cdc3159fc7e11ab8c221aabc76c5a370c73e0ecbaf26b3c803f313caeaa7"
-    sha256 arm64_big_sur:  "d22bd87df2353d4fc9260f3c7a1d0d99c2653e2c7b71f1efcf537c65415b13a0"
-    sha256 ventura:        "9d040510785ea9f3d6b989211138348b1db81d5adb02e4c34c1647f0e470865d"
-    sha256 monterey:       "0c1a3e0a5f9f2de898f106260c19d212468aefdd5adb3f04df0f26c76ad2e90a"
-    sha256 big_sur:        "de7803163887f1533950fdae9bd6c81901946b58339bee9985f55cd312db3afb"
-    sha256 x86_64_linux:   "e34a6fd3ec083c27f88d431eea7e3e21be17046a0b8eb3f51ba3f55226853d77"
+    sha256 arm64_sequoia: "8ae52e0cd8200e05e9aab9b15269c4617b648079a1ccaf54879acc759eb268a9"
+    sha256 arm64_sonoma:  "81d599c0cb61e67ee19ecc54293cac944568884b61d470fd50b0b30a1b8dae33"
+    sha256 arm64_ventura: "5e07587d607e55a3ed72f4537dccb417b16e2cd463a6690f8ca8d508d520c919"
+    sha256 sonoma:        "b6b358141e0bd18ba760ad85aee702004152e6d68d3cda9da560e519e4361c25"
+    sha256 ventura:       "826e7bbdd50a8db3a8fd53b53b2183eb53f5cf107edb9adb3590ace085b16112"
+    sha256 x86_64_linux:  "ae7ef43f713a5e828d33cfb43d4344ea6efb28809e95fdcdb47c06532fcb0705"
   end
 
   depends_on "libtool" => :build
@@ -24,6 +22,10 @@ class Dict < Formula
   uses_from_macos "zlib"
 
   def install
+    # Workaround for Xcode 14.3
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
+    ENV["ac_cv_search_yywrap"] = "yes"
     ENV["LIBTOOL"] = "glibtool"
     system "./configure", *std_configure_args,
                           "--sysconfdir=#{etc}",

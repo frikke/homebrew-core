@@ -1,21 +1,21 @@
 class Global < Formula
   include Language::Python::Shebang
+  include Language::Python::Virtualenv
 
   desc "Source code tag system"
   homepage "https://www.gnu.org/software/global/"
-  url "https://ftp.gnu.org/gnu/global/global-6.6.10.tar.gz"
-  mirror "https://ftpmirror.gnu.org/global/global-6.6.10.tar.gz"
-  sha256 "2dd1e6a945e93c01390fb941a4e694f4c71bbd7569d64149c04e927bbf4dcce8"
+  url "https://ftp.gnu.org/gnu/global/global-6.6.14.tar.gz"
+  mirror "https://ftpmirror.gnu.org/global/global-6.6.14.tar.gz"
+  sha256 "f6e7fd0b68aed292e85bb686616baf6551d5c9424adcddca11d808ba318cb320"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "ab5d00488d82ef4d6bb53ab2b149584fa3349c07996c3c71335c8afcb97f983c"
-    sha256 arm64_monterey: "04de3a2049cb3947e09af8d378384a8f882cb33833a59427e8b4f7504504d4d9"
-    sha256 arm64_big_sur:  "e9417586ab588d26a6384d2ba010b406a2c0b4feadc4221d7745f2704605debd"
-    sha256 ventura:        "f572a117a2318f132d27272cf2872a10cceea9c436c8933a38c99884fb80b173"
-    sha256 monterey:       "a55bfa20d77cda1e1d7448972511adf54e78311e8c03951ddeb2c0188b3fd085"
-    sha256 big_sur:        "3a45c02b24c75ed96347d28b8fa67e767cf99ac02c8478d4f38c7abe50a46791"
-    sha256 x86_64_linux:   "238f9b7b4ee814fe82a6b27d7adf171ec918d125563e2a212d108df9f2b9fa85"
+    sha256 arm64_sequoia: "11eed24d33dad01e9a23cd8d7ec8e0fa937af1828ee5d0cdd147b75a02e0a045"
+    sha256 arm64_sonoma:  "48b7c70d65b140cfc53d4d82883640d2348b2a24f6e5456b97b532afb8395284"
+    sha256 arm64_ventura: "38135ecf03e163025ce24ac2919964d0df0c554b7c1ddac5484f0a5be5f38e66"
+    sha256 sonoma:        "25dd61063f62711b0b37222f890169382d50920254c7b269b3f2b1622f8c5609"
+    sha256 ventura:       "32a73fdb042ecc97ee871d76794214ebc56ed8640298538ab1bd3135fdbeb4ba"
+    sha256 x86_64_linux:  "069518d2237ae351e7a27efb6f710d7d632c61261190454241022fd94ba4d620"
   end
 
   head do
@@ -31,33 +31,37 @@ class Global < Formula
 
   depends_on "libtool"
   depends_on "ncurses"
-  depends_on "pygments"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "sqlite"
   depends_on "universal-ctags"
 
   skip_clean "lib/gtags"
 
+  resource "pygments" do
+    url "https://files.pythonhosted.org/packages/8e/62/8336eff65bcbc8e4cb5d05b55faf041285951b6e80f33e2bff2024788f31/pygments-2.18.0.tar.gz"
+    sha256 "786ff802f32e91311bff3889f6e9a86e81505fe99f2735bb6d60ae0c5004f199"
+  end
+
+  def python3
+    "python3.13"
+  end
+
   def install
     system "sh", "reconf.sh" if build.head?
 
-    python3 = "python3.11"
-    ENV.prepend_create_path "PYTHONPATH", libexec/Language::Python.site_packages(python3)
+    venv = virtualenv_create(libexec, python3)
+    venv.pip_install resources
 
     args = %W[
       --disable-dependency-tracking
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --with-sqlite3=#{Formula["sqlite"].opt_prefix}
+      --with-python-interpreter=#{venv.root}/bin/python
       --with-universal-ctags=#{Formula["universal-ctags"].opt_bin}/ctags
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
-
-    rewrite_shebang detected_python_shebang, share/"gtags/script/pygments_parser.py"
-
-    bin.env_script_all_files(libexec/"bin", PYTHONPATH: ENV["PYTHONPATH"])
 
     etc.install "gtags.conf"
 
@@ -68,16 +72,16 @@ class Global < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       int c2func (void) { return 0; }
       void cfunc (void) {int cvar = c2func(); }")
-    EOS
-    (testpath/"test.py").write <<~EOS
+    C
+    (testpath/"test.py").write <<~PYTHON
       def py2func ():
            return 0
       def pyfunc ():
            pyvar = py2func()
-    EOS
+    PYTHON
 
     system bin/"gtags", "--gtagsconf=#{share}/gtags/gtags.conf", "--gtagslabel=pygments"
     assert_match "test.c", shell_output("#{bin}/global -d cfunc")

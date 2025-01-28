@@ -2,9 +2,9 @@ class CernNdiff < Formula
   desc "Numerical diff tool"
   # NOTE: ndiff is a sub-project of Mad-X at the moment.
   homepage "https://mad.web.cern.ch/mad/"
-  url "https://github.com/MethodicalAcceleratorDesign/MAD-X/archive/5.09.00.tar.gz"
-  sha256 "fc2823cdb90a53c1422cca93a48b003c97c1e72641d9e925cd8f59b08f795c7a"
-  license :cannot_represent
+  url "https://github.com/MethodicalAcceleratorDesign/MAD-X/archive/refs/tags/5.09.03.tar.gz"
+  sha256 "cd57f9451e3541a820814ad9ef72b6e01d09c6f3be56802fa2e95b1742db7797"
+  license "GPL-3.0-only"
   head "https://github.com/MethodicalAcceleratorDesign/MAD-X.git", branch: "master"
 
   livecheck do
@@ -13,13 +13,15 @@ class CernNdiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "92113f5cfdd408e3e6d144aa5290709a691cae486aacdc513af10be0160d484d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "84e1a138bfa3f3c1dc254beafe791f8b0748a0cef867bf127fa980731299075a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7ce91e3f3bb0bdcab6babe3bba385d18d65d6cf6f24de23c71fd39cd8157a7f6"
-    sha256 cellar: :any_skip_relocation, ventura:        "26c731438e58d46fcfb04b356e6d3cb9a83de2e5588a027827b04611a3df514c"
-    sha256 cellar: :any_skip_relocation, monterey:       "718fb107f6b55a696da01252ce562855c164f53046d0734fc7f7b81c2fed377d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "456dda19013d2ffa8d889ccf5fa29920e9b2168d15d315e1160ee207c798bcd3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "45481fce67f3760a63d6659bb562b78766511881b8b16c9ba46436e5ce6b638d"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "9d45e67a3d9f934e921d76dccfcbb31f4b1b3af041dac06b4505cdc4bae2fe73"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "89e85cfeaa7bb36ccf6c86e8e8cd1c969656c81ee54f73a4b544d47b4d9ef04d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9951fa4368100f6c4d2b600e7da2d15c3c1c4031e94666fa822f935502251afd"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "62a8a71d7515060897bea3dbe97136b0dac99454a403e370e859f482b4e129d3"
+    sha256 cellar: :any_skip_relocation, sonoma:         "807d3f5b977b2d2012901b5c9ed066ecd3ff4561a7758a03e503021a2e0594b2"
+    sha256 cellar: :any_skip_relocation, ventura:        "141fb295ae4157e0b8f53d4ec91a465baa6380d8611652da5915f40298a50060"
+    sha256 cellar: :any_skip_relocation, monterey:       "9ae23c61ad53062f561cc9a70e52a54d90add55b98962c06ea76e129359acc4d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b79c1e4f9d23f8dd06659de060aa2fe4bf0b863a2f9d1e1da8cab2c3347c108b"
   end
 
   depends_on "cmake" => :build
@@ -27,16 +29,20 @@ class CernNdiff < Formula
   conflicts_with "ndiff", "nmap", because: "both install `ndiff` binaries"
 
   def install
-    cd "tools/numdiff" do
-      system "cmake", ".", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", "tools/numdiff", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
+    # Avoid installing MAD-X license as numdiff is under a different license
+    rm "License.txt"
+    prefix.install "tools/numdiff/LICENSE"
   end
 
   test do
     (testpath/"lhs.txt").write("0.0 2e-3 0.003")
     (testpath/"rhs.txt").write("1e-7 0.002 0.003")
     (testpath/"test.cfg").write("*   * abs=1e-6")
-    system "#{bin}/ndiff", "lhs.txt", "rhs.txt", "test.cfg"
+
+    system bin/"ndiff", "lhs.txt", "rhs.txt", "test.cfg"
   end
 end

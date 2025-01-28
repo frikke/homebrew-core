@@ -1,19 +1,18 @@
 class Ormolu < Formula
   desc "Formatter for Haskell source code"
   homepage "https://github.com/tweag/ormolu"
-  url "https://github.com/tweag/ormolu/archive/0.7.2.0.tar.gz"
-  sha256 "bc0aa2efed178fb67d0b06acffcdefed0ea31f0b9a42af56aec969d49504a124"
+  url "https://github.com/tweag/ormolu/archive/refs/tags/0.8.0.0.tar.gz"
+  sha256 "e3948bfa80984b70cf0b701b15d206c9010862ea29d44a9a3ebd417646854948"
   license "BSD-3-Clause"
   head "https://github.com/tweag/ormolu.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "08ba95c61b387c4a63539ee60cb7398e555ee06196c266baddfc091b184cb834"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a91e25eb115a01a12be0636758b268aef69bec0adbb64e8f86164eee076632b6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "89d40d88f7b2e3ec3220a57ecbd617ef8d35299a437a8e82728dcba4a18ea142"
-    sha256 cellar: :any_skip_relocation, ventura:        "329de960e423b67866b010a0760b560e5392c81435070b88bf1a90a91b6c7050"
-    sha256 cellar: :any_skip_relocation, monterey:       "c3fc2fa26c21dc95674f2a0941addc4c6e6aace570db76fac06d184733d6415f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "79d0b05ac7b248e23b879629fc6e31aa84d97999189780ba5e383d404a0d9ae8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b76c38bb2770cd61a93939f2223ad4f340c4254f6a8f1896a97c6ca76786cb20"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6cee9b02ace0ce65f8a84cc635178647a8007b1daea9c652573e57399d43e80e"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ae68f6fd985883a51bb7f6cfaa98e9a6c44eb247a78e19088e80a2701ed6861d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "84da61972b5d54b7d2a461c0b9a408ca0fdf2856abb1eacd777cd4b7bef69626"
+    sha256 cellar: :any_skip_relocation, sonoma:        "ace0cda866c90b4427927a38936d65db91ac1422b62a451b92a31e70a1b34eba"
+    sha256 cellar: :any_skip_relocation, ventura:       "c5d8fb13f9d1a8be511e9fd39c62237c0adb65ebc8f7fb373fe8d7d15eab45eb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "24cdc78d741ef47efd1f3b5ffcd480d538b43f427e7cc381ed09c453118fc01f"
   end
 
   depends_on "cabal-install" => :build
@@ -25,7 +24,7 @@ class Ormolu < Formula
   end
 
   test do
-    (testpath/"test.hs").write <<~EOS
+    (testpath/"test.hs").write <<~HASKELL
       foo =
         f1
         p1
@@ -39,8 +38,8 @@ class Ormolu < Formula
       foo'' =
         f3 p1 p2
         p3
-    EOS
-    expected = <<~EOS
+    HASKELL
+    expected = <<~HASKELL
       foo =
         f1
           p1
@@ -58,7 +57,7 @@ class Ormolu < Formula
           p1
           p2
           p3
-    EOS
+    HASKELL
     assert_equal expected, shell_output("#{bin}/ormolu test.hs")
   end
 end

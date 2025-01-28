@@ -1,29 +1,34 @@
 class Vapor < Formula
   desc "Command-line tool for Vapor (Server-side Swift web framework)"
   homepage "https://vapor.codes"
-  url "https://github.com/vapor/toolbox/archive/18.7.1.tar.gz"
-  sha256 "f0d3f0676de0e9c492a0a7f1d4a3c42bb2c103a4c86d0d78c548556090cd4f0f"
+  url "https://github.com/vapor/toolbox/archive/refs/tags/18.7.5.tar.gz"
+  sha256 "0322fee24872b713e1e495070e6b7b1fca468bed19f48bcf7a1397ffdf701e9a"
   license "MIT"
+  revision 1
   head "https://github.com/vapor/toolbox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1b4915ff63abcee4712993b6e0a249aefd568f20e4c3ed984fd03cdc8d2cb4cb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f67958d8b7764eb2359bd301392cf3d1f7b0c355ab56f89c47cd93270a146e81"
-    sha256 cellar: :any_skip_relocation, ventura:        "f66cb3190b831f10c73cae86140d096c81801f0cd8b2858655fed2abff369f36"
-    sha256 cellar: :any_skip_relocation, monterey:       "12dcd526a2ec89b98f2cd94ddf3bbcb5fc71adc7f527a8b8cdf636751cf77ffb"
-    sha256                               x86_64_linux:   "32a84eac9df8cd04e575261cc49e23ca14ed198e4fcfec86da8960dfec7170a9"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b457b119c396cd83259510166ddf9d9cccf7b699052baf04ab94b63b19ac53f4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2192519ec8d2181f08f86d0b735b9ce722612659e068481415c7483f4e1616a5"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "28fab09761f167d57d34130f67925049db4bdb5002c0f3dbd75cb1027c4353d8"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9b811fd0499f54a6fa4dd3397d608f2daabba985bdb68d88a6670ad50de149b5"
+    sha256 cellar: :any_skip_relocation, ventura:       "839f36608641d08575dddcf5614850ffc9125459bb67c2560f52f70c990e0607"
+    sha256                               x86_64_linux:  "421fd857c04941c7c5443faac4183e79cf919db6b2066668022a40fb57d0c78b"
   end
 
   # vapor requires Swift 5.6.0
   depends_on xcode: "13.3"
 
-  uses_from_macos "swift", since: :big_sur
+  uses_from_macos "swift"
 
   def install
-    system "swift", "build", "--disable-sandbox", "-c", "release", "-Xswiftc",
-      "-cross-module-optimization", "--enable-test-discovery"
-    mv ".build/release/vapor", "vapor"
-    bin.install "vapor"
+    args = if OS.mac?
+      ["--disable-sandbox"]
+    else
+      ["--static-swift-stdlib"]
+    end
+    system "swift", "build", *args, "-c", "release", "-Xswiftc", "-cross-module-optimization"
+    bin.install ".build/release/vapor"
   end
 
   test do

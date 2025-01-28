@@ -1,19 +1,18 @@
 class Notify < Formula
   desc "Stream the output of any CLI and publish it to a variety of supported platforms"
   homepage "https://github.com/projectdiscovery/notify"
-  url "https://github.com/projectdiscovery/notify/archive/refs/tags/v1.0.5.tar.gz"
-  sha256 "15824bee28cb9f3e74aa34559619fdceb865182fe12961d6c5cfc26db642b38c"
+  url "https://github.com/projectdiscovery/notify/archive/refs/tags/v1.0.7.tar.gz"
+  sha256 "ec9f1e6c48f975b58d30162071d954db0cd771ea3f5dc7168f5ecdc73658c0ad"
   license "MIT"
   head "https://github.com/projectdiscovery/notify.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a98b613b397408f9064059db3cb9d395d00c34f60e5b47195f2a3d3442be76f0"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a98b613b397408f9064059db3cb9d395d00c34f60e5b47195f2a3d3442be76f0"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a98b613b397408f9064059db3cb9d395d00c34f60e5b47195f2a3d3442be76f0"
-    sha256 cellar: :any_skip_relocation, ventura:        "4ab287f6289bd0e830b3e599c7b886d6399c95639712edf5e6e972b37cf8cdb8"
-    sha256 cellar: :any_skip_relocation, monterey:       "4ab287f6289bd0e830b3e599c7b886d6399c95639712edf5e6e972b37cf8cdb8"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4ab287f6289bd0e830b3e599c7b886d6399c95639712edf5e6e972b37cf8cdb8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "62de427da765f4b2b26e38f055a5adf2fdf2c01410e7c2115786618b4cc7c6ec"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7be1bc9e0154bb8c4f496425c468dec71e6a373461aa7883445e57d2d7e2a738"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "af1cb932e57d925915878389b7a207098b8a3324e0800f1ea5db8b12a42d3bc0"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "2aeec01296186f92a51779563e40390db5b65585f2f0f9fc5a4339c23af9199c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1da6aac2df79d0f709092d1b2a9449ad3dfee1fe6fb4b2073635b321540b7895"
+    sha256 cellar: :any_skip_relocation, ventura:       "b91f8d7fd9626a85fa58b680effdd66c1bc3aa8b8871c699eeeaa7019ff27b44"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b193c3bb416604ece04efc3382efb032885718e2740d26e98d6a6094d6e1eb2b"
   end
 
   depends_on "go" => :build
@@ -23,7 +22,8 @@ class Notify < Formula
   end
 
   test do
-    assert_match "Current Version: #{version}", shell_output("#{bin}/notify --version 2>&1")
-    assert_predicate testpath/".config/notify/config.yaml", :exist?
+    assert_match "Current Version: #{version}", shell_output("#{bin}/notify -disable-update-check -version 2>&1")
+    output = shell_output("#{bin}/notify -disable-update-check -config \"#{testpath}/non_existent\" 2>&1", 1)
+    assert_match "Could not read config", output
   end
 end

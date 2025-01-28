@@ -1,19 +1,20 @@
 class Luacheck < Formula
   desc "Tool for linting and static analysis of Lua code"
   homepage "https://luacheck.readthedocs.io/"
-  url "https://github.com/lunarmodules/luacheck/archive/refs/tags/v1.1.1.tar.gz"
-  sha256 "6ef4276498c4bb4ec527c3f942e35ff5c71fdd8c88ed0619a83a1c967d135c81"
+  url "https://github.com/lunarmodules/luacheck/archive/refs/tags/v1.2.0.tar.gz"
+  sha256 "8efe62a7da4fdb32c0c22ec1f7c9306cbc397d7d40493c29988221a059636e25"
   license "MIT"
   head "https://github.com/lunarmodules/luacheck.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d6e0ed26ec229c27e88566004cd49d9f6b21d17e356d3e0acc8ce74324d842d6"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "12f62002bd4aed8cf19a0f1f1a46211bc0ffe0e589c8b7db53abcb10a8415594"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3998530e4c43b096971256853c6fb48e42ed5ae94f7c4fd1cbe3d58e5bc2699d"
-    sha256 cellar: :any_skip_relocation, ventura:        "349998dddeb7ab02db71faf48239245f0462b40ef0f0d2f17abc6b11e246635f"
-    sha256 cellar: :any_skip_relocation, monterey:       "327ee4e07efa6495183e462554ba02973caa0669d0f718b121f718bf65223d82"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3837335c3e9bf8cfd33c2d3d4572b35385b0a7191a9240a6a7ad365bf9e54163"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dc597af58be9d43cfdbfedce8dc3f7bdc205d6365550e45f6653de00546e84b8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "a169aee2121f7c2ed0b06c929b7d7af23ffc3307bdbf0422d55320eb28c4ada7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "15a92f15305c2dd68712f301650a1e4dd44f125d877cce6805fe7c350a3d6846"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "afb2f3120e5fe5f65c04b23fb0b0c71b11aae1f568b0ee089ff571aa8f646760"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c6e14232fc83825fc5e95905a1494ff3871ea0b714304a1bbdd1341aa9a23e77"
+    sha256 cellar: :any_skip_relocation, sonoma:         "5c001a53a3e07a42f1feb1e8357d10413acabfb687b3b91aebd5f04e576c1332"
+    sha256 cellar: :any_skip_relocation, ventura:        "2a8e782aac328d196dab06ac9da394d11d8c613c9057ef7392abdb44e3839e3a"
+    sha256 cellar: :any_skip_relocation, monterey:       "94a98b05bfa94bb3ec210d38328b18028f764bd1024efe56c738dd8b9c481e72"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eaba85e939f4055b051482af96f2009a1a86fc113f69b12abc4d6a10ec887e64"
   end
 
   depends_on "luarocks" => :build
@@ -22,7 +23,7 @@ class Luacheck < Formula
   uses_from_macos "unzip" => :build
 
   def install
-    system "luarocks", "make", "--tree=#{libexec}", "--global", "--lua-dir=#{Formula["lua"].opt_prefix}"
+    system "luarocks", "make", "--tree=#{libexec}", "--local", "--lua-dir=#{Formula["lua"].opt_prefix}"
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 

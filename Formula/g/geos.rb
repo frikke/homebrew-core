@@ -1,8 +1,8 @@
 class Geos < Formula
   desc "Geometry Engine"
   homepage "https://libgeos.org/"
-  url "https://download.osgeo.org/geos/geos-3.12.0.tar.bz2"
-  sha256 "d96db96011259178a35555a0f6d6e75a739e52a495a6b2aa5efb3d75390fbc39"
+  url "https://download.osgeo.org/geos/geos-3.13.0.tar.bz2"
+  sha256 "47ec83ff334d672b9e4426695f15da6e6368244214971fabf386ff8ef6df39e4"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,30 +11,30 @@ class Geos < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "bf4c039446e6b3f5ba706af44f60204b9c70073a10791ca2855eae3a7d499604"
-    sha256 cellar: :any,                 arm64_ventura:  "3ba823368eb77741222d965f954b635e779b96eb1bf646f1ec6d5c688714f4c3"
-    sha256 cellar: :any,                 arm64_monterey: "260454c4c2ec6ce753eed67c930e0bffb4209e5120c18b11de8526217bc01298"
-    sha256 cellar: :any,                 arm64_big_sur:  "6fde6c00108bb83d3fe7c463a8b6463f711533d243be257ae672c5f6c8b5d821"
-    sha256 cellar: :any,                 sonoma:         "49abf2dd2a65958ffdfbfcf9d81761002faa7cc8c1e5c56bc228844542b1ca08"
-    sha256 cellar: :any,                 ventura:        "73ddca31e205dd9f87a713c702ff18a312522b6ffaa4983ac2fb1187111682f3"
-    sha256 cellar: :any,                 monterey:       "1a14c6f67d8299f354a35e3dcf3bdb60dd41a4ded646dcecff1cf0733510e4d7"
-    sha256 cellar: :any,                 big_sur:        "4d14d5caafcb81dbe582a4ec5174ca2ac659fd406a4cb97c52962b1314172634"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e7c3514a35b53d8ddff3598956b39bf34fe8b95a873c32117abe99764e4805db"
+    sha256 cellar: :any,                 arm64_sequoia:  "d07e0287c32e0742bf62253fc48f3384bb385b4384973af995c1c8eef7f11361"
+    sha256 cellar: :any,                 arm64_sonoma:   "7598e3f97042c2dc4442e77feb4e8d3af4cd0fe58922ad99644134be1172b815"
+    sha256 cellar: :any,                 arm64_ventura:  "012ee44940537761cf2da1f0bb120389dac8f7bae8c392b849cc383402ad2d0c"
+    sha256 cellar: :any,                 arm64_monterey: "6ffce2acd56557396bc6013265d9c05f4c74ba9d3ae6f5c17d82540fc9f1ae6e"
+    sha256 cellar: :any,                 sonoma:         "b59f7be995ac70f363ec0141a7be9a42d613f37546706ed42d4c219c06519daf"
+    sha256 cellar: :any,                 ventura:        "150710ce1adbad6392e7a5f454cbd99440314dca20acf5fc916cda1fec428f2d"
+    sha256 cellar: :any,                 monterey:       "e571b0cb00d55a304164afc584d75b1e0bef8f208cf324470bf8acac8e9118d6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5c0af95be5136b4a47d1a841e85326cdf7e8ad25f83b074b29d2b6752172541c"
   end
 
   depends_on "cmake" => :build
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "-S", ".", "-B", "build", "-DCMAKE_INSTALL_RPATH=#{rpath}", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
-    system "cmake", "-S", ".", "-B", "static", *std_cmake_args, "-DBUILD_SHARED_LIBS=OFF"
+
+    system "cmake", "-S", ".", "-B", "static", "-DBUILD_SHARED_LIBS=OFF", *std_cmake_args
     system "cmake", "--build", "static"
     lib.install Dir["static/lib/*.a"]
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdarg.h>
       #include <geos_c.h>
@@ -58,7 +58,8 @@ class Geos < Formula
           printf("Intersection(A, B): %s\\n", wkt_inter);
           return 0;
       }
-    EOS
+    C
+
     cflags = shell_output("#{bin}/geos-config --cflags").split
     libs = shell_output("#{bin}/geos-config --clibs").split
     system ENV.cc, *cflags, "test.c", *libs

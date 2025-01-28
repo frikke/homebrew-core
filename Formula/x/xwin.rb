@@ -1,18 +1,19 @@
 class Xwin < Formula
   desc "Microsoft CRT and Windows SDK headers and libraries loader"
   homepage "https://github.com/Jake-Shadle/xwin"
-  url "https://github.com/Jake-Shadle/xwin/archive/refs/tags/0.3.1.tar.gz"
-  sha256 "a3731ac69543105b48ccbfe5b361938a889494dec6b5ecbf127fce84e713e098"
+  url "https://github.com/Jake-Shadle/xwin/archive/refs/tags/0.6.5.tar.gz"
+  sha256 "01fbb8c9b11d71388f0836cd112caf32a0b5c29e7307396594ec8391a815c19c"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "83523838f7a32e07380169059ff3558ef253f599bb671f722a45bafbec93be39"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4e77c84f37642a9f1ea4a3b70e076a8b1c64df84ad34c2211265080c5fcbe272"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9ad900f936e6af437e18431ebb3318be52f474729cafe9cd92c05438825dbcb7"
-    sha256 cellar: :any_skip_relocation, ventura:        "85085edc4baa4e1b9b0ea3491838d86548c82fb922dee32677af332c5a99ccde"
-    sha256 cellar: :any_skip_relocation, monterey:       "b559b6e3996505f28ad7934ad284d553f7446e4dddbdb115c3df74a70a7dcf19"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3acaca1ceeeaf14d8c16b91d8571bc1142773da5709bf4cfc85adccf35704608"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7f204ff5340ee029d3ef6ea6a66f861c26a5d8a82018ab5ca264dc4c0341f7b6"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "4037b8f7f0cc14cc0ceeef6bbcda2a8bc884eaf644c8a7fe28c5954a1bf1c526"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "024ef02449c4a8def7975e5a888029ad67057092f46bc3a834c986dc267d7d3d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "88a0344d220aa9b7efdf4eac804dc4f4d045a862658e73e5d4206006821acb8d"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b991244b55050f4b79a5e42245863ebdc624f8b42138ddd6741713a8f40d8e76"
+    sha256 cellar: :any_skip_relocation, sonoma:         "8eb6be6eddc5bdaa98e9bedd06e15fe9dd98189ff5ee9f969093160eb91d0b3b"
+    sha256 cellar: :any_skip_relocation, ventura:        "3b9c9cc7645f66e685ad98c7f9a450b45bfc36eddbcea151f25c857f132c28b9"
+    sha256 cellar: :any_skip_relocation, monterey:       "ecee39a502597e5ce214487c8031c1b2679a835390b3385fbe0fafe7592d2ea2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "244e179fcfcca8f1df7ca7d9490764602279f6dc45a678b5dfb2845ef5cb95ff"
   end
 
   depends_on "rust" => :build

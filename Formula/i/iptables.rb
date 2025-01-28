@@ -1,8 +1,8 @@
 class Iptables < Formula
   desc "Linux kernel packet control tool"
   homepage "https://www.netfilter.org/projects/iptables/index.html"
-  url "https://www.netfilter.org/pub/iptables/iptables-1.8.9.tar.xz"
-  sha256 "ef6639a43be8325a4f8ea68123ffac236cb696e8c78501b64e8106afb008c87f"
+  url "https://www.netfilter.org/pub/iptables/iptables-1.8.11.tar.xz"
+  sha256 "d87303d55ef8c92bcad4dd3f978b26d272013642b029425775f5bad1009fe7b2"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,27 +11,27 @@ class Iptables < Formula
   end
 
   bottle do
-    sha256 x86_64_linux: "c51bb8a5dd82a11b2230095f7152092497e8d868d0a1ea76de6b48f81556de05"
+    sha256 x86_64_linux: "4de49c1ece1a24f6f72d8290a3d1b4f875a94b9a277640f65faf3258e578a6da"
   end
 
   depends_on "linux-headers@5.15" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libmnl"
   depends_on "libnetfilter_conntrack"
   depends_on "libnfnetlink"
   depends_on "libnftnl"
+  depends_on "libpcap"
   depends_on :linux
   depends_on "nftables"
 
-  uses_from_macos "libpcap"
-
   def install
     ENV.append "CFLAGS", "-I#{Formula["linux-headers@5.15"].opt_include}"
-    system "./configure", *std_configure_args, "--disable-silent-rules",
-      "--enable-bpf-compiler",
-      "--enable-devel",
-      "--enable-libipq",
-      "--enable-shared"
+    system "./configure", "--disable-silent-rules",
+                          "--enable-bpf-compiler",
+                          "--enable-devel",
+                          "--enable-libipq",
+                          "--enable-shared",
+                          *std_configure_args
     system "make"
     system "make", "install"
   end

@@ -1,19 +1,18 @@
 class Nghttp2 < Formula
   desc "HTTP/2 C Library"
   homepage "https://nghttp2.org/"
-  url "https://github.com/nghttp2/nghttp2/releases/download/v1.56.0/nghttp2-1.56.0.tar.gz"
-  mirror "http://fresh-center.net/linux/www/nghttp2-1.56.0.tar.gz"
-  sha256 "eb00ded354db1159dcccabc11b0aaeac893b7c9b154f8187e4598c4b8f3446b5"
+  url "https://github.com/nghttp2/nghttp2/releases/download/v1.64.0/nghttp2-1.64.0.tar.gz"
+  mirror "http://fresh-center.net/linux/www/nghttp2-1.64.0.tar.gz"
+  sha256 "20e73f3cf9db3f05988996ac8b3a99ed529f4565ca91a49eb0550498e10621e8"
   license "MIT"
 
   bottle do
-    sha256 arm64_ventura:  "fed09dcc9c9764c4d624209763b33bfa78136cd8847ba948ed44c501b06ab1ec"
-    sha256 arm64_monterey: "354731bddd11def8919a9aabbba8e6af3b3d643c6548a811fb1f148d599d3948"
-    sha256 arm64_big_sur:  "6d2b03accd138d1aefce8f909306eff780516450cd5afec3143329f228fbea2e"
-    sha256 ventura:        "d54b8c8749e68bb3a1a1fe451f10305f77139a403f9e65034441e4f663f47e9f"
-    sha256 monterey:       "fc3a8b98e0496a36b5dfba9614b54213ad6ee38225821a6469f703b6bfc96d35"
-    sha256 big_sur:        "3c269a2cbc02823f97bd955e715fb1b3309b4b5fb377932a367ebc3fead00c3e"
-    sha256 x86_64_linux:   "01cbbf3a66b8e215f8968bf497dbdf31bf7d8063c739075166ee935770f8688e"
+    sha256 arm64_sequoia: "e626538d43446893a19c27979bf5bc759328bad620c7f4b2fec5749163095b54"
+    sha256 arm64_sonoma:  "468740e1514254893cc0152051cc585c58e2198cf5a23f858acbdc77036e1843"
+    sha256 arm64_ventura: "2a11bcd1f34969b3b0bc1c139620f6f6fd292dff88877ac6a8bcc4ff14e1957f"
+    sha256 sonoma:        "f48ec7a32430def92612eaabad4c44a2107ea427457e6403eae124c0fb309114"
+    sha256 ventura:       "21dd2b43f676e1d8258efc200739a496085040c9e12bce1bad585599f9c9a44b"
+    sha256 x86_64_linux:  "b23ec98444cb5163f6f488604afe11c47c76b7e35c28f4aa1e63e0b521679f30"
   end
 
   head do
@@ -24,7 +23,7 @@ class Nghttp2 < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "c-ares"
   depends_on "jemalloc"
   depends_on "libev"
@@ -34,17 +33,28 @@ class Nghttp2 < Formula
   uses_from_macos "libxml2"
   uses_from_macos "zlib"
 
-  # Fix: shrpx_api_downstream_connection.cc:57:3: error:
-  # array must be initialized with a brace-enclosed initializer
-  # https://github.com/nghttp2/nghttp2/pull/1269
-  patch do
-    on_linux do
-      url "https://github.com/nghttp2/nghttp2/commit/829258e7038fe7eff849677f1ccaeca3e704eb67.patch?full_index=1"
-      sha256 "c4bcf5cf73d5305fc479206676027533bb06d4ff2840eb672f6265ba3239031e"
-    end
+  on_macos do
+    # macOS 12 or older
+    depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1400
+  end
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with :clang do
+    build 1400
+    cause "Requires C++20 support"
+  end
+
+  fails_with :gcc do
+    version "11"
+    cause "Requires C++20 support"
   end
 
   def install
+    ENV.llvm_clang if OS.mac? && DevelopmentTools.clang_build_version <= 1400
+
     # fix for clang not following C++14 behaviour
     # https://github.com/macports/macports-ports/commit/54d83cca9fc0f2ed6d3f873282b6dd3198635891
     inreplace "src/shrpx_client_handler.cc", "return dconn;", "return std::move(dconn);"
@@ -53,12 +63,11 @@ class Nghttp2 < Formula
     inreplace "Makefile.in", /(SUBDIRS =) lib/, "\\1"
     inreplace Dir["**/Makefile.in"] do |s|
       # These don't exist in all files, hence audit_result being false.
-      s.gsub!(%r{^(LDADD = )\$[({]top_builddir[)}]/lib/libnghttp2\.la}, "\\1-lnghttp2", false)
-      s.gsub!(%r{\$[({]top_builddir[)}]/lib/libnghttp2\.la}, "", false)
+      s.gsub!(%r{^(LDADD = )\$[({]top_builddir[)}]/lib/libnghttp2\.la}, "\\1-lnghttp2", audit_result: false)
+      s.gsub!(%r{\$[({]top_builddir[)}]/lib/libnghttp2\.la}, "", audit_result: false)
     end
 
-    args = %W[
-      --prefix=#{prefix}
+    args = %w[
       --disable-silent-rules
       --enable-app
       --disable-examples
@@ -67,8 +76,8 @@ class Nghttp2 < Formula
       --without-systemd
     ]
 
-    system "autoreconf", "-ivf" if build.head?
-    system "./configure", *args
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end

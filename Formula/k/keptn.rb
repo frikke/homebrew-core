@@ -1,24 +1,22 @@
 class Keptn < Formula
   desc "CLI for keptn.sh, a message-driven control-plane for application delivery"
   homepage "https://keptn.sh"
-  url "https://github.com/keptn/keptn/archive/refs/tags/1.4.2.tar.gz"
-  sha256 "0b4489256597d5cc0963e387a750f183d389bdda93ecd783e674d702c6c425ed"
+  url "https://github.com/keptn/keptn/archive/refs/tags/1.4.5.tar.gz"
+  sha256 "2b767fedf0ac9581b914bb6c89720749023cf102d154c283697a653103a3318c"
   license "Apache-2.0"
 
-  livecheck do
-    url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "6890b7bf9d1147ffb7b3399b83f07fe7302594687bdc560e61ff94bcbcd01483"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "423b33841420a90882c5969217d114ab5deab10ef1c06c79b32b4629daff77ca"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c1b1139e9d32bcf7c1cc2f576952aae560568efcb57267267d682944945f0345"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "736007fe68b58bc08c475c4cfe1297c609216eb289d507b746652a3737511abb"
+    sha256 cellar: :any_skip_relocation, sonoma:         "6c44a452fe99b5dd940d2cc5ca32d9d38aed9486de7b49e730646ada4b74e4c3"
+    sha256 cellar: :any_skip_relocation, ventura:        "df51b37cc88aeef3a096468048c533c9bec399e0e51630ef0d4b99b00e1f98ca"
+    sha256 cellar: :any_skip_relocation, monterey:       "b70fb2caa668ef82dcb5a46340bb831d055f6922e200edd74f8d6dbc19910b73"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9fc0beacc9f716d912ecc6cb638b023c98a87cb079ea782e787f6de36b50b2c1"
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d0f40ee4af457f38467a66ec8eb6e720842bca5ca75f08d2eaa84075e7d6d374"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3d5d5bba0fe227aeaab85159dfab03c7f438880a4b12d8fcf475c04ee1231cd2"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7028fd1d9edd6eb21745ad4f8394130aa09c2b56789d3ec3d25f0af8e2e4504c"
-    sha256 cellar: :any_skip_relocation, ventura:        "fe2272970e14cded9b79c9ee90f009b23d9b3dd2564e1d81e27225094512ab65"
-    sha256 cellar: :any_skip_relocation, monterey:       "5391066339f23d10a89653f7b3b6e8a05c551f93ed52539fbd883e5024afcad4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bc8777eff2b3d99da12833b7442670afc076a5edc24f30fe69b26c0753314224"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8658de205632c8446f98b63597122f3fe10f6f71b37b8b06029c11a267802069"
-  end
+  disable! date: "2024-12-21", because: :repo_archived
 
   depends_on "go" => :build
 
@@ -30,7 +28,7 @@ class Keptn < Formula
     ]
 
     cd buildpath/"cli" do
-      system "go", "build", *std_go_args(ldflags: ldflags)
+      system "go", "build", *std_go_args(ldflags:)
     end
   end
 

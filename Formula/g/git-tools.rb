@@ -3,13 +3,14 @@ class GitTools < Formula
 
   desc "Assorted git-related scripts and tools"
   homepage "https://github.com/MestreLion/git-tools"
-  url "https://github.com/MestreLion/git-tools/archive/v2022.12.tar.gz"
+  url "https://github.com/MestreLion/git-tools/archive/refs/tags/v2022.12.tar.gz"
   sha256 "b01e3b8de268ee07854e6cc66d78db6ed6cbc3e71dfeded8456138881bdf97f1"
   license "GPL-3.0-or-later"
   head "https://github.com/MestreLion/git-tools.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "996e1c6bb27e63ddcc47a3e19cd180b05fbfad44cbaaed7cfcf6241ac4852959"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "e366dc448c4d69062807a793bc8fdd6ae66a17a0a785b71a1f36f661eb7fbd35"
   end
 
   uses_from_macos "python", since: :catalina

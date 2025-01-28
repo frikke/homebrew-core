@@ -3,8 +3,8 @@ class Cups < Formula
   homepage "https://github.com/OpenPrinting/cups"
   # This is the author's fork of CUPS. Debian have switched to this fork:
   # https://lists.debian.org/debian-printing/2020/12/msg00006.html
-  url "https://github.com/OpenPrinting/cups/releases/download/v2.4.6/cups-2.4.6-source.tar.gz"
-  sha256 "58e970cf1955e1cc87d0847c32526d9c2ccee335e5f0e3882b283138ba0e7262"
+  url "https://github.com/OpenPrinting/cups/releases/download/v2.4.11/cups-2.4.11-source.tar.gz"
+  sha256 "9a88fe1da3a29a917c3fc67ce6eb3178399d68e1a548c6d86c70d9b13651fd71"
   license "Apache-2.0"
   head "https://github.com/OpenPrinting/cups.git", branch: "master"
 
@@ -14,39 +14,33 @@ class Cups < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_sonoma:   "7547779c1d49a79fdbdb48baf9981a62269f6384e9b78bd2c0fabc082e0aa365"
-    sha256 arm64_ventura:  "5097ac6de3fcd9c2da3bd4f09c01714d73761c0399c8695592d6534cdf23c6e8"
-    sha256 arm64_monterey: "65d0e5f4ba75438cca64d341adca30d9d1bfc4867358421cb74fa375b94a7e69"
-    sha256 arm64_big_sur:  "f0b6128fddf54ec1069c32a9b83788457f377a0b09dc256b6464f4f2161560ae"
-    sha256 sonoma:         "5540a2cee4335337db05889f1a76adfe6b589d97bd2dfba8796d82d8a3d22baa"
-    sha256 ventura:        "1bd88a31dd6fc3292cf4df626b6531c05b1a35fb35c4e219950710df939da85f"
-    sha256 monterey:       "9f9324ad8a39f8d3d4863a044107290e8933b9e8b091dbe5d32bc5d490db5c35"
-    sha256 big_sur:        "f52e62e443641e19a167ced1e76969c45486a513b4fed8bdc33cc80f1203dc36"
-    sha256 x86_64_linux:   "841f335903bfdd8a6e2e4fc4db73a0f261f581d59bbd3f3a98acb5e83507f699"
+    sha256 arm64_sequoia: "9ce97cb2305aa0b8fb73d5f104b47a5d0e22ea9583d1b15b8e9091962fbcd48c"
+    sha256 arm64_sonoma:  "da9bb8ae69dc9c9b741d06cc4c3143961d2c084367ec60e50360e67a0c89be43"
+    sha256 arm64_ventura: "e8b56d92ae803cbce09b2390b90705c520a3475607fb9c61ec6d2b9095000f3e"
+    sha256 sonoma:        "bfdb13e6164cc005e1387d8d53df0e3aa5fb21c85546ff36e2838bf22a2a4102"
+    sha256 ventura:       "0d1726c5edfcdba47a6ab127d39e8cbfa72c000746692db8f3fdc0213dbbfaf2"
+    sha256 x86_64_linux:  "450c1b750daf7df268f6107c5bd585c9a1d20fe20914ff9f038e9f5bbf028380"
   end
 
   keg_only :provided_by_macos
 
+  depends_on "pkgconf" => :build
+  depends_on "openssl@3"
+
   uses_from_macos "krb5"
   uses_from_macos "zlib"
 
-  on_linux do
-    depends_on "openssl@3"
-  end
-
   def install
-    system "./configure", *std_configure_args,
-                          "--with-components=core",
-                          "--without-bundledir"
+    system "./configure", "--with-components=core",
+                          "--with-tls=openssl",
+                          "--without-bundledir",
+                          *std_configure_args
     system "make", "install"
   end
 
   test do
     port = free_port.to_s
-    pid = fork do
-      exec "#{bin}/ippeveprinter", "-p", port, "Homebrew Test Printer"
-    end
+    pid = spawn "#{bin}/ippeveprinter", "-p", port, "Homebrew Test Printer"
 
     begin
       sleep 2

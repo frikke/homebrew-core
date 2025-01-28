@@ -3,32 +3,23 @@ class Asciidoc < Formula
 
   desc "Formatter/translator for text files to numerous formats"
   homepage "https://asciidoc-py.github.io/"
-  url "https://files.pythonhosted.org/packages/8a/57/50180e0430fdb552539da9b5f96f1da6f09c4bfa951b39a6e1b4fbe37d75/asciidoc-10.2.0.tar.gz"
-  sha256 "91ff1dd4c85af7b235d03e0860f0c4e79dd1ff580fb610668a39b5c77b4ccace"
+  url "https://files.pythonhosted.org/packages/1d/e7/315a82f2d256e9270977aa3c15e8fe281fd7c40b8e2a0b97e0cb61ca8fa0/asciidoc-10.2.1.tar.gz"
+  sha256 "d9f13c285981b3c7eb660d02ca0a2779981e88d48105de81bb40445e60dddb83"
   license "GPL-2.0-or-later"
   head "https://github.com/asciidoc-py/asciidoc-py.git", branch: "main"
 
-  livecheck do
-    url :head
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
-  end
-
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "8a50a066a93e3c1123ddcb598da231d463c5a6ff5b0ea96275cbffa898ef1f12"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1e2f219174f367e4f191679e888c14db8391a531f99e5830a491ca7a5a38d5a9"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "1e2f219174f367e4f191679e888c14db8391a531f99e5830a491ca7a5a38d5a9"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1e2f219174f367e4f191679e888c14db8391a531f99e5830a491ca7a5a38d5a9"
-    sha256 cellar: :any_skip_relocation, sonoma:         "5ded30ec60906462bdbd578655ff30014882c5e259d07113d4593a8eaa90e222"
-    sha256 cellar: :any_skip_relocation, ventura:        "ef0ff79ca1a2494626667efc995c8e3ff75993889d75312fd46d9acb408d0e4c"
-    sha256 cellar: :any_skip_relocation, monterey:       "ef0ff79ca1a2494626667efc995c8e3ff75993889d75312fd46d9acb408d0e4c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ef0ff79ca1a2494626667efc995c8e3ff75993889d75312fd46d9acb408d0e4c"
-    sha256 cellar: :any_skip_relocation, catalina:       "ef0ff79ca1a2494626667efc995c8e3ff75993889d75312fd46d9acb408d0e4c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4791ddff487d774346c8e313b7b3bee367ca06cdc79bef543da253166401cbab"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ec67acbcd8040ec963e8d3c2cab2427254d2b8b411b65db720347518ab341559"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ec67acbcd8040ec963e8d3c2cab2427254d2b8b411b65db720347518ab341559"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "ec67acbcd8040ec963e8d3c2cab2427254d2b8b411b65db720347518ab341559"
+    sha256 cellar: :any_skip_relocation, sonoma:        "ec67acbcd8040ec963e8d3c2cab2427254d2b8b411b65db720347518ab341559"
+    sha256 cellar: :any_skip_relocation, ventura:       "ec67acbcd8040ec963e8d3c2cab2427254d2b8b411b65db720347518ab341559"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "51190b8ffe36e536f0208a5d0f420ed9be8c119051241188801d181a12bfd83a"
   end
 
   depends_on "docbook"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "source-highlight"
 
   def install
@@ -52,7 +43,7 @@ class Asciidoc < Formula
 
   test do
     (testpath/"test.txt").write("== Hello World!")
-    system "#{bin}/asciidoc", "-b", "html5", "-o", testpath/"test.html", testpath/"test.txt"
+    system bin/"asciidoc", "-b", "html5", "-o", testpath/"test.html", testpath/"test.txt"
     assert_match %r{<h2 id="_hello_world">Hello World!</h2>}, File.read(testpath/"test.html")
   end
 end

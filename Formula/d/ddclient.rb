@@ -1,10 +1,9 @@
 class Ddclient < Formula
   desc "Update dynamic DNS entries"
   homepage "https://ddclient.net/"
-  url "https://github.com/ddclient/ddclient/archive/v3.10.0.tar.gz"
-  sha256 "34b6d9a946290af0927e27460a965ad018a7c525625063b0f380cbddffc01c1b"
+  url "https://github.com/ddclient/ddclient/archive/refs/tags/v4.0.0.tar.gz"
+  sha256 "4b37c99ac0011102d7db62f1ece7ff899b06df3d4b172e312703931a3c593c93"
   license "GPL-2.0-or-later"
-  revision 2
   head "https://github.com/ddclient/ddclient.git", branch: "master"
 
   livecheck do
@@ -13,19 +12,19 @@ class Ddclient < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4d7b4313f149190585d9acdb4f0cc0c4457d7cf907c0b78c3d6351fa72d1a6e8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4d7b4313f149190585d9acdb4f0cc0c4457d7cf907c0b78c3d6351fa72d1a6e8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4d7b4313f149190585d9acdb4f0cc0c4457d7cf907c0b78c3d6351fa72d1a6e8"
-    sha256 cellar: :any_skip_relocation, ventura:        "4d7b4313f149190585d9acdb4f0cc0c4457d7cf907c0b78c3d6351fa72d1a6e8"
-    sha256 cellar: :any_skip_relocation, monterey:       "4d7b4313f149190585d9acdb4f0cc0c4457d7cf907c0b78c3d6351fa72d1a6e8"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4d7b4313f149190585d9acdb4f0cc0c4457d7cf907c0b78c3d6351fa72d1a6e8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "71744d2abf1d487d7749ab508eee5786e62adffc9f6f81f7f81c53ac1c76e223"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "295bbe6bc8b84952958cac5b33b021419cb51002f95c8c6a1f1eb67ff9b2cb72"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "295bbe6bc8b84952958cac5b33b021419cb51002f95c8c6a1f1eb67ff9b2cb72"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "295bbe6bc8b84952958cac5b33b021419cb51002f95c8c6a1f1eb67ff9b2cb72"
+    sha256 cellar: :any_skip_relocation, sonoma:        "295bbe6bc8b84952958cac5b33b021419cb51002f95c8c6a1f1eb67ff9b2cb72"
+    sha256 cellar: :any_skip_relocation, ventura:       "295bbe6bc8b84952958cac5b33b021419cb51002f95c8c6a1f1eb67ff9b2cb72"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c48a16e4d1c11696c5561210e47f3bb922c10f7b7bfdd0f6d3298bf0814d0caf"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
+
   uses_from_macos "perl"
+  uses_from_macos "zlib"
 
   on_linux do
     depends_on "openssl@3"
@@ -34,14 +33,17 @@ class Ddclient < Formula
       url "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/IO-Socket-INET6-2.73.tar.gz"
       sha256 "b6da746853253d5b4ac43191b4f69a4719595ee13a7ca676a8054cf36e6d16bb"
     end
+
     resource "IO::Socket::SSL" do
-      url "https://cpan.metacpan.org/authors/id/S/SU/SULLR/IO-Socket-SSL-2.078.tar.gz"
-      sha256 "4cf83737a72b0970948b494bc9ddab7f725420a0ca0152d25c7e48ef8fa2b6a1"
+      url "https://cpan.metacpan.org/authors/id/S/SU/SULLR/IO-Socket-SSL-2.084.tar.gz"
+      sha256 "a60d1e04e192363155329560498abd3412c3044295dae092d27fb6e445c71ce1"
     end
+
     resource "JSON::PP" do
       url "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/JSON-PP-4.16.tar.gz"
       sha256 "8bc2f162bafc42645c489905ad72540f0d3c284b360c96299095183c30cc9789"
     end
+
     resource "Net::SSLeay" do
       url "https://cpan.metacpan.org/authors/id/C/CH/CHRISN/Net-SSLeay-1.92.tar.gz"
       sha256 "47c2f2b300f2e7162d71d699f633dd6a35b0625a00cbda8c50ac01144a9396a9"
@@ -76,18 +78,7 @@ class Ddclient < Formula
 
   def post_install
     (var/"run").mkpath
-    chmod "go-r", etc/"ddclient.conf"
-
-    # Migrate old configuration files to the new location that `ddclient` checks.
-    # Remove on 31/12/2023.
-    old_config_file = pkgetc/"ddclient.conf"
-    return unless old_config_file.exist?
-
-    new_config_file = etc/"ddclient.conf"
-    ohai "Migrating `#{old_config_file}` to `#{new_config_file}`..."
-    etc.install new_config_file => "ddclient.conf.default" if new_config_file.exist?
-    etc.install old_config_file
-    pkgetc.rmtree if pkgetc.empty?
+    chmod "go-r", pkgetc/"ddclient.conf"
   end
 
   def caveats

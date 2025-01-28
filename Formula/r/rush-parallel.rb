@@ -1,24 +1,26 @@
 class RushParallel < Formula
   desc "Cross-platform command-line tool for executing jobs in parallel"
   homepage "https://github.com/shenwei356/rush"
-  url "https://github.com/shenwei356/rush/archive/refs/tags/v0.5.3.tar.gz"
-  sha256 "bc60ba4653298a904679df2ca80c49f1f580c6aa238951d00bf13a9e30807d3f"
+  url "https://github.com/shenwei356/rush/archive/refs/tags/v0.6.0.tar.gz"
+  sha256 "58f1998c7d03daa30aea7a29c57893c87399d1d722dc5d2349ad3b4f7dc599bc"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a5cbdc1c37c4be7adf095b9563decc377277187d7edec2795334a8e3f7fe01fe"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "899841a1daa64609c5f317f75b4c4a9ac3bc67fd1551baa7ceb9cd916b9bc794"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3d1a58653893f6e243a7debca6d1ba1ea391be9dbdb5a83e27d01c19ed41bd1c"
-    sha256 cellar: :any_skip_relocation, ventura:        "67e529988d61acc691d983a99a99e6808594259186c05ec38c072af3cdcb33bb"
-    sha256 cellar: :any_skip_relocation, monterey:       "c4422022d18f3910037c980d74535cd0b5fd49344018a369b3548259b1377788"
-    sha256 cellar: :any_skip_relocation, big_sur:        "34c84caff2c8b54062f72bce223b5680f07c2ad0af1fb533fd3a553440073143"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3dd362dea1ff8fd0db3d9a4c36cb12f86e77f5deccefad7a194199b065b49122"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5510040b64f0a9cf2d310a27e0c1a82b3eb130e89774f685983352d6cd1974fd"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f226e3ccae486d4c57366a9254fb58143b105d3f8cff38128eccad8931d8ef27"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "8d8df45e31f040c10abe32e453752a8936f8b243f55f055acf5f13901c8a63b0"
+    sha256 cellar: :any_skip_relocation, sonoma:        "d3d8349c104fda7ea2f942bc7cd78ad0a9a51e3f6993ecbe0864e79e89761a74"
+    sha256 cellar: :any_skip_relocation, ventura:       "24f04b4289b7c9e33d87dafd6fe1a50f6d7eb74793af7b5ab632bf135b8c8531"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b58d850ad1c83658290b87b0399b221f6d8c6bb6080de122f52cc06f4df29ba9"
   end
 
   depends_on "go" => :build
 
+  conflicts_with "rush", because: "both install `rush` binaries"
+
   def install
-    system "go", "build", *std_go_args(output: bin/"rush")
+    system "go", "build", *std_go_args(ldflags: "-s -w", output: bin/"rush")
   end
 
   test do

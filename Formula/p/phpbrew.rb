@@ -1,23 +1,23 @@
 class Phpbrew < Formula
   desc "Brew & manage PHP versions in pure PHP at HOME"
   homepage "https://phpbrew.github.io/phpbrew"
-  url "https://github.com/phpbrew/phpbrew/releases/download/2.1.0/phpbrew.phar"
-  sha256 "0f8f55bb31f6680ad3b9703cddb46d9c5186ea67778fc1896b35f44569d9d006"
+  url "https://github.com/phpbrew/phpbrew/releases/download/2.2.0/phpbrew.phar"
+  sha256 "3247b8438888827d068542b2891392e3beffebe122f4955251fa4f9efa0da03d"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e20e3587cdb7bb9d7c599b3c6c886741175f816e15119342408db805d1040afc"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e20e3587cdb7bb9d7c599b3c6c886741175f816e15119342408db805d1040afc"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e20e3587cdb7bb9d7c599b3c6c886741175f816e15119342408db805d1040afc"
-    sha256 cellar: :any_skip_relocation, ventura:        "0d565cc6354d5b0a0061356412f79ad79560072774a4bfbc1eb240f80e87c8eb"
-    sha256 cellar: :any_skip_relocation, monterey:       "0d565cc6354d5b0a0061356412f79ad79560072774a4bfbc1eb240f80e87c8eb"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0d565cc6354d5b0a0061356412f79ad79560072774a4bfbc1eb240f80e87c8eb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ff8a8974f572904d08b66360b914c9198b632e6dcfee59a27e3d0db97aeb1638"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "5313331a47dc3d43289333b1a1345dd53fcfd6b1cff99db2ee2483302288b1d8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "5313331a47dc3d43289333b1a1345dd53fcfd6b1cff99db2ee2483302288b1d8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5313331a47dc3d43289333b1a1345dd53fcfd6b1cff99db2ee2483302288b1d8"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5313331a47dc3d43289333b1a1345dd53fcfd6b1cff99db2ee2483302288b1d8"
+    sha256 cellar: :any_skip_relocation, sonoma:         "593e3afb0ab7517aba5f5576cb14b11ef5c1f58de3d6707688d1d6a751835b3f"
+    sha256 cellar: :any_skip_relocation, ventura:        "593e3afb0ab7517aba5f5576cb14b11ef5c1f58de3d6707688d1d6a751835b3f"
+    sha256 cellar: :any_skip_relocation, monterey:       "593e3afb0ab7517aba5f5576cb14b11ef5c1f58de3d6707688d1d6a751835b3f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5313331a47dc3d43289333b1a1345dd53fcfd6b1cff99db2ee2483302288b1d8"
   end
 
-  # TODO: When `php` 8.2+ support is landed, switch back to `php`.
-  # https://github.com/phpbrew/phpbrew/blob/#{version}/composer.json#L27
-  depends_on "php@8.1"
+  depends_on "php"
 
   # Keg-relocation breaks the formula when it replaces `/usr/local` with a non-default prefix
   on_macos do
@@ -27,14 +27,7 @@ class Phpbrew < Formula
   end
 
   def install
-    # When switched back to `php`, use `bin.install` instead.
-    # bin.install "phpbrew.phar" => "phpbrew"
-
-    libexec.install "phpbrew.phar"
-    (bin/"phpbrew").write <<~EOS
-      #!#{Formula["php@8.1"].opt_bin}/php
-      <?php require '#{libexec}/phpbrew.phar';
-    EOS
+    bin.install "phpbrew.phar" => "phpbrew"
   end
 
   test do

@@ -1,8 +1,8 @@
 class Mpop < Formula
   desc "POP3 client"
   homepage "https://marlam.de/mpop/"
-  url "https://marlam.de/mpop/releases/mpop-1.4.18.tar.xz"
-  sha256 "6099950184f7d094a782d1e7ab9833736f12308d34a544a59b46a8471d9f85b7"
+  url "https://marlam.de/mpop/releases/mpop-1.4.21.tar.xz"
+  sha256 "4ca0d1e0d01366fe3e0cf490d88d154df511278fb595638713be3ca675665855"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,22 +11,21 @@ class Mpop < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "0cb57fca35ffe7fddc6e474f81ab63b60555dffe4202a86ab9fa741c784e1b49"
-    sha256 arm64_monterey: "ca57144cd013c41caa043663fb211fb21dbeaa965cf788393a8f7e96e83dcb1d"
-    sha256 arm64_big_sur:  "fd748cc2f7d85ff93240a1941ab5320a14a05676c51e922c6fd12362a2f3f339"
-    sha256 ventura:        "f4846cf9268fe45b354912dc8353effe2e1bc0b329887291b036ce5953ea3195"
-    sha256 monterey:       "d32f190cdde4f59a0a16ea5981ad7f837988dd52ac49d6c29431f7aace86ac61"
-    sha256 big_sur:        "fcd3897a5efca4a72b8dac253f2937c228e2a4efc269d602ba011074ea070e39"
-    sha256 x86_64_linux:   "9dfed437057c0932e7c85990a5417a81d5c6262d588925d089c0da66a10a0e23"
+    sha256 arm64_sequoia: "150ff82a6b04b43d23e1bd2dd829aada62ce3ea5d9b3fed02b39576f4f63e54a"
+    sha256 arm64_sonoma:  "1153dc80d795fce29566e64d3ef7f2af6f87576253da13a43328713ba7251a06"
+    sha256 arm64_ventura: "2d583441a27b2a280df6638d0f84f3b13a36c3636a8dd688ec85ba452fccb0f4"
+    sha256 sonoma:        "1f53b046ff585b6881305ed39356cf3f17183634e0c36d2efe9368e4cf00c9a2"
+    sha256 ventura:       "1d439effaaa6da0bbc6ec4a4ecc99bda8ee74e7424f368f06de36a16a597da5f"
+    sha256 x86_64_linux:  "2e1ee9de528062ddb2bbe3e5338e6b8856bfa295c5afd755d77574e3adc3e69d"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gettext"
   depends_on "gnutls"
   depends_on "libidn2"
 
   def install
-    system "./configure", "--prefix=#{prefix}", "--disable-dependency-tracking"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

@@ -1,15 +1,18 @@
 class Fpdns < Formula
   desc "Fingerprint DNS server versions"
   homepage "https://github.com/kirei/fpdns"
-  url "https://github.com/kirei/fpdns/archive/20190131.tar.gz"
+  url "https://github.com/kirei/fpdns/archive/refs/tags/20190131.tar.gz"
   sha256 "f6599ebed73c2d87d7c2bafc8c3a63fb76bda52478e9a1912410d481f7536100"
   license "BSD-3-Clause"
   head "https://github.com/kirei/fpdns.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "4e0d682473c047769e42d96bc148da4958e6e0f3cf7d7c21810246614da0b922"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "3a486095c74d7d69245c053fe75de78305f5f7a78889b51c82b5c5abe6df4f88"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "fb77e083c32bc72c0f52807fd1ff356ef7fe5f2513e19e7a21df53fa714bd4f8"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "913d16a19cc4f3da646f509dd0a3f392949171f915811e351b375d2534c821cc"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3b622516234b6e929c375a741e0024467632a691cab2e61f86044b6553b5d394"
+    sha256 cellar: :any_skip_relocation, sonoma:         "9f1a1eff8dec9b89a6171124a0d22a283822cc64addf0c6303eb429ccfc98a7a"
     sha256 cellar: :any_skip_relocation, ventura:        "135e95b0470401a3a650251c06a28f55f30b0ce50e69ec15fc9a0aeaada9e451"
     sha256 cellar: :any_skip_relocation, monterey:       "6449eb8bcfee73a6f2c8149075a8f9e04953cff9989a2622511190ddbb5649a1"
     sha256 cellar: :any_skip_relocation, big_sur:        "b0dcb11f28f97cf7ecb129a0e7ecbcd91bb8b60ffe9091fc690da73bf6a88b29"
@@ -18,6 +21,8 @@ class Fpdns < Formula
     sha256 cellar: :any_skip_relocation, high_sierra:    "0de082e3b044641f04bdc018b5a720c89f1ae3f24340c1bc6bfb88fbe0c3f79f"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "68319dfe4e90d4370c9571a6b540536ff203da441bdf83b387818a1c6b6eed8d"
   end
+
+  deprecate! date: "2024-10-02", because: :repo_archived
 
   uses_from_macos "perl"
 

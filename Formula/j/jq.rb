@@ -1,8 +1,8 @@
 class Jq < Formula
   desc "Lightweight and flexible command-line JSON processor"
   homepage "https://jqlang.github.io/jq/"
-  url "https://github.com/jqlang/jq/releases/download/jq-1.7/jq-1.7.tar.gz"
-  sha256 "402a0d6975d946e6f4e484d1a84320414a0ff8eb6cf49d2c11d144d4d344db62"
+  url "https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-1.7.1.tar.gz"
+  sha256 "478c9ca129fd2e3443fe27314b455e211e0d8c60bc8ff7df703873deeee580c2"
   license "MIT"
 
   livecheck do
@@ -11,15 +11,15 @@ class Jq < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "fe0e7ed9a1407256a50afe7f49af6018f450a6e2bf04d47eafec60f1f63111ac"
-    sha256 cellar: :any,                 arm64_ventura:  "976b252c6a3f6dfa2531ee1459718ab7a8338ac4fb84edacd6f6d55743713a16"
-    sha256 cellar: :any,                 arm64_monterey: "c702eade07a9a6914fc3aa075d89ccca3afc2d4ea77bee895f233ca4479e570d"
-    sha256 cellar: :any,                 arm64_big_sur:  "d121938e0e87bd80584f6b452b29ac22cde7acca0b15ed3e91f8fd1d3c9014eb"
-    sha256 cellar: :any,                 sonoma:         "8d0493297afbb4ae6131c51e4eed0369cf3aaacf0f845f6cca078b6201a7288b"
-    sha256 cellar: :any,                 ventura:        "e4b23ebcff759f57e62e2573359ccb62e8e3426a1237082bf3301843230d3094"
-    sha256 cellar: :any,                 monterey:       "748e1d8825d2961e082d412583e6e7b6e60ad75408325e976516c0db266720fe"
-    sha256 cellar: :any,                 big_sur:        "0edbe8f1792bd794762018699592fe24d4aac01a2de369a4c4a4e25b96bc213f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9dfc7c926478acd7652b60300155adf5df9a0afbb4f9fe1a838793529d968ca0"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "a10c82b07e393869d4467ad3e8ba26346d026b1ad3533d31dbb5e72abe9a7968"
+    sha256 cellar: :any,                 arm64_sonoma:   "7d01bc414859db57e055c814daa10e9c586626381ea329862ad4300f9fee78ce"
+    sha256 cellar: :any,                 arm64_ventura:  "b1a185e72ca020f08a8de22fabe1ad2425bf48d2e0378c5e07a6678020fa3e15"
+    sha256 cellar: :any,                 arm64_monterey: "8f8c06332f413f5259b360ed65dc3ef21b5d3f2fff35160bc12367e53cbd06bf"
+    sha256 cellar: :any,                 sonoma:         "6bc01de99fd7f091b86880534842132a876f2d3043e3932ea75efc5f51c40aea"
+    sha256 cellar: :any,                 ventura:        "03227348d3845fe16ed261ad020402c1f23c56e73f65799ce278af4bac63c799"
+    sha256 cellar: :any,                 monterey:       "25aab2c539a41e4d67cd3d44353aac3cdd159ea815fec2b8dd82fbf038c559cc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9559d8278cf20ad0294f2059855e1bc9d2bcabfd2bd5b5774c66006d1f201ad8"
   end
 
   head do

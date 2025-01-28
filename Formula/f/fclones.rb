@@ -1,18 +1,19 @@
 class Fclones < Formula
   desc "Efficient Duplicate File Finder"
   homepage "https://github.com/pkolaczk/fclones"
-  url "https://github.com/pkolaczk/fclones/archive/refs/tags/v0.32.1.tar.gz"
-  sha256 "313d4dad30ed1db4d74abd78f30a7a9917c361918d2bc6d84c9d97a2a8c7c5cb"
+  url "https://github.com/pkolaczk/fclones/archive/refs/tags/v0.34.0.tar.gz"
+  sha256 "5e8c94bb5fb313a5c228bdc870cf6605487338f31c5a14305e54e7e3ac15d0ad"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9067e8185d41cf16f5d3bc29fdc2b3ce8f4edad185b3c9ec383ab06aa811cca0"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "03eff43c5ae76de8a591cc95a73ea5e0c65a689677d88e09f916da80606fa35b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "14f6717c129313c4d7547dbd9019045d2a1104c42bbe5885350c84ddc7ab15ee"
-    sha256 cellar: :any_skip_relocation, ventura:        "d5c29c8cde27f210b3980b15956bd1324c659e0c3651bf47db9038ff5295d901"
-    sha256 cellar: :any_skip_relocation, monterey:       "e36b45ce1b8df565f6d3cad2524457cc5ac8ce8052f37b515b2f9f22c1dd17ce"
-    sha256 cellar: :any_skip_relocation, big_sur:        "6d92e888eb4d5636bf721e3cf195d2d8228a2ca3e1d4362dafa1e2d2469dc0a6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8fb8949117746fa9a7d854b2f075c7ca21397f257ae46e39a6e1bfad5202a4e8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "066372287675aca1dc5b9235734ad7eacd79945e6ace1992ba97fde2241e6701"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d720767853cc23dd6fb8a35008d39c8b005f99b367c0d260b1197d1a9d4c19dd"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "16fa6fb02ca993ef54bd942f18860dd602ea04946149c296fabaaecde93dd55c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "68841eacebe1435bb4e39325ed55522bc51d8668ceeb7f108fb9482c7c32f49f"
+    sha256 cellar: :any_skip_relocation, sonoma:         "87e479b0556ee718fa992c697584d1c64eb6e8d55c1fc30ce0d2851179bff293"
+    sha256 cellar: :any_skip_relocation, ventura:        "30095d67ac23b747bddc931e8a083394809b22e7a479f390d50b234a7e045481"
+    sha256 cellar: :any_skip_relocation, monterey:       "dc7a8ba4486994b7296fda40c49d0df7c7178042b55677ec64a333ff9e7455f0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "774daef5f511aac75797d39d11b8076ab58a6e004fbb604dc4a4fd7ca1c2d802"
   end
 
   depends_on "rust" => :build

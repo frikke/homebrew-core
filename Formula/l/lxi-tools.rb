@@ -1,42 +1,51 @@
 class LxiTools < Formula
   desc "Open source tools for managing network attached LXI compatible instruments"
   homepage "https://github.com/lxi-tools/lxi-tools"
-  url "https://github.com/lxi-tools/lxi-tools/archive/refs/tags/v2.7.tar.gz"
-  sha256 "6196980e82be2d143aa7f52e8e4612866b570cfce225d7d61698d2eeb1bf8a00"
+  url "https://github.com/lxi-tools/lxi-tools/archive/refs/tags/v2.8.tar.gz"
+  sha256 "ef9d013189c9449f850d467dd35ac3840929e76a888cdb77e0edbce067da0b2d"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1ca1f9223772ee912d686f6652c7b699324850fb4dccc03d5a77be23c66afcf3"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b6090dd52015d0d7d17a705742793a8986b9339d5e2c9aed7595f0a9b142b992"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f1531d09c7f93a01b13b413a708f076c05c08c828c6e42092cd8e670c8aca36c"
-    sha256 cellar: :any_skip_relocation, ventura:        "69b704762e5a07d767978da9109a8980bcf86374c4d537b5eb034f7dbdd31413"
-    sha256 cellar: :any_skip_relocation, monterey:       "acd842a43b3b4c9e2476728f8e40884b701d31c6a85452559cb61a89adfbc0ce"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b9bcbc6c149c2ca24dbcb1cae8f07b0ccba087cd1d6fe4c2ebe1b479b17fe842"
-    sha256                               x86_64_linux:   "4dd930cc0b1e29dbdbe11595e0112fd420729776cf0dedcdb76bc73d092a1df6"
+    sha256 cellar: :any, arm64_sequoia: "be6069943c2ea42d4bbe08093d302097c6b845daf5715a3c48fe53fc6af9d613"
+    sha256 cellar: :any, arm64_sonoma:  "aa7dcfd5abb6be73394e6de4e178852da17b4d77c9e2ac92e0526e166f8aa146"
+    sha256 cellar: :any, arm64_ventura: "2d6da719bc67d07ecaa3c90eba4adfb710287f1a658dc6f430c7218ca47a5cfe"
+    sha256 cellar: :any, sonoma:        "2072bc9693447a72bf3fa53f4b7fe44e1eaae6d86c7f451b51005a5613b20182"
+    sha256 cellar: :any, ventura:       "1007e5d715fa7d3dd46a13354eb0403e21de7062914650da8ebd4b0d58011678"
+    sha256               x86_64_linux:  "ec4ad53dd83db6db87bae92862f289e2e098aabaf94a2c1f056562e9b8b6293f"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
+  depends_on "cairo"
   depends_on "desktop-file-utils"
+  depends_on "gdk-pixbuf"
+  depends_on "glib"
+  depends_on "gtk4"
   depends_on "gtksourceview5"
   depends_on "hicolor-icon-theme"
   depends_on "json-glib"
   depends_on "libadwaita"
   depends_on "liblxi"
   depends_on "lua"
+  depends_on "readline"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
+    ENV["DESTDIR"] = "/"
     system "meson", "setup", "build", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
-    rm_f "#{share}/glib-2.0/schemas/gschemas.compiled"
   end
 
   def post_install
-    system "#{Formula["glib"].opt_bin}/glib-compile-schemas", "#{HOMEBREW_PREFIX}/share/glib-2.0/schemas"
-    system "#{Formula["gtk4"].opt_bin}/gtk4-update-icon-cache", "-f", "-t", "#{HOMEBREW_PREFIX}/share/icons/hicolor"
+    system Formula["glib"].opt_bin/"glib-compile-schemas", HOMEBREW_PREFIX/"share/glib-2.0/schemas"
+    system Formula["gtk4"].opt_bin/"gtk4-update-icon-cache", "-f", "-t", HOMEBREW_PREFIX/"share/icons/hicolor"
+    system Formula["desktop-file-utils"].opt_bin/"update-desktop-database", HOMEBREW_PREFIX/"share/applications"
   end
 
   test do

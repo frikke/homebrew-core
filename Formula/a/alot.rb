@@ -3,21 +3,22 @@ class Alot < Formula
 
   desc "Text mode MUA using notmuch mail"
   homepage "https://github.com/pazz/alot"
-  url "https://github.com/pazz/alot/archive/0.10.tar.gz"
-  sha256 "71f382aa751fb90fde1a06a0a4ba43628ee6aa6d41b5cd53c8701fd7c5ab6e6e"
+  # TODO: check if we can remove `standard-mailcap` from pypi_formula_mappings.json
+  # https://github.com/pazz/alot/issues/1632
+  url "https://github.com/pazz/alot.git",
+      tag:      "0.11",
+      revision: "a8a108e2344656a13bca21211ccc0df2414cbef6"
   license "GPL-3.0-only"
-  revision 2
+  revision 1
   head "https://github.com/pazz/alot.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cbc27be19820f2ed61e791dd3e2c8971fd774958e1138c6f8d9bc75a51de3246"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "904705776c6822e74b2ccd669522d0d5d8ebc50d897d84ae4a18d224e94369e0"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dc3065c6a113ae5444dd8773b756f0bab98e22d01e9d453dcd47c61273ecb74c"
-    sha256 cellar: :any_skip_relocation, ventura:        "6dcfd106f5fc14934312343aa07ed2832d1b3f687c898ad68875ef0d50366810"
-    sha256 cellar: :any_skip_relocation, monterey:       "cdcfffd6db99d900cd0b400c0fda246ca55d6eb03e03cd2a65dc74481197f48e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "911f53e8988cb79626167fd5a7ec16aa8597f0729bc334217a193a29872e9263"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "38f7d297ebe88d841b19c3ad745661e2ca0b7e75129f99e1d166cb0883c2fb8f"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ff5d90b1a2b335e78f0a2a26a452dcc05620ec910645330ea7fd9be8cdf72152"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "78e840e2fafaac627380575d0e855ee986af666c7f5603c605eb2d4b272cf268"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1a6ce0bd0798bca5bd5eaf719c839525208847eecc968cfd29d28ece2e63394a"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9365d1c64fbc74200b5e64d8a4bdf04666d4e1775c4d5c9e626aed0faf783acc"
+    sha256 cellar: :any_skip_relocation, ventura:       "a999f33e1e8db8fa7d588e448395f6e2816a6ee3a88ed031580cf81331854f08"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b9fe0e18bbd0fde515a158f77ba00c50045f1e3b60d1bd2b36da91be030214a7"
   end
 
   depends_on "sphinx-doc" => :build
@@ -25,28 +26,26 @@ class Alot < Formula
   depends_on "gpgme"
   depends_on "libmagic"
   depends_on "notmuch"
-  depends_on "python-typing-extensions"
-  depends_on "python@3.11"
-  depends_on "six"
+  depends_on "python@3.13"
 
   resource "attrs" do
-    url "https://files.pythonhosted.org/packages/1a/cb/c4ffeb41e7137b23755a45e1bfec9cbb76ecf51874c6f1d113984ecaa32c/attrs-22.1.0.tar.gz"
-    sha256 "29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6"
+    url "https://files.pythonhosted.org/packages/fc/0f/aafca9af9315aee06a89ffde799a10a582fe8de76c563ee80bbcdc08b3fb/attrs-24.2.0.tar.gz"
+    sha256 "5cfb1b9148b5b086569baec03f20d7b6bf3bcacc9a42bebf87ffaaca362f6346"
   end
 
-  resource "Automat" do
-    url "https://files.pythonhosted.org/packages/7a/7b/9c3d26d8a0416eefbc0428f168241b32657ca260fb7ef507596ff5c2f6c4/Automat-22.10.0.tar.gz"
-    sha256 "e56beb84edad19dcc11d30e8d9b895f75deeb5ef5e96b84a467066b3b84bb04e"
+  resource "automat" do
+    url "https://files.pythonhosted.org/packages/8d/2d/ede4ad7fc34ab4482389fa3369d304f2fa22e50770af706678f6a332fa82/automat-24.8.1.tar.gz"
+    sha256 "b34227cf63f6325b8ad2399ede780675083e439b20c323d376373d8ee6306d88"
   end
 
   resource "configobj" do
-    url "https://files.pythonhosted.org/packages/64/61/079eb60459c44929e684fa7d9e2fdca403f67d64dd9dbac27296be2e0fab/configobj-5.0.6.tar.gz"
-    sha256 "a2f5650770e1c87fb335af19a9b7eb73fc05ccf22144eb68db7d00cd2bcb0902"
+    url "https://files.pythonhosted.org/packages/cb/87/17d4c6d634c044ab08b11c0cd2a8a136d103713d438f8792d7be2c5148fb/configobj-5.0.8.tar.gz"
+    sha256 "6f704434a07dc4f4dc7c9a745172c1cad449feb548febd9f7fe362629c627a97"
   end
 
   resource "constantly" do
-    url "https://files.pythonhosted.org/packages/95/f1/207a0a478c4bb34b1b49d5915e2db574cadc415c9ac3a7ef17e29b2e8951/constantly-15.1.0.tar.gz"
-    sha256 "586372eb92059873e29eba4f9dec8381541b4d3834660707faf8ba59146dfc35"
+    url "https://files.pythonhosted.org/packages/4d/6f/cb2a94494ff74aa9528a36c5b1422756330a75a8367bf20bd63171fc324d/constantly-23.10.4.tar.gz"
+    sha256 "aa92b70a33e2ac0bb33cd745eb61776594dc48764b06c35e0efd050b7f1c7cbd"
   end
 
   resource "hyperlink" do
@@ -55,13 +54,18 @@ class Alot < Formula
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz"
-    sha256 "814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"
+    url "https://files.pythonhosted.org/packages/00/6f/93e724eafe34e860d15d37a4f72a1511dd37c43a76a8671b22a15029d545/idna-3.9.tar.gz"
+    sha256 "e5c5dafde284f26e9e0f28f6ea2d6400abd5ca099864a67f576f3981c6476124"
   end
 
   resource "incremental" do
-    url "https://files.pythonhosted.org/packages/86/42/9e87f04fa2cd40e3016f27a4b4572290e95899c6dce317e2cdb580f3ff09/incremental-22.10.0.tar.gz"
-    sha256 "912feeb5e0f7e0188e6f42241d2f450002e11bbc0937c65865045854c24c0bd0"
+    url "https://files.pythonhosted.org/packages/27/87/156b374ff6578062965afe30cc57627d35234369b3336cf244b240c8d8e6/incremental-24.7.2.tar.gz"
+    sha256 "fb4f1d47ee60efe87d4f6f0ebb5f70b9760db2b2574c59c8e8912be4ebd464c9"
+  end
+
+  resource "mock" do
+    url "https://files.pythonhosted.org/packages/66/ab/41d09a46985ead5839d8be987acda54b5bb93f713b3969cc0be4f81c455b/mock-5.1.0.tar.gz"
+    sha256 "5e96aad5ccda4718e0a229ed94b2024df75cc2d55575ba5762d31f5767b8767d"
   end
 
   resource "python-magic" do
@@ -69,14 +73,34 @@ class Alot < Formula
     sha256 "c1ba14b08e4a5f5c31a302b7721239695b2f0f058d125bd5ce1ee36b9d9d3c3b"
   end
 
-  resource "Twisted" do
-    url "https://files.pythonhosted.org/packages/b2/ce/cbb56597127b1d51905b0cddcc3f314cc769769efc5e9a8a67f4617f7bca/Twisted-22.10.0.tar.gz"
-    sha256 "32acbd40a94f5f46e7b42c109bfae2b302250945561783a8b7a059048f2d4d31"
+  resource "setuptools" do
+    url "https://files.pythonhosted.org/packages/3e/2c/f0a538a2f91ce633a78daaeb34cbfb93a54bd2132a6de1f6cec028eee6ef/setuptools-74.1.2.tar.gz"
+    sha256 "95b40ed940a1c67eb70fc099094bd6e99c6ee7c23aa2306f4d2697ba7916f9c6"
+  end
+
+  resource "six" do
+    url "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz"
+    sha256 "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"
+  end
+
+  resource "standard-mailcap" do
+    url "https://files.pythonhosted.org/packages/53/e8/672bd621c146b89667a2bfaa58a1384db13cdd62bb7722ddb8d672bf7a75/standard_mailcap-3.13.0.tar.gz"
+    sha256 "19ed7955dbeaccb35e8bb05b2b5443ce55c1f932a8cbe7a5c13d42f9db4f499a"
+  end
+
+  resource "twisted" do
+    url "https://files.pythonhosted.org/packages/8b/bf/f30eb89bcd14a21a36b4cd3d96658432d4c590af3c24bbe08ea77fa7bbbb/twisted-24.7.0.tar.gz"
+    sha256 "5a60147f044187a127ec7da96d170d49bcce50c6fd36f594e60f4587eff4d394"
+  end
+
+  resource "typing-extensions" do
+    url "https://files.pythonhosted.org/packages/df/db/f35a00659bc03fec321ba8bce9420de607a1d37f8342eee1863174c69557/typing_extensions-4.12.2.tar.gz"
+    sha256 "1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"
   end
 
   resource "urwid" do
-    url "https://files.pythonhosted.org/packages/94/3f/e3010f4a11c08a5690540f7ebd0b0d251cc8a456895b7e49be201f73540c/urwid-2.1.2.tar.gz"
-    sha256 "588bee9c1cb208d0906a9f73c613d2bd32c3ed3702012f51efe318a3f2127eae"
+    url "https://files.pythonhosted.org/packages/85/b7/516b0bbb7dd9fc313c6443b35d86b6f91b3baa83d2c4016e4d8e0df5a5e3/urwid-2.6.15.tar.gz"
+    sha256 "9ecc57330d88c8d9663ffd7092a681674c03ff794b6330ccfef479af7aa9671b"
   end
 
   resource "urwidtrees" do
@@ -84,24 +108,25 @@ class Alot < Formula
     sha256 "50b19c06b03a5a73e561757a26d449cfe0c08afabe5c0f3cd4435596bdddaae9"
   end
 
+  resource "wcwidth" do
+    url "https://files.pythonhosted.org/packages/6c/63/53559446a878410fc5a5974feb13d31d78d752eb18aeba59c7fef1af7598/wcwidth-0.2.13.tar.gz"
+    sha256 "72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5"
+  end
+
   resource "zope-interface" do
-    url "https://files.pythonhosted.org/packages/38/6f/fbfb7dde38be7e5644bb342c4c7cdc444cd5e2ffbd70d091263b3858a8cb/zope.interface-5.5.2.tar.gz"
-    sha256 "bfee1f3ff62143819499e348f5b8a7f3aa0259f9aca5e0ddae7391d059dce671"
+    url "https://files.pythonhosted.org/packages/c8/83/7de03efae7fc9a4ec64301d86e29a324f32fe395022e3a5b1a79e376668e/zope.interface-7.0.3.tar.gz"
+    sha256 "cd2690d4b08ec9eaf47a85914fe513062b20da78d10d6d789a792c0b20307fb1"
   end
 
   def install
-    virtualenv_install_with_resources
-
-    # Add path configuration file to use notmuch CFFI bindings
-    site_packages = Language::Python.site_packages("python3.11")
-    pth_contents = "import site; site.addsitedir('#{Formula["notmuch"].opt_libexec/site_packages}')\n"
-    (libexec/site_packages/"homebrew-notmuch2.pth").write pth_contents
+    venv = virtualenv_install_with_resources
 
     pkgshare.install Pathname("extra").children - [Pathname("extra/completion")]
     zsh_completion.install "extra/completion/alot-completion.zsh" => "_alot"
 
     ENV["LC_ALL"] = "en_US.UTF-8"
     ENV["SPHINXBUILD"] = Formula["sphinx-doc"].opt_bin/"sphinx-build"
+    ENV.prepend_path "PYTHONPATH", venv.site_packages
     cd "docs" do
       system "make", "pickle"
       system "make", "man", "html"

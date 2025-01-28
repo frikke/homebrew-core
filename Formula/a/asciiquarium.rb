@@ -1,14 +1,10 @@
-require "language/perl"
-
 class Asciiquarium < Formula
-  include Language::Perl::Shebang
-
   desc "Aquarium animation in ASCII art"
   homepage "https://robobunny.com/projects/asciiquarium/html/"
   url "https://robobunny.com/projects/asciiquarium/asciiquarium_1.1.tar.gz"
   sha256 "1b08c6613525e75e87546f4e8984ab3b33f1e922080268c749f1777d56c9d361"
   license "GPL-2.0-or-later"
-  revision 4
+  revision 5
 
   livecheck do
     url "https://robobunny.com/projects/asciiquarium/"
@@ -16,22 +12,23 @@ class Asciiquarium < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "eaeef5f718e5346acce2ce6680d3970a3d8e7e7f6ee0ea0a4a58ca0e4b2d0c60"
-    sha256 cellar: :any,                 arm64_monterey: "bffaf8931358ce91194a050df4d70785d1675ae86a13abf16039a6633961e59c"
-    sha256 cellar: :any,                 arm64_big_sur:  "054f9401007de6e17d4ed642bb4c38490fcbf72713e6357b0269ee0f3e538e36"
-    sha256 cellar: :any,                 ventura:        "4d723f7505af54bf515aa127a673d5a700e1f04573214826b43f7fb323c7c816"
-    sha256 cellar: :any,                 monterey:       "6dd99c8969cd14a6ab694d9fc3df4ce29bd6b262aefc04af71714e26e081577b"
-    sha256 cellar: :any,                 big_sur:        "3328f27bbb4cecfb62236e12fcac7f0f101c21d3843533d9d687f1d8892ebe73"
-    sha256 cellar: :any,                 catalina:       "20b7a67f26033299553cbcc66e01f75510ee16f384d670a92546c282349865b2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5c6e8ffdf5b6f3578234c833129b28cdefe9055980c391ca069aa9d69c85f7dd"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "080079f96aa210857f68ea0e376ce057dca85875e94df0a2da695559d37d08e9"
+    sha256 cellar: :any,                 arm64_sonoma:   "059912db660f5e55c48c425c6c227f9122d02055e13bdaf1633ce39e0a4f575e"
+    sha256 cellar: :any,                 arm64_ventura:  "6f9aa92e662714c05c5abebf715071a583eafdc0f639a1d0230a66043d28d088"
+    sha256 cellar: :any,                 arm64_monterey: "025b86916160e616180c3c84e58dbe678dafc777704d66ce9d7a2ba07df5241e"
+    sha256 cellar: :any,                 sonoma:         "821f581063ff102904f53455f6f7c412e060a0da3be1563dae89fe592b613986"
+    sha256 cellar: :any,                 ventura:        "d1774d0ec6069c399b4a40e49e7f98f7df94fa51b3f6ddd3a402e14c96c34f2b"
+    sha256 cellar: :any,                 monterey:       "0e107b8988ca4b01b6a7df53abb9fd894447836f3bca8af95528c5a26ca1da76"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c07d0ae91d74691fa184d850d1444412042d9302d52ef44c37f14ab6f00cb433"
   end
 
   depends_on "ncurses"
   depends_on "perl"
 
   resource "Curses" do
-    url "https://cpan.metacpan.org/authors/id/G/GI/GIRAFFED/Curses-1.37.tar.gz"
-    sha256 "74707ae3ad19b35bbefda2b1d6bd31f57b40cdac8ab872171c8714c88954db20"
+    url "https://cpan.metacpan.org/authors/id/G/GI/GIRAFFED/Curses-1.45.tar.gz"
+    sha256 "84221e0013a2d64a0bae6a32bb44b1ae5734d2cb0465fb89af3e3abd6e05aeb2"
   end
 
   resource "Term::Animation" do
@@ -45,15 +42,9 @@ class Asciiquarium < Formula
     resources.each do |r|
       r.stage do
         system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}"
-        system "make"
         system "make", "install"
       end
     end
-
-    # Disable dynamic selection of perl which may cause segfault when an
-    # incompatible perl is picked up.
-    # https://github.com/Homebrew/homebrew-core/issues/4936
-    rewrite_shebang detected_perl_shebang, "asciiquarium"
 
     chmod 0755, "asciiquarium"
     bin.install "asciiquarium"
@@ -76,7 +67,7 @@ class Asciiquarium < Formula
     require "pty"
     ENV["TERM"] = "xterm"
     PTY.spawn(bin/"asciiquarium") do |stdout, stdin, _pid|
-      sleep 1
+      sleep 5
       stdin.write "q"
       output = begin
         stdout.gets

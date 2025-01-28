@@ -1,8 +1,8 @@
 class Lilypond < Formula
   desc "Music engraving system"
   homepage "https://lilypond.org"
-  url "https://lilypond.org/download/sources/v2.24/lilypond-2.24.2.tar.gz"
-  sha256 "7944e610d7b4f1de4c71ccfe1fbdd3201f54fac54561bdcd048914f8dbb60a48"
+  url "https://lilypond.org/download/sources/v2.24/lilypond-2.24.4.tar.gz"
+  sha256 "e96fa03571c79f20e1979653afabdbe4ee42765a3d9fd14953f0cd9eea51781c"
   license all_of: [
     "GPL-3.0-or-later",
     "GPL-3.0-only",
@@ -20,13 +20,13 @@ class Lilypond < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "b973ba76a36b81950caa232b10148e2c0d43e62f0def6677e6b19aa40da15552"
-    sha256 arm64_monterey: "5732abb8072a696dda9cbfb272f7d8c5ad6f332ebfb7a7eaa70ef1936b0fe5b7"
-    sha256 arm64_big_sur:  "b95ab74431437c46a3f382c4811feb154071f2959dd19dcde23329c51f8fbb54"
-    sha256 ventura:        "6849dd72a19388dd6df520c49ffc340b0fdccecea03bf8157ff41c59be8e0ce1"
-    sha256 monterey:       "408f15cc55d732483e7ed346914689557ca38a9190b1815b8ee6da3ef65a32a1"
-    sha256 big_sur:        "a5412b0836cbcce70f3dcfd6cf0923f65d10e215ce98fc4db20a70028b257ea4"
-    sha256 x86_64_linux:   "4e9a9887ae7ee6205a6c5b85a2e2ab69b46b75676781228910bb3ad780a7d794"
+    rebuild 1
+    sha256 arm64_sequoia: "186ccba4e185bdb0160e66bc68c4e70594d77b9d18a863718886667817b0f8b0"
+    sha256 arm64_sonoma:  "80da0e56c2e27506e4a82b7cfcdfe9ca5e819ce2a52bc9c1cbdcc597557862db"
+    sha256 arm64_ventura: "38a76fb76615646d4b43b6578d368fac8daee24834dc049ea0f50ffaeca73b33"
+    sha256 sonoma:        "b31020b0176335c832d55556e5709b45b54ac04b2c0d04129d16a6a25ef8e6e7"
+    sha256 ventura:       "a4112ff2f62a0b79a6de8ba3c34db2167d0076949ac617eeb81f9335dd461607"
+    sha256 x86_64_linux:  "d3bd2174c750e48ee24e19959f3587eaeaca0e155ba8d8dc973e3d43511d89d5"
   end
 
   head do
@@ -35,24 +35,35 @@ class Lilypond < Formula
     mirror "https://git.savannah.gnu.org/git/lilypond.git"
 
     depends_on "autoconf" => :build
+    depends_on "make" => :build # make >= 4.2 is required
   end
 
   depends_on "bison" => :build # bison >= 2.4.1 is required
   depends_on "fontforge" => :build
-  depends_on "gettext" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "t1utils" => :build
   depends_on "texinfo" => :build # makeinfo >= 6.1 is required
   depends_on "texlive" => :build
+  depends_on "bdw-gc"
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "ghostscript"
+  depends_on "glib"
   depends_on "guile"
   depends_on "pango"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   uses_from_macos "flex" => :build
   uses_from_macos "perl" => :build
+
+  on_macos do
+    depends_on "gettext"
+    depends_on "harfbuzz"
+  end
+
+  on_linux do
+    depends_on "gettext" => :build
+  end
 
   resource "font-urw-base35" do
     url "https://github.com/ArtifexSoftware/urw-base35-fonts/archive/refs/tags/20200910.tar.gz"
@@ -64,7 +75,7 @@ class Lilypond < Formula
 
     system "./configure", "--datadir=#{share}",
                           "--disable-documentation",
-                          "--with-flexlexer-dir=#{Formula["flex"].include}",
+                          *("--with-flexlexer-dir=#{Formula["flex"].include}" if OS.linux?),
                           "GUILE_FLAVOR=guile-3.0",
                           *std_configure_args
 
@@ -76,7 +87,7 @@ class Lilypond < Formula
 
     elisp.install share.glob("emacs/site-lisp/*.el")
 
-    fonts = pkgshare/version/"fonts/otf"
+    fonts = pkgshare/(build.head? ? File.read("out/VERSION").chomp : version)/"fonts/otf"
 
     resource("font-urw-base35").stage do
       ["C059", "NimbusMonoPS", "NimbusSans"].each do |name|
@@ -97,7 +108,7 @@ class Lilypond < Formula
     assert_predicate testpath/"test.pdf", :exist?
 
     output = shell_output("#{bin}/lilypond --define-default=show-available-fonts 2>&1")
-    output = output.encode("UTF-8", invalid: :replace, replace: "\ufffd")
+             .encode("UTF-8", invalid: :replace, replace: "\ufffd")
     common_styles = ["Regular", "Bold", "Italic", "Bold Italic"]
     {
       "C059"            => ["Roman", *common_styles[1..]],

@@ -1,26 +1,20 @@
 class Pcb2gcode < Formula
   desc "Command-line tool for isolation, routing and drilling of PCBs"
   homepage "https://github.com/pcb2gcode/pcb2gcode"
-  url "https://github.com/pcb2gcode/pcb2gcode/archive/v2.5.0.tar.gz"
+  url "https://github.com/pcb2gcode/pcb2gcode/archive/refs/tags/v2.5.0.tar.gz"
   sha256 "96f1b1b4fd58e86f152b691202a15593815949dc9250fab9ab02f2346f5c2c52"
   license "GPL-3.0-or-later"
-  revision 3
+  revision 8
   head "https://github.com/pcb2gcode/pcb2gcode.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "83adb12d503b158b1437a8f2acf404de7884a2379fbbb4cc1ae1813ed9e6a6c5"
-    sha256 cellar: :any,                 arm64_monterey: "c99e0090428ea8fa639cc81e16c15afcd8b735b9d562fc60198369111367a31d"
-    sha256 cellar: :any,                 arm64_big_sur:  "9d3f240c3005a34a168920fa133b4b5412b136fce769760eabf5379fd91affbc"
-    sha256 cellar: :any,                 ventura:        "e9b5ea8ab2529a05d2f748fccc374ab04c4d24a8aab632c5176f80fdf1bb6697"
-    sha256 cellar: :any,                 monterey:       "4325f231ce7a6f35db794bcb8c9f1b3acb768c45a46cd8ab8e3e488bc62a325d"
-    sha256 cellar: :any,                 big_sur:        "f05095ba713b3ca3b7834a5c9e3ec9d9059e8bc80f87c79f2e3254f9847a598f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7fef49896da1220fe507c68ea63b675c0bd183f372c66b38257cfca449977c0c"
+    sha256 cellar: :any,                 arm64_sonoma:  "c29b1146f609eb8cdd430d11432024ca58f6e1f652a94c22d989ba7f1859751a"
+    sha256 cellar: :any,                 arm64_ventura: "1bd775f10b1fcec13597b9fe2f26858ba9b22df4015bb6f0f633b760c1f52b70"
+    sha256 cellar: :any,                 sonoma:        "c60f05e50ccb6cf55ab4711d22650e036c53d914c73df39d60e65d3bf8245e28"
+    sha256 cellar: :any,                 ventura:       "b8c036923b52057524e833672a896936c0732d564390807c5b21dc7dc0bea8e0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3637e073b135195ec18571de3119125e82dd8027252bb14aa6b01622f1a47544"
   end
 
-  # Release 2.0.0 doesn't include an autoreconfed tarball
-  # glibmm, gtkmm and librsvg are used only in unittests,
-  # and are therefore not needed at runtime.
-  depends_on "atkmm@2.28" => :build
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "cairomm@1.14" => :build
@@ -30,15 +24,21 @@ class Pcb2gcode < Formula
   depends_on "libsigc++@2" => :build
   depends_on "libtool" => :build
   depends_on "pangomm@2.46" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "at-spi2-core"
   depends_on "boost"
+  depends_on "cairo"
+  depends_on "gdk-pixbuf"
   depends_on "gerbv"
-
-  fails_with gcc: "5"
+  depends_on "gettext"
+  depends_on "glib"
+  depends_on "gtk+"
+  depends_on "harfbuzz"
+  depends_on "pango"
 
   def install
     system "autoreconf", "--force", "--install", "--verbose"
-    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
@@ -114,8 +114,8 @@ class Pcb2gcode < Formula
       al-y=15
       software=LinuxCNC
     EOS
-    system "#{bin}/pcb2gcode", "--front=front.gbr",
-                               "--outline=edge.gbr",
-                               "--drill=drill.drl"
+    system bin/"pcb2gcode", "--front=front.gbr",
+                            "--outline=edge.gbr",
+                            "--drill=drill.drl"
   end
 end

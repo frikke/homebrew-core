@@ -1,24 +1,25 @@
 class Benerator < Formula
   desc "Tool for realistic test data generation"
   homepage "https://rapiddweller.github.io/homebrew-benerator/"
-  url "https://github.com/rapiddweller/rapiddweller-benerator-ce/releases/download/3.1.0/rapiddweller-benerator-ce-3.1.0-jdk-11-dist.tar.gz"
-  sha256 "194feb051ae18cfcd407b8e1668ce9c60561394bc454f9fc9747c274166843bc"
+  url "https://github.com/rapiddweller/rapiddweller-benerator-ce/releases/download/3.2.1/rapiddweller-benerator-ce-3.2.1-jdk-11-dist.tar.gz"
+  sha256 "5d1b3de2344f0c2a1719eed5ab8154a75597a5d7693c373734e0603a45e5f96d"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "b9dbcf4f48977d55becf5ba073086aaf6e338435b5dba1a646683e7e94685e4f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "a73bf659d5c7c62f8048aae669bd74c7da97f750ce0ecb1d8009f94ba32e77fd"
   end
 
-  depends_on "openjdk"
+  depends_on "openjdk@11"
 
   def install
     # Remove unnecessary files
-    rm_f Dir["bin/*.bat", "bin/pom.xml"]
+    rm(Dir["bin/*.bat", "bin/pom.xml"])
 
     # Installs only the "bin" and "lib" directories from the tarball
     libexec.install Dir["bin", "lib"]
     # Generate a script that sets the necessary environment variables
-    env = Language::Java.overridable_java_home_env
+    env = Language::Java.overridable_java_home_env("11")
     env["BENERATOR_HOME"] = libexec
     (bin/"benerator").write_env_script(libexec/"bin/benerator", env)
   end
@@ -27,7 +28,7 @@ class Benerator < Formula
     # Test if version is correct
     assert_match "Benerator Community Edition #{version}-jdk-11",
                  shell_output("#{bin}/benerator --version")
-    assert_match "Java version:  #{Formula["openjdk"].version}", shell_output("#{bin}/benerator --version")
+    assert_match "Java version:  #{Formula["openjdk@11"].version}", shell_output("#{bin}/benerator --version")
     # Test if data is generated follow the corrected scheme.
     # We feed benerator an xml and a scheme in demo/db/script/h2.multischema.sql.
     # The XML scheme in myscript.xml have an inhouse test in <evaluate /> to check if the data is generated correctly,

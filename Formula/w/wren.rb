@@ -1,7 +1,7 @@
 class Wren < Formula
   desc "Small, fast, class-based concurrent scripting language"
   homepage "https://wren.io"
-  url "https://github.com/wren-lang/wren/archive/0.4.0.tar.gz"
+  url "https://github.com/wren-lang/wren/archive/refs/tags/0.4.0.tar.gz"
   sha256 "23c0ddeb6c67a4ed9285bded49f7c91714922c2e7bb88f42428386bf1cf7b339"
   license "MIT"
 
@@ -11,9 +11,12 @@ class Wren < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "32ef27315c3c2718071ccbe516fbdc91934eb94d2a0e5f91ec63c215efb8aea0"
+    sha256 cellar: :any,                 arm64_sonoma:   "a3100038802e99ce273976dec06b8cd2239cc9146523664938107d867ad9ba60"
     sha256 cellar: :any,                 arm64_ventura:  "a56a102a2a2e336cae95c2df5bec5ddc48dcb53dd7c922ae6f19380637f6c759"
     sha256 cellar: :any,                 arm64_monterey: "c3e1412d38068f8218c7753b55468289c1602c0bc60ab2d60f45fb2bb7547dbf"
     sha256 cellar: :any,                 arm64_big_sur:  "cbe4d9028c361a3e725091eb9d15b9b040160f03508d674de3052df405691e24"
+    sha256 cellar: :any,                 sonoma:         "126f8d26f864a6efb1bcddf49d492c5c9246bf3aff05b7cd58b8479e1eba83d8"
     sha256 cellar: :any,                 ventura:        "9404afe9b05d7f6c8453162417624aa4c67c1bdd13bc296353c7b3b65aec1329"
     sha256 cellar: :any,                 monterey:       "64f267fae9c817599741fa6f00121de14f18c1287df743b33c7c7567e2d5cda0"
     sha256 cellar: :any,                 big_sur:        "c54db478f8ec48d08dc4992bb8efe1308d478f20f3177513d0154460e26ad1f0"
@@ -34,7 +37,7 @@ class Wren < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <stdio.h>
       #include "wren.h"
@@ -51,7 +54,7 @@ class Wren < Formula
         printf("1 + 2 = %d\\n", (int) wrenGetSlotDouble(vm, 0));
         wrenFreeVM(vm);
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lwren", "-o", "test"
     assert_equal "1 + 2 = 3", shell_output("./test").strip
   end

@@ -1,8 +1,8 @@
 class Clib < Formula
   desc "Package manager for C programming"
   homepage "https://github.com/clibs/clib"
-  url "https://github.com/clibs/clib/archive/2.8.3.tar.gz"
-  sha256 "0ad8262d13ef138a12452e67e081e3eb31a264e2040cfce09417e8f7eed4e1f5"
+  url "https://github.com/clibs/clib/archive/refs/tags/2.8.7.tar.gz"
+  sha256 "83d5767e363c3ed4b4271000b9ce63b6e11b6c4740df910e0074f844fb34258e"
   license "MIT"
   head "https://github.com/clibs/clib.git", branch: "master"
 
@@ -12,13 +12,14 @@ class Clib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2e32fd4fabf6ae444d06ac04f3f469fc8b45a6313db7d5d33da2c41974e5d991"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "531b420f544115b76de3f062ca797e29d8d67033606d900fb4f24110be6d79a4"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5570b36fd28e42add8fc2bacc2bde04bbba0964c703b54a166cb28edade444da"
-    sha256 cellar: :any_skip_relocation, ventura:        "191e02d060b9a2802b7bc9e99dd3a68572ee3cc68f732f5de4208a32c7961586"
-    sha256 cellar: :any_skip_relocation, monterey:       "690ee73163b6fa61ad18f2edf33191f073e547ffa1b996573daf1d563e235043"
-    sha256 cellar: :any_skip_relocation, big_sur:        "42094b31e28fa21086e7765abb6d09e02eff56bea9088227895dee48e97c1477"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f9fae1b2b9a3c8dd01a954573192eb2106fd0b2590c83180210c11cbdbe38be8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d55c0d80cdf3962c6f472fbf9f977bbc1f38108789a35f28083eb901be9a1d51"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "adaa04956400da4720ab59df6f5751b1f04e98dd297890f3289eafd55bcd7f3a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7209d89f9749907745dffd80fa70d85b722ce4e907020cc55a63dd3d9066e6d0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f1a9ccc23f7f02055c2df418f3131adea4c9341c0d859d7fe1b84e37d2b82e08"
+    sha256 cellar: :any_skip_relocation, sonoma:         "638ea5f7900fa5e5e1fee0f597c2268979333dcf56dc303f2ca8a36d73957bb5"
+    sha256 cellar: :any_skip_relocation, ventura:        "6c143f9e0b7d3f78e90b7ddd112ac7c73b5f31500401753e6ebc6ec8d18a6e8a"
+    sha256 cellar: :any_skip_relocation, monterey:       "eaaf603e0f7a35bc6ea1f9b51a0704968e608aaee2f587035a37ef108d091faa"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b575c125079396fdd1f4fd5b96a0d23048052aa8f0c9ff29986ac5209b14e649"
   end
 
   uses_from_macos "curl"
@@ -29,6 +30,6 @@ class Clib < Formula
   end
 
   test do
-    system "#{bin}/clib", "install", "stephenmathieson/rot13.c"
+    system bin/"clib", "install", "stephenmathieson/rot13.c"
   end
 end

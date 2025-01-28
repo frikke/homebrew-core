@@ -1,8 +1,8 @@
 class Libsvm < Formula
   desc "Library for support vector machines"
   homepage "https://www.csie.ntu.edu.tw/~cjlin/libsvm/"
-  url "https://www.csie.ntu.edu.tw/~cjlin/libsvm/libsvm-3.32.tar.gz"
-  sha256 "8644cc6518ca88bbc50d8c8ead1734f1ab9b6f17017045ef9ae38773aa653dad"
+  url "https://www.csie.ntu.edu.tw/~cjlin/libsvm/libsvm-3.35.tar.gz"
+  sha256 "ea5633fc84b1c2fa58aa4c44b62e437573020297a1dfbe73bf1531ec817a8478"
   license "BSD-3-Clause"
   head "https://github.com/cjlin1/libsvm.git", branch: "master"
 
@@ -12,15 +12,15 @@ class Libsvm < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "03eed5ecad519bd21ad40a6e4322f4b8bc73a85260b0b0ace53e679470b629f6"
-    sha256 cellar: :any,                 arm64_ventura:  "fe235819b910f8d4076349a0c777525baa46f469cca14821a80775d6cad6ab0e"
-    sha256 cellar: :any,                 arm64_monterey: "9267ca6d537c962fecbfc3f9478487d172cc150e3bd5b26a6e88ae020b48c21b"
-    sha256 cellar: :any,                 arm64_big_sur:  "dfead0cdebbbed12bf34e06ff4c058ce528f207ea8aba50c4e0495dc2c4a97fe"
-    sha256 cellar: :any,                 sonoma:         "5f611833eeb344f1315398542c7ca0ead9b542294d1fc21203c83f0aef3e1f37"
-    sha256 cellar: :any,                 ventura:        "a00f5eb69a10446eafbe0b16be164a28e3ef03db654ecf18baaedc8f0db12e2f"
-    sha256 cellar: :any,                 monterey:       "8da95e20f0b0ff7560004e15fab010f1aae1486326ab9d617f7e06de0b3e2b5e"
-    sha256 cellar: :any,                 big_sur:        "cc6ee0e7e2532a05a9b82beec1a8ca04e7c1380f9d6634a2b45a79e6479c4d4d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "464056f924539b980646498a4b2ec99422656e35a676c2d1439064df97609b44"
+    rebuild 2
+    sha256 cellar: :any,                 arm64_sequoia:  "fbd7f0cb7371ece33c5cfef9a0de2c8ce9ae60975ca902621ff7767d3f4a489e"
+    sha256 cellar: :any,                 arm64_sonoma:   "b0b42109fa5ef7614278c54c343022fc60f3946e7d1f110472e002e0a333dca8"
+    sha256 cellar: :any,                 arm64_ventura:  "dec298a98db2de896176f6c2d0dd4a9304f8da4a3e2f3af3c90f097f41d7f6f4"
+    sha256 cellar: :any,                 arm64_monterey: "9984ecea26fd1aab82612a0ac2a267dfe30ceb81ab8ae365027f2acfb6677ef5"
+    sha256 cellar: :any,                 sonoma:         "cf42abb68e45caccd897b737ce1aa00b2c5f0e79f5c5336432e56171ebf2b95e"
+    sha256 cellar: :any,                 ventura:        "7d908bc4532b8e00b9a03f91b7e67d6e279b51ec5a8ec67465ca914dd0b899f2"
+    sha256 cellar: :any,                 monterey:       "ddaef78accfa874e5d2b3638b8dcd00f73ed979d012d6cb97307b56d72ee5311"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "180e48479f4ce02ec77db9750d16a1eb71f29768d90f4f012e152e5f542a6cdb"
   end
 
   def install
@@ -28,13 +28,25 @@ class Libsvm < Formula
     system "make", "CFLAGS=#{ENV.cflags}"
     system "make", "lib"
     bin.install "svm-scale", "svm-train", "svm-predict"
-    lib.install "libsvm.so.3" => shared_library("libsvm", 3)
-    lib.install_symlink shared_library("libsvm", 3) => shared_library("libsvm")
-    MachO::Tools.change_dylib_id("#{lib}/libsvm.3.dylib", "#{lib}/libsvm.3.dylib") if OS.mac?
     include.install "svm.h"
+
+    libsvm_files = buildpath.glob("libsvm.so.*")
+    odie "Expected exactly one `libsvm`!" if libsvm_files.count != 1
+
+    libsvm = libsvm_files.first
+    libsvm_soversion = libsvm.to_s[/(?<=\.)\d+(?:\.\d+)*$/]
+    lib.install libsvm => shared_library("libsvm", libsvm_soversion)
+    lib.install_symlink shared_library("libsvm", libsvm_soversion) => shared_library("libsvm")
+    return unless OS.mac?
+
+    libsvm = shared_library("libsvm", libsvm_soversion)
+    MachO::Tools.change_dylib_id lib/libsvm, (opt_lib/libsvm).to_s
+    MachO.codesign!(lib/libsvm)
   end
 
   test do
+    assert_path_exists lib/shared_library("libsvm")
+
     (testpath/"train_classification.txt").write <<~EOS
       +1 201:1.2 3148:1.8 3983:1 4882:1
       -1 874:0.3 3652:1.1 3963:1 6179:1
@@ -49,7 +61,10 @@ class Libsvm < Formula
       -0.12 1168:1.2 3318:1.2 3938:1.8 4481:1
     EOS
 
-    system "#{bin}/svm-train", "-s", "0", "train_classification.txt"
-    system "#{bin}/svm-train", "-s", "3", "train_regression.txt"
+    system bin/"svm-train", "-s", "0", "train_classification.txt"
+    system bin/"svm-train", "-s", "3", "train_regression.txt"
+    return unless OS.mac?
+
+    assert (lib/shared_library("libsvm")).dylib_id.end_with?("dylib")
   end
 end

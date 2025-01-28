@@ -3,39 +3,62 @@ class Snakefmt < Formula
 
   desc "Snakemake code formatter"
   homepage "https://github.com/snakemake/snakefmt/"
-  url "https://files.pythonhosted.org/packages/36/9c/00be291ff608ca73cbc9662c1c59cddef20279298e0fb410ca1ec1875c99/snakefmt-0.8.4.tar.gz"
-  sha256 "277eb436d4d61161d2c75c6eece44df34bcbb6299bc3f4fffafb0976e16afe40"
+  url "https://files.pythonhosted.org/packages/b4/61/0228586a10b76064431e1d0c965f030b4c7dfbea6d1cfcb4d3f0cb0e6726/snakefmt-0.10.2.tar.gz"
+  sha256 "4286a5903b66da7e52763c5e8184da4edc95113b758f4448528804fb54f9b75a"
   license "MIT"
   head "https://github.com/snakemake/snakefmt.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "78fa80a9a0dd8bed819be21b14eb7f5ba5256e26a3ba79da185ed73dbbc162b6"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e3df170687d2d0d028e335724a8d8c0ba1294671fdace69565b54ad0ec901573"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a6e7660112c57b1db419e5374a4402c2d6b39cc69f7a1bdbd0a3557f459539b3"
-    sha256 cellar: :any_skip_relocation, ventura:        "a1f0e554d2aa849e04e1b8c5dd003468f5a80865339e1965c2678c52b3449678"
-    sha256 cellar: :any_skip_relocation, monterey:       "e70923304c46034abb3af0cf3993ca7b24673a0e38edf9142862d11425b0e6de"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9057a5052ecc45abc5df3ba28b0daaaf5a8ba017a99887bda5f676af7597e0c4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "890638778841809d83b6fc803cd9ea611c0b1aa2d80cb3f8c35f49373a61eef7"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6b26bcc28c7e1ea655e96b0fc28ece25b56aa50c3010c6c45251e316d36d5cac"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6b26bcc28c7e1ea655e96b0fc28ece25b56aa50c3010c6c45251e316d36d5cac"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "6b26bcc28c7e1ea655e96b0fc28ece25b56aa50c3010c6c45251e316d36d5cac"
+    sha256 cellar: :any_skip_relocation, sonoma:        "617081ca430c5571eb91f71a3c0938b4aa7e7fc8557dc2c2a0d8f63dd4722bb3"
+    sha256 cellar: :any_skip_relocation, ventura:       "617081ca430c5571eb91f71a3c0938b4aa7e7fc8557dc2c2a0d8f63dd4722bb3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "134a3acf2ecfbc67102471f3eb3a167e0b3251e458bc9e15c151e87412fa69ef"
   end
 
-  depends_on "black"
-  depends_on "python-toml"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
-  # Switch build-system to poetry-core to avoid rust dependency on Linux.
-  # https://github.com/snakemake/snakefmt/pull/199
-  patch do
-    url "https://github.com/snakemake/snakefmt/commit/cee8a662c286fc78a593534f5700e08a7096c822.patch?full_index=1"
-    sha256 "094e56dd75bf2506ac3c73ab9877cd2a56137092c98bd8063404f57a77825536"
+  resource "black" do
+    url "https://files.pythonhosted.org/packages/d8/0d/cc2fb42b8c50d80143221515dd7e4766995bd07c56c9a3ed30baf080b6dc/black-24.10.0.tar.gz"
+    sha256 "846ea64c97afe3bc677b761787993be4991810ecc7a4a937816dd6bddedc4875"
+  end
+
+  resource "click" do
+    url "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz"
+    sha256 "ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de"
+  end
+
+  resource "mypy-extensions" do
+    url "https://files.pythonhosted.org/packages/98/a4/1ab47638b92648243faf97a5aeb6ea83059cc3624972ab6b8d2316078d3f/mypy_extensions-1.0.0.tar.gz"
+    sha256 "75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782"
+  end
+
+  resource "packaging" do
+    url "https://files.pythonhosted.org/packages/51/65/50db4dda066951078f0a96cf12f4b9ada6e4b811516bf0262c0f4f7064d4/packaging-24.1.tar.gz"
+    sha256 "026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002"
+  end
+
+  resource "pathspec" do
+    url "https://files.pythonhosted.org/packages/ca/bc/f35b8446f4531a7cb215605d100cd88b7ac6f44ab3fc94870c120ab3adbf/pathspec-0.12.1.tar.gz"
+    sha256 "a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712"
+  end
+
+  resource "platformdirs" do
+    url "https://files.pythonhosted.org/packages/13/fc/128cc9cb8f03208bdbf93d3aa862e16d376844a14f9a0ce5cf4507372de4/platformdirs-4.3.6.tar.gz"
+    sha256 "357fb2acbc885b0419afd3ce3ed34564c13c9b95c89360cd9563f73aa5e2b907"
+  end
+
+  resource "toml" do
+    url "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz"
+    sha256 "b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"
   end
 
   def install
     virtualenv_install_with_resources
 
-    site_packages = Language::Python.site_packages("python3.11")
-    black = Formula["black"].opt_libexec
-    (libexec/site_packages/"homebrew-black.pth").write black/site_packages
+    generate_completions_from_executable(bin/"snakefmt", shells: [:fish, :zsh], shell_parameter_format: :click)
   end
 
   test do

@@ -1,30 +1,27 @@
-require "language/node"
-
 class Mjml < Formula
   desc "JavaScript framework that makes responsive-email easy"
   homepage "https://mjml.io"
-  url "https://registry.npmjs.org/mjml/-/mjml-4.14.1.tgz"
-  sha256 "fb9ebe982773f05711ab7da2d26fcf4eb11e50e44a6e8d12ef354b6f6057867d"
+  url "https://registry.npmjs.org/mjml/-/mjml-4.15.3.tgz"
+  sha256 "1918171314f07c1283a84f24bbf6e9cd1325906d48722b26a4b901f0eea00176"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b455e25e7a59b43ccf662c88aba0bd03f8ef7916147dc1aeb3e7df3220bad0d7"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b455e25e7a59b43ccf662c88aba0bd03f8ef7916147dc1aeb3e7df3220bad0d7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b455e25e7a59b43ccf662c88aba0bd03f8ef7916147dc1aeb3e7df3220bad0d7"
-    sha256 cellar: :any_skip_relocation, ventura:        "0c3fa66cdaae582eb8fb5971b7ec41475af85133f779f1ea824e1bb9492e968b"
-    sha256 cellar: :any_skip_relocation, monterey:       "0c3fa66cdaae582eb8fb5971b7ec41475af85133f779f1ea824e1bb9492e968b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0c3fa66cdaae582eb8fb5971b7ec41475af85133f779f1ea824e1bb9492e968b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "19167babb492a099bfa30b6d2584c25456d5497bed3ebbda230b04b532f16adb"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "bcde646a47d51238258b06388c69a52115f850eef26ea76c218ad5e7318a2f57"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "1a681f3fa1b9bfc3159325c2faa63b1cbe148e94d4cfd1a2b2c94587c30b25de"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1a681f3fa1b9bfc3159325c2faa63b1cbe148e94d4cfd1a2b2c94587c30b25de"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "1a681f3fa1b9bfc3159325c2faa63b1cbe148e94d4cfd1a2b2c94587c30b25de"
+    sha256 cellar: :any_skip_relocation, sonoma:         "464b8c2813c2c1a80ac3f4b91fbb5fc3e2a9e189191ee6858c210d0674e00868"
+    sha256 cellar: :any_skip_relocation, ventura:        "464b8c2813c2c1a80ac3f4b91fbb5fc3e2a9e189191ee6858c210d0674e00868"
+    sha256 cellar: :any_skip_relocation, monterey:       "464b8c2813c2c1a80ac3f4b91fbb5fc3e2a9e189191ee6858c210d0674e00868"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b7056b342d8ea37e7da098cc2b2cc3764d3a418e5d36d3d2f07058f634fe12b2"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
-
-    # Replace universal binaries with native slices
-    deuniversalize_machos libexec/"lib/node_modules/mjml/node_modules/fsevents/fsevents.node"
   end
 
   test do

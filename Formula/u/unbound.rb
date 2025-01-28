@@ -1,20 +1,10 @@
 class Unbound < Formula
   desc "Validating, recursive, caching DNS resolver"
   homepage "https://www.unbound.net"
+  url "https://nlnetlabs.nl/downloads/unbound/unbound-1.22.0.tar.gz"
+  sha256 "c5dd1bdef5d5685b2cedb749158dd152c52d44f65529a34ac15cd88d4b1b3d43"
   license "BSD-3-Clause"
-  revision 1
   head "https://github.com/NLnetLabs/unbound.git", branch: "master"
-
-  stable do
-    url "https://nlnetlabs.nl/downloads/unbound/unbound-1.18.0.tar.gz"
-    sha256 "3da95490a85cff6420f26fae0b84a49f5112df1bf1b7fc34f8724f02082cb712"
-
-    # https://github.com/NLnetLabs/unbound/issues/928
-    patch do
-      url "https://github.com/NLnetLabs/unbound/commit/17a557dfd5eadb8f0b812d25cea28deccaa62de9.patch?full_index=1"
-      sha256 "59710836ece231ff89c2cdf7257723f30e9f18527076b4a5bd7b6b3c0e494112"
-    end
-  end
 
   # We check the GitHub repo tags instead of
   # https://nlnetlabs.nl/downloads/unbound/ since the first-party site has a
@@ -25,15 +15,12 @@ class Unbound < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "cd2cd768b043b13adc8e5017856c9c50e72275a13ee08374f73b8eaa068800e5"
-    sha256 arm64_ventura:  "c2eda6654a2643a7615778c4e565d4bd892d4db6793744382ed7651d1d447d65"
-    sha256 arm64_monterey: "2bdae3f32da84ff6a051e8b3bd8dc81fa6264fae100b1ee30da0e9d61b7c9462"
-    sha256 arm64_big_sur:  "6010cd37fb6961c9266bd2fddefc4747b82914774be8de23a7be8e8931c7860d"
-    sha256 sonoma:         "9927aa9c3a63353a14dde9190c151574598481e7b1450c9e06dd81b046588614"
-    sha256 ventura:        "ae41104389bf249c8f26eb5db079a66485a9a3c0b9df1c7d16582c8b813adc00"
-    sha256 monterey:       "eef12398b6ff2e7296a6d4f1ce9b8927b7b850d307ce6347f81558a2a523a378"
-    sha256 big_sur:        "9826b2f8e37c87b1f43c5d2f8e0c9fe9cc3d3afa7f2626c24a82db439904c6c1"
-    sha256 x86_64_linux:   "da10e82c76362d4434f46b14bd8b3d1ea782c2ad1f95cf2e4645f6ec0841118e"
+    sha256 arm64_sequoia: "b1b2f3ec332c26033f00996f6caa847652848647e1a29d68fb9059547ace2373"
+    sha256 arm64_sonoma:  "277b3f59fc64e10d079fa02a4872c0f921ab71f4e140863c47c1e2327ca9c133"
+    sha256 arm64_ventura: "17686e80c85d436a27f924041f61c45c0dac68ad36da04f950f2dea26a35e66e"
+    sha256 sonoma:        "76f56efe19cb9cbc6e2fc1fc053656d4e603b8a45fc7b6da707c23e81e4b29f8"
+    sha256 ventura:       "3c43de07ff89234c7d9a7fc9fbcf3c0df0932872db9fa764d1bd7370305cf796"
+    sha256 x86_64_linux:  "a9db089b57722fb40fd586077155936973dbcee07176a4cdf98a46ffefc9cf5d"
   end
 
   depends_on "libevent"

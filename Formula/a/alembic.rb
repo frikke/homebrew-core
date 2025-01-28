@@ -1,20 +1,18 @@
 class Alembic < Formula
   desc "Open computer graphics interchange framework"
-  homepage "http://alembic.io"
-  url "https://github.com/alembic/alembic/archive/1.8.5.tar.gz"
-  sha256 "180a12f08d391cd89f021f279dbe3b5423b1db751a9898540c8059a45825c2e9"
+  homepage "http://www.alembic.io/"
+  url "https://github.com/alembic/alembic/archive/refs/tags/1.8.8.tar.gz"
+  sha256 "ba1f34544608ef7d3f68cafea946ec9cc84792ddf9cda3e8d5590821df71f6c6"
   license "BSD-3-Clause"
-  revision 2
   head "https://github.com/alembic/alembic.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "7d0f784a0a6564a113eb74cc8d5f28a354fca2efe9ddc0f68a2965eff844b912"
-    sha256 cellar: :any,                 arm64_monterey: "0ceadb2a9b215d2cb5dbe81f54264d6219625f4bd12a03272699fdf0d5c6d2eb"
-    sha256 cellar: :any,                 arm64_big_sur:  "ffa0a060fbc70b5b164024c4551a6a6b62a3772ca402c6f8311a8eb18c2631bb"
-    sha256 cellar: :any,                 ventura:        "ee7cd38f57c819d15ddaacbb1b73835c95daef95f6897444311e179c82ecf4cd"
-    sha256 cellar: :any,                 monterey:       "8f01095690c9f319e75f6b47f784134e4c7b1a445b6d85490dafcf25a6875b46"
-    sha256 cellar: :any,                 big_sur:        "953292d9c490f5e9925a760c588ca9cb68153cd4db018e8f3f4a7ed2cd92ebd0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1280691814dc7b43abccf9df9a79c7bacc55011bef40769ffba86ffd26af467d"
+    sha256 cellar: :any,                 arm64_sequoia: "6a69e3e7fe9ed8794cfb70d95e5a90d4edd03fb37870d318cc2772f3d887dc57"
+    sha256 cellar: :any,                 arm64_sonoma:  "a0de5bbd49ecae579210057e2fd9623bfcd5c8751ebb33638b9c498a8e896cfd"
+    sha256 cellar: :any,                 arm64_ventura: "805fdb868569c1d52f0014d0fe5c33ec94351295713cabd827d6604ec59b931a"
+    sha256 cellar: :any,                 sonoma:        "9b999957a0cd7bb166cbaab35e65c2b29fa7571366d7140548469cb416fa0a7e"
+    sha256 cellar: :any,                 ventura:       "b0156c9b787c034db3f133800446abae92cb2d9ad778cc28e76c8e2794b9a72f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fef41d868f2c1ab7bfe69219612f1958056e6396dd5055d8320a6a952dca4e2d"
   end
 
   depends_on "cmake" => :build

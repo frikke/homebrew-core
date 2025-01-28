@@ -11,6 +11,7 @@ class OpencoreAmr < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "48a7944b5baf1d23777ff16d0f1b44ba3fb1872728e578e245993019895b0075"
     sha256 cellar: :any,                 arm64_sonoma:   "b9598108fb81e647206266d1ebfd43872454df8d9eb8292e09b550fb190e5c4f"
     sha256 cellar: :any,                 arm64_ventura:  "673be457f0de7494de04b1d079de9074e79e03a74f1fe520227f75d7c7953265"
     sha256 cellar: :any,                 arm64_monterey: "9641b13b82cf4d325e2fc5a0b2576a9ffb6d8d3bead8c6637e4b22a35ed24776"
@@ -29,14 +30,14 @@ class OpencoreAmr < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <opencore-amrwb/dec_if.h>
       int main(void) {
         void *s = D_IF_init();
         D_IF_exit(s);
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lopencore-amrwb", "-o", "test"
     system "./test"

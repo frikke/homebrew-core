@@ -3,6 +3,7 @@ class Exiftags < Formula
   homepage "https://johnst.org/sw/exiftags/"
   url "https://johnst.org/sw/exiftags/exiftags-1.01.tar.gz"
   sha256 "d95744de5f609f1562045f1c2aae610e8f694a4c9042897a51a22f0f0d7591a4"
+  license "BSD-4-Clause"
 
   livecheck do
     url :homepage
@@ -10,9 +11,12 @@ class Exiftags < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "43f7d6a7bd08e653cfde12d0f3cdcdb371b27bb4912a8f2bcda42120da960cb7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "499981c69ffb64e8bdc63a1b43a07884fa62a11034112483f00eca053836a031"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "5c0fa5c7f7ec7c138c3601aa24c6539210b2e8aa06694c2caa7edb936dbad92d"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "066860c554be69f80330da1152b1d4ef3c6ff177dbb73a20367dbd5598ff0029"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2229163e3493c0fae8cf83479f5c5258b926437b353038cd738d7f7d50fc20f9"
+    sha256 cellar: :any_skip_relocation, sonoma:         "ab4c192e4d932cac9aba2b50781e4c8a44678398e4e99b507dd458fafd472b95"
     sha256 cellar: :any_skip_relocation, ventura:        "dbc075e01b52cabb93e00ab84498cbcb0e32e1597259f28630fed2524f8be6eb"
     sha256 cellar: :any_skip_relocation, monterey:       "d6dddffe9628d46253e6ec7af11a16cb60c2983c475210f718f1f69d030c99e2"
     sha256 cellar: :any_skip_relocation, big_sur:        "e6f10871b2577320dd9c219faa1e1b31fac8a311cde68810d233aaafa79a5a08"

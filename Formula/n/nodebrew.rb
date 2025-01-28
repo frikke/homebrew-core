@@ -1,13 +1,14 @@
 class Nodebrew < Formula
   desc "Node.js version manager"
   homepage "https://github.com/hokaccha/nodebrew"
-  url "https://github.com/hokaccha/nodebrew/archive/v1.2.0.tar.gz"
+  url "https://github.com/hokaccha/nodebrew/archive/refs/tags/v1.2.0.tar.gz"
   sha256 "6d72e39c8acc5b22f4fc7a1734cd3bb8d00b61119ab7fea6cde376810ff2005e"
   license "MIT"
   head "https://github.com/hokaccha/nodebrew.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "eed2aeff4fd05a4c2969d670ce9a38bc01832ac90b65a1c773689532cb376660"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "bd835b02ed3b28570708b7c98d0ea7a761c53f561544496d07728c9adf3502e2"
   end
 
   def install

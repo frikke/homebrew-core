@@ -1,41 +1,38 @@
 class EasyRsa < Formula
   desc "CLI utility to build and manage a PKI CA"
   homepage "https://github.com/OpenVPN/easy-rsa"
-  url "https://github.com/OpenVPN/easy-rsa/archive/v3.1.6.tar.gz"
-  sha256 "82958fc66ba3825dd78113c3b3283858303d9973caff434989a4a235d47a319d"
+  url "https://github.com/OpenVPN/easy-rsa/releases/download/v3.2.1/EasyRSA-3.2.1.tgz"
+  sha256 "ec0fdca46c07afef341e0e0eeb2bf0cfe74a11322b77163e5d764d28cb4eec89"
   license "GPL-2.0-only"
   head "https://github.com/OpenVPN/easy-rsa.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "42813aefc0517c80c7b7efd846eede30d816cf05ee47fd49b1e6c5dfd72f8cc8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "42813aefc0517c80c7b7efd846eede30d816cf05ee47fd49b1e6c5dfd72f8cc8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "42813aefc0517c80c7b7efd846eede30d816cf05ee47fd49b1e6c5dfd72f8cc8"
-    sha256 cellar: :any_skip_relocation, ventura:        "d1cd86ad4f56473e7295ca8eb15655bd781ba7c4353d6f242a9ec57dd3960f96"
-    sha256 cellar: :any_skip_relocation, monterey:       "d1cd86ad4f56473e7295ca8eb15655bd781ba7c4353d6f242a9ec57dd3960f96"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d1cd86ad4f56473e7295ca8eb15655bd781ba7c4353d6f242a9ec57dd3960f96"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "42813aefc0517c80c7b7efd846eede30d816cf05ee47fd49b1e6c5dfd72f8cc8"
+    sha256 cellar: :any_skip_relocation, all: "3057967081df2d2d15bf9547dc7d7a25019fccd91340ecb5f801c1f6c9c71d5a"
   end
 
   depends_on "openssl@3"
 
   def install
-    inreplace "easyrsa3/easyrsa", "'/etc/easy-rsa'", "'#{pkgetc}'"
-    libexec.install "easyrsa3/easyrsa"
+    inreplace "easyrsa" do |s|
+      s.gsub! "'/etc/easy-rsa'", "'#{pkgetc}'"
+      s.gsub! "'/usr/local/share/easy-rsa'", "'#{opt_pkgshare}'"
+    end
+
+    libexec.install "easyrsa"
     (bin/"easyrsa").write_env_script libexec/"easyrsa",
       EASYRSA:         pkgetc,
       EASYRSA_OPENSSL: Formula["openssl@3"].opt_bin/"openssl",
       EASYRSA_PKI:     "${EASYRSA_PKI:-#{etc}/pki}"
 
     pkgetc.install %w[
-      easyrsa3/openssl-easyrsa.cnf
-      easyrsa3/x509-types
-      easyrsa3/vars.example
+      openssl-easyrsa.cnf
+      x509-types
+      vars.example
     ]
 
     doc.install %w[
       ChangeLog
       COPYING.md
-      KNOWN_ISSUES
       README.md
       README.quickstart.md
     ]

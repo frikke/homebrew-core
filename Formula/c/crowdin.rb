@@ -1,8 +1,8 @@
 class Crowdin < Formula
   desc "Command-line tool that allows to manage your resources with crowdin.com"
   homepage "https://support.crowdin.com/cli-tool/"
-  url "https://github.com/crowdin/crowdin-cli/releases/download/3.14.0/crowdin-cli.zip"
-  sha256 "61be33391b66120646bbd874e7fb78b10e9e4e58c76daf3d2592a1eefcc8a764"
+  url "https://github.com/crowdin/crowdin-cli/releases/download/4.5.2/crowdin-cli.zip"
+  sha256 "820f5c04dd0de0a1875ba8b9eae3b9f9413560914c6b6690f27255f093d2be65"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class Crowdin < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "cf9b07c4b8a242514e093097dc2e712cd970f489309dd38799b3b591029d2264"
+    sha256 cellar: :any_skip_relocation, all: "953e63ec8b5468bc254244459ea2c2da36cd4281ebbcf6e8ec2e5f050077647c"
   end
 
   depends_on "openjdk"
@@ -22,7 +22,7 @@ class Crowdin < Formula
   end
 
   test do
-    (testpath/"crowdin.yml").write <<~EOS
+    (testpath/"crowdin.yml").write <<~YAML
       "project_id": "12"
       "api_token": "54e01--your-personal-token--2724a"
       "base_path": "."
@@ -36,12 +36,11 @@ class Crowdin < Formula
           "translation" : "/%two_letters_code%/%original_file_name%"
         }
       ]
-    EOS
+    YAML
 
-    assert "Your configuration file looks good",
-      shell_output("#{bin}/crowdin lint")
+    system bin/"crowdin", "init"
 
-    assert "Failed to authorize in Crowdin",
-      shell_output("#{bin}/crowdin upload sources --config #{testpath}/crowdin.yml", 1)
+    assert "Failed to collect project info",
+      shell_output("#{bin}/crowdin upload sources --config #{testpath}/crowdin.yml 2>&1", 102)
   end
 end

@@ -2,10 +2,10 @@ class Moc < Formula
   desc "Terminal-based music player"
   homepage "https://moc.daper.net/"
   license "GPL-2.0-or-later"
-  revision 7
+  revision 8
 
   stable do
-    url "http://ftp.daper.net/pub/soft/moc/stable/moc-2.5.2.tar.bz2"
+    url "https://ftp.daper.net/pub/soft/moc/stable/moc-2.5.2.tar.bz2"
     sha256 "f3a68115602a4788b7cfa9bbe9397a9d5e24c68cb61a57695d1c2c3ecf49db08"
 
     # Remove for > 2.5.2; FFmpeg 4.0 compatibility
@@ -43,14 +43,14 @@ class Moc < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "d384eac5db501bffc4ca293814999bd211a30aa8d8c51608264c141ecae0e588"
-    sha256 arm64_monterey: "76a10d22e284b7082d386b7850b228ba8c7b8a39e0af5fe8dd3bfda8ee5e8504"
-    sha256 arm64_big_sur:  "748bce503189849012269695eaa9da403d63944d480b5f65912efd30abe75937"
-    sha256 ventura:        "e1d9b0a8885b048bef641d9e5dde6d7be8cdfd007a93f1abc86b67cafa8152e6"
-    sha256 monterey:       "3ef692dc6ca98b8613faab3346997a9bf908180569ef437404c1fe2183d8c414"
-    sha256 big_sur:        "38313bf01863d64276c647565074618b71e09cd3b4a7dc0121b606dd52b534ad"
-    sha256 catalina:       "15e7bfdbd9e0c3726962278c05ca09e646bf4fd748a5107f103f8133b7bfc3f9"
-    sha256 x86_64_linux:   "c5dcdab691336c5c529fca538c46a26874e7bb92da1d9a803265f89b83720336"
+    sha256 arm64_sequoia:  "00f4a5601d8f7d75cf8ac0dfccd99960c64b125c02b815177261440134b80302"
+    sha256 arm64_sonoma:   "3d2be9bbd88ca175407d8852d2711796d4b391202a418a8e7eecafd3cd92ec03"
+    sha256 arm64_ventura:  "161367cc683c8292aaaebd85805f1b4f57f56b4345d94932e96fb6357597718b"
+    sha256 arm64_monterey: "93c436057264891cfab1658f79b6b33192755107c5619e0d1f34a9556812d614"
+    sha256 sonoma:         "7fd5ca668b20ddb6ff8f6b25871de75e8d0ac1fff3a50032a960c9b709a2ec11"
+    sha256 ventura:        "e6759d0aaebfaa03fea50065da4cc6e12b66192191821abb274ec6769d46bfbc"
+    sha256 monterey:       "88b28596fd214730528be0c8ec3d6f5af13808bcd222ada7455d8c256c28294e"
+    sha256 x86_64_linux:   "5226928bc5fe64461826f8d4ac78ee53212e1065a5acf656753077eb9863b886"
   end
 
   head do
@@ -63,19 +63,27 @@ class Moc < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "gettext" => :build
-  depends_on "pkg-config" => :build
-  depends_on "berkeley-db"
-  depends_on "ffmpeg@4"
+  depends_on "pkgconf" => :build
+  depends_on "berkeley-db@5"
+  depends_on "ffmpeg@4" # FFmpeg 5 issue: https://moc.daper.net/node/3644
+  depends_on "flac"
   depends_on "jack"
+  depends_on "libogg"
+  depends_on "libsamplerate"
+  depends_on "libsndfile"
   depends_on "libtool"
+  depends_on "libvorbis"
   depends_on "ncurses"
+  depends_on "speex"
 
-  fails_with gcc: "5" # ffmpeg is compiled with GCC
+  on_linux do
+    depends_on "alsa-lib"
+  end
 
   def install
     # Not needed for > 2.5.2
-    system "autoreconf", "-fvi"
-    system "./configure", "--disable-debug", "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

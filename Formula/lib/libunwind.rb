@@ -1,25 +1,24 @@
 class Libunwind < Formula
   desc "C API for determining the call-chain of a program"
   homepage "https://www.nongnu.org/libunwind/"
-  url "https://download.savannah.nongnu.org/releases/libunwind/libunwind-1.6.2.tar.gz"
-  sha256 "4a6aec666991fb45d0889c44aede8ad6eb108071c3554fcdff671f9c94794976"
+  url "https://github.com/libunwind/libunwind/releases/download/v1.8.1/libunwind-1.8.1.tar.gz"
+  sha256 "ddf0e32dd5fafe5283198d37e4bf9decf7ba1770b6e7e006c33e6df79e6a6157"
   license "MIT"
 
   livecheck do
-    url "https://download.savannah.nongnu.org/releases/libunwind/"
-    regex(/href=.*?libunwind[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :stable
+    strategy :github_latest
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "12c878018ce1adf39c49dd1bd14f4f82785f601b908fc2051ad7cbfb7f0bf65f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "81f89b76defac2b351bfb10864fcb7a9169b126f6e62a0c37c235873034fea7d"
   end
 
   keg_only "libunwind conflicts with LLVM"
 
   depends_on :linux
-
-  uses_from_macos "xz"
-  uses_from_macos "zlib"
+  depends_on "xz"
+  depends_on "zlib"
 
   def install
     system "./configure", *std_configure_args, "--disable-silent-rules"
@@ -28,14 +27,14 @@ class Libunwind < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libunwind.h>
       int main() {
         unw_context_t uc;
         unw_getcontext(&uc);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-I#{include}", "test.c", "-L#{lib}", "-lunwind", "-o", "test"
     system "./test"
   end

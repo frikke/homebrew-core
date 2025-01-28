@@ -1,18 +1,12 @@
 class Gitbucket < Formula
   desc "Git platform powered by Scala offering"
   homepage "https://github.com/gitbucket/gitbucket"
-  url "https://github.com/gitbucket/gitbucket/releases/download/4.39.0/gitbucket.war"
-  sha256 "ca7454a7fb472b61a0ca4ad056ae8930bdafd53b7cc6cd0fc3b30c6cf09c7666"
+  url "https://github.com/gitbucket/gitbucket/releases/download/4.42.1/gitbucket.war"
+  sha256 "0091ab52edac75279d2cf35b207aadfc38a87e10218f57930ecae54886c403d3"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5eda39fbee0512a3e34ccb30eb23f6ddbfe6ced65e665a7cbfdb02846b489011"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5eda39fbee0512a3e34ccb30eb23f6ddbfe6ced65e665a7cbfdb02846b489011"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5eda39fbee0512a3e34ccb30eb23f6ddbfe6ced65e665a7cbfdb02846b489011"
-    sha256 cellar: :any_skip_relocation, ventura:        "5eda39fbee0512a3e34ccb30eb23f6ddbfe6ced65e665a7cbfdb02846b489011"
-    sha256 cellar: :any_skip_relocation, monterey:       "5eda39fbee0512a3e34ccb30eb23f6ddbfe6ced65e665a7cbfdb02846b489011"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5eda39fbee0512a3e34ccb30eb23f6ddbfe6ced65e665a7cbfdb02846b489011"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ff39786b69d94da3c46979fe7ceb5dc9584a14a290420c9dc66ed5bc6f38a871"
+    sha256 cellar: :any_skip_relocation, all: "3b18003aed4fc3c7c12445926a6cc86ad72d2f01f04bc360676d52492ea06b31"
   end
 
   head do

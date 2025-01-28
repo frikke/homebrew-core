@@ -1,8 +1,9 @@
 class Miniupnpc < Formula
   desc "UPnP IGD client library and daemon"
   homepage "https://miniupnp.tuxfamily.org"
-  url "https://miniupnp.tuxfamily.org/files/download.php?file=miniupnpc-2.2.5.tar.gz"
-  sha256 "38acd5f4602f7cf8bcdc1ec30b2d58db2e9912e5d9f5350dd99b06bfdffb517c"
+  url "https://miniupnp.tuxfamily.org/files/download.php?file=miniupnpc-2.3.0.tar.gz"
+  mirror "http://miniupnp.free.fr/files/miniupnpc-2.3.0.tar.gz"
+  sha256 "025c9ab95677f02a69bc64ac0a747f07e02ba99cf797bc679a5a552fed8d990c"
   license "BSD-3-Clause"
 
   # We only match versions with only a major/minor since versions like 2.1 are
@@ -13,15 +14,12 @@ class Miniupnpc < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "4a06368a2a1a20ce1ebfd43c6e019c062b5349a9fead39f2b68aa5ca01fc5bfd"
-    sha256 cellar: :any,                 arm64_ventura:  "f6ecafbc60eadb5fd14c12efce8f25b24ba5cf58d35700558072e8d1284d0298"
-    sha256 cellar: :any,                 arm64_monterey: "a3ac9ac040fdb5c551b331812e16ad5815c0c4a1fffe76db1b8c50598d182746"
-    sha256 cellar: :any,                 arm64_big_sur:  "f5cdb0a658e0365301886fa456c889df15b094439cbb5b3a0358e9f5076ca21e"
-    sha256 cellar: :any,                 sonoma:         "af442c08368a0147ea7771b53cb8b5b2b7a9ceac7619863f3cc0bb8d32a7ad3f"
-    sha256 cellar: :any,                 ventura:        "c5169ce164fb7f73958235a65fae51a976e323393738e0b580dff6e6ca059e98"
-    sha256 cellar: :any,                 monterey:       "fb719f010b4936c1fe4117df0f80799075a8db33438ba85099508eac11420ff7"
-    sha256 cellar: :any,                 big_sur:        "9ed146f123781d070d7f18716d567373fda2e28bc051ce8aaba3bb4aeb46f56e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e662068adb2eadd32d856f8ee3d634ce7b86238b9c89f034c8db56b79cf4637e"
+    sha256 cellar: :any,                 arm64_sequoia: "b53196f6bf5c2d28576b5641ef81ab2dde16a6c1194d7493d4239cac7683c3ce"
+    sha256 cellar: :any,                 arm64_sonoma:  "627cca7ad456c05525b713e7672af9fcf61ae9795de70195447338927c432e5a"
+    sha256 cellar: :any,                 arm64_ventura: "aabd467d18967c700a6fca90dafe9c660d362f9e59999119e70c2f5747e9c90f"
+    sha256 cellar: :any,                 sonoma:        "f10bc722814029cbfed7e0561a93f80d492d5a8829f3a2f361bd0986b105bf06"
+    sha256 cellar: :any,                 ventura:       "689112816ace0060ef2f9966c8614d2fd5a36901916b0bd91a37c41060224ebc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "87d9003fd6b19c5666943c03136f754847fe0542a7350325c7ecd633e712fe38"
   end
 
   def install
@@ -29,7 +27,11 @@ class Miniupnpc < Formula
   end
 
   test do
-    output = shell_output("#{bin}/upnpc --help 2>&1", 1)
+    # `No IGD UPnP Device` on CI
+    output = shell_output("#{bin}/upnpc -l 2>&1", 1)
+    assert_match "No IGD UPnP Device found on the network !", output
+
+    output = shell_output("#{bin}/upnpc --help 2>&1")
     assert_match version.to_s, output
   end
 end

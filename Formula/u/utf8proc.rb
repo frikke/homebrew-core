@@ -1,21 +1,18 @@
 class Utf8proc < Formula
   desc "Clean C library for processing UTF-8 Unicode data"
   homepage "https://juliastrings.github.io/utf8proc/"
-  url "https://github.com/JuliaStrings/utf8proc/archive/v2.8.0.tar.gz"
-  sha256 "a0a60a79fe6f6d54e7d411facbfcc867a6e198608f2cd992490e46f04b1bcecc"
+  url "https://github.com/JuliaStrings/utf8proc/archive/refs/tags/v2.10.0.tar.gz"
+  sha256 "6f4f1b639daa6dca9f80bc5db1233e9cbaa31a67790887106160b33ef743f136"
   license all_of: ["MIT", "Unicode-DFS-2015"]
+  head "https://github.com/JuliaStrings/utf8proc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "539dbffd0d8c36de242f70a8cf2c79ad2e38022c748e3310259476743181bb31"
-    sha256 cellar: :any,                 arm64_ventura:  "30ed86d43d46f716a4a1b72387914314e4a59340e1baa4fbb737af16c3307d08"
-    sha256 cellar: :any,                 arm64_monterey: "509a6e2796a043ba5fcc913adf088330edd7b0196d80a9978de685757f113b8d"
-    sha256 cellar: :any,                 arm64_big_sur:  "42a02f08806443010d52cfe20390fde9e0a20b995f0cee8aaf1ff69761dee632"
-    sha256 cellar: :any,                 sonoma:         "f7175f22c305955749992df0b04c33bb086b580e9a94351d86a9797ffd919a2e"
-    sha256 cellar: :any,                 ventura:        "205b140d52a4e1c1fe8ff42514f95b230e7a9542789a7eb1da599b454aefd7df"
-    sha256 cellar: :any,                 monterey:       "f6e51a50dc42de33bca46db0dc1a065c417a3ade6dc812cf184da6ea88bc48d8"
-    sha256 cellar: :any,                 big_sur:        "e1572b897d7f68c664ff54d8b701f1f839c909bd10ea8d47cc5ea221cbc39018"
-    sha256 cellar: :any,                 catalina:       "a4985025c7b99050f9f136d13de2446a77d2d36f8067469c7ac11813be9848ff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f445634d879944ce4965d2c0c022859fd3f8c15022e96ab51e4257cbc5d6376b"
+    sha256 cellar: :any,                 arm64_sequoia: "81533530b545ad8ebf73b33a3bdca4bd7fd79c08b43b36065f01786e303474bb"
+    sha256 cellar: :any,                 arm64_sonoma:  "077fcc508fb1911325da5deaea023cfaaf0ca58fdde2097d415779bca397c285"
+    sha256 cellar: :any,                 arm64_ventura: "be90c358d69294427f51905783aa6bb9fd9e10f3b5c2fa499f7629186fc61d6c"
+    sha256 cellar: :any,                 sonoma:        "94a054d454bd5df62734457a4ac938ab20b3637ae8ee9d36e37fa72fb9adaf41"
+    sha256 cellar: :any,                 ventura:       "7086a1eb8b0caa36a1abfad15c613a158ba78800bdfe3f8539d78ad8f10f8a1d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9b814bb33469856d652a662d92121da8b878a2fa3630dda62ba6646d943dae7e"
   end
 
   def install
@@ -23,7 +20,7 @@ class Utf8proc < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <string.h>
       #include <utf8proc.h>
 
@@ -31,7 +28,7 @@ class Utf8proc < Formula
         const char *version = utf8proc_version();
         return strnlen(version, sizeof("1.3.1-dev")) > 0 ? 0 : -1;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lutf8proc", "-o", "test"
     system "./test"

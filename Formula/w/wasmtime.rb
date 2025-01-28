@@ -2,42 +2,46 @@ class Wasmtime < Formula
   desc "Standalone JIT-style runtime for WebAssembly, using Cranelift"
   homepage "https://wasmtime.dev/"
   url "https://github.com/bytecodealliance/wasmtime.git",
-      tag:      "v12.0.2",
-      revision: "79a5d2ac52ea76e47265c46a77d329ca0e6839c9"
+      tag:      "v29.0.1",
+      revision: "58282df898d79a787a726d829b166272dde155b9"
   license "Apache-2.0" => { with: "LLVM-exception" }
   head "https://github.com/bytecodealliance/wasmtime.git", branch: "main"
 
+  # Upstream maintains multiple major versions and the "latest" release may be
+  # for a lower version, so we have to check multiple releases to identify the
+  # highest version.
   livecheck do
     url :stable
-    strategy :github_latest
+    strategy :github_releases
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "69e2a5912295d8e563b6d5db8dafea3b4c411c4e2a1846736aa3492b957bc90c"
-    sha256 cellar: :any,                 arm64_monterey: "ccee5e10d33439408bc14ecb6cefe8f570174ec7563b3fec6177a513c1996ef5"
-    sha256 cellar: :any,                 arm64_big_sur:  "19f6aa8f36cab41e307ce5c4e4b1147604fcb2f522888b1074734135d86a1c9f"
-    sha256 cellar: :any,                 ventura:        "96914dac92bd2ca4cd34dad60d5fc23573707c0d1d88a48d3876334e6fc14502"
-    sha256 cellar: :any,                 monterey:       "dd61a1f07eb41b6db0cab962410887e04ad6d6ef95ef89a4c8116d2db3fa81b4"
-    sha256 cellar: :any,                 big_sur:        "c25929af7d642491983888cf3ca0ccaf4ae1f89c2507355478c40a064373eef8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3a36f0fc7ae46646d593514cbb55e292ae36b111e09d512a90f1239d6c764b01"
+    sha256 cellar: :any,                 arm64_sequoia: "57aa467e30ccd3754b31de3d63e3fc90ed3c2e28fa9e47b014bd735a7b638d2d"
+    sha256 cellar: :any,                 arm64_sonoma:  "08ef6b5b38c1dd3bf5278623f11e7e9def6e041fd3377b0a7db1dcfc58015ba5"
+    sha256 cellar: :any,                 arm64_ventura: "906ecd556170309b452aa9018991e64e00d01d68d0135a19fc5b20d981aa4db7"
+    sha256 cellar: :any,                 sonoma:        "bea3250e3fd0f69abae0fea65e8843a08e6a73d7d0f4b89f15f3994f1512a349"
+    sha256 cellar: :any,                 ventura:       "ec8a1ef94e2c9e1f7cad45717d6c24040d8f8edf5048bb22febf10d087be796c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a2f6514238ed0aae4037560f55fc71e5f5f7a0e019c681955e34c7a6905d74a9"
   end
 
+  depends_on "cmake" => :build
   depends_on "rust" => :build
 
   def install
-    system "cargo", "install", *std_cargo_args
-    system "cargo", "build", "--locked", "--lib", "--manifest-path", "crates/c-api/Cargo.toml", "--release"
-    cp "crates/c-api/wasm-c-api/include/wasm.h", "crates/c-api/include/"
-    lib.install shared_library("target/release/libwasmtime")
-    include.install "crates/c-api/wasm-c-api/include/wasm.h"
-    include.install Dir["crates/c-api/include/*"]
+    system "cargo", "install", *std_cargo_args, "--profile=fastest-runtime"
+
+    system "cmake", "-S", "crates/c-api", "-B", "build", "-DWASMTIME_FASTEST_RUNTIME=ON", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
+    generate_completions_from_executable(bin/"wasmtime", "completion")
   end
 
   test do
     wasm = ["0061736d0100000001070160027f7f017f030201000707010373756d00000a09010700200020016a0b"].pack("H*")
     (testpath/"sum.wasm").write(wasm)
     assert_equal "3\n",
-      shell_output("#{bin}/wasmtime #{testpath/"sum.wasm"} --invoke sum 1 2")
+      shell_output("#{bin}/wasmtime --invoke sum #{testpath/"sum.wasm"} 1 2")
 
     (testpath/"hello.wat").write <<~EOS
       (module
@@ -48,7 +52,7 @@ class Wasmtime < Formula
 
     # Example from https://docs.wasmtime.dev/examples-c-hello-world.html to test C library API,
     # with comments removed for brevity
-    (testpath/"hello.c").write <<~EOS
+    (testpath/"hello.c").write <<~C
       #include <assert.h>
       #include <stdio.h>
       #include <stdlib.h>
@@ -152,7 +156,7 @@ class Wasmtime < Formula
         wasm_byte_vec_delete(&error_message);
         exit(1);
       }
-    EOS
+    C
 
     system ENV.cc, "hello.c", "-I#{include}", "-L#{lib}", "-lwasmtime", "-o", "hello"
     expected = <<~EOS

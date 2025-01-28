@@ -6,13 +6,9 @@ class Libtextcat < Formula
   sha256 "5677badffc48a8d332e345ea4fe225e3577f53fc95deeec8306000b256829655"
   license "BSD-3-Clause"
 
-  livecheck do
-    url :homepage
-    regex(/href=.*?libtextcat[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
-
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "b470b7355ee704a07a4768b12909b0c80501f241c57f257d4639147b0fda41eb"
     sha256 cellar: :any,                 arm64_sonoma:   "cc83f030e51cc9de7708c72e452fc0064c21cfbeb3b83e15970901c26f1e1cb0"
     sha256 cellar: :any,                 arm64_ventura:  "e5d60db841a6a8bd707de17b8e6e67f7113a9c8b54a1a614342f77797cbb041b"
     sha256 cellar: :any,                 arm64_monterey: "af621f1b2cfa2e6463bad63f3b7dbb77c928881dee5e41425489687c4849ceb0"
@@ -29,15 +25,15 @@ class Libtextcat < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "2104f4e2ec57f7f63de0e6f68d7b2dae82c6912146c17908f4fc1625a17bc7c5"
   end
 
+  disable! date: "2025-01-01", because: :repo_removed
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
 
   def install
-    system "autoreconf", "-ivf"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
     (include/"libtextcat/").install Dir["src/*.h"]
     share.install "langclass/LM", "langclass/ShortTexts", "langclass/conf.txt"

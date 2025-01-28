@@ -1,23 +1,21 @@
 class Findutils < Formula
   desc "Collection of GNU find, xargs, and locate"
   homepage "https://www.gnu.org/software/findutils/"
-  url "https://ftp.gnu.org/gnu/findutils/findutils-4.9.0.tar.xz"
-  mirror "https://ftpmirror.gnu.org/findutils/findutils-4.9.0.tar.xz"
-  sha256 "a2bfb8c09d436770edc59f50fa483e785b161a3b7b9d547573cb08065fd462fe"
+  url "https://ftp.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz"
+  mirror "https://ftpmirror.gnu.org/findutils/findutils-4.10.0.tar.xz"
+  sha256 "1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5"
   license "GPL-3.0-or-later"
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "f6e698b67946d557bc577ee72dc5d6fda6b4fd01b28a0aa7c04a1435d19618d4"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "74fbe230e7727aaaf128082d47a2fc0f032c204154375b83461161442934961a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e21f10bcc0baed90d33aad5ce7428f9ad24a9cd4e35f4b0003e14160045f8fb5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "72ddcf7cfdccb52f6c4c4f20c2c0cdbb4111d37641d73a1622a4af170ed5b53b"
-    sha256 cellar: :any_skip_relocation, sonoma:         "7312e1463b5b7e47b061cc180381acdcf5c5a7d396012ed0481f2fccd32e0b99"
-    sha256 cellar: :any_skip_relocation, ventura:        "c32f96d54d0b689a5df3f9664a65d2a1fe954402481a49593767b5e856700887"
-    sha256 cellar: :any_skip_relocation, monterey:       "595025aa645a0bc036179b30613986bd436081cc4416db21de0f8fba4d95934b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e2171d40184a93549ca6877410abf8717c7d8b13ae1a0bf3568dd49a24b7747e"
-    sha256 cellar: :any_skip_relocation, catalina:       "a957b1c3b354edee634d1d96f66315fa8ea327efc9f282c8c026b5298d8802e3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3be871b90f426c6a6b9f292e65ba359c402017e783523746e965d849436137db"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "c09536c5626e7159ccbee77d9a8c771397305bdaecd8a9a67c495482c8dba0f7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "1c9fb06c4b3b4bdd0cf9dd38b18168a2ec9bfd689af59ef95808246c4b7c3c91"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0f8cb6a602454e6739de9b20f925692c192d33d9d3b725447be3e9eee9ebd13f"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "a95af4320383b2e5b00f76fa5b17dc904cc5f1599536fc316f79000c6d85483d"
+    sha256 cellar: :any_skip_relocation, sonoma:         "6f6c220a82a470cd41bd33c330d6bb752df6da9df4aa2ead4e011fff80abad0c"
+    sha256 cellar: :any_skip_relocation, ventura:        "90ec3d5bf4c1f5c58bad4e40a28f00f856e5f15f995a2e724b89a882112e4db2"
+    sha256 cellar: :any_skip_relocation, monterey:       "642fe05dc9e71c9941570328bf7f8ab9d5c61e5517211ab8f62a08f9d3936ac5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0e2d353feb5ebd258d6a53a4ca3c5904dec97797c56bbd13ae5ff75cdebc0492"
   end
 
   def install
@@ -45,7 +43,7 @@ class Findutils < Formula
       end
     end
 
-    libexec.install_symlink "gnuman" => "man"
+    (libexec/"gnubin").install_symlink "../gnuman" => "man"
   end
 
   def post_install

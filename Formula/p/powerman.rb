@@ -1,28 +1,19 @@
 class Powerman < Formula
   desc "Control (remotely and in parallel) switched power distribution units"
   homepage "https://github.com/chaos/powerman"
+  url "https://github.com/chaos/powerman/releases/download/v2.4.4/powerman-2.4.4.tar.gz"
+  sha256 "d675502144bc0875def92dad4c0efc6d43bc81c78d6fdb09ebc5f3558b3b7c85"
   license "GPL-2.0-or-later"
 
-  stable do
-    url "https://github.com/chaos/powerman/releases/download/v2.3.27/powerman-2.3.27.tar.gz"
-    sha256 "1575f0c2cc49ba14482582b9bbba19e95496434f95d52de6ad2412e66200d2d8"
-
-    # Fix -flat_namespace being used on Big Sur and later.
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
-      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
-    end
-  end
-
   bottle do
-    sha256 arm64_ventura:  "111132a22f3537ebc1726cec49965768bc874fabaf46b2c2c7e5c1dfe7bd6c1c"
-    sha256 arm64_monterey: "bf7397842c0e10d990a848340dfb2287596ed94591840997a946886edfb307d9"
-    sha256 arm64_big_sur:  "9742622a1433440ff96eb624c08a9b28c30fa12d4d120bc3d73072acc371a968"
-    sha256 ventura:        "07d0663bbe475dbe29617e4a7678ca4a6076303da2c1553a8fc2ca411ac0b575"
-    sha256 monterey:       "518f201a1163ea0c947a9322360f7020f45f5d115752b06497baadbe0cc3f987"
-    sha256 big_sur:        "a493a8832e7af6dce239bdea4db718455d5d919c39ff3fc027a5b7192f0416f4"
-    sha256 catalina:       "a453e51a5217c9bb4846590f195710c693aa38382ea78b14750437a3fba53784"
-    sha256 x86_64_linux:   "15e926da608bdb3d7aa8ddd394f85608cd7effaa775df653059a5ed6c4809f32"
+    sha256 arm64_sequoia:  "54a0c75c35b58a6eb25dc9f56b019643b33fbfcc3b71f6d1316f2eb32447eb11"
+    sha256 arm64_sonoma:   "6274589c50d20da83fdc311f6810716088ecdeab30dd079faffd7622694ae8ae"
+    sha256 arm64_ventura:  "bed3bba37a720c974c0752e1026bafabf8c6c647b6cb344a372d3354429a15ee"
+    sha256 arm64_monterey: "e218e0db90cd2e380ebfd077218c11dd0431006677e34a30fd253b73a3bdffaa"
+    sha256 sonoma:         "86b2910601c00324092ad76240a00179fc9f957131804f621bd06f54af35d826"
+    sha256 ventura:        "0e043048d342891a2062efc4a573b0d434276eb59401881cb30a90528ebcecbb"
+    sha256 monterey:       "2df1fa862eaa9e2fa6c9af732f77430919cc6664db0a9a1e170029830cc3ea37"
+    sha256 x86_64_linux:   "995393b52583123c1791404fca6de037205ea8b8ae14817c817328a6eb3e7b96"
   end
 
   head do
@@ -34,6 +25,10 @@ class Powerman < Formula
   end
 
   depends_on "curl"
+  depends_on "jansson"
+
+  uses_from_macos "bison" => :build
+  uses_from_macos "flex" => :build
 
   def install
     system "./autogen.sh" if build.head?

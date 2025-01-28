@@ -1,26 +1,25 @@
 class Libproxy < Formula
   desc "Library that provides automatic proxy configuration management"
   homepage "https://libproxy.github.io/libproxy/"
-  url "https://github.com/libproxy/libproxy/archive/refs/tags/0.5.3.tar.gz"
-  sha256 "0d8d8e4dd96239ba173c2b18905c0bb6e161fd5000e1e0aeace16f754e9a9108"
+  url "https://github.com/libproxy/libproxy/archive/refs/tags/0.5.9.tar.gz"
+  sha256 "a1976c3ac4affedc17e6d40cf78c9d8eca6751520ea3cbbec1a8850f7ded1565"
   license "LGPL-2.1-or-later"
   head "https://github.com/libproxy/libproxy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "075b1519da1ad392cf866beec168b4f715177d1543e900e7ede7ae8507dfb3b7"
-    sha256 cellar: :any, arm64_monterey: "aad46ee51cd177d04ea1cfd7605b2b603f196fe1e301563191ffe4d003fe85ad"
-    sha256 cellar: :any, arm64_big_sur:  "b8fbd8ad12afa8dc832ba23c7b25fad26fb8499335f73bbe13b56a0aa69cb8f1"
-    sha256 cellar: :any, ventura:        "c3bac36fac9fd9a9863dfb2a94b285cde660387b04d7daf3ec50c76ae39097a2"
-    sha256 cellar: :any, monterey:       "a29a26ef4cd57036219b82d2866f7daf19d55711c265e8aa6b0a57f9c2c09771"
-    sha256 cellar: :any, big_sur:        "9b9351680c2be932c8da8db56563a7110225784f0d8f92ab0a149081d258618d"
-    sha256               x86_64_linux:   "20ae30585fffb6e10c91f6d993574b7b6ff3da6c9d5e1ece42021eead1a8fcc4"
+    sha256 cellar: :any, arm64_sequoia: "ea05222062747c5eb6ad1c2b6702f15fc17449dab974454882a7730ab71a57fe"
+    sha256 cellar: :any, arm64_sonoma:  "98cbc8687ff557d1c3846bee65cbd2bf1bb28c12ab11fcf5a508364147e623d8"
+    sha256 cellar: :any, arm64_ventura: "3b1fadfe0d664fba4cb8490bf6b60d6c60fba021ecbdf2392baa3883c7802be8"
+    sha256 cellar: :any, sonoma:        "33bcfa11bc19106a39baec8b02ea502d5dc8b33d3337e2d59f8b10027f1d6ad5"
+    sha256 cellar: :any, ventura:       "e1c5deed45524a740381a8cfb7298b8e2cce31574addda6143546b07517a2535"
+    sha256               x86_64_linux:  "c49f1a448cfc3917e90a0d189b88bfaee1573c717d119f944d13abd8047c7e3a"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "gsettings-desktop-schemas" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "vala" => :build # for vapigen
 
   depends_on "duktape"

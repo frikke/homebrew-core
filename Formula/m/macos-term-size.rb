@@ -1,12 +1,13 @@
 class MacosTermSize < Formula
   desc "Get the terminal window size on macOS"
   homepage "https://github.com/sindresorhus/macos-term-size"
-  url "https://github.com/sindresorhus/macos-term-size/archive/v1.0.0.tar.gz"
+  url "https://github.com/sindresorhus/macos-term-size/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "5ec39d49a461e4495f20660609276b0630ef245bf8eb80c8447c090a5fefda3c"
   license "MIT"
   head "https://github.com/sindresorhus/macos-term-size.git", branch: "main"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "08a0e517feb1a5fea5bb36871b5d3abbe781978e11e458574e92041f4cd07042"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "3424acd9de93f00406b4a94e2320a01169a092704c8ab9c66e23f230979c9ff1"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "6bc40ca23b802dbca1e7895f476a61f62cabbd2ee4b149028cf7e9a57b1ee1cd"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "f44cab0d2907e1fe48658f15eb8719e2df21e904df6b00ccd69b3dda4be38752"

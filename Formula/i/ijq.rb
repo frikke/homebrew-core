@@ -2,27 +2,25 @@ class Ijq < Formula
   desc "Interactive jq"
   homepage "https://sr.ht/~gpanders/ijq/"
   url "https://git.sr.ht/~gpanders/ijq",
-      tag:      "v0.4.1",
-      revision: "22034bea72c80db75cb8aa9fdd5808940bd45fd4"
+      tag:      "v1.1.2",
+      revision: "f67100db8b03095fbd25fef8c7f01e6407023923"
   license "GPL-3.0-or-later"
   head "https://git.sr.ht/~gpanders/ijq", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "564d6d6f157700d1d0869d3340186bbf6bf8325314954804d8d9dbea45d9fe63"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "9a7ea5d89f9eb6e575d2b4f3a5667364d03fccb1373207e6f6f226544f23a3d0"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f215c334ffea9e2ddf51319ac5b80a9b0ecab7e1d652ac8b72eb22534a8dae05"
-    sha256 cellar: :any_skip_relocation, ventura:        "db72d1ed855f451cfb0e8e4f5ef6565e89b273e26d22635186aeb7a764eca033"
-    sha256 cellar: :any_skip_relocation, monterey:       "47a030fd33f08d4888a73b3ac03135fb8493bfabeaeea13231143393cfb42be3"
-    sha256 cellar: :any_skip_relocation, big_sur:        "16b7b6a8c95d9a8ba5b2f5610438c70b0b139e279910f88e823bb1239e53ed7d"
-    sha256 cellar: :any_skip_relocation, catalina:       "022500c720f8926ae3e758f20c3290d60e0bdd4393ed118dc0c38c140d59cedf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d748a577f085a1c6a7a1ee841c95b4805604f8e42b6531ada40ee82907e89cd0"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "1f6d56b0207fbe0c580f29636d34c39e2d52349f649e04988a56f73d3ea9a1a8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "0a744ffeab4e167df5562e00df9f6881619690890b944e8812c36f6bf173c7b8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "fd09def3304b0cfcd714745a057853784b49e482a32d599db45c742d2eac3522"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "539054df9a9d84798427580397d6495c34f7ce8fd844fa8073fa7eef765727c5"
+    sha256 cellar: :any_skip_relocation, sonoma:         "d1821ef799142750e30c540f77a45b584c376d7806638fb9deddda3aead6c1c6"
+    sha256 cellar: :any_skip_relocation, ventura:        "593ef098186825e2813b8d33687f3d7781e48d765a51f3d7e7801441579394b8"
+    sha256 cellar: :any_skip_relocation, monterey:       "f9343078267b776e7fe34ab333b29753cfc44aec8ab291507b43cb7a815faa0a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c92b37ce9a8a054ad37bfefe48a1d1b03ed163527545ba10de7b7f0c3c3a9825"
   end
 
   depends_on "go" => :build
   depends_on "scdoc" => :build
   depends_on "jq"
-
-  uses_from_macos "expect" => :test
 
   def install
     system "make", "prefix=#{prefix}", "install"
@@ -33,23 +31,19 @@ class Ijq < Formula
 
     (testpath/"filterfile.jq").write '["foo", "bar", "baz"] | sort | add'
 
-    (testpath/"ijq.exp").write <<~EOS
-      #!/usr/bin/expect -f
-      proc succeed {} {
-        puts success
-        exit 0
-      }
-      proc fail {} {
-        puts failure
-        exit 1
-      }
-      set timeout 5
-      spawn ijq -H '' -M -n -f filterfile.jq
-      expect {
-        barbazfoo   succeed
-        timeout     fail
-      }
-    EOS
-    system "expect", "-f", "ijq.exp"
+    require "expect"
+    require "pty"
+    PTY.spawn("#{bin}/ijq -H '' -M -n -f filterfile.jq > result") do |r, w, pid|
+      refute_nil r.expect("barbazfoo", 5), "Expected barbazfoo"
+      w.write "\r"
+      r.read
+    rescue Errno::EIO
+      # GNU/Linux raises EIO when read is done on closed pty
+    ensure
+      r.close
+      w.close
+      Process.wait(pid)
+    end
+    assert_equal "\"barbazfoo\"\n", (testpath/"result").read
   end
 end

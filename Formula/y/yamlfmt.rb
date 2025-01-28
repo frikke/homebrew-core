@@ -1,30 +1,30 @@
 class Yamlfmt < Formula
   desc "Extensible command-line tool to format YAML files"
   homepage "https://github.com/google/yamlfmt"
-  url "https://github.com/google/yamlfmt/archive/refs/tags/v0.10.0.tar.gz"
-  sha256 "27d3528a835548b820cd68b3ee60fe5bbed6562a8d54848e353fb19bb7f7f188"
+  url "https://github.com/google/yamlfmt/archive/refs/tags/v0.15.0.tar.gz"
+  sha256 "e1c0461ece664516ddcb51a513e7cc4c955fe4e08f6d3193396bcffd16b9f798"
   license "Apache-2.0"
   head "https://github.com/google/yamlfmt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "9872caa0a7f86b271236e9a204c742271b4c13f08b670eb5add2cbf45e7ca910"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "19158d063dadfb16fee2a6ef1f008351daffd775a044fbcc10a71da878a2b3ca"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "33e0efa7383d2a3448237c48a0c01ac43d6caf760508ccd1bf1de4fcb4bd267b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "72e23f2ae3f2c0ba811ac4b2b85d05d7ea863cddf0acc464d21d00a83b88efac"
-    sha256 cellar: :any_skip_relocation, sonoma:         "8b1af3da0c72c87fd7aadee38cc0d2643805cd7bd3764c7e9ae86a0144197ac7"
-    sha256 cellar: :any_skip_relocation, ventura:        "e764bd428332103a68a124c54e8e9f336888c248c2667d277b8a1e53d9ec9e4e"
-    sha256 cellar: :any_skip_relocation, monterey:       "8e84f224f84db9dee8297289d597d2811b80fbc50594f7c759caa86d51bfc288"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ff637cb08353a4c7775df99ca600797fbeee1c0db9316d99957469ae7f3087d7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "951e0b23959df0a4b05b46c7df7b8c24ce682444ee81361fbaf1d8f118129726"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2343005d1b1df4aa279d819c1aff8d28a3a13046e8a16a91d0528aaaf9022041"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2343005d1b1df4aa279d819c1aff8d28a3a13046e8a16a91d0528aaaf9022041"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "2343005d1b1df4aa279d819c1aff8d28a3a13046e8a16a91d0528aaaf9022041"
+    sha256 cellar: :any_skip_relocation, sonoma:        "cfa25baa8706007c5403efc39836074f54b5fb8878547299af7cde2561a8f808"
+    sha256 cellar: :any_skip_relocation, ventura:       "cfa25baa8706007c5403efc39836074f54b5fb8878547299af7cde2561a8f808"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dfd5debc8b0e9a2a45e43b802ba41921a8c62b3a9bf178caa80c72cfa7c82b6c"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/yamlfmt"
+    ldflags = "-s -w -X main.version=#{version} -X main.commit=#{tap.user}"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/yamlfmt"
   end
 
   test do
+    assert_match version.to_s, shell_output("#{bin}/yamlfmt -version")
+
     (testpath/"test.yml").write <<~YAML
       foo: bar
     YAML

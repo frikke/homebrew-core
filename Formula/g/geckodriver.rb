@@ -8,40 +8,41 @@ class Geckodriver < Formula
     # Get the hg_revision for stable releases from
     # https://searchfox.org/mozilla-central/source/testing/geckodriver/CHANGES.md
     # Get long hash via `https://hg.mozilla.org/mozilla-central/rev/<commit-short-hash>`
-    hg_revision = "a80e5fd61076eda50fbf755f90bd30440ad12cc7"
+    hg_revision = "9f0a0036bea4d15e95ac10baa4a2328c8b0e4031"
     url "https://hg.mozilla.org/mozilla-central/archive/#{hg_revision}.zip/testing/geckodriver/"
-    version "0.33.0"
-    sha256 "0cc493ff77bb809e6925edd28baf6237b8e60950b7d3d2632847339bd1384b3e"
+    version "0.35.0"
+    sha256 "e06f62f008cd455265f4a4789a5659b5049c96a0820b42c6db42e04a396f79cd"
 
     resource "webdriver" do
       url "https://hg.mozilla.org/mozilla-central/archive/#{hg_revision}.zip/testing/webdriver/"
-      sha256 "70e571deb26b80ebf23984218ba253bcb329b10a02ce3e96ab84ba36214f52ea"
+      sha256 "a3dbb655be02b5a2d8ba94ea73caae3e3fe686f5130070450426f527c565be21"
     end
 
     resource "mozbase" do
       url "https://hg.mozilla.org/mozilla-central/archive/#{hg_revision}.zip/testing/mozbase/rust/"
-      sha256 "55faf1bd9c8239cff541c6d7c92fb63c284543f90a6eb6ad934e506d4d3f115c"
+      sha256 "4491d31bf1c893bfbae06567a1df646b3cd6e22773c01e4c74acb6d4c6124b76"
     end
 
     resource "Cargo.lock" do
       url "https://hg.mozilla.org/mozilla-central/raw-file/#{hg_revision}/Cargo.lock"
-      sha256 "40b7cd177ae5f9a1f1d40232fca9c1d6d7538b8e0df535e851c0c4d93e07c659"
+      sha256 "6926f3874508ebc5ecf75a9ae4499427c97e06489a689ae61fca8bb46f779295"
     end
   end
 
   livecheck do
-    url "https://github.com/mozilla/geckodriver.git"
+    url :homepage
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "58e395855e57f06d764c3def6d6d097258e02635a71ab3966192738cc5eecffa"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4cf155d33ba2b30186ed870e1413e37b6074d28053439d9072170f109328fcb7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "68f157c4a44d2015c691e83162c2f99616b806787059f89efa576b95cff83301"
-    sha256 cellar: :any_skip_relocation, ventura:        "0f8893249096660b0a31c030e402fd19971a41445e0a6b2435c27672c604d510"
-    sha256 cellar: :any_skip_relocation, monterey:       "a38132365353a169d06c78d167aec5cd2d366e7300302f516aa3c1205eab1cf3"
-    sha256 cellar: :any_skip_relocation, big_sur:        "520359529fe9f90c5fb182acf27421c39603bf7f43756ada27632e34c90538e2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "193f488a95a9ac7ec532f3284a619173208fc26da0fe2bd5140a5bdf418c6aff"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "61c09a42615f9687ba921eaf49d3a5f789fe682fa3b684d73d5dfd5fb697892b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "1a94affedc1448a651aef77cf7272f6bc24a9d21a841ae7d065fd9fd5dc83e21"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c90b62ac37e6c8f5469360b4e42d1407d2e241f230c832d0e591d69bf17a24f6"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ef272c6100a72b0f504d8cf68fbe9ca58af52761021bfe3a1255510f5432629e"
+    sha256 cellar: :any_skip_relocation, sonoma:         "4ab69fa6ad11ec81637762fb58e96e628f11cd7af876283c9f95a02890925cae"
+    sha256 cellar: :any_skip_relocation, ventura:        "2cecfa7421a96e88f3ac782901c2ab0b60b97489f2b04e4ad4ebfc8a5a2aa50c"
+    sha256 cellar: :any_skip_relocation, monterey:       "46d96a42a9868df7c40f3e6542e08493014acc8ba54a86bd56e96df9b583463a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9e4b78cd2af9526750d327338ec7804eb8ed7c3cec46182d4327a161168f46f3"
   end
 
   depends_on "rust" => :build
@@ -55,9 +56,9 @@ class Geckodriver < Formula
       %w[webdriver mozbase].each do |r|
         (buildpath/"staging").install resource(r)
         mv buildpath/"staging"/"testing"/r, buildpath/"testing"
-        rm_rf buildpath/"staging"/"testing"
+        rm_r(buildpath/"staging"/"testing")
       end
-      rm_rf buildpath/"staging"
+      rm_r(buildpath/"staging")
       (buildpath/"testing"/"geckodriver").install resource("Cargo.lock")
     end
 

@@ -1,12 +1,13 @@
 class Libccd < Formula
   desc "Collision detection between two convex shapes"
   homepage "https://github.com/danfis/libccd"
-  url "https://github.com/danfis/libccd/archive/v2.1.tar.gz"
+  url "https://github.com/danfis/libccd/archive/refs/tags/v2.1.tar.gz"
   sha256 "542b6c47f522d581fbf39e51df32c7d1256ac0c626e7c2b41f1040d4b9d50d1e"
   license "BSD-3-Clause"
   revision 1
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "69d7221dceabfe62cded58442a541ed7b4e40dc91195ddc1032d9219d6d4eb80"
     sha256 cellar: :any,                 arm64_sonoma:   "0a6c12b8b5b369018a4186622359a2b9bc8ce40a4c0fe2452263e2d4ef03d92a"
     sha256 cellar: :any,                 arm64_ventura:  "9db2e87ee4c5b69faa9269a54f22046b5c4d18a72a65bc0dd4164c35a23edbe1"
     sha256 cellar: :any,                 arm64_monterey: "95bbd2e402b8388a6b348fd755b6997ae765568357115013996efe9e596f982f"
@@ -23,12 +24,13 @@ class Libccd < Formula
   depends_on "cmake" => :build
 
   def install
-    system "cmake", ".", "-DENABLE_DOUBLE_PRECISION=ON", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", "-DENABLE_DOUBLE_PRECISION=ON", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <ccd/config.h>
       #include <ccd/vec3.h>
@@ -41,7 +43,7 @@ class Libccd < Formula
           ccd_vec3_origin, NULL);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c", "-L#{lib}", "-lccd"
     system "./test"
   end

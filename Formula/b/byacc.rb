@@ -1,8 +1,8 @@
 class Byacc < Formula
   desc "(Arguably) the best yacc variant"
   homepage "https://invisible-island.net/byacc/"
-  url "https://invisible-mirror.net/archives/byacc/byacc-20230521.tgz"
-  sha256 "5ad915a7d5833aa38a5e31bd077505666029c35e365dff8569fe4598eaa9fef2"
+  url "https://invisible-mirror.net/archives/byacc/byacc-20241231.tgz"
+  sha256 "192c2fae048d4e7f514ba451627f9c4e612765099f819c19191f9fde3e609673"
   license :public_domain
 
   livecheck do
@@ -11,15 +11,12 @@ class Byacc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "ca47f2fe6cda1f89a13c3a3f1817c693ce5d8a2723fcdb269d78e18b1783792a"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "38ce343287827cb635395e53d6335d31022e05e07cded481ace466889c003615"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "9c0cda08a52207ffec61486dd83aab12002b67f0e650cd7eb9170dc3596016fa"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f2498ba1b3d8beb6c7c29f11763f1971707f708bd56c0dcdb2fe058f66cce3cc"
-    sha256 cellar: :any_skip_relocation, sonoma:         "d83b4520cce9e86c6845fb4aaa01fbe27cdd65b16fb8a375878f7576687671db"
-    sha256 cellar: :any_skip_relocation, ventura:        "559fd17c57ee319a5f0ffa0b04b2f42ffc3a0a6dbf0e85e3a42dc9cda059218f"
-    sha256 cellar: :any_skip_relocation, monterey:       "309accb76b2f5daa03813ccf640da8396bec1d0540f83a13e85ed41d6b64b4ea"
-    sha256 cellar: :any_skip_relocation, big_sur:        "420f2b6d7799a77f32c8ad2cd86b5a00218ad2019e2daa07f2d8f87559d3c242"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "55dff71ab67cd1fc94db04da4501a5fe110d27bc18ce6918fa014c3ee1e423e3"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2b612e162124adb2c0a376645ec5a6fd73a32a048f93ff3f0a9cf822755ec9c3"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e0efb664c82544393a02605e60e18599b8aeffcdf2cfae244a7f7336de1164e9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "8ea708b5af936039ee437745f89d0db999464ab1dd68d7369e114b09315724c8"
+    sha256 cellar: :any_skip_relocation, sonoma:        "652bcab4132cf85526b03cdbfa52294d455500e566febe2891e118ca43351146"
+    sha256 cellar: :any_skip_relocation, ventura:       "50253d20fdb4a50ffd1066fa33baddcbd912128cfc7474622bfea06114c1a5d6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6bb26e744e5e9602d7c1ff3766f2578fb34c1a8a497d3cd02932650d2b6c2023"
   end
 
   def install

@@ -1,34 +1,32 @@
 class Cmark < Formula
   desc "Strongly specified, highly compatible implementation of Markdown"
   homepage "https://commonmark.org/"
-  url "https://github.com/commonmark/cmark/archive/0.30.3.tar.gz"
-  sha256 "85e9fb515531cc2c9ae176d693f9871774830cf1f323a6758fb187a5148d7b16"
+  url "https://github.com/commonmark/cmark/archive/refs/tags/0.31.1.tar.gz"
+  sha256 "3da93db5469c30588cfeb283d9d62edfc6ded9eb0edc10a4f5bbfb7d722ea802"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "0b22613ee9aa75990bdb4bbbfc6166ef8d176b17c8caf7bbad25ed0738841a7b"
-    sha256 cellar: :any,                 arm64_monterey: "739ea11aa0a356b621c49661721ceb371e3c5ea56c244328bd10aae74a0f95a4"
-    sha256 cellar: :any,                 arm64_big_sur:  "162ade26201f90662fc6305a83c72ae2a550ddc4326ccf453d5ab1fd85879c25"
-    sha256 cellar: :any,                 ventura:        "ea945f37fb8de82dffc9ba85f6592b564036228e7ee2ba49951bc639b51266c6"
-    sha256 cellar: :any,                 monterey:       "43e230aa0745cc9362d1f2f7c1d85424005690242c725117d3a88be8b88d31c2"
-    sha256 cellar: :any,                 big_sur:        "cef92df088c591e3b123ad841a0773fd75c4961d59f701b5e6d27902ecde14af"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f35b1d16c83135d09f2f022a0e4f5a25479feea6411c5115bd8dddfc866f4d1a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "2ef6e622a90bf422b50d87ced249c01fcddf68577dca5c1d253ae49e65507612"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "1ddac8c6456bff3ff163cb189b713cf3993cc2515d740e39b4f135d4233eb368"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "19bbac821a80898d2fc9174479d3b0e6e8ec8e1fa104069714d504e8a859b4a5"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9520669d2fd57eb90ecda887a67c706bde219508516a1876ec73d4047acd0467"
+    sha256 cellar: :any_skip_relocation, sonoma:         "bc90c65f67d701afea02da66a2748b2cf5531a9ea490aca25ae05cab740b5550"
+    sha256 cellar: :any_skip_relocation, ventura:        "574b08c9836e1c14a4956b5fdf387c97ba36d7956be1c59db8315586ec37de45"
+    sha256 cellar: :any_skip_relocation, monterey:       "e94600f55338f8f6a328d24b917dfe4f2786f847f07bb178317aaf254c905bd8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "44766462af04cc1d8e0ed724abd72297db90add455b432a395ba7c6caf175591"
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.11" => :build
-
-  conflicts_with "cmark-gfm", because: "both install a `cmark.h` header"
+  uses_from_macos "python" => :build
 
   def install
-    mkdir "build" do
-      system "cmake", "..", "-DCMAKE_INSTALL_LIBDIR=lib", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    output = pipe_output("#{bin}/cmark", "*hello, world*")
+    output = pipe_output(bin/"cmark", "*hello, world*")
     assert_equal "<p><em>hello, world</em></p>", output.chomp
   end
 end

@@ -1,8 +1,8 @@
 class Pyenv < Formula
   desc "Python version management"
   homepage "https://github.com/pyenv/pyenv"
-  url "https://github.com/pyenv/pyenv/archive/refs/tags/v2.3.27.tar.gz"
-  sha256 "600526bd8ee7e458e14376ba02e30ea9edf82a6f0bc5369836d0df5e7a32e81f"
+  url "https://github.com/pyenv/pyenv/archive/refs/tags/v2.5.1.tar.gz"
+  sha256 "676b1309015b0e6e2157cd38c9fbc2a9723ae21f1c0b7dd77034ffadd5376350"
   license "MIT"
   version_scheme 1
   head "https://github.com/pyenv/pyenv.git", branch: "master"
@@ -13,20 +13,17 @@ class Pyenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "44ea044b20197daa91ee0ba3b4e6cc7d36614c1654ce292b33ff9173c05561e2"
-    sha256 cellar: :any,                 arm64_ventura:  "9e55863d70a0d01961a983b773f198e2dbfcec47b6c7495442660e0ad9ff12af"
-    sha256 cellar: :any,                 arm64_monterey: "d43c8f94f590540f7d1359a69925cad531ffa522f873514bf089d9cf9682c9be"
-    sha256 cellar: :any,                 arm64_big_sur:  "7706202123316adfa410c40baebb892c2307eb1884b4f44e3756a2d5405c1f81"
-    sha256 cellar: :any,                 sonoma:         "a0481f60b734d585775899883ba8ad24d68e12529374597dfecf6d7a371069d0"
-    sha256 cellar: :any,                 ventura:        "e39b472b4d223abc17d251169d471315741d49eaa5ea5285e1d1c47713b18320"
-    sha256 cellar: :any,                 monterey:       "8e7516a43be113a2f46b696fc4243a49ad7177b3cdb1acdd84fa0b4b478f438d"
-    sha256 cellar: :any,                 big_sur:        "d40f881de5ff2026f42e3991ea37b637dc5e726f04d7562c7482cd3d238e49c3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "85ec38cd1bfca0d13c2bfc1fd483385aca386917d8d2ce192c3436b9b439dbb5"
+    sha256 cellar: :any,                 arm64_sequoia: "6a76e0359b87f465a1b5d68ed1707e2b9992c0fbfb27d974183e6526407a6480"
+    sha256 cellar: :any,                 arm64_sonoma:  "89f08ddbadaafe258b3d98c14905ce2273113916b3df2f10cfc9fce8e432a3f4"
+    sha256 cellar: :any,                 arm64_ventura: "f5cc91c7fb9e9942b0f3a7e545c8e6f84bfc23e815e3fb0a5fdbd9dac303b28e"
+    sha256 cellar: :any,                 sonoma:        "18af49c6369e8812881319e6ca7115020c48b8eab54f450b974d201e8ec39c4f"
+    sha256 cellar: :any,                 ventura:       "f98e8602ac19d8db8d9958e9826f0ff15a7210d33593ede0ec15595e639d851a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8b7375d1400c90e17563e5ea4a86c1b115e5a14b523e4c2cb8732a517ffb17fa"
   end
 
   depends_on "autoconf"
   depends_on "openssl@3"
-  depends_on "pkg-config"
+  depends_on "pkgconf"
   depends_on "readline"
 
   uses_from_macos "python" => :test

@@ -11,11 +11,13 @@ class ProcpsAT3 < Formula
 
   keg_only :versioned_formula
 
+  disable! date: "2024-10-11", because: :versioned_formula
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "gettext" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on :linux
   depends_on "ncurses"
 
@@ -29,7 +31,7 @@ class ProcpsAT3 < Formula
   end
 
   test do
-    system "#{bin}/ps", "--version"
+    system bin/"ps", "--version"
     assert_match "grep homebrew", shell_output("#{bin}/ps aux | grep homebrew")
   end
 end

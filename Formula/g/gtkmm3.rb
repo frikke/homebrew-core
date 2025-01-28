@@ -1,8 +1,8 @@
 class Gtkmm3 < Formula
   desc "C++ interfaces for GTK+ and GNOME"
   homepage "https://www.gtkmm.org/"
-  url "https://download.gnome.org/sources/gtkmm/3.24/gtkmm-3.24.8.tar.xz"
-  sha256 "d2940c64922e5b958554b23d4c41d1839ea9e43e0d2e5b3819cfb46824a098c4"
+  url "https://download.gnome.org/sources/gtkmm/3.24/gtkmm-3.24.9.tar.xz"
+  sha256 "30d5bfe404571ce566a8e938c8bac17576420eb508f1e257837da63f14ad44ce"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,23 +11,27 @@ class Gtkmm3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_sonoma:   "4e45dd6bcbbcc6edea1604f8b9bf713de8e78309300e768a5540c7fe5799b270"
-    sha256 cellar: :any, arm64_ventura:  "d09df4ca0f3ab0d81e6f6adf49fb8897e69f8d8782fe435fd941e1f8e67ce367"
-    sha256 cellar: :any, arm64_monterey: "abc44666af25bedd6e470ed46dd54f6d8b9ce1e3e03c4020e335fa269e6f16e5"
-    sha256 cellar: :any, arm64_big_sur:  "74547d4474ffdc944b017fa8394681b7ee669216ca1d3b0957d69c17968c99ca"
-    sha256 cellar: :any, sonoma:         "ed0b7ec0302bec6e71c305d5912ce7d51114c31a314b3188d57095f5f0b4aea1"
-    sha256 cellar: :any, ventura:        "63fca66eadb4a64d3a4155e8671ec80dccc423150eeab5bb50534830eae4221d"
-    sha256 cellar: :any, monterey:       "25d28cb65838bb115c07facd15450f69b16919fca544e97c2302cb51e1d33070"
-    sha256 cellar: :any, big_sur:        "cc4a7601a18212b67b82c0b630a93d8bd95cd67cee936f2e8c93b612d7bbf12e"
-    sha256               x86_64_linux:   "4636cb05f997adce9a64c56c745dcc553f0f2884d6a803cfd25371ab7dd6dfe2"
+    sha256 cellar: :any, arm64_sequoia:  "34f51a1502979c61cb7b92921770e9bf0a388acf0cac71f15c589b9ee583c8ee"
+    sha256 cellar: :any, arm64_sonoma:   "fb81c07b62bf93741751146db60e01d13dd0f2e2f10686286703133e8356668a"
+    sha256 cellar: :any, arm64_ventura:  "a96cef2e81067ac9239b8eeadd95f1e13f33f02058e43a6f2b349b56b5579c2c"
+    sha256 cellar: :any, arm64_monterey: "417c16642451874e4444883262d2850241e35607d87e8bf02c534b041b798f3d"
+    sha256 cellar: :any, sonoma:         "ddebda42ae26f02c468c9fa4d990ec4c6a110c281c90d63f4a6db1ab6eb53ba6"
+    sha256 cellar: :any, ventura:        "94b66c7c5c18c00262020c88f2abed754cbf9e500f1838d2c9e634f99b91ea6b"
+    sha256 cellar: :any, monterey:       "059230eadd967c816ea5c01903c5eb07c39690dbc9c54cdec0cbbcf5760c1a91"
+    sha256               x86_64_linux:   "548ac36e8284ef35d9bb0700f63a50deb54ebfb67b27de3e72b0ab45793b6232"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
+
   depends_on "atkmm@2.28"
   depends_on "cairomm@1.14"
+  depends_on "gdk-pixbuf"
+  depends_on "glib"
+  depends_on "glibmm@2.66"
   depends_on "gtk+3"
+  depends_on "libsigc++@2"
   depends_on "pangomm@2.46"
 
   def install
@@ -37,16 +41,18 @@ class Gtkmm3 < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <gtkmm.h>
+
       class MyLabel : public Gtk::Label {
         MyLabel(Glib::ustring text) : Gtk::Label(text) {}
       };
       int main(int argc, char *argv[]) {
         return 0;
       }
-    EOS
-    flags = shell_output("#{Formula["pkg-config"].opt_bin}/pkg-config --cflags --libs gtkmm-3.0").strip.split
+    CPP
+
+    flags = shell_output("pkgconf --cflags --libs gtkmm-3.0").chomp.split
     system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", *flags
     system "./test"
   end

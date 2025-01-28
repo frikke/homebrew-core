@@ -1,6 +1,6 @@
 class Rome < Formula
   desc "Carthage cache for S3, Minio, Ceph, Google Storage, Artifactory and many others"
-  homepage "https://github.com/tmspzz/Rome/#readme"
+  homepage "https://github.com/tmspzz/Rome"
   url "https://github.com/tmspzz/Rome/archive/refs/tags/v0.24.0.65.tar.gz"
   sha256 "7aee4de208a78208559d6a9ad17788d70f62cace4ff2435b3e817a3e03efdef6"
   license "MIT"
@@ -14,6 +14,10 @@ class Rome < Formula
     sha256 cellar: :any_skip_relocation, catalina:       "135212529c003247ae4ac695a19e5658ae704ee1c1c0dc8131d6b776fa163233"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "2a60357d041aa0c5547afc0cd0ea6bc9d2933d0db3ce3bfaeb6607c9b664f0e4"
   end
+
+  # https://github.com/tmspzz/Rome/issues/262
+  # Original deprecation date: 2023-10-01
+  disable! date: "2024-07-26", because: :does_not_build
 
   depends_on "cabal-install" => :build
   depends_on "ghc@8.10" => :build

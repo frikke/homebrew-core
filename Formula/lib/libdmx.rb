@@ -6,6 +6,7 @@ class Libdmx < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "e5034cca46b4ff523130888f6d8bf0d75937e0f1b490a0cf0c0c175f32d8be2d"
     sha256 cellar: :any,                 arm64_sonoma:   "f9beee8dec503a6ecc7479eaec0f9f567d03d38076e4b0237e75969155df0006"
     sha256 cellar: :any,                 arm64_ventura:  "bd69993016d92420d1f32df152e891cadf75c3693e2d4d6573e4f651ca6dab10"
     sha256 cellar: :any,                 arm64_monterey: "62fcb302aec2c914524a9d00e43ccc8846f259b4a018fde0d8ef95fc32941058"
@@ -17,27 +18,25 @@ class Libdmx < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "0296a0ca6fde5ca5ba12b45505db769743916188a47d0b876049488f31185833"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libx11"
   depends_on "libxext"
   depends_on "xorgproto"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/Xlib.h"
       #include "X11/extensions/dmxext.h"
 
@@ -45,7 +44,7 @@ class Libdmx < Formula
         DMXScreenAttributes attributes;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

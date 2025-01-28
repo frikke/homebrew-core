@@ -1,19 +1,17 @@
 class Gdu < Formula
   desc "Disk usage analyzer with console interface written in Go"
   homepage "https://github.com/dundee/gdu"
-  url "https://github.com/dundee/gdu/archive/v5.25.0.tar.gz"
-  sha256 "83fe876d953b4f2f7a856552e758aae4aa0cd9569dcf1aded61bdc834b834275"
+  url "https://github.com/dundee/gdu/archive/refs/tags/v5.30.1.tar.gz"
+  sha256 "ad363967b6a34e02812e4cba36bb340f377cf64a435e23f6e8e9e6b3f775220e"
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7ddc42b8da31e35f87c722fe3c1912e338b15e4af553e1d0bb1d8ac7a4dd600e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7ddc42b8da31e35f87c722fe3c1912e338b15e4af553e1d0bb1d8ac7a4dd600e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7ddc42b8da31e35f87c722fe3c1912e338b15e4af553e1d0bb1d8ac7a4dd600e"
-    sha256 cellar: :any_skip_relocation, ventura:        "aa1ba23f987df2ec8403887234196d7d548819f4725935e4333ed9802d6bacae"
-    sha256 cellar: :any_skip_relocation, monterey:       "aa1ba23f987df2ec8403887234196d7d548819f4725935e4333ed9802d6bacae"
-    sha256 cellar: :any_skip_relocation, big_sur:        "aa1ba23f987df2ec8403887234196d7d548819f4725935e4333ed9802d6bacae"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6830146fdaba73d2c0bd32cfd4de1fcd9f1c5d3b097acd6fa0d062ad81a3e5e5"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "30f8670a47423d2d9ab75cc3dcfc0c7b5996120cd2a2df56f5a54c79904c5d17"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "30f8670a47423d2d9ab75cc3dcfc0c7b5996120cd2a2df56f5a54c79904c5d17"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "30f8670a47423d2d9ab75cc3dcfc0c7b5996120cd2a2df56f5a54c79904c5d17"
+    sha256 cellar: :any_skip_relocation, sonoma:        "818de028c8fc955fb8df9d1e03f20ac8f792f1f9265b3b845d74cb19a6fd1a12"
+    sha256 cellar: :any_skip_relocation, ventura:       "818de028c8fc955fb8df9d1e03f20ac8f792f1f9265b3b845d74cb19a6fd1a12"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bdc10b86df052f39e3fbbf431d05492e410808cf6c831ed653a862e484ae8b56"
   end
 
   depends_on "go" => :build
@@ -29,7 +27,7 @@ class Gdu < Formula
       -X "github.com/dundee/gdu/v#{major}/build.User=#{user}"
     ]
 
-    system "go", "build", *std_go_args(ldflags: ldflags, output: "#{bin}/gdu-go"), "./cmd/gdu"
+    system "go", "build", *std_go_args(ldflags:, output: bin/"gdu-go"), "./cmd/gdu"
   end
 
   def caveats

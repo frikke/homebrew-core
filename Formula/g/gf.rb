@@ -1,19 +1,18 @@
 class Gf < Formula
   desc "App development framework of Golang"
   homepage "https://goframe.org"
-  url "https://github.com/gogf/gf/archive/refs/tags/v2.5.4.tar.gz"
-  sha256 "06967b713e6d03a94161c6e41609dc58cf7cd8115e8e208ce7a27eba2c3379e8"
+  url "https://github.com/gogf/gf/archive/refs/tags/v2.8.3.tar.gz"
+  sha256 "ade95d6d2f0d37c50be400fb6988c8c0d4dad560c46a5d49fc689f3968a72e60"
   license "MIT"
   head "https://github.com/gogf/gf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4a1b6049b11aca1a121fa772b569d81790158a39d0f266d186d6bc1d6e948eb8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ad269dcdc0da5af544815f60612c4f343c89ebeafbb7614c3b68915f4b9a3b2a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b7633e3f9ea4aa9a6f185eec9bc7ba84e996762d7a806129c317a9d2c546437c"
-    sha256 cellar: :any_skip_relocation, ventura:        "8052e315a6ea72e376f6e279fdf86a7a08ab8d2700dd51b06a9404d92df7be64"
-    sha256 cellar: :any_skip_relocation, monterey:       "25d159e6dd6cb2232c3348f9b5711270dcdc24c74d0ea7f9c2dc0d940750d9aa"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c9f6ed07e24577291206a1c9121a1e012ef84f33d8b448c2ab830e06ad964e8c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "74ea521c601354e114bdccac623046e76651853350d60959bccb35e122e35038"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2022193b52c7b8a9176e0cc575b214a16cf8236070278e6184d485a4c8b1d5d9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2022193b52c7b8a9176e0cc575b214a16cf8236070278e6184d485a4c8b1d5d9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "2022193b52c7b8a9176e0cc575b214a16cf8236070278e6184d485a4c8b1d5d9"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1b00ebfda3dab63aeddaf916aff12d31365ed836b867fc85c4d174bd72ff5e59"
+    sha256 cellar: :any_skip_relocation, ventura:       "1b00ebfda3dab63aeddaf916aff12d31365ed836b867fc85c4d174bd72ff5e59"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "995b209cd742541ad9f6fd0f0484232bfcd6c1509b1423ca14dc6b00f5a9121f"
   end
 
   depends_on "go" => [:build, :test]
@@ -26,8 +25,8 @@ class Gf < Formula
 
   test do
     output = shell_output("#{bin}/gf --version 2>&1")
-    assert_match "GoFrame CLI Tool v#{version}, https://goframe.org", output
-    assert_match "GoFrame Version: cannot find go.mod", output
+    assert_match "v#{version}\nWelcome to GoFrame!", output
+    assert_match "GF Version(go.mod): cannot find go.mod", output
 
     output = shell_output("#{bin}/gf init test 2>&1")
     assert_match "you can now run \"cd test && gf run main.go\" to start your journey, enjoy!", output

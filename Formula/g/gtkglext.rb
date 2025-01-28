@@ -4,33 +4,41 @@ class Gtkglext < Formula
   url "https://download.gnome.org/sources/gtkglext/1.2/gtkglext-1.2.0.tar.gz"
   sha256 "e5073f3c6b816e7fa67d359d9745a5bb5de94a628ac85f624c992925a46844f9"
   license "LGPL-2.1-or-later"
-  revision 3
+  revision 4
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any, arm64_ventura:  "7e761fba5d5ae2e370a03c9f09336d0faa9c13f65ee73b8b2bdae413c035f471"
-    sha256 cellar: :any, arm64_monterey: "a42443e10af16bb89c45e2ebed7735f8a5693219e00964a6a8599cf105e4f289"
-    sha256 cellar: :any, arm64_big_sur:  "0e7132d3e408cb5d9bbff6e8f6e93bc6460ebbb4f3e6f365d8cb331edee9435a"
-    sha256 cellar: :any, ventura:        "cd52e03d283779558b3eb60e58633be5ef0977e662710c265b7d7465ebfe52b2"
-    sha256 cellar: :any, monterey:       "9f4a28bef624c621d498d6f0c8dc1c0193735ab5f63b60373a9969dba9736c34"
-    sha256 cellar: :any, big_sur:        "b367a1ac2118e2bf146d4efd53f5c7b3870b1f0e123ebfc072edf3e1c7eee8d6"
-    sha256 cellar: :any, catalina:       "34d57545ff116ecf21f8e6f8695a6a20ac8f1fe90439be0f166420d4623b0050"
-    sha256 cellar: :any, mojave:         "aa701707e57b30e6bba5e9f4b28993e7393d43f471994a46572daaee6d678a55"
-    sha256 cellar: :any, high_sierra:    "6862527d7b86b6940a38f9fb189085d80b6ea67ee80adc2794e550999e8cc86c"
-    sha256               x86_64_linux:   "6e82f4383e3a88e158ad287109440ad81b8298efb14045efbc33b892a10482dc"
+    sha256 cellar: :any,                 arm64_sonoma:   "dbda7d73cfcf8ff56426e761be3d928b47cc25142be9e436f29634f306ceb02d"
+    sha256 cellar: :any,                 arm64_ventura:  "97c561405376a0e3f03d661edb63332c449464eca670d94d95276d7a16708ada"
+    sha256 cellar: :any,                 arm64_monterey: "4082e12c1b01e56342b49fb16241fb6e4e52b6c1f5691052b332f75b8892781f"
+    sha256 cellar: :any,                 sonoma:         "ea372181dc03023ea581b14ca996646f6da8cdb54d81911f5b999281c70ecdd7"
+    sha256 cellar: :any,                 ventura:        "986da9680b6032a4f4ae363e3c18176dce0bd276367e311c36b09494198d79d1"
+    sha256 cellar: :any,                 monterey:       "6f045d38e2a584449fa6b5fc275f13b46bce7a4bd892219bb9dbe9bae44a9835"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bea86597c739ebbf55d551970dee174085bfc3d0c4d70f06f0cce969979ef2af"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => [:build, :test]
   depends_on "glib"
   depends_on "gtk+"
+  depends_on "pango"
+
+  on_macos do
+    depends_on "at-spi2-core"
+    depends_on "cairo"
+    depends_on "gdk-pixbuf"
+    depends_on "gettext"
+    depends_on "harfbuzz"
+  end
 
   on_linux do
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
+
+    depends_on "libx11"
+    depends_on "mesa"
     depends_on "mesa-glu"
 
-    resource("pangox-compat") do
+    resource "pangox-compat" do
       url "https://gitlab.gnome.org/Archive/pangox-compat/-/archive/0.0.2/pangox-compat-0.0.2.tar.gz"
       sha256 "c8076b3d54d5088974dbb088a9d991686d7340f368beebaf437b78dfed6c5cd5"
 
@@ -97,6 +105,9 @@ class Gtkglext < Formula
   end
 
   def install
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
     unless OS.mac?
       resource("pangox-compat").stage do
         system "./autogen.sh"
@@ -106,10 +117,10 @@ class Gtkglext < Formula
       end
       ENV.append_path "PKG_CONFIG_PATH", libexec/"lib/pkgconfig"
 
-      system "autoreconf", "-fvi"
+      system "autoreconf", "--force", "--install", "--verbose"
     end
 
-    args = *std_configure_args
+    args = []
     if OS.mac?
       args << "--without-x"
       # Fix flat_namespace usage
@@ -117,80 +128,22 @@ class Gtkglext < Formula
                 "${wl}-undefined ${wl}dynamic_lookup"
     end
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gtk/gtkgl.h>
 
       int main(int argc, char *argv[]) {
         int version_check = GTKGLEXT_CHECK_VERSION(1, 2, 0);
         return 0;
       }
-    EOS
-    atk = Formula["atk"]
-    cairo = Formula["cairo"]
-    fontconfig = Formula["fontconfig"]
-    freetype = Formula["freetype"]
-    gdk_pixbuf = Formula["gdk-pixbuf"]
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    gtkx = Formula["gtk+"]
-    harfbuzz = Formula["harfbuzz"]
-    libpng = Formula["libpng"]
-    pango = Formula["pango"]
-    pixman = Formula["pixman"]
-    flags = %W[
-      -I#{atk.opt_include}/atk-1.0
-      -I#{cairo.opt_include}/cairo
-      -I#{fontconfig.opt_include}
-      -I#{freetype.opt_include}/freetype2
-      -I#{gdk_pixbuf.opt_include}/gdk-pixbuf-2.0
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{gtkx.opt_include}/gtk-2.0
-      -I#{gtkx.opt_lib}/gtk-2.0/include
-      -I#{harfbuzz.opt_include}/harfbuzz
-      -I#{include}/gtkglext-1.0
-      -I#{libpng.opt_include}/libpng16
-      -I#{lib}/gtkglext-1.0/include
-      -I#{pango.opt_include}/pango-1.0
-      -I#{pixman.opt_include}/pixman-1
-      -D_REENTRANT
-      -L#{atk.opt_lib}
-      -L#{cairo.opt_lib}
-      -L#{gdk_pixbuf.opt_lib}
-      -L#{gettext.opt_lib}
-      -L#{glib.opt_lib}
-      -L#{gtkx.opt_lib}
-      -L#{lib}
-      -L#{pango.opt_lib}
-      -latk-1.0
-      -lcairo
-      -lgio-2.0
-      -lglib-2.0
-      -lgmodule-2.0
-      -lgobject-2.0
-      -lgdk_pixbuf-2.0
-      -lpango-1.0
-      -lpangocairo-1.0
-    ]
+    C
 
-    if OS.mac?
-      flags += %w[
-        -lgdk-quartz-2.0
-        -lgtk-quartz-2.0
-        -lgdkglext-quartz-1.0
-        -lgtkglext-quartz-1.0
-        -lintl
-        -framework AppKit
-        -framework OpenGL
-      ]
-    end
-
+    ENV.append_path "PKG_CONFIG_PATH", libexec/"lib/pkgconfig"
+    flags = shell_output("pkgconf --cflags --libs gtkglext-1.0").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

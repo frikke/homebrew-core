@@ -4,6 +4,7 @@ class Rogue < Formula
   homepage "https://sourceforge.net/projects/roguelike/"
   url "https://src.fedoraproject.org/repo/pkgs/rogue/rogue5.4.4-src.tar.gz/033288f46444b06814c81ea69d96e075/rogue5.4.4-src.tar.gz"
   sha256 "7d37a61fc098bda0e6fac30799da347294067e8e079e4b40d6c781468e08e8a1"
+  license "BSD-3-Clause"
 
   livecheck do
     url "https://src.fedoraproject.org/repo/pkgs/rogue/"
@@ -12,9 +13,12 @@ class Rogue < Formula
 
   bottle do
     rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "78ece502084d54a61267fe5b312cc9a85161bc428fc6f8785f7e5e738bcaa237"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "596bea046705fe93367152155bd753a89a490728692838f3d281e66af803d23a"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "eb41a1bc17c2894736afe57978b32b796793b405a238685b04c5bb4b0e8ff466"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "6c73ef712b35b6ba4c3339828add299a2ce8d53dd35a455d439f9639b484e99d"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1cfeb02e30c14d89cf9d831c553a06eb17a6d6d27734c215e3ee7e72ab0c7c76"
+    sha256 cellar: :any_skip_relocation, sonoma:         "2e0cbcc68239387495a09dd1786e0691f725b9812472fcc13563021d1fcb44cc"
     sha256 cellar: :any_skip_relocation, ventura:        "cbb8530b652299bddc7a997cbb51205f58a89f88ed43a06dac27e784886deb11"
     sha256 cellar: :any_skip_relocation, monterey:       "0c169854e9edcfdf99c7c52e5fbfb39dbf883c74f076097aaf3027daf9f2064b"
     sha256 cellar: :any_skip_relocation, big_sur:        "c6e8bb630a966cd8885e378242f9175ffd8327e26ec1ed679016302b437a5156"
@@ -53,6 +57,6 @@ class Rogue < Formula
   end
 
   test do
-    system "#{bin}/rogue", "-s"
+    system bin/"rogue", "-s"
   end
 end

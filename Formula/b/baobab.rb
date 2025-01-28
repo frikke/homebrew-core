@@ -1,18 +1,17 @@
 class Baobab < Formula
   desc "Gnome disk usage analyzer"
-  homepage "https://wiki.gnome.org/Apps/Baobab"
-  url "https://download.gnome.org/sources/baobab/44/baobab-44.0.tar.xz"
-  sha256 "845b63bb9123d74568c8126c571bbc74273483ff920179a2cf1eddbbefa1bfc0"
+  homepage "https://apps.gnome.org/Baobab/"
+  url "https://download.gnome.org/sources/baobab/47/baobab-47.0.tar.xz"
+  sha256 "b88f74f9c052d3c2388f7062d228cf5e927545acf7408c56841df80ccd1f9c37"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "51ceb0c963e73eed95c217497c225c1567a96bd0c351bb8fdd8f0f340096f637"
-    sha256 arm64_monterey: "6415103c8d7a5abb1cd0d3964b7e0e4adb2b648952c5a765de3406625de2c0ca"
-    sha256 arm64_big_sur:  "e344b2469eed54edaea7e2e643d7018075cf212d3d715b991dbdb5d87ae6ae63"
-    sha256 ventura:        "b3ab0b152bbb0e004e9bb4e297494f530b8a6e4aceb68ed1fde9fb46e058b18e"
-    sha256 monterey:       "7045d114d65ca8b07f7534fff54959329a147803051a8772d17ad8e192a179b5"
-    sha256 big_sur:        "91f456b18cbb84f6dd510bb3faf7593ff2c735b361b9a26fa3611d5cc9c01a1e"
-    sha256 x86_64_linux:   "5bf6be47037b1bb21274c6bee9544c15805280705bc9a9d52b5b1445c9a3ba67"
+    sha256 arm64_sequoia: "12e11545d6f02d1a88483055e749bac19b045b156fd5ca7cae591e792e5e61dc"
+    sha256 arm64_sonoma:  "38db124b08f97a3724fd1120e492d9c4d40e6a5c584cab7bdfab4847622167ab"
+    sha256 arm64_ventura: "12d32bb8bdadbf48a6545deca728efd0bba40c89fe4ba67e327994190cc85c26"
+    sha256 sonoma:        "b4df7f44d53e3d27f90505331a0410c9c2d353ad8e9c98425c4e9c41e28291eb"
+    sha256 ventura:       "e7a371708e8a66aa9526089ec7a291f75fc9347658f2bf959a363ee467cc9829"
+    sha256 x86_64_linux:  "ab089d8ad6d53915b1523b8cc93f2c50b09c60a8e8fe9da2b2285f175546a5c6"
   end
 
   depends_on "desktop-file-utils" => :build
@@ -20,15 +19,27 @@ class Baobab < Formula
   depends_on "itstool" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "vala" => :build
+
   depends_on "adwaita-icon-theme"
+  depends_on "cairo"
   depends_on "glib"
+  depends_on "graphene"
   depends_on "gtk4"
   depends_on "hicolor-icon-theme"
   depends_on "libadwaita"
+  depends_on "pango"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
+    # Work-around for build issue with Xcode 15.3
+    # upstream bug report, https://gitlab.gnome.org/GNOME/baobab/-/issues/122
+    ENV.append_to_cflags "-Wno-incompatible-function-pointer-types" if DevelopmentTools.clang_build_version >= 1500
+
     # stop meson_post_install.py from doing what needs to be done in the post_install step
     ENV["DESTDIR"] = "/"
 

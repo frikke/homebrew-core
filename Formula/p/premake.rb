@@ -1,8 +1,8 @@
 class Premake < Formula
   desc "Write once, build anywhere Lua-based build system"
   homepage "https://premake.github.io/"
-  url "https://github.com/premake/premake-core/releases/download/v5.0.0-beta2/premake-5.0.0-beta2-src.zip"
-  sha256 "4c1100f5170ae1c3bd1b4fd9458b3b02ae841aefbfc41514887b80996436dee2"
+  url "https://github.com/premake/premake-core/releases/download/v5.0.0-beta4/premake-5.0.0-beta4-src.zip"
+  sha256 "7ed887b3731ef6454b7c1cf99adbecb77f1abee088d0478916db8a4da16a1e82"
   license "BSD-3-Clause"
   version_scheme 1
   head "https://github.com/premake/premake-core.git", branch: "master"
@@ -13,13 +13,12 @@ class Premake < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b7c0e198ec64df063c624729b362aeffcf03b6a7c3d369a289553830aa84e76e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c1a2d677314bd928dbbe53c160bd3d67477b485904f7df4afe1e7d92876380d7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bb6aded02913a669e7bb98a1556c1c1d069ca998e41c22fb77da2bafb82baa75"
-    sha256 cellar: :any_skip_relocation, ventura:        "2e6089750d30a7173fd03d1c0397188f0bc81def52bd14d78c52b062d269a245"
-    sha256 cellar: :any_skip_relocation, monterey:       "1e2e64dcda1ad406434262658bca0830bd564a6c8fc9878bad0178e807fc140d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0468917acf8072ff58035d030cff0500de669c64445bf113740d65d5cc098bea"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "df19de0950ff6c2e808f5faf472ef74b52b68076c12ed4db4afe7ed9583c514b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "881991a8f92bae6785d61fa135b75cbf2167f72dea81dc69e988f82584a34650"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "af776f3b2b25129f1e76ea56f2f595563300c7a3aba8a15325e360e5dbe979b9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "2d0b3e94a3622f3b5cf93055810dfd4c347e8d882709e0b3a734a1620d20230d"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b7e7485f8685afe2c9614ae25632fa7578e843a96e4aee68f1c071fd667d75be"
+    sha256 cellar: :any_skip_relocation, ventura:       "31b4dea50eff685369daec416ac307a59c112ddc2b790cb841c5b37eb5ac3463"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0e288f6bdf196560a2b12e270ad36b3fc760c57d5badf44296643e03cb1110c8"
   end
 
   on_linux do
@@ -27,7 +26,7 @@ class Premake < Formula
   end
 
   def install
-    # Workaround for Xcode 14.3
+    # Fix compile with newer Clang
     # upstream issue, https://github.com/premake/premake-core/issues/2092
     ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
 
@@ -45,7 +44,6 @@ class Premake < Formula
   end
 
   test do
-    expected_version = build.head? ? "-dev" : version.to_s
-    assert_match expected_version, shell_output("#{bin}/premake5 --version")
+    assert_match version.to_s, shell_output("#{bin}/premake5 --version")
   end
 end

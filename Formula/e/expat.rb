@@ -1,8 +1,8 @@
 class Expat < Formula
   desc "XML 1.0 parser"
   homepage "https://libexpat.github.io/"
-  url "https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.xz"
-  sha256 "ef2420f0232c087801abf705e89ae65f6257df6b7931d37846a193ef2e8cdcbe"
+  url "https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.lz"
+  sha256 "80a5bec283c7cababb3c6ec145feb4f34a7741eae69f9e6654cc82f5890f05e2"
   license "MIT"
 
   livecheck do
@@ -14,16 +14,12 @@ class Expat < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "450d6a6ffbdf07006b39a7974de0dd96a9f14d79a7a098d8320b548e241eab71"
-    sha256 cellar: :any,                 arm64_ventura:  "3c7cd6f81b3171b8858df622e03582d983053c9fab61c6786690dc21915b37bc"
-    sha256 cellar: :any,                 arm64_monterey: "b2da23ec6cc32aa2cfabf746594e905cddb76b8351b40d317b9d4231cb782f13"
-    sha256 cellar: :any,                 arm64_big_sur:  "be121e65ca172e88af2d28b7e8a13fab9794ce1df74c597d34011c3dd7cc9a72"
-    sha256 cellar: :any,                 sonoma:         "5fe8f9a832e949d8fc5495d767594145b56748b9cb230ce6fd6962aa862a2435"
-    sha256 cellar: :any,                 ventura:        "1c45270bdb0c45c810cd90457cca0aa2e48e25762624443b59d3f0c1ed9f9ebf"
-    sha256 cellar: :any,                 monterey:       "ece2dd08612bb84c394074eea1ee11249678b716d35ae8a29a3369f54a10e9b8"
-    sha256 cellar: :any,                 big_sur:        "fbad8bd585ca3b1fe7a9f65ca014893ae06d65727c7edf29e9c16ddd06b49242"
-    sha256 cellar: :any,                 catalina:       "0cb52adc9b8b11faedd3e6a4bc579d3aa4c90ee451282130fc885afb884c1d4d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ed2b581249b57581db4178a3f219f94f75d8b540867cc27fe1b809b3d32f1772"
+    sha256 cellar: :any,                 arm64_sequoia: "7f47cdcb2b385e14a695b7cf0c11ad2810c7d80860730180b70c315ed4f1aefb"
+    sha256 cellar: :any,                 arm64_sonoma:  "60a7805061d5eb779c8798b8fc3fa0c1cb3063e6786471d329687de38cfde52f"
+    sha256 cellar: :any,                 arm64_ventura: "69954446c870bfbea2df1e26784ac789456d654754f75bd94297bf89bcea66ad"
+    sha256 cellar: :any,                 sonoma:        "e98fa8b9fe6d09089fbf75356463f1a4aefd1efb8069436fab2266a8efc2e855"
+    sha256 cellar: :any,                 ventura:       "e9563e83b969283e97681f9358a333727b9a0f8145c01fa942a8045adbfbb48d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d426857dc98acacb3a4c3bb6d7646dadf65bb4c154a4c6681103de42fa2f981e"
   end
 
   head do
@@ -46,7 +42,7 @@ class Expat < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include "expat.h"
 
@@ -79,7 +75,7 @@ class Expat < Formula
 
         return result;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lexpat", "-o", "test"
     assert_equal "tag:str|data:Hello, world!|", shell_output("./test")
   end

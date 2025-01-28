@@ -2,8 +2,8 @@ class Pixie < Formula
   desc "Observability tool for Kubernetes applications"
   homepage "https://px.dev/"
   url "https://github.com/pixie-io/pixie.git",
-      tag:      "release/cli/v0.8.2",
-      revision: "401c92c1ed086eaa35dbe17b4fbcfd96e7b1ca4f"
+      tag:      "release/cli/v0.8.8",
+      revision: "042e35639f16d32fced41939c5fbc5085e1272ff"
   license "Apache-2.0"
   head "https://github.com/pixie-io/pixie.git", branch: "main"
 
@@ -13,16 +13,17 @@ class Pixie < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ae39dedd709f92a8add505011b2f5939eeba7f18e5a8372bf9b41767d1d4f94a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "693e5840758901a9cafde136280a33628328119b0fe836d15aa1d1ea791180e3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f4d9c0810f8e2bfd7374d70c33427cd293adb2fde6eeb7afaa61174b54bfa94b"
-    sha256 cellar: :any_skip_relocation, ventura:        "ca5612497f9bc097b7deaca8973674661db74d5cea9db12c147d7f90d78da29f"
-    sha256 cellar: :any_skip_relocation, monterey:       "151c8631c02e8a3fda66937ff3e6a0a7c27bcc2a5a8faa774c9e1aa8a380ddab"
-    sha256 cellar: :any_skip_relocation, big_sur:        "08a65cf20796c23ee6bce718fdbf33555b643a20bb64779d7f903d14747c8e3a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f25e44683314c716e558324dd012a8953def0f917f15b8c7968867c9aa32b1f5"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6c7fbaafa23de8f05e452d24747a4edd4c8a0d61a0a01b3ba664ca804c843e8e"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "76f8833feb8e94f8f7fb33848057603d35acf63c1d6acdbfd02d3a4c22e863fb"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1cf672d31b3b683081c257958eb297f56ff5f0b394dc48f51e4be862751f9bce"
+    sha256 cellar: :any_skip_relocation, sonoma:        "8fdd739ced12415fabcad6ceeb96550171e1b585143f274376ec56f776c83d90"
+    sha256 cellar: :any_skip_relocation, ventura:       "afdfd7b18e2528f563336d90b53d9266a72b86d847df1afac796fc70f7f6e8e8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "da530afc94d1ab1753b32d48e963b6cb6e4c45ef4daaaa2cad0255e54fab966a"
   end
 
   depends_on "go" => :build
+
+  conflicts_with "px", because: "both install `px` binaries"
 
   def install
     semver = build.head? ? "0.0.0-dev" : version
@@ -35,9 +36,9 @@ class Pixie < Formula
       -X px.dev/pixie/src/shared/goversion.buildNumber=#{revision + bottle&.rebuild.to_i + 1}
       -X px.dev/pixie/src/shared/goversion.builtBy=#{tap.user}
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags, output: bin/"px"), "./src/pixie_cli"
+    system "go", "build", *std_go_args(ldflags:, output: bin/"px"), "./src/pixie_cli"
 
-    generate_completions_from_executable(bin/"px", "completion", base_name: "px")
+    generate_completions_from_executable(bin/"px", "completion")
   end
 
   test do

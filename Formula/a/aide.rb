@@ -1,18 +1,19 @@
 class Aide < Formula
   desc "File and directory integrity checker"
   homepage "https://aide.github.io/"
-  url "https://github.com/aide/aide/releases/download/v0.18.6/aide-0.18.6.tar.gz"
-  sha256 "8ff36ce47d37d0cc987762d5d961346d475de74bba8a1832fd006db6edd3c10e"
+  url "https://github.com/aide/aide/releases/download/v0.18.8/aide-0.18.8.tar.gz"
+  sha256 "16662dc632d17e2c5630b801752f97912a8e22697c065ebde175f1cc37b83a60"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "83a95d3294e93c9e97dce63f90669196c83385b8c9746726b1de80c519dbb989"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "89d4522e294308bb68cb77a6af9b2efac9ed3766f3af891830b760822ec7bfe6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "abc3a66e2bc062aec14e805564de1640d916b124b53f6fc8df5e9539fecdc869"
-    sha256 cellar: :any_skip_relocation, ventura:        "55b3325f8102ad90e22d655a683d5d92fada2acc3bb2a9b3ef6a5d7957aa7b7d"
-    sha256 cellar: :any_skip_relocation, monterey:       "b8b22c018153d7d4b8ac0540455d975066e1be9679dc224cf062d24972df50be"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3399423faa40213b9206f1ca09f5979d1ae8d5b19f22d80485b099b2d0cf41d4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9212d924afb1b8912d17b0c0242e4dc7a5d837199f0ed4e43f568c2f992cf601"
+    sha256 cellar: :any,                 arm64_sequoia:  "366f1aadcab6aaea9eabda7c97ed85cd57c88c14ef22f83f7de5ffb0d4d937a7"
+    sha256 cellar: :any,                 arm64_sonoma:   "67de729676b7cef9aaaed2c7b206a7786f6ef9ea9c4afc01b618aff46dcc2b18"
+    sha256 cellar: :any,                 arm64_ventura:  "28b109731344ff7448929640721cf9b57b75147dc48552952090adb11e086ab5"
+    sha256 cellar: :any,                 arm64_monterey: "50ac76fbb9fdb0ed794ca4def350631b9c297c20635c8609c8efd19b5dd5159c"
+    sha256 cellar: :any,                 sonoma:         "a7a43ce551b4cc61a6b23e011a6114fadbb2c86f7c1266623f327d4e4ae738f1"
+    sha256 cellar: :any,                 ventura:        "d9693e7f65cd11f1195eedecc860b385f556b57e3d700b9cc5758c819aa062dd"
+    sha256 cellar: :any,                 monterey:       "68c94e713f48b7633df19a440444043e8e64c6f93a125d062d4ba33c12737c1a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "aa5f708845d27bd45bdaf4780d901964e206f9202da0be92f66e3a85e9d849c7"
   end
 
   head do
@@ -23,7 +24,8 @@ class Aide < Formula
     depends_on "bison" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "libgcrypt"
   depends_on "libgpg-error"
   depends_on "pcre2"
@@ -31,6 +33,7 @@ class Aide < Formula
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
   uses_from_macos "curl"
+  uses_from_macos "zlib"
 
   def install
     # use sdk's strnstr instead
@@ -39,11 +42,9 @@ class Aide < Formula
     system "sh", "./autogen.sh" if build.head?
 
     args = %W[
-      --disable-lfs
       --disable-static
       --with-zlib
       --sysconfdir=#{etc}
-      --prefix=#{prefix}
     ]
 
     args << if OS.mac?
@@ -52,8 +53,7 @@ class Aide < Formula
       "--with-curl=#{Formula["curl"].prefix}"
     end
 
-    system "./configure", *args
-
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
@@ -69,6 +69,6 @@ class Aide < Formula
       database_attrs = sha256
       /etc p+i+u+g+sha256
     EOS
-    system "#{bin}/aide", "--config-check", "-c", "aide.conf"
+    system bin/"aide", "--config-check", "-c", "aide.conf"
   end
 end

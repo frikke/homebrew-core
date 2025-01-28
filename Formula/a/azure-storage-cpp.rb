@@ -1,41 +1,46 @@
 class AzureStorageCpp < Formula
   desc "Microsoft Azure Storage Client Library for C++"
-  homepage "https://azure.github.io/azure-storage-cpp"
-  url "https://github.com/Azure/azure-storage-cpp/archive/v7.5.0.tar.gz"
+  homepage "https://azure.github.io/azure-storage-cpp/"
+  url "https://github.com/Azure/azure-storage-cpp/archive/refs/tags/v7.5.0.tar.gz"
   sha256 "446a821d115949f6511b7eb01e6a0e4f014b17bfeba0f3dc33a51750a9d5eca5"
   license "Apache-2.0"
-  revision 6
+  revision 11
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "ab552ebf3bdc993fc9e579e2a6b75759c9da2ae1be66951caf8f9e609d7a1800"
-    sha256 cellar: :any,                 arm64_monterey: "46cd609d6586555b067f95d24cf0de532e40db79b0b3367c290d51cab751ce41"
-    sha256 cellar: :any,                 arm64_big_sur:  "be9e3706cc237d12e7285ca3184b45681784905855e0f12e71457fdde06e980d"
-    sha256 cellar: :any,                 ventura:        "30ff16a364d78d4ff1b0478c79262628c42f614a585be85649cdb6dd1ef9d37c"
-    sha256 cellar: :any,                 monterey:       "412a2a4bc2bb9a1e8e350fc906b43bc1f6461efc36bc21246358b4ee0cea2c4f"
-    sha256 cellar: :any,                 big_sur:        "cf309d60aec3a7898cb09864286a950332cda74e165f7c8d741ef8f74b1cdd3a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cc25900db6d940de570b1196d2680d440be510bbadf5310208e3728b6b55ebed"
+    sha256 cellar: :any,                 arm64_sequoia: "f00202a3cc5f45662cb1bf801b41b41da1e6723ab96ae9a34d25cce65d62ff4e"
+    sha256 cellar: :any,                 arm64_sonoma:  "66384afbbbaaf12285b727f25b3f6c21637183de034a0cf48c1d3c282f90cb67"
+    sha256 cellar: :any,                 arm64_ventura: "6765f5fa16be2927c8fcf835d78ee871d3732ccea22a810177bf9f96df5f80f2"
+    sha256 cellar: :any,                 sonoma:        "2ce10849c8309c5ce8244584ad2684d56e038228d93dd4116228518f4b28b847"
+    sha256 cellar: :any,                 ventura:       "b8a14b220f1ad4e4c759146992258c51906652387a5aabaa924a296f31d37a31"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "43fc31791da3f757934d1f122292cce81008d2af85f98284a7cfb89f9aab9104"
   end
 
+  # https://github.com/Azure/azure-storage-cpp/commit/b319b189067ac5f54137ddcfc18ef506816cbea4
+  # https://aka.ms/AzStorageCPPSDKRetirement
+  disable! date: "2025-05-20", because: :deprecated_upstream
+
   depends_on "cmake" => :build
-  depends_on "boost"
+  depends_on "boost@1.85"
   depends_on "cpprestsdk"
-  depends_on "gettext"
   depends_on "openssl@3"
+
+  uses_from_macos "libxml2"
 
   on_linux do
     depends_on "util-linux"
   end
 
   def install
-    system "cmake", "Microsoft.WindowsAzure.Storage",
+    system "cmake", "-S", "Microsoft.WindowsAzure.Storage", "-B", "build",
                     "-DBUILD_SAMPLES=OFF",
                     "-DBUILD_TESTS=OFF",
                     *std_cmake_args
-    system "make", "install"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <was/common.h>
       #include <was/storage_account.h>
       using namespace azure;
@@ -47,12 +52,13 @@ class AzureStorageCpp < Formula
         }
         catch(...){ return 1; }
       }
-    EOS
+    CPP
+    boost = Formula["boost@1.85"]
     flags = ["-std=c++11", "-I#{include}",
-             "-I#{Formula["boost"].include}",
+             "-I#{boost.include}",
              "-I#{Formula["openssl@3"].include}",
              "-I#{Formula["cpprestsdk"].include}",
-             "-L#{Formula["boost"].lib}",
+             "-L#{boost.lib}",
              "-L#{Formula["cpprestsdk"].lib}",
              "-L#{Formula["openssl@3"].lib}",
              "-L#{lib}",

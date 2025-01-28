@@ -11,8 +11,8 @@ class Scalariform < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "0a155625340add1d947b67289ee0ebfad84655735801562fe67ed853840ec92a"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "57e890f720dfb6cb481d8ea3898b8d4706a33bfe02a6f71a8db118b7cb918e16"
   end
 
   head do
@@ -34,17 +34,17 @@ class Scalariform < Formula
   end
 
   test do
-    before_data = <<~EOS
+    before_data = <<~SCALA
       def foo() {
       println("Hello World")
       }
-    EOS
+    SCALA
 
-    after_data = <<~EOS
+    after_data = <<~SCALA
       def foo() {
          println("Hello World")
       }
-    EOS
+    SCALA
 
     (testpath/"foo.scala").write before_data
     system bin/"scalariform", "-indentSpaces=3", testpath/"foo.scala"

@@ -1,18 +1,17 @@
 class DuoUnix < Formula
   desc "Two-factor authentication for SSH"
   homepage "https://www.duosecurity.com/docs/duounix"
-  url "https://github.com/duosecurity/duo_unix/archive/duo_unix-2.0.2.tar.gz"
-  sha256 "0a2ccaa8e2fef3cca00cfdf9e1310df4ec1253aa7720e37bc0a824a5c2f1433d"
+  url "https://github.com/duosecurity/duo_unix/archive/refs/tags/duo_unix-2.0.4.tar.gz"
+  sha256 "e77512725dedb23b3e8094ca3153fc3ffe51d3c32cd9dd56779480a93625de90"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "9a6bbfe6c75da709bdf0afe6018f2e6395ac27727b5672db37b9bf6a56b98222"
-    sha256 arm64_monterey: "a56165902f8088823615fe8e7e8a3e1675bc2f06e2d1e5033f60406c6d072768"
-    sha256 arm64_big_sur:  "798f6731f3545946c7fbc89822f34ba8f5e969a11ba98b396b9be4cd66952276"
-    sha256 ventura:        "d8fcb91bf99c57dbaac23d2018989fe732dae914ac3ef4e5a5a74fbd347f18d2"
-    sha256 monterey:       "f6b1fdcb60764a5bc05e540693ca61f5ceb46dd6c9cce219e7a4bbaca47148b0"
-    sha256 big_sur:        "5101c623cdda9d871dde50690614087b2494461f4c249c1f8e9194665afa4bf3"
-    sha256 x86_64_linux:   "73dcc6c177ec868d564a3c73f241c58e85ef4754852d2bcc6e6086d8ad6b6cb7"
+    sha256 arm64_sequoia: "a5a83f2592c5b682bf178fab0175c3c6038005821e6c06c7df552df9239f2c39"
+    sha256 arm64_sonoma:  "1a74a2f536ed3aa4f3f17bb99771de85ac79a9f8ad08ae48009c3c923ccd3ee2"
+    sha256 arm64_ventura: "8c35a0ef94b4b3b4b73e5e28d8b76bf9f5bb07498532ebfc3dd824c481872b79"
+    sha256 sonoma:        "01ba2b5a22076ea198c6295fce94d20526507e1009b8669fd65d7425899c6cb4"
+    sha256 ventura:       "3271ea0c7e12aa40fc6f5fce6040b99c9f4378f767c8583459ea566af706d72d"
+    sha256 x86_64_linux:  "3d3f20a51db6e5642f7c85185081d89d38566b977c4d7c14406e115f34c78183"
   end
 
   depends_on "autoconf" => :build
@@ -25,6 +24,7 @@ class DuoUnix < Formula
   end
 
   def install
+    File.write("build-date", time.to_i)
     system "./bootstrap"
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",

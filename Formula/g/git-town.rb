@@ -1,19 +1,17 @@
 class GitTown < Formula
   desc "High-level command-line interface for Git"
   homepage "https://www.git-town.com/"
-  url "https://github.com/git-town/git-town/archive/refs/tags/v9.0.1.tar.gz"
-  sha256 "692a4125b86375e77f4957f80ef815cc757676cd8843a7e45b1fbf12da1a8a46"
+  url "https://github.com/git-town/git-town/archive/refs/tags/v17.2.0.tar.gz"
+  sha256 "f547aba92fe464ac0a724def6554c774571a12654234a692ff699c63d6c23620"
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b005247d2c3a341467eb2e75a81378be1ed06ac5035b3f2131d6c29a82e6ca38"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d2814f1faa26f316f34fecfd3a694dda9ad148a736fa319a261f232762c1af43"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "744861eed899e8f89638f76d74071ffbd94f72268b81391523e695293d65fbd0"
-    sha256 cellar: :any_skip_relocation, ventura:        "13a1e95b6db3c6e3334bf585c11786a70427ae9511e9658a6957175aad04caec"
-    sha256 cellar: :any_skip_relocation, monterey:       "62850ae0fad8dd4654c5a41051a1838d18893a9c2678aa69ecad3bd3c8acf195"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0c7e33b05a1c88a8f5ab8efde32b25391471ebf3522fcb9e55ce28badb838de0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "55b9e7f390166077daa9445ad898a621a1ceaabc390a7b0af365ab01238aca10"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "121899148aa40626a761b8851c81f9a18c85c4424b414e2a183b795c5e77a064"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "121899148aa40626a761b8851c81f9a18c85c4424b414e2a183b795c5e77a064"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "121899148aa40626a761b8851c81f9a18c85c4424b414e2a183b795c5e77a064"
+    sha256 cellar: :any_skip_relocation, sonoma:        "f5c3657397249038afcc6af449575b8cdfe0af084aaab041530b17731974bfac"
+    sha256 cellar: :any_skip_relocation, ventura:       "f5c3657397249038afcc6af449575b8cdfe0af084aaab041530b17731974bfac"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d5ce705e992ade288de5896b6cb9317661073de767f8d87d48bebf159fc08b30"
   end
 
   depends_on "go" => :build
@@ -21,17 +19,17 @@ class GitTown < Formula
   def install
     ldflags = %W[
       -s -w
-      -X github.com/git-town/git-town/v9/src/cmd.version=v#{version}
-      -X github.com/git-town/git-town/v9/src/cmd.buildDate=#{time.strftime("%Y/%m/%d")}
+      -X github.com/git-town/git-town/v#{version.major}/src/cmd.version=v#{version}
+      -X github.com/git-town/git-town/v#{version.major}/src/cmd.buildDate=#{time.strftime("%Y/%m/%d")}
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
 
     # Install shell completions
     generate_completions_from_executable(bin/"git-town", "completions")
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/git-town version")
+    assert_match version.to_s, shell_output("#{bin}/git-town -V")
 
     system "git", "init"
     touch "testing.txt"

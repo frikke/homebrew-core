@@ -1,22 +1,22 @@
 class TomeePlus < Formula
   desc "Everything in TomEE Web Profile and JAX-RS, plus more"
   homepage "https://tomee.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=tomee/tomee-9.1.0/apache-tomee-9.1.0-plus.tar.gz"
-  mirror "https://archive.apache.org/dist/tomee/tomee-9.1.0/apache-tomee-9.1.0-plus.tar.gz"
-  sha256 "8de618304e261cbefdb30c59516c9cef3417df67f07fa857eab636c662d874a7"
+  url "https://www.apache.org/dyn/closer.lua?path=tomee/tomee-10.0.0/apache-tomee-10.0.0-plus.tar.gz"
+  mirror "https://archive.apache.org/dist/tomee/tomee-10.0.0/apache-tomee-10.0.0-plus.tar.gz"
+  sha256 "5f33aa1d0717d73fb1de84b0013f4b12ab76ba55f0d37ffe9267a20f3fbc4cfd"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "89a2bc95dda06b9cd3486b35ab7bed3d05bfeba0458ad4c59b62e65644c73676"
+    sha256 cellar: :any_skip_relocation, all: "98b4a55b38d8119fe3da0752d49addb26bbc26471be2a2a03929121fa363045c"
   end
 
   depends_on "openjdk"
 
   def install
     # Remove Windows scripts
-    rm_rf Dir["bin/*.bat"]
-    rm_rf Dir["bin/*.bat.original"]
-    rm_rf Dir["bin/*.exe"]
+    rm_r(Dir["bin/*.bat"])
+    rm_r(Dir["bin/*.bat.original"])
+    rm_r(Dir["bin/*.exe"])
 
     # Install files
     prefix.install %w[NOTICE LICENSE RELEASE-NOTES RUNNING.txt]

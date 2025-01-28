@@ -1,8 +1,8 @@
 class Ckan < Formula
   desc "Comprehensive Kerbal Archive Network"
   homepage "https://github.com/KSP-CKAN/CKAN/"
-  url "https://github.com/KSP-CKAN/CKAN/releases/download/v1.33.2/ckan.exe"
-  sha256 "1489ddc51c860e05e29cff195f4a3a2c426018d370f38b423f0e45755014dd32"
+  url "https://github.com/KSP-CKAN/CKAN/releases/download/v1.35.2/ckan.exe"
+  sha256 "48ad9e29d1ff6e6f96faa53c5d41d10fdb9f7e67e9e5b478741bc11142829bc1"
   license "MIT"
 
   livecheck do
@@ -11,22 +11,17 @@ class Ckan < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0aebfcde33833ff4a208f1f27749294fa9ee25e9a7b4d42a11e618dc58cf756e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0aebfcde33833ff4a208f1f27749294fa9ee25e9a7b4d42a11e618dc58cf756e"
-    sha256 cellar: :any_skip_relocation, ventura:        "0aebfcde33833ff4a208f1f27749294fa9ee25e9a7b4d42a11e618dc58cf756e"
-    sha256 cellar: :any_skip_relocation, monterey:       "0aebfcde33833ff4a208f1f27749294fa9ee25e9a7b4d42a11e618dc58cf756e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0aebfcde33833ff4a208f1f27749294fa9ee25e9a7b4d42a11e618dc58cf756e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "620c44d093856fb7ac1c6ef26460bb87e62fa91eac9f6f5878eb90093b500215"
+    sha256 cellar: :any_skip_relocation, all: "cfe6a4662dbd9f9ce458b9e9c57ffcee586850264619d2a5ea85978ef5b32039"
   end
 
   depends_on "mono"
 
   def install
     (libexec/"bin").install "ckan.exe"
-    (bin/"ckan").write <<~EOS
+    (bin/"ckan").write <<~SHELL
       #!/bin/sh
       exec mono "#{libexec}/bin/ckan.exe" "$@"
-    EOS
+    SHELL
   end
 
   def caveats
@@ -36,6 +31,9 @@ class Ckan < Formula
   end
 
   test do
-    system bin/"ckan", "version"
+    assert_match version.to_s, shell_output(bin/"ckan version")
+
+    output = shell_output(bin/"ckan update", 1)
+    assert_match "I don't know where a game instance is installed", output
   end
 end

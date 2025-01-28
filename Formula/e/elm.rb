@@ -1,26 +1,24 @@
 class Elm < Formula
   desc "Functional programming language for building browser-based GUIs"
   homepage "https://elm-lang.org"
-  url "https://github.com/elm/compiler/archive/0.19.1.tar.gz"
+  url "https://github.com/elm/compiler/archive/refs/tags/0.19.1.tar.gz"
   sha256 "aa161caca775cef1bbb04bcdeb4471d3aabcf87b6d9d9d5b0d62d3052e8250b1"
   license "BSD-3-Clause"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ce89444a740bfc41ae2a03006171af4fb21dd2659164b5f68ff7fed681b214bb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7efd5b1f3446827c5c06502a65c4bf80cabde7ecf11156e206a373d0c568af35"
-    sha256 cellar: :any_skip_relocation, ventura:        "958032075f348d62564a86ced5fc4b188a7e2ad934910cefee945b12be051b87"
-    sha256 cellar: :any_skip_relocation, monterey:       "fef837b97895efeb899730e1381953b637f34910dd9e94d8c0a60e1da00d4b32"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8054bda935a4760f4cfd799f2bef0bb8fd2b25c10cc2d1fc1c0824625eaf30a3"
-    sha256 cellar: :any_skip_relocation, catalina:       "0df96547e648ed70d25f67cbec301e8b1e9af814da5dba059c0c54cb594d1d0d"
-    sha256 cellar: :any_skip_relocation, mojave:         "a826ba1bd9a92f3a5384a772533bf90c8d87e5f6c4ca8f30a6877c10ee9bab2f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "810bfd7c5a40e9c6f4bae78af527acf2df4fbea11bc1af632526e90429fb68e0"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "1b77344c25644ff522e7dbe293e6b98bbcb75f275cbb4c8a8033c88d93888ce0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "931f251316bf041c3f380e6f5701ddb6445fd0c2f4ef395fee1fab041d8e7f30"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ff99c87ecd2cb25c5a86b1988ecdc8326c8257f02a93024c42a91ca3107eef43"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "85f72af4af1b44ea8bcd28947583173c7e857cbaa9f9bca31dd2544d8915bf54"
+    sha256 cellar: :any_skip_relocation, sonoma:         "114104b3a08b3d609c9fdbe01f0216c2b5e689ac0f36ba7ec9855e01e6e5412c"
+    sha256 cellar: :any_skip_relocation, ventura:        "57f7be542255990ab3f4f95c014ee98bd5943dd1c4af92cee1d1f994e55c513c"
+    sha256 cellar: :any_skip_relocation, monterey:       "bbf5b72f0ce8a8a15eec445e56702d983a955da17b05828f69c5634bfcc5ee5a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cbb29db68081d05284e41a32a2deb06c4696a3a6db0adea067754c44057d7af9"
   end
 
-  deprecate! date: "2023-09-10", because: :unmaintained
-
   depends_on "cabal-install" => :build
-  depends_on "ghc@8.10" => :build
+  depends_on "ghc" => :build
 
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
@@ -33,15 +31,26 @@ class Elm < Formula
     sha256 "556ff15fb4d8e5ca6e853280e35389c8875fa31a543204b315b55ec2ac967624"
   end
 
+  patch do
+    # These patches allow elm to build on ghc 9.4+.
+    url "https://github.com/elm/compiler/commit/0421dfbe48e53d880a401e201890eac0b3de5f06.patch?full_index=1"
+    sha256 "b498e39112ab7306b18b47821e799bf436d0c2151836187388c2a6b6f32bd437"
+  end
+
   def install
+    # Work around build failure due to incompatibility with newer `tls` package
+    # Ref: https://github.com/elm/compiler/pull/2325
+    args = ["--constraint=tls<2"]
+    odie "Check if `tls` constraint can be removed!" if version > "0.19.1"
+
     system "cabal", "v2-update"
-    system "cabal", "v2-install", *std_cabal_v2_args
+    system "cabal", "v2-install", *args, *std_cabal_v2_args
   end
 
   test do
     # create elm.json
     elm_json_path = testpath/"elm.json"
-    elm_json_path.write <<~EOS
+    elm_json_path.write <<~JSON
       {
         "type": "application",
         "source-directories": [
@@ -66,14 +75,14 @@ class Elm < Formula
             "indirect": {}
         }
       }
-    EOS
+    JSON
 
     src_path = testpath/"Hello.elm"
-    src_path.write <<~EOS
+    src_path.write <<~ELM
       module Hello exposing (main)
       import Html exposing (text)
       main = text "Hello, world!"
-    EOS
+    ELM
 
     out_path = testpath/"index.html"
     system bin/"elm", "make", src_path, "--output=#{out_path}"

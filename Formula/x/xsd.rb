@@ -1,91 +1,86 @@
 class Xsd < Formula
   desc "XML Data Binding for C++"
   homepage "https://www.codesynthesis.com/products/xsd/"
-  url "https://www.codesynthesis.com/download/xsd/4.0/xsd-4.0.0+dep.tar.bz2"
-  version "4.0.0"
-  sha256 "eca52a9c8f52cdbe2ae4e364e4a909503493a0d51ea388fc6c9734565a859817"
+  url "https://www.codesynthesis.com/download/xsd/4.2/xsd-4.2.0.tar.gz"
+  sha256 "2bed17c601cfb984f9a7501fd5c672f4f18eac678f5bdef6016971966add9145"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
-  revision 1
 
-  bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "145cc4cc5c80f28c500b9366ef04f21722d30bd5b35494c2a387d22981e6dc34"
-    sha256 cellar: :any,                 arm64_monterey: "95198623fcf033077d6ecd6b4e5f1f63801f2fd3d627360e7688b59e11e72647"
-    sha256 cellar: :any,                 arm64_big_sur:  "d2849a3cc67e9e3ad119bc2de7b4f9f278d44619e770f87ba90978a01cf3222c"
-    sha256 cellar: :any,                 ventura:        "71e1639991944335d03acbff5dec86a17e6cd086cda72545964f1df7ab05ade5"
-    sha256 cellar: :any,                 monterey:       "d34d64497149ef2b227d34fb2e091ddf733efc3f0c3980b19ad5ffda371be914"
-    sha256 cellar: :any,                 big_sur:        "9ce5a5f4190d2db8665260ac89c115888dd986e6f59fb81f03ef0eee97dc3d04"
-    sha256 cellar: :any,                 catalina:       "8de0a3cfd410a3b2640a557e009b751f67c6f2416e38e42aa3a6634e73941847"
-    sha256 cellar: :any,                 mojave:         "cb064aa81b48f1777f14888e4c6df4ae3782159f5a315944df49882bce06b231"
-    sha256 cellar: :any,                 high_sierra:    "25dfd3dbcbe7f6f442bf6d45adaa849b5fbc4e7360ca4d9084bb1910252f992d"
-    sha256 cellar: :any,                 sierra:         "935d1bcd6d9cf35cdd42e68ddb9931ad29df0834b76d6f4b9cdaa743176d7bae"
-    sha256 cellar: :any,                 el_capitan:     "4e4a26fc0a99b11e8a740b6f5041964b682048de7ff0a9cbfd15ffea263f0c62"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e1e0712d3d4b01b0a0a6ac03b57d81efb957aff42d0960614bf41d7ea2cb6acc"
+  livecheck do
+    url "https://www.codesynthesis.com/products/xsd/download.xhtml"
+    regex(/href=.*?xsd[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  depends_on "pkg-config" => :build
+  bottle do
+    sha256 cellar: :any,                 arm64_sequoia: "9bab1b8a054ae9b32e68d6c0ab9ee59435715bcedbdc1206de8b54a5c8210ce5"
+    sha256 cellar: :any,                 arm64_sonoma:  "b095172797b397ec3afe2c05033aa138ef2449d982aa8e77b9b26b484cd7fbc9"
+    sha256 cellar: :any,                 arm64_ventura: "515effcddd5163ba8ac3fc30f2daf51d5c9380209b376cd4fbbffc54eb823b9e"
+    sha256 cellar: :any,                 sonoma:        "dcd70b1bada26e56ead16eaceeced482d7e8c4b84a8894d34073d46ad0c2f57e"
+    sha256 cellar: :any,                 ventura:       "d6d34d7402ae33a991c7817a34d6f8bdec2f55bc68ec922b5e112d639f308dd0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d2ce6cba3e04b1e0239789b2c57ab98fbf8b465dc8477fb43c184da992002322"
+  end
+
+  depends_on "build2" => :build
+  depends_on "libcutl"
+  depends_on "libxsd-frontend"
   depends_on "xerces-c"
 
   conflicts_with "mono", because: "both install `xsd` binaries"
 
-  # Patches:
-  # 1. As of version 4.0.0, Clang fails to compile if the <iostream> header is
-  #    not explicitly included. The developers are aware of this problem, see:
-  #    https://www.codesynthesis.com/pipermail/xsd-users/2015-February/004522.html
-  # 2. As of version 4.0.0, building fails because this makefile invokes find
-  #    with action -printf, which GNU find supports but BSD find does not. There
-  #    is no place to file a bug report upstream other than the xsd-users mailing
-  #    list (xsd-users@codesynthesis.com). I have sent this patch there but have
-  #    received no response (yet).
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/85fa66a9/xsd/4.0.0.patch"
-    sha256 "55a15b7a16404e659060cc2487f198a76d96da7ec74e2c0fac9e38f24b151fa7"
+  resource "libxsd" do
+    url "https://www.codesynthesis.com/download/xsd/4.2/libxsd-4.2.0.tar.gz"
+    sha256 "55caf0038603883eb39ac4caeaacda23a09cf81cffc8eb55a854b6b06ef2c52e"
+
+    livecheck do
+      formula :parent
+    end
   end
 
   def install
-    # Rename version files so that the C++ preprocess doesn't try to include these as headers.
-    mv "xsd/version", "xsd/version.txt"
-    mv "libxsd-frontend/version", "libxsd-frontend/version.txt"
-    mv "libcutl/version", "libcutl/version.txt"
+    odie "`libxsd` resource needs to be updated!" if version != resource("libxsd").version
 
-    ENV.append "LDFLAGS", `pkg-config --libs --static xerces-c`.chomp
-    ENV.cxx11
-    system "make", "install", "install_prefix=#{prefix}"
+    system "b", "configure", "config.cc.loptions=-L#{HOMEBREW_PREFIX}/lib", "config.install.root=#{prefix}"
+    system "b", "install", "--jobs=#{ENV.make_jobs}", "-V"
+
+    resource("libxsd").stage do
+      system "b", "configure", "config.install.root=#{prefix}"
+      system "b", "install", "--jobs=#{ENV.make_jobs}", "-V"
+    end
   end
 
   test do
-    schema = testpath/"meaningoflife.xsd"
-    schema.write <<~EOS
+    (testpath/"meaningoflife.xsd").write <<~XSD
       <?xml version="1.0" encoding="UTF-8"?>
       <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
                  targetNamespace="https://brew.sh/XSDTest" xmlns="https://brew.sh/XSDTest">
-          <xs:element name="MeaningOfLife" type="xs:positiveInteger"/>
+        <xs:element name="MeaningOfLife" type="xs:positiveInteger"/>
       </xs:schema>
-    EOS
-    instance = testpath/"meaningoflife.xml"
-    instance.write <<~EOS
+    XSD
+
+    (testpath/"meaningoflife.xml").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <MeaningOfLife xmlns="https://brew.sh/XSDTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="https://brew.sh/XSDTest meaningoflife.xsd">
-          42
+                     xsi:schemaLocation="https://brew.sh/XSDTest meaningoflife.xsd">
+        42
       </MeaningOfLife>
-    EOS
-    xsdtest = testpath/"xsdtest.cxx"
-    xsdtest.write <<~EOS
+    XML
+
+    (testpath/"xsdtest.cxx").write <<~CPP
       #include <cassert>
       #include "meaningoflife.hxx"
       int main (int argc, char *argv[]) {
-          assert(2==argc);
-          std::auto_ptr< ::xml_schema::positive_integer> x = XSDTest::MeaningOfLife(argv[1]);
-          assert(42==*x);
-          return 0;
+        assert(2==argc);
+        std::unique_ptr<::xml_schema::positive_integer> x = XSDTest::MeaningOfLife(argv[1]);
+        assert(42==*x);
+        return 0;
       }
-    EOS
-    system "#{bin}/xsd", "cxx-tree", schema
-    assert_predicate testpath/"meaningoflife.hxx", :exist?
-    assert_predicate testpath/"meaningoflife.cxx", :exist?
-    system ENV.cxx, "-o", "xsdtest", "xsdtest.cxx", "meaningoflife.cxx", "-std=c++11",
-                  "-L#{Formula["xerces-c"].opt_lib}", "-lxerces-c"
-    assert_predicate testpath/"xsdtest", :exist?
-    system testpath/"xsdtest", instance
+    CPP
+
+    system bin/"xsd", "cxx-tree", "meaningoflife.xsd"
+    assert_path_exists testpath/"meaningoflife.hxx"
+    assert_path_exists testpath/"meaningoflife.cxx"
+
+    system ENV.cxx, "-std=c++11", "xsdtest.cxx", "meaningoflife.cxx", "-o", "xsdtest",
+                    "-L#{Formula["xerces-c"].opt_lib}", "-lxerces-c"
+    system "./xsdtest", "meaningoflife.xml"
   end
 end

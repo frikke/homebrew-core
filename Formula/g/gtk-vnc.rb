@@ -1,8 +1,8 @@
 class GtkVnc < Formula
   desc "VNC viewer widget for GTK"
-  homepage "https://wiki.gnome.org/Projects/gtk-vnc"
-  url "https://download.gnome.org/sources/gtk-vnc/1.3/gtk-vnc-1.3.1.tar.xz"
-  sha256 "512763ac4e0559d0158b6682ca5dd1a3bd633f082f5e4349d7158e6b5f80f1ce"
+  homepage "https://gitlab.gnome.org/GNOME/gtk-vnc"
+  url "https://download.gnome.org/sources/gtk-vnc/1.4/gtk-vnc-1.4.0.tar.xz"
+  sha256 "1be64c4e4760c52b3ec33067290d1efa40ad4cecab6c673813804e3c559d9683"
   license "LGPL-2.1-or-later"
 
   # gtk-vnc doesn't use the usual "even-numbered minor is stable" GNOME version
@@ -14,29 +14,36 @@ class GtkVnc < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura:  "74998a793c0d7fd96b2a9d4a7ed4b0da1a4d84dce9c2f3aac187fb1430f43423"
-    sha256 arm64_monterey: "2109dd9faa3e24eb8d2bab51a3e00cfde6f660bd690912326c0185d61b9b684b"
-    sha256 arm64_big_sur:  "45af9d03738555dea42232249d0b44d115efa45e45f7e3e304a156ca7101c92d"
-    sha256 ventura:        "0280b7af865b61bba28e5f921b7a3905be00621f831e51bdd4291c300bc4fa72"
-    sha256 monterey:       "9dd26957dbc1e2481560b641e34d363df11638713cc3e5872ac978f44e658b59"
-    sha256 big_sur:        "002f65ea23b94e3307cf9363670d4de923643cde75334294ce9df880dde01168"
-    sha256 x86_64_linux:   "4c70374f53d695c50ba007b971f9ea8c3b88136497f2b344e332107ba7807696"
+    sha256 arm64_sequoia: "e4fbfc19655d663d62ac42d2fea67cd8920872f2e7062d04d04db9e640e84f55"
+    sha256 arm64_sonoma:  "4c9533a7b17df72d46ca4ab708d7fb819cc785d84d122bcca4c5975be6bc292a"
+    sha256 arm64_ventura: "3004e00b5f09d325aea98dc419e455e0180ce3c4c2f174194a469cf2b61cbe70"
+    sha256 sonoma:        "cc38da956437c5ded9cb307deea89853870637f83323b94b11be1c455229dc3f"
+    sha256 ventura:       "90a6efce4d4be08febcdc180184396fe0f091d299e0f3e3d758424137671e414"
+    sha256 x86_64_linux:  "8588d8654acbd5f147f4541d4df783a3fa8d6bd5f737bdba62f74fd448985c96"
   end
 
   depends_on "gettext" => :build
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
+  depends_on "cairo"
+  depends_on "gdk-pixbuf"
+  depends_on "glib"
+  depends_on "gmp"
   depends_on "gnutls"
   depends_on "gtk+3"
   depends_on "libgcrypt"
 
-  # coroutine: avoid ucontext impl on macOS M1 hardware. Remove in the next release
-  patch do
-    url "https://gitlab.gnome.org/GNOME/gtk-vnc/-/commit/40c59c557ecf7d22d307b8cf890ce08b0376ca5a.diff"
-    sha256 "795f35a50bb4a1976d05b961a708415246a2c3f1164c1f9d4e7931996af9f706"
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "gettext"
+  end
+
+  on_linux do
+    depends_on "libx11"
   end
 
   def install
@@ -46,6 +53,6 @@ class GtkVnc < Formula
   end
 
   test do
-    system "#{bin}/gvnccapture", "--help"
+    system bin/"gvnccapture", "--help"
   end
 end

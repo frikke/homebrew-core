@@ -1,19 +1,19 @@
 class Nb < Formula
-  desc "Command-line and local web note‑taking, bookmarking, and archiving"
+  desc "Command-line and local web note-taking, bookmarking, and archiving"
   homepage "https://xwmx.github.io/nb"
-  url "https://github.com/xwmx/nb/archive/refs/tags/7.6.0.tar.gz"
-  sha256 "9f51e214f93aadf5ba075cf4fc377f1342ce48d5137e9eff153be02e47f0cc72"
+  url "https://github.com/xwmx/nb/archive/refs/tags/7.15.1.tar.gz"
+  sha256 "ca3e7e233aa848f1fe0f2318a3dbe7c7794173db890730f5af4443fbbf3d4cc7"
   license "AGPL-3.0-or-later"
   head "https://github.com/xwmx/nb.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d41bdfd1e1983568de112008e8777d87db2b40b8ffe70cb5d4afa3ba1b7416cb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d41bdfd1e1983568de112008e8777d87db2b40b8ffe70cb5d4afa3ba1b7416cb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d41bdfd1e1983568de112008e8777d87db2b40b8ffe70cb5d4afa3ba1b7416cb"
-    sha256 cellar: :any_skip_relocation, ventura:        "8c3a9efaf5927d2f63d58a7171734c43e94d6ceadd9c9d57a1ca71f5bb4ee667"
-    sha256 cellar: :any_skip_relocation, monterey:       "8c3a9efaf5927d2f63d58a7171734c43e94d6ceadd9c9d57a1ca71f5bb4ee667"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8c3a9efaf5927d2f63d58a7171734c43e94d6ceadd9c9d57a1ca71f5bb4ee667"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d41bdfd1e1983568de112008e8777d87db2b40b8ffe70cb5d4afa3ba1b7416cb"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2f77dc7c286c62b2fb1899636c01c7781b0cdcf296edf06c97d9c7a408cd5b8e"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2f77dc7c286c62b2fb1899636c01c7781b0cdcf296edf06c97d9c7a408cd5b8e"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "2f77dc7c286c62b2fb1899636c01c7781b0cdcf296edf06c97d9c7a408cd5b8e"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e79f7ea22c434ebf9cd32b77d8fccf0721593c71e05e40406e1e59f8518ffaa2"
+    sha256 cellar: :any_skip_relocation, ventura:       "e79f7ea22c434ebf9cd32b77d8fccf0721593c71e05e40406e1e59f8518ffaa2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2f77dc7c286c62b2fb1899636c01c7781b0cdcf296edf06c97d9c7a408cd5b8e"
   end
 
   depends_on "bat"
@@ -28,7 +28,7 @@ class Nb < Formula
   def install
     bin.install "nb", "bin/bookmark"
 
-    bash_completion.install "etc/nb-completion.bash" => "nb.bash"
+    bash_completion.install "etc/nb-completion.bash" => "nb"
     zsh_completion.install "etc/nb-completion.zsh" => "_nb"
     fish_completion.install "etc/nb-completion.fish" => "nb.fish"
   end

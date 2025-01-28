@@ -9,19 +9,18 @@ class Tern < Formula
   head "https://github.com/tern-tools/tern.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0334278b654dc7a4dc2e1afbc300f9ff825d54b1d791bc2f076fefe720041828"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "9730e9770740879d8269bc431429e3ff712f930d116c8111117ee6986db89e7c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b0a126825339228d61a0535f70ec1208878b70b4adcaf9a57c1b40712489347a"
-    sha256 cellar: :any_skip_relocation, ventura:        "f2c033584f56f8bd7549b597a8338cf9ae14f7a8abfec3d8173e1a5cf4536654"
-    sha256 cellar: :any_skip_relocation, monterey:       "f133a6da1ff3234e31ff7f372155e9993ac038a51982162d35996e3ba6972054"
-    sha256 cellar: :any_skip_relocation, big_sur:        "686426b7af0f024dc8e643ec846e0a8b5eeff65c4fdcd0c466e402dd35ad0db8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b636aadce34e9bd22fbaae0c129ab725a879aca6c9189df973be5bffe052adae"
+    rebuild 5
+    sha256 cellar: :any,                 arm64_sequoia: "9594d3b770425800447abf9fc76b1b63de4e5223e7e3723baa5d5b166d03d31b"
+    sha256 cellar: :any,                 arm64_sonoma:  "c2a837d667d346d33b55d02a9906b4595f56a7e0b2560562f2d7fe23e5ce22a2"
+    sha256 cellar: :any,                 arm64_ventura: "1c7069dee7010a442e0758aee5b3753dba899c08a0c6c39208a777698545a9d6"
+    sha256 cellar: :any,                 sonoma:        "01949eeb68831139ad1010fb02478532973687a33b0517d6cd4250117a261e55"
+    sha256 cellar: :any,                 ventura:       "d6c69c21614592472c67581b01a3d62b4ab16e56180c561918cb17c261371031"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "540089053f102287f5b3484efecc2170365b28d992a0dcf24ca2b77058c8c9ad"
   end
 
-  depends_on "python-certifi"
-  depends_on "python@3.11"
-  depends_on "pyyaml"
+  depends_on "certifi"
+  depends_on "libyaml"
+  depends_on "python@3.13"
 
   on_linux do
     depends_on "attr" # for `getfattr`
@@ -88,8 +87,8 @@ class Tern < Formula
   end
 
   resource "packaging" do
-    url "https://files.pythonhosted.org/packages/b9/6c/7c6658d258d7971c5eb0d9b69fa9265879ec9a9158031206d47800ae2213/packaging-23.1.tar.gz"
-    sha256 "a392980d2b6cffa644431898be54b0045151319d1e7ec34f0cfed48767dd334f"
+    url "https://files.pythonhosted.org/packages/fb/2b/9b9c33ffed44ee921d0967086d653047286054117d584f1b1a7c22ceaf7b/packaging-23.2.tar.gz"
+    sha256 "048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5"
   end
 
   resource "pbr" do
@@ -102,6 +101,11 @@ class Tern < Formula
     sha256 "031eae6a9102017e8c7c7906460d150b7ed78b20fd1d8c8be4edaf88556c07ce"
   end
 
+  resource "pyyaml" do
+    url "https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz"
+    sha256 "d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"
+  end
+
   resource "regex" do
     url "https://files.pythonhosted.org/packages/18/df/401fd39ffd50062ff1e0344f95f8e2c141de4fd1eca1677d2f29609e5389/regex-2023.6.3.tar.gz"
     sha256 "72d1a25bf36d2050ceb35b517afe13864865268dfb45910e2e17a84be6cbfeb0"
@@ -110,6 +114,11 @@ class Tern < Formula
   resource "requests" do
     url "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz"
     sha256 "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
+  end
+
+  resource "setuptools" do
+    url "https://files.pythonhosted.org/packages/c8/1f/e026746e5885a83e1af99002ae63650b7c577af5c424d4c27edcf729ab44/setuptools-69.1.1.tar.gz"
+    sha256 "5c0806c7d9af348e6dd3777b4f4dbb42c7ad85b190104837488eab9a7c945cf8"
   end
 
   resource "smmap" do

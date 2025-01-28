@@ -1,12 +1,13 @@
 class Xlearn < Formula
   desc "High performance, easy-to-use, and scalable machine learning package"
   homepage "https://xlearn-doc.readthedocs.io/en/latest/index.html"
-  url "https://github.com/aksnzhy/xlearn/archive/v0.4.4.tar.gz"
+  url "https://github.com/aksnzhy/xlearn/archive/refs/tags/v0.4.4.tar.gz"
   sha256 "7b0e9db901c0e6feda4dfb793748ec959b2b56188fc2a80de5983c37e2b9f7d2"
   license "Apache-2.0"
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 sonoma:       "7ec1cd645264843122f75e157e366c1cc0ef84be1b8a4a0d3705d9e04619d256"
     sha256 cellar: :any,                 ventura:      "c0ecafbd0f8f1103d6a01ff267bb86a11ad8515a4421acda57ff9b2c0d33250a"
     sha256 cellar: :any,                 monterey:     "36bbe9dd0cc0deb15f9bca3a0f8db3da4e57cf4c62f3cfb2138b5bb88f7f4587"
     sha256 cellar: :any,                 big_sur:      "a28e91b107a782fe4bfa9894ba647a36ed7669f25978bc0cec1ce25627d19b6d"
@@ -22,21 +23,19 @@ class Xlearn < Formula
   def install
     inreplace "CMakeLists.txt", "set(CMAKE_INSTALL_PREFIX \"xLearn\")", ""
 
-    mkdir "build" do
-      system "cmake", "..", "-DCMAKE_MACOSX_RPATH=TRUE", *std_cmake_args
-      system "make"
-      system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", "-DCMAKE_MACOSX_RPATH=TRUE", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
-      bin.install "xlearn_train"
-      bin.install "xlearn_predict"
-      lib.install "lib/#{shared_library("libxlearn_api")}"
-    end
+    bin.install "build/xlearn_train"
+    bin.install "build/xlearn_predict"
+    lib.install "build/lib/#{shared_library("libxlearn_api")}"
 
     pkgshare.install "demo"
   end
 
   test do
     cp_r (pkgshare/"demo/classification/criteo_ctr/small_train.txt"), testpath
-    system "#{bin}/xlearn_train", "small_train.txt"
+    system bin/"xlearn_train", "small_train.txt"
   end
 end

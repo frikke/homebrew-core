@@ -1,15 +1,18 @@
 class Dasm < Formula
   desc "Macro assembler with support for several 8-bit microprocessors"
   homepage "https://dasm-assembler.github.io/"
-  url "https://github.com/dasm-assembler/dasm/archive/2.20.14.1.tar.gz"
+  url "https://github.com/dasm-assembler/dasm/archive/refs/tags/2.20.14.1.tar.gz"
   sha256 "ec71ffd10eeaa70bf7587ee0d79a92cd3f0a017c0d6d793e37d10359ceea663a"
   license "GPL-2.0-or-later"
   version_scheme 1
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "018a5c5e7494685ffa0c9f40846072fff6ba4508efc1b07bd1d45235e02a4eff"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "4d556e6302cb3fa636be29a938b48905d5685697dc0875a7f9e469ab4e1307f5"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "58360e2858c11aa4bcfefad632932d52bdf5fa38bbe3914f555a9ec515ac7278"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "60b9a619d4394ab4079ce4f909549c604aabfd32f1a3ecd96b8e7c30c1cfb823"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "edc22129ec5a851546aa675a89dc4e6895eac68428914d806cfc03a4bb119eeb"
+    sha256 cellar: :any_skip_relocation, sonoma:         "5f0b00c2325e27d6b47e040d6ccacacef637757f4d0d92dfce6303f133264f8e"
     sha256 cellar: :any_skip_relocation, ventura:        "4a267314f9ad2a37150c159fabbaea9620311f61c5b9ac60007e369d8709db9e"
     sha256 cellar: :any_skip_relocation, monterey:       "39de6472c8ffb52fbeaff1d112b4961b3d0912bbd1777f35db5f7fab46955fe7"
     sha256 cellar: :any_skip_relocation, big_sur:        "0de7ec1bbb50537c46364d86188b6ef07c2e6d6efeee6b013be29eab793290d3"
@@ -26,12 +29,12 @@ class Dasm < Formula
 
   test do
     path = testpath/"a.asm"
-    path.write <<~EOS
+    path.write <<~ASM
       ; Instructions must be preceded by whitespace
         processor 6502
         org $c000
         jmp $fce2
-    EOS
+    ASM
 
     system bin/"dasm", path
     code = (testpath/"a.out").binread.unpack("C*")

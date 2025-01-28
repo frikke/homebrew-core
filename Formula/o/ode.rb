@@ -1,25 +1,24 @@
 class Ode < Formula
   desc "Simulating articulated rigid body dynamics"
   homepage "https://www.ode.org/"
-  url "https://bitbucket.org/odedevs/ode/downloads/ode-0.16.4.tar.gz"
-  sha256 "71037b8281c6c86b0a55729f90d5db697abe4cbec1d8118157e00d48ec253467"
+  url "https://bitbucket.org/odedevs/ode/downloads/ode-0.16.6.tar.gz"
+  sha256 "c91a28c6ff2650284784a79c726a380d6afec87ecf7a35c32a6be0c5b74513e8"
   license any_of: ["LGPL-2.1-or-later", "BSD-3-Clause"]
   head "https://bitbucket.org/odedevs/ode.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "0db659d5d8b9f5b0a8391e07bf6dce76c6528ee142ef64227d27cd108c14fe76"
-    sha256 cellar: :any,                 arm64_monterey: "2eb1e7ae85cec1e9d3686113190d8ec89fca460c58b81f3e978b20961d235cf6"
-    sha256 cellar: :any,                 arm64_big_sur:  "f4cb558f0e993040046a0400a5d6aa69bd4916d5cac25e45597f2b6b72cbdb83"
-    sha256 cellar: :any,                 ventura:        "e04a88ce07030af5f9f93f2bd035a4b89ea200a9d67a17ebd89c7ad5bc536565"
-    sha256 cellar: :any,                 monterey:       "af90730fce7e61597be9dd2132e985386a47e59dde6ba23a16c42d4e6a0d44f2"
-    sha256 cellar: :any,                 big_sur:        "21c78389a6a1999ea1c0a5deb90e779ae44cbe71affcc7b6c5ac5ce0d43af578"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "26dc057f117efea645ebf883369d7d48082b6a87a40443ad95e2d40f26d2ff48"
+    sha256 cellar: :any,                 arm64_sequoia: "3aa96ecd0a92215d8005fb5f663c51b40df82454815f7bf5ab18f29ecef9d401"
+    sha256 cellar: :any,                 arm64_sonoma:  "18918632c616a8dcebb91fd9f717133b8921bc1fb1c383e2da6b8fee8debb26d"
+    sha256 cellar: :any,                 arm64_ventura: "c36bfd094cdf7c2cc6d877f05e7fba556fb012bd9ef5948b097e14f0b596be15"
+    sha256 cellar: :any,                 sonoma:        "3ee055bde9ea2aca43d4305de3cad0aeda9f54a3a1ff69dde4618487223f792b"
+    sha256 cellar: :any,                 ventura:       "2579b830d5c07a1c799bfee7bc1c0536614da23483a02190ad6d2f87585d84b2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fb0f3a0439ddeada4699c0ca1004810a676e4bb07d910464d9641b3b5b4dddc1"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libccd"
 
   # Fix -flat_namespace being used on Big Sur and later.
@@ -34,20 +33,21 @@ class Ode < Formula
                           "--enable-libccd",
                           "--enable-shared",
                           "--disable-static",
+                          "--disable-demos",
                           "--enable-double-precision"
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <ode/ode.h>
       int main() {
         dInitODE();
         dCloseODE();
         return 0;
       }
-    EOS
+    CPP
     system ENV.cc, "test.cpp", "-I#{include}/ode", "-L#{lib}", "-lode",
                    "-L#{Formula["libccd"].opt_lib}", "-lccd", "-lm", "-lpthread",
                    "-o", "test"

@@ -1,24 +1,20 @@
 class Libxcursor < Formula
   desc "X.Org: X Window System Cursor management library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libXcursor-1.2.1.tar.xz"
-  sha256 "46c143731610bafd2070159a844571b287ac26192537d047a39df06155492104"
+  url "https://www.x.org/archive/individual/lib/libXcursor-1.2.3.tar.xz"
+  sha256 "fde9402dd4cfe79da71e2d96bb980afc5e6ff4f8a7d74c159e1966afb2b2c2c0"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "70ec623c70ec762aff5d4a86f5852f95dc5a9cfba7d70366ef97836a5006c852"
-    sha256 cellar: :any,                 arm64_ventura:  "ae05b72658d10621a2a0c6e21ffddc7324e1e32951d40cad613a1f083bbc37b0"
-    sha256 cellar: :any,                 arm64_monterey: "74a824dd9c8862745f66a17707ae3e5b4dd0e4f144717af8c6b706b76bed01a9"
-    sha256 cellar: :any,                 arm64_big_sur:  "e808a3694e529e169a6765b123c76b9e50e99bd781ee3fb5dc99370f2c97bff5"
-    sha256 cellar: :any,                 sonoma:         "3918e59986a7815943547c6ab05d77e92ebaf1dff31826d5308f1ad122c731d7"
-    sha256 cellar: :any,                 ventura:        "f73f30a2edac35df26e71b2995064c6647272ed9ab801be52a789ffef6589787"
-    sha256 cellar: :any,                 monterey:       "1ee235ee41180ae71b83c66948d3414ffaa855f689615dd3a247a68871dece6b"
-    sha256 cellar: :any,                 big_sur:        "33c6a96d769a95b515172c9fabfeb7cf37b3f1ba40bac913dee1457ee0659cb2"
-    sha256 cellar: :any,                 catalina:       "2c2cb1a2d43f836c277bdb33e4ebea581b49f84ef968c4d2c08e87bd9ffedc45"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5feaf269b3a872f4a9b934baac4bfa833dba9e87437243d6071808b3b66495ea"
+    sha256 cellar: :any,                 arm64_sequoia: "8e5c2f6e0290a1308db48d7588e0ce6a831cb56011491470f3592e182db4f3d2"
+    sha256 cellar: :any,                 arm64_sonoma:  "d030b6eaf5ac89a53962e3935e98ad22b8d269fe69941faf82ba9b93d8ccb0a7"
+    sha256 cellar: :any,                 arm64_ventura: "68a9ded5d9e51bb9d9f1f9aaf8b67402c83c8fd11f28fdc557a0aa37ed28a129"
+    sha256 cellar: :any,                 sonoma:        "9a063644b479ef0269bb01a8faa79eaab44cf159ffb4cd30d399beea2d5bf459"
+    sha256 cellar: :any,                 ventura:       "c3dccfd8fffba3cb2dbee1135fb1ebaa601ae8d25fcdf1add36c13052cd62d6e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "02e5f01e4940638fbcce577f05ac3bc57f87bf272959e286a323f6fe3c2fc86d"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "util-macros" => :build
   depends_on "libx11"
   depends_on "libxfixes"
@@ -26,27 +22,25 @@ class Libxcursor < Formula
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/Xcursor/Xcursor.h"
 
       int main(int argc, char* argv[]) {
         XcursorFileHeader header;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

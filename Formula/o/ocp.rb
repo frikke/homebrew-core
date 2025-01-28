@@ -1,10 +1,9 @@
 class Ocp < Formula
   desc "UNIX port of the Open Cubic Player"
   homepage "https://stian.cubic.org/project-ocp.php"
-  url "https://stian.cubic.org/ocp/ocp-0.2.106.tar.xz"
-  sha256 "bf11d96d4a58bbf9c344eb53cf815fc2097c63a3c2c713f7ffb134073bd84721"
+  url "https://stian.cubic.org/ocp/ocp-3.0.1.tar.xz"
+  sha256 "60a03d73883ea9c5dd94253907fc2002aa229e0fc41febb17d7baa341b228db1"
   license "GPL-2.0-or-later"
-  revision 1
   head "https://github.com/mywave82/opencubicplayer.git", branch: "master"
 
   livecheck do
@@ -13,17 +12,17 @@ class Ocp < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "98b920bce3a8dd1664102804316a636f1f36a1750d54be98a27d2c208585078f"
-    sha256 arm64_monterey: "98bee92ef9e920e5d4e5a16af9efba47eb26bca3bab25bc3b8de8fd57124a526"
-    sha256 arm64_big_sur:  "7dfbcf78f996adff1dc4c1dab3f908912b9109e068503361c10546adc397cdb4"
-    sha256 ventura:        "43069ef46c4e17de75490c55aa93393420660c2fafbb21dd6af13408601d3d56"
-    sha256 monterey:       "bdf0c54732d8169c6f0f2b10ac74eb388234bf41f9a8c7edbceae18e18b0b712"
-    sha256 big_sur:        "303b794f8055a4657ecfd8982930b1e7f96cb3f73111d6c5da78dfc9cf6218d8"
-    sha256 x86_64_linux:   "7f832d99afc957045e5e577d0d176e3ed4d4af7da5374774cd948df4d5c7345a"
+    sha256 arm64_sequoia: "4d4d287a60ac8edc317dffcb07feb6c23bf1cb54007ba45dfdbd3f4470b32059"
+    sha256 arm64_sonoma:  "962b118d6aa52c978601e4e883cb5bcc126c71ea7f79da884fff7586f4cd36f4"
+    sha256 arm64_ventura: "8047661b61d3c6108da0f3afa9a1f378c514e6dae83aecdbc39770bddd2533c7"
+    sha256 sonoma:        "29f04bc146add83b8a79e4e429de670ca2b3b05aedf5ace9153ff01c9f9d7a8e"
+    sha256 ventura:       "c490c649231ce92725e67f5ca97acc59649f157403f89fb7e3e721d0efc64226"
+    sha256 x86_64_linux:  "82469d6356888ba79497060ddf9c1cc7223a84e555aacf9116c7724b8af03feb"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "xa" => :build
+
   depends_on "ancient"
   depends_on "cjson"
   depends_on "flac"
@@ -36,21 +35,26 @@ class Ocp < Formula
   depends_on "mad"
   depends_on "sdl2"
 
+  uses_from_macos "bzip2"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
-  on_linux do
-    depends_on "util-linux" => :build # for `hexdump`
+  on_macos do
+    depends_on "libogg"
   end
 
+  on_linux do
+    depends_on "util-linux" => :build # for `hexdump`
+    depends_on "alsa-lib"
+  end
+
+  # pin to 15.0.6 to use precompiled fonts
   resource "unifont" do
     url "https://ftp.gnu.org/gnu/unifont/unifont-15.0.06/unifont-15.0.06.tar.gz"
     sha256 "36668eb1326d22e1466b94b3929beeafd10b9838bf3d41f4e5e3b52406ae69f1"
   end
 
   def install
-    ENV.deparallelize
-
     # Required for SDL2
     resource("unifont").stage do |r|
       cd "font/precompiled" do
@@ -70,12 +74,16 @@ class Ocp < Formula
       --with-unifontdir-otf=#{share}
     ]
 
+    # We do not use *std_configure_args here since
+    # `--prefix` is the only recognized option we pass
     system "./configure", *args
     system "make"
     system "make", "install"
   end
 
   test do
-    system "#{bin}/ocp", "--help"
+    assert_match version.to_s, shell_output("#{bin}/ocp --help 2>&1")
+
+    assert_path_exists testpath/".config/ocp/ocp.ini"
   end
 end

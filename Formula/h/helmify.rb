@@ -1,50 +1,49 @@
 class Helmify < Formula
   desc "Create Helm chart from Kubernetes yaml"
   homepage "https://github.com/arttor/helmify"
-  url "https://github.com/arttor/helmify.git",
-      tag:      "v0.4.5",
-      revision: "e6af99e5738ee4dbe42a4cc4c1b9fcd1d3734a88"
+  url "https://github.com/arttor/helmify/archive/refs/tags/v0.4.17.tar.gz"
+  sha256 "81ea18dcbf1f135c9fae8c3502cb845dcfd99f2ead7234f03913ebebf563beb7"
   license "MIT"
   head "https://github.com/arttor/helmify.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a680ff660fd46441bf65b6f7f83739598b774cd6a74f54265cccf3caf6f64a5d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a680ff660fd46441bf65b6f7f83739598b774cd6a74f54265cccf3caf6f64a5d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a680ff660fd46441bf65b6f7f83739598b774cd6a74f54265cccf3caf6f64a5d"
-    sha256 cellar: :any_skip_relocation, ventura:        "84c0a4d1d8502ad2416896924aa87848b7d46fee2bb23131f00ff3d1094a4def"
-    sha256 cellar: :any_skip_relocation, monterey:       "84c0a4d1d8502ad2416896924aa87848b7d46fee2bb23131f00ff3d1094a4def"
-    sha256 cellar: :any_skip_relocation, big_sur:        "84c0a4d1d8502ad2416896924aa87848b7d46fee2bb23131f00ff3d1094a4def"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f1c146f86bd90b627e812a78e6419a600c8efe17f7bec002927df1b63c0f6033"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1245594585c7cde444edd84dfa10a42f31bd78f853153ac7bc7cf6d4dfe72132"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1245594585c7cde444edd84dfa10a42f31bd78f853153ac7bc7cf6d4dfe72132"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1245594585c7cde444edd84dfa10a42f31bd78f853153ac7bc7cf6d4dfe72132"
+    sha256 cellar: :any_skip_relocation, sonoma:        "906399dee463915b51a296d41708920370efbf7727d67e3750923222ad985cce"
+    sha256 cellar: :any_skip_relocation, ventura:       "906399dee463915b51a296d41708920370efbf7727d67e3750923222ad985cce"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2b531a6283d42bdeb97c354d38ed75995127f1219ef4dc68aa860038bdc31310"
   end
 
   depends_on "go" => :build
 
   def install
     ldflags = %W[
+      -s -w
       -X main.version=#{version}
       -X main.date=#{time.iso8601}
-      -X main.commit=#{Utils.git_head}
+      -X main.commit=#{tap.user}
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/helmify"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/helmify"
   end
 
   test do
     test_service = testpath/"service.yml"
-    test_service.write <<~EOS
+    test_service.write <<~YAML
       apiVersion: v1
       kind: Service
       metadata:
         name: brew-test
       spec:
         type: LoadBalancer
-    EOS
+    YAML
 
-    expected_values_yaml = <<~EOS
+    expected_values_yaml = <<~YAML
       brewTest:
         ports: []
         type: LoadBalancer
       kubernetesClusterDomain: cluster.local
-    EOS
+    YAML
 
     system "cat #{test_service} | #{bin}/helmify brewtest"
     assert_predicate testpath/"brewtest/Chart.yaml", :exist?

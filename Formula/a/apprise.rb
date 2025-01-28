@@ -3,38 +3,41 @@ class Apprise < Formula
 
   desc "Send notifications from the command-line to popular notification services"
   homepage "https://pypi.org/project/apprise/"
-  url "https://files.pythonhosted.org/packages/08/b5/07b086d9a984cb296533833eb35ed7553e0eed6f1094a3b434891a7998a7/apprise-1.5.0.tar.gz"
-  sha256 "3c581141077a101790ede0cab16fa283ad032a9b2f97dc6d3565fb2d91813fd7"
+  url "https://files.pythonhosted.org/packages/09/b9/77582f557b5b5fcfea85ff2e1c5708a848a98ce368db001ce37c5d7cc758/apprise-1.9.2.tar.gz"
+  sha256 "290eb1217028dd5040802371494d70c1bcab907e6634a77c263489dbe4fd73a8"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1217080df5328723a218217aadca53fceb25bf67796f65855a8f7c7a4522a7eb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0fe8596972c1a7fbceb26a7320203d8d815616fab833f9c779fec8a7c35c9397"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cbbb14c2735522c7545b736ea692c61ffe4169415881e7f9cba4f7b1e930a2da"
-    sha256 cellar: :any_skip_relocation, ventura:        "8f725f43edc94142c0b4d715e4fc9acbc8659254ad55219fa7afbdbafcb28b85"
-    sha256 cellar: :any_skip_relocation, monterey:       "7961117709aea378a24be648c6f7c21c3ffc11db10afee1f2cbe08796bfd9afd"
-    sha256 cellar: :any_skip_relocation, big_sur:        "fbf6b8c0347b84ba4acef9b64ac61074b0848cd3f32b522fae5d3f6385f2063f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "11a4c8ddcdaeaff8baf13575f2e23ca2fad5768349947603ee4966a30a212852"
+    sha256 cellar: :any,                 arm64_sequoia: "5f747749a8c7afc9de8f69f31e6db689120c19de72a082ef58465dd0fb66aa70"
+    sha256 cellar: :any,                 arm64_sonoma:  "479eee3d1b4d6fe0c9fcf00174f623127b4a45bfe6ef6e7f65c4aec864e44f45"
+    sha256 cellar: :any,                 arm64_ventura: "ee3a667e4505dbf002e06d3627951b595be8e3c8b31167985df4185b295f8ba4"
+    sha256 cellar: :any,                 sonoma:        "3b9f36ac03c417ecac66d5acf3e9b5b9a57a62857192a9eb0d47de2c0a79bde9"
+    sha256 cellar: :any,                 ventura:       "ae9b6033eb32522a73adf6fdccad30923e7674955eace905552c7ca42bb3e067"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "358b77565f5e76a42ef739aa4f4addf519fe72ab1c6cae9ca36d7e3c57ce53b3"
   end
 
-  depends_on "python-certifi"
-  depends_on "python-markdown"
-  depends_on "python@3.11"
-  depends_on "pyyaml"
+  depends_on "certifi"
+  depends_on "libyaml"
+  depends_on "python@3.13"
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/2a/53/cf0a48de1bdcf6ff6e1c9a023f5f523dfe303e4024f216feac64b6eb7f67/charset-normalizer-3.2.0.tar.gz"
-    sha256 "3bb3d25a8e6c0aedd251753a79ae98a093c7e7b471faa3aa9a93a81431987ace"
+    url "https://files.pythonhosted.org/packages/16/b0/572805e227f01586461c80e0fd25d65a2115599cc9dad142fee4b747c357/charset_normalizer-3.4.1.tar.gz"
+    sha256 "44251f18cd68a75b56585dd00dae26183e102cd5e0f9f1466e6df5da2ed64ea3"
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz"
-    sha256 "ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de"
+    url "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz"
+    sha256 "ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a"
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz"
-    sha256 "814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"
+    url "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz"
+    sha256 "12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"
+  end
+
+  resource "markdown" do
+    url "https://files.pythonhosted.org/packages/54/28/3af612670f82f4c056911fbbbb42760255801b3068c48de792d354ff4472/markdown-3.7.tar.gz"
+    sha256 "2ae2471477cfd02dbbf038d5d9bc226d40def84b4fe2986e49b59b6b472bbed2"
   end
 
   resource "oauthlib" do
@@ -42,53 +45,50 @@ class Apprise < Formula
     sha256 "9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918"
   end
 
+  resource "pyyaml" do
+    url "https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz"
+    sha256 "d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"
+  end
+
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz"
-    sha256 "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
+    url "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz"
+    sha256 "55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"
   end
 
   resource "requests-oauthlib" do
-    url "https://files.pythonhosted.org/packages/95/52/531ef197b426646f26b53815a7d2a67cb7a331ef098bb276db26a68ac49f/requests-oauthlib-1.3.1.tar.gz"
-    sha256 "75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a"
+    url "https://files.pythonhosted.org/packages/42/f2/05f29bc3913aea15eb670be136045bf5c5bbf4b99ecb839da9b422bb2c85/requests-oauthlib-2.0.0.tar.gz"
+    sha256 "b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/31/ab/46bec149bbd71a4467a3063ac22f4486ecd2ceb70ae8c70d5d8e4c2a7946/urllib3-2.0.4.tar.gz"
-    sha256 "8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11"
+    url "https://files.pythonhosted.org/packages/aa/63/e53da845320b757bf29ef6a9062f5c669fe997973f966045cb019c3f4b66/urllib3-2.3.0.tar.gz"
+    sha256 "f8c5449b3cf0861679ce7e0503c7b44b5ec981bec0d1d3795a07f1ba96f0204d"
   end
 
   def install
     virtualenv_install_with_resources
+
+    generate_completions_from_executable(bin/"apprise", shells: [:fish, :zsh], shell_parameter_format: :click)
   end
 
   test do
     # Setup a custom notifier that can be passed in as a plugin
-    brewtest_notifier_file = "#{testpath}/brewtest_notifier.py"
-    apprise_plugin_definition = <<~EOS
+    file = testpath/"brewtest_notifier.py"
+    file.write <<~PYTHON
       from apprise.decorators import notify
 
       @notify(on="brewtest")
       def my_wrapper(body, title, *args, **kwargs):
         # A simple test - print to screen
         print("{}: {}".format(title, body))
-    EOS
-
-    File.write(brewtest_notifier_file, apprise_plugin_definition)
+    PYTHON
 
     charset = Array("A".."Z") + Array("a".."z") + Array(0..9)
-    brewtest_notification_title = charset.sample(32).join
-    brewtest_notification_body = charset.sample(256).join
+    title = charset.sample(32).join
+    body = charset.sample(256).join
 
     # Run the custom notifier and make sure the output matches the expected value
-    assert_match \
-      "#{brewtest_notification_title}: #{brewtest_notification_body}", \
-      shell_output(
-        "#{bin}/apprise" \
-        + " " + %Q(-P "#{brewtest_notifier_file}") \
-        + " " + %Q(-t "#{brewtest_notification_title}") \
-        + " " + %Q(-b "#{brewtest_notification_body}") \
-        + " " + '"brewtest://"' \
-        + " " + "2>&1",
-      )
+    assert_match "#{title}: #{body}",
+      shell_output("#{bin}/apprise -P \"#{file}\" -t \"#{title}\" -b \"#{body}\" \"brewtest://\" 2>&1")
   end
 end

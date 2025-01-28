@@ -1,8 +1,8 @@
 class Ncdu < Formula
   desc "NCurses Disk Usage"
   homepage "https://dev.yorhel.nl/ncdu"
-  url "https://dev.yorhel.nl/download/ncdu-2.3.tar.gz"
-  sha256 "bbce1d1c70f1247671be4ea2135d8c52cd29a708af5ed62cecda7dc6a8000a3c"
+  url "https://dev.yorhel.nl/download/ncdu-2.7.tar.gz"
+  sha256 "b218cc14a2bb9852cf951db4e21aec8980e7a8c3aca097e3aa3417f20eb93000"
   license "MIT"
   head "https://g.blicky.net/ncdu.git", branch: "zig"
 
@@ -12,19 +12,19 @@ class Ncdu < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "be4225e9e3a60fc201015d0b347b4d6aa91716ec87b48329f5a3fb64201aaede"
-    sha256 cellar: :any,                 arm64_monterey: "b9811c7444bc9803111b4473484019a83da067071e7cfbd0e8dfb53970a57098"
-    sha256 cellar: :any,                 arm64_big_sur:  "d6e1ccd31a5f1f1f6957743f625444e3cc6328be9831eb0f618c98a6f314e2ad"
-    sha256 cellar: :any,                 ventura:        "d7904cf9cf2980d12c5db4f69c9d19b0533fab76190de548af0c69012f1eafd9"
-    sha256 cellar: :any,                 monterey:       "c0aeb8ca6c14b2475bd5a60a5b8fc08ba8def91abad411b32a06c88a85597fef"
-    sha256 cellar: :any,                 big_sur:        "739dd2be415a7edaff71ab49ac6c5afb830dba6d66ceffe6f54b7683d0e5dfaa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a6619212d336a2472d712eebc2c44239164ca8253fef4c09ec5268493ba41568"
+    sha256 cellar: :any,                 arm64_sequoia: "94e8907cf6b72057a4cc6913ff0a8b942172f82f231384dc2659c2476ffa7a8e"
+    sha256 cellar: :any,                 arm64_sonoma:  "1041490c1b919a6d63c9108ff77ed89f62fc12c766ca2be16068a2da553abb94"
+    sha256 cellar: :any,                 arm64_ventura: "dbd4d5e5b8d15bfc0923ed9bf43040e04e9f32e8d8d32cae75a26ef1dbc35b3b"
+    sha256 cellar: :any,                 sonoma:        "43a6e24ab5ff83297138f2aec826aa6ccc57ca64b8eb3b2f87e64ad7b60b155d"
+    sha256 cellar: :any,                 ventura:       "4ffc8d1553dbe38037cb3019c4607afb3c0b22399cc72a6d41b37c2f1a0db4af"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bed452df75f7c3eab2ace9ed72104d9a12bc0f75241ab562a1a023b5e5aa9416"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "zig" => :build
   # Without this, `ncdu` is unusable when `TERM=tmux-256color`.
   depends_on "ncurses"
+  depends_on "zstd"
 
   def install
     # Fix illegal instruction errors when using bottles on older CPUs.
@@ -34,7 +34,7 @@ class Ncdu < Formula
     else Hardware.oldest_cpu
     end
 
-    args = %W[--prefix #{prefix} -Doptimize=ReleaseFast]
+    args = %W[--prefix #{prefix} --release=fast]
     args << "-Dpie=true" if OS.mac?
     args << "-Dcpu=#{cpu}" if build.bottle?
 

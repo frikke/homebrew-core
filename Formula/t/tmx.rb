@@ -1,33 +1,33 @@
 class Tmx < Formula
   desc "Portable C library to load tiled maps in your games"
   homepage "https://github.com/baylej/tmx"
-  url "https://github.com/baylej/tmx/archive/tmx_1.4.0.tar.gz"
-  sha256 "5ab52e72976141260edd1b15ea34e1626c0f4ba9b8d2afe7f4d68b51fc9fedf7"
+  url "https://github.com/baylej/tmx/archive/refs/tags/tmx_1.10.0.tar.gz"
+  sha256 "8ee42d1728c567d6047a58b2624c39c8844aaf675c470f9f284c4ed17e94188f"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "5714907b97ede6353e5f461db191396197605b67df3bd5d79a53e01c9edc5fa5"
-    sha256 cellar: :any,                 arm64_monterey: "1741909448819ba29272e002c9d25fdb8cc315e0ea70991799e2bbfa4bcdb88f"
-    sha256 cellar: :any,                 arm64_big_sur:  "770cdb601ea6b496a29832960cb5fd79626a99f55f01c635985aa921f3e5f31d"
-    sha256 cellar: :any,                 ventura:        "25da4b79d7d3f89fb78a74c5cffba62085adda61a932f01d3dd3d70b858ed0fd"
-    sha256 cellar: :any,                 monterey:       "fd62803bd77e4f17e11137d591ee0f916eea138b4e9a076355fea04f5a01d67c"
-    sha256 cellar: :any,                 big_sur:        "91e9846b6d59e0694918753e357736c229c2a70d8021fdbaa2eb506e5be746c2"
-    sha256 cellar: :any,                 catalina:       "1013715fdb263f6d6985c9145a5dbc05d2e41ba6c4aa28af766f0bc82a87f2c5"
-    sha256 cellar: :any,                 mojave:         "060eab2a5090afed9dfbf6ca716a2867b956be2222e6a623a5b98774bf06ef6e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0ab5a06f59f128524607cfc604d1f7a5b40875572bd4516524fd61bb5db4ba13"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "b90d11cd5cb3b8b5d3ed6755386f7a0c61cba35135bf113366b0fe55170c16ed"
+    sha256 cellar: :any,                 arm64_sonoma:  "338149122323df8764c414aca5f168221b3b239e988c28a10e4f2a1f08aeb10d"
+    sha256 cellar: :any,                 arm64_ventura: "824f876037e825eee41439481c88496183ceeaf3b28b2f6713b76947e000e1d5"
+    sha256 cellar: :any,                 sonoma:        "373c7ff58f085aae49d1472d061222aed7d3ed7c67675a982333c77d5bff6ad2"
+    sha256 cellar: :any,                 ventura:       "245d68a570c8b1bf021dd5d1fbf40d1b35d0ad3a3fe6839824af29548d8e05b0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c43d5b6605675c73193fff26c3f7e8dadbeb89833e9d5dc4a8e6cdbef76526cf"
   end
 
   depends_on "cmake" => :build
 
   uses_from_macos "libxml2"
+  uses_from_macos "zlib"
 
   def install
-    system "cmake", ".", "-DBUILD_SHARED_LIBS=on", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", "-DBUILD_SHARED_LIBS=ON", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.tmx").write <<-EOS
+    (testpath/"test.tmx").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <map version="1.0" tiledversion="1.0.2" orientation="orthogonal" renderorder="right-down" width="28" height="18" tilewidth="32" tileheight="32">
         <tileset firstgid="1" name="base" tilewidth="32" tileheight="32" spacing="1" tilecount="9" columns="3">
@@ -42,8 +42,8 @@ class Tmx < Formula
           </layer>
         </group>
       </map>
-    EOS
-    (testpath/"test.c").write <<-EOS
+    XML
+    (testpath/"test.c").write <<~C
       #include <tmx.h>
 
       int main(void) {
@@ -55,7 +55,7 @@ class Tmx < Formula
 
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "#{lib}/#{shared_library("libtmx")}", "-lz", "-lxml2", "-o", "test"
     system "./test"
   end

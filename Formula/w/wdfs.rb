@@ -6,23 +6,27 @@ class Wdfs < Formula
   license "GPL-2.0-or-later"
   revision 1
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "795f6e2939f798aeea462d891b102cb80e32c5abb3586f8d57841843d2120f91"
+  livecheck do
+    skip "No longer developed or maintained"
   end
 
-  depends_on "pkg-config" => :build
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "8e9e8b67d2d470f355a46983ac2a52cb2c34a6ebd63e1720e5ceb010c7bd9298"
+  end
+
+  depends_on "pkgconf" => :build
   depends_on "glib"
   depends_on "libfuse@2"
   depends_on :linux # on macOS, requires closed-source macFUSE
   depends_on "neon"
 
   def install
-    system "./configure", "--disable-debug", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/wdfs", "-v"
+    system bin/"wdfs", "-v"
   end
 end

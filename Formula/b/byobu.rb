@@ -1,37 +1,36 @@
 class Byobu < Formula
   desc "Text-based window manager and terminal multiplexer"
-  homepage "https://launchpad.net/byobu"
-  url "https://launchpad.net/byobu/trunk/5.133/+download/byobu_5.133.orig.tar.gz"
-  sha256 "4d8ea48f8c059e56f7174df89b04a08c32286bae5a21562c5c6f61be6dab7563"
+  homepage "https://github.com/dustinkirkland/byobu"
+  url "https://github.com/dustinkirkland/byobu/archive/refs/tags/6.12.tar.gz"
+  sha256 "abb000331858609dfda9214115705506249f69237625633c80487abe2093dd45"
   license "GPL-3.0-only"
-  revision 3
+  revision 1
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "03b4147cf768eb8069102dbae06173cb819552e3ec9c3b1dab31b03ce052a27b"
+    sha256 cellar: :any_skip_relocation, all: "b611adbdd842b9d1cb00130161b54e76ab27da7a1aadc9881e4bcf5771f87dfc"
   end
 
-  head do
-    url "https://github.com/dustinkirkland/byobu.git", branch: "master"
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
 
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-  end
-
-  depends_on "gettext"
   depends_on "newt"
   depends_on "tmux"
 
   on_macos do
     depends_on "coreutils"
+    depends_on "gettext"
   end
 
   conflicts_with "ctail", because: "both install `ctail` binaries"
 
   def install
-    if build.head?
-      cp "./debian/changelog", "./ChangeLog"
-      system "autoreconf", "--force", "--install", "--verbose"
-    end
+    cp "./debian/changelog", "./ChangeLog"
+    system "autoreconf", "--force", "--install", "--verbose"
     system "./configure", *std_configure_args
     system "make", "install"
 

@@ -1,9 +1,10 @@
 class NotmuchMutt < Formula
   desc "Notmuch integration for Mutt"
   homepage "https://notmuchmail.org/"
-  url "https://notmuchmail.org/releases/notmuch-0.38.tar.xz"
-  sha256 "a17901adbe43f481a6bf53c15a2a20268bc8dc7ad5ccf685a0d17c1456dbaf6e"
+  url "https://notmuchmail.org/releases/notmuch-0.38.3.tar.xz"
+  sha256 "9af46cc80da58b4301ca2baefcc25a40d112d0315507e632c0f3f0f08328d054"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://git.notmuchmail.org/git/notmuch", using: :git, branch: "master"
 
   livecheck do
@@ -11,50 +12,48 @@ class NotmuchMutt < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "79e313438c9332b53b8904e17415a516e3eebcc189de92234e1616f51c0d4edd"
-    sha256 cellar: :any,                 arm64_monterey: "e2bacabd6507b8c64a4bd24940fc6cc3785a95bfda67a7a18ab7049c8bee52ec"
-    sha256 cellar: :any,                 arm64_big_sur:  "705d5c69ad1b0cfe59609785e726cdd1af302c0a993df8b6ee0a7964c2b97cc9"
-    sha256 cellar: :any,                 ventura:        "ed203220afb16b5129fc349e4bd7f0bf672064f23d2217eec2f75b22ae03846e"
-    sha256 cellar: :any,                 monterey:       "e5541e9d930433b0449668bb412e8819e2b9b2396e5bf14947d738b4a105a792"
-    sha256 cellar: :any,                 big_sur:        "7fed64a33a46e55518e2d0b9841886d6874097e2e7151e0792f20b9883cfd8e0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "23a0c5fe3c67f06aaf99c9082a7995ccd642ea878af92acbf9f09a9f0e3de7f5"
+    sha256 cellar: :any,                 arm64_sequoia: "f8e6267e15ba67f6952b2af6f7b7a544ad07d4464c710b659f93dafcbe91a171"
+    sha256 cellar: :any,                 arm64_sonoma:  "23020e1c1bff402445cdd9099bc0ea7395b6d64c1c5c8dcd25955ac00b9b5a97"
+    sha256 cellar: :any,                 arm64_ventura: "88995f4ddbd5790dd5f4dfdb3fb922bb4c31d1fc0b8ba69c4e80a0c052848d41"
+    sha256 cellar: :any,                 sonoma:        "f63f141a9a62d1245784c09573d7ccd2d19f385c4f1675a657ba75b227e22a2b"
+    sha256 cellar: :any,                 ventura:       "a95b08d75d12c468eeb8c6e256db0e654b1b348ceadfb4475dd53a127c40891f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a2bf3fd1b806f84210edbfd26c718506ed9c6c3af7e93bf32c1c15b61856899c"
   end
 
   depends_on "notmuch"
+  depends_on "perl"
   depends_on "readline"
 
-  uses_from_macos "perl"
+  uses_from_macos "ncurses"
 
-  on_linux do
-    resource "Date::Parse" do
-      url "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-2.33.tar.gz"
-      sha256 "c0b69c4b039de6f501b0d9f13ec58c86b040c1f7e9b27ef249651c143d605eb2"
-    end
+  resource "Date::Parse" do
+    url "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-2.33.tar.gz"
+    sha256 "c0b69c4b039de6f501b0d9f13ec58c86b040c1f7e9b27ef249651c143d605eb2"
+  end
 
-    resource "IO::Lines" do
-      url "https://cpan.metacpan.org/authors/id/C/CA/CAPOEIRAB/IO-Stringy-2.113.tar.gz"
-      sha256 "51220fcaf9f66a639b69d251d7b0757bf4202f4f9debd45bdd341a6aca62fe4e"
-    end
+  resource "IO::Lines" do
+    url "https://cpan.metacpan.org/authors/id/C/CA/CAPOEIRAB/IO-Stringy-2.113.tar.gz"
+    sha256 "51220fcaf9f66a639b69d251d7b0757bf4202f4f9debd45bdd341a6aca62fe4e"
+  end
 
-    resource "Devel::GlobalDestruction" do
-      url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Devel-GlobalDestruction-0.14.tar.gz"
-      sha256 "34b8a5f29991311468fe6913cadaba75fd5d2b0b3ee3bb41fe5b53efab9154ab"
-    end
+  resource "Devel::GlobalDestruction" do
+    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Devel-GlobalDestruction-0.14.tar.gz"
+    sha256 "34b8a5f29991311468fe6913cadaba75fd5d2b0b3ee3bb41fe5b53efab9154ab"
+  end
 
-    resource "Sub::Exporter::Progressive" do
-      url "https://cpan.metacpan.org/authors/id/F/FR/FREW/Sub-Exporter-Progressive-0.001013.tar.gz"
-      sha256 "d535b7954d64da1ac1305b1fadf98202769e3599376854b2ced90c382beac056"
-    end
+  resource "Sub::Exporter::Progressive" do
+    url "https://cpan.metacpan.org/authors/id/F/FR/FREW/Sub-Exporter-Progressive-0.001013.tar.gz"
+    sha256 "d535b7954d64da1ac1305b1fadf98202769e3599376854b2ced90c382beac056"
+  end
 
-    resource "File::Remove" do
-      url "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/File-Remove-1.60.tar.gz"
-      sha256 "e86e2a40ffedc6d5697d071503fd6ba14a5f9b8220af3af022110d8e724f8ca6"
-    end
+  resource "File::Remove" do
+    url "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/File-Remove-1.61.tar.gz"
+    sha256 "fd857f585908fc503461b9e48b3c8594e6535766bc14beb17c90ba58d5dc4975"
   end
 
   resource "Term::ReadLine::Gnu" do
-    url "https://cpan.metacpan.org/authors/id/H/HA/HAYASHI/Term-ReadLine-Gnu-1.37.tar.gz"
-    sha256 "3bd31a998a9c14748ee553aed3e6b888ec47ff57c07fc5beafb04a38a72f0078"
+    url "https://cpan.metacpan.org/authors/id/H/HA/HAYASHI/Term-ReadLine-Gnu-1.46.tar.gz"
+    sha256 "b13832132e50366c34feac12ce82837c0a9db34ca530ae5d27db97cf9c964c7b"
   end
 
   resource "String::ShellQuote" do
@@ -63,8 +62,8 @@ class NotmuchMutt < Formula
   end
 
   resource "Mail::Box::Maildir" do
-    url "https://cpan.metacpan.org/authors/id/M/MA/MARKOV/Mail-Box-3.009.tar.gz"
-    sha256 "9185216b0e14c919ec2384769525559491ed7d56d27adb1bc985a1fbeb799165"
+    url "https://cpan.metacpan.org/authors/id/M/MA/MARKOV/Mail-Box-3.010.tar.gz"
+    sha256 "ae194fa250c545c9b9153e3fb5103cab29f79cf2acd4e9fd75cec532201a9564"
   end
 
   resource "Mail::Header" do
@@ -73,13 +72,13 @@ class NotmuchMutt < Formula
   end
 
   resource "Mail::Reporter" do
-    url "https://cpan.metacpan.org/authors/id/M/MA/MARKOV/Mail-Message-3.010.tar.gz"
-    sha256 "58414b1ae382988153a915d317245d89dd450f186ecf6d383c964b3673a78b13"
+    url "https://cpan.metacpan.org/authors/id/M/MA/MARKOV/Mail-Message-3.015.tar.gz"
+    sha256 "b2858d7f877d3ed489f83404a40aaa95dd96ef61e00f141aef149a332399b25a"
   end
 
   resource "MIME::Types" do
-    url "https://cpan.metacpan.org/authors/id/M/MA/MARKOV/MIME-Types-2.18.tar.gz"
-    sha256 "31ca35a41f2ae998ccd7d33c19e42023ee6540fd9ded619b9abd48ff06a095be"
+    url "https://cpan.metacpan.org/authors/id/M/MA/MARKOV/MIME-Types-2.26.tar.gz"
+    sha256 "bc738483cb4cdb47d61e85fe9304fa929aa9ab927e3171ec2ba2ab1cd7cefdff"
   end
 
   resource "Object::Realize::Later" do
@@ -105,10 +104,6 @@ class NotmuchMutt < Formula
       # Prevent the Makefile to try and build universal binaries
       ENV.refurbish_args
 
-      # Work around issue with Makefile.PL not detecting -ltermcap
-      # https://rt.cpan.org/Public/Bug/Display.html?id=133846
-      inreplace "Makefile.PL", "my $TERMCAP_LIB =", "my $TERMCAP_LIB = '-lncurses'; 0 &&"
-
       system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}",
                      "--includedir=#{Formula["readline"].opt_include}",
                      "--libdir=#{Formula["readline"].opt_lib}"
@@ -119,6 +114,6 @@ class NotmuchMutt < Formula
   end
 
   test do
-    system "#{bin}/notmuch-mutt", "search", "Homebrew"
+    system bin/"notmuch-mutt", "search", "Homebrew"
   end
 end

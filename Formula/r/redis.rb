@@ -1,37 +1,53 @@
 class Redis < Formula
   desc "Persistent key-value database, with built-in net interface"
   homepage "https://redis.io/"
-  url "https://download.redis.io/releases/redis-7.2.1.tar.gz"
-  sha256 "5c76d990a1b1c5f949bcd1eed90d0c8a4f70369bdbdcb40288c561ddf88967a4"
-  license "BSD-3-Clause"
+  # NOTE: Do not bump to v7.4+ as license changed to RSALv2+SSPLv1
+  # https://github.com/redis/redis/pull/13157
+  url "https://download.redis.io/releases/redis-7.2.7.tar.gz"
+  sha256 "72c081e3b8cfae7144273d26d76736f08319000af46c01515cad5d29765cead5"
+  license all_of: [
+    "BSD-3-Clause",
+    "BSD-2-Clause", # deps/jemalloc, deps/linenoise, src/lzf*
+    "BSL-1.0", # deps/fpconv
+    "MIT", # deps/lua
+    any_of: ["CC0-1.0", "BSD-2-Clause"], # deps/hdr_histogram
+  ]
   head "https://github.com/redis/redis.git", branch: "unstable"
 
   livecheck do
     url "https://download.redis.io/releases/"
     regex(/href=.*?redis[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    strategy :page_match do |page, regex|
+      version_limit = Version.new("7.4")
+      page.scan(regex).map do |match|
+        match[0] if Version.new(match[0]) < version_limit
+      end
+    end
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "1f8bc92ee86e652c307f4cb242fd1c20e852b57655bd675a2c4d4e6eeb6ce9aa"
-    sha256 cellar: :any,                 arm64_monterey: "3b5fd4f19340f608800faefbdec54141139ffbab0c1f5f9e28ac6540a6f92e0f"
-    sha256 cellar: :any,                 arm64_big_sur:  "7399b07530ec8ecf674b6d1e3bec31c1f46374a9f545982ea27953c654659988"
-    sha256 cellar: :any,                 sonoma:         "3b37dd962054703ce81d9fb204257642181b34b9c26829b3f44bfc735dd4e536"
-    sha256 cellar: :any,                 ventura:        "1004403807ad5b66a43e9378f4d16d258ec0ee4f54d68ccc5a44f1f8b1bf1b6f"
-    sha256 cellar: :any,                 monterey:       "697cd84b21cf855dec8e583ea46ce723ed139ce68d9f8ef90642437956de5ffd"
-    sha256 cellar: :any,                 big_sur:        "d5d3966e8d18f3d610ce87037c0832a492278e7bb39d23db4b09a8031e767201"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ca0d71336e4db1c285f3333679afea03e05f2587cf3feaaff57f0db6a751aecb"
+    sha256 cellar: :any,                 arm64_sequoia: "aefa0dd010a6707c9814f24a0d0e20deeaba297958fe901a4786204970815e0f"
+    sha256 cellar: :any,                 arm64_sonoma:  "f52f75401515e756b6ab71953ea1d3c10dbcd6b16bc9afb016ff20695bd2053e"
+    sha256 cellar: :any,                 arm64_ventura: "45d4fd71c45fc068ddef77c8159e5516d73b14d6076c2d8ccf379640ea9dc3be"
+    sha256 cellar: :any,                 sonoma:        "ea691d1b50bf68112f6ba65836ef1af4e9d2869d2aa72959da62cf22075b5402"
+    sha256 cellar: :any,                 ventura:       "db2bbb4405291b3918fe4f0f11b68460f407a5f8d1127b41abfe0acfa9d3bb01"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "35b84640a9a360afa2fabe95ad44cec532c7c8c0a2a46c1a636b874125cf9ca3"
   end
 
   depends_on "openssl@3"
 
+  conflicts_with "valkey", because: "both install `redis-*` binaries"
+
   def install
+    odie "Do not bump to v7.4+" if version.major_minor >= "7.4"
+
     system "make", "install", "PREFIX=#{prefix}", "CC=#{ENV.cc}", "BUILD_TLS=yes"
 
     %w[run db/redis log].each { |p| (var/p).mkpath }
 
     # Fix up default conf file to match our paths
     inreplace "redis.conf" do |s|
-      s.gsub! "/var/run/redis.pid", var/"run/redis.pid"
+      s.gsub! "/var/run/redis_6379.pid", var/"run/redis.pid"
       s.gsub! "dir ./", "dir #{var}/db/redis/"
       s.sub!(/^bind .*$/, "bind 127.0.0.1 ::1")
     end

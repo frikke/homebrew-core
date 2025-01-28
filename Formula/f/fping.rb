@@ -1,8 +1,8 @@
 class Fping < Formula
   desc "Scriptable ping program for checking if multiple hosts are up"
   homepage "https://fping.org/"
-  url "https://fping.org/dist/fping-5.1.tar.gz"
-  sha256 "1ee5268c063d76646af2b4426052e7d81a42b657e6a77d8e7d3d2e60fd7409fe"
+  url "https://fping.org/dist/fping-5.3.tar.gz"
+  sha256 "d57bd0141aea082e3adfc198bfc3db5dfd12a7014c7c2655e97f61cd54901d0e"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,14 +11,12 @@ class Fping < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0438caca030b6ef2929d7c99e6138734f1aef1e992cf29883ac4437dbff951e4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "087d83a0737273f2a17e731d6dd3a850a73b09bb8bb1ffa79d557af23acbddbe"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f5fa545f848ec9144a99596c909227193d63858b01cdb0feacf564a2a021846d"
-    sha256 cellar: :any_skip_relocation, ventura:        "696dea8ec56b37e2772fc69e5bedeb074afd1221911672b5ee374d06f3567304"
-    sha256 cellar: :any_skip_relocation, monterey:       "11128619d0c6500c6aadc9b81f4953fc78ea965fe158d296072519089708a674"
-    sha256 cellar: :any_skip_relocation, big_sur:        "04bb01d86dd906a4fc5b63ed165a4bc936ab436fd17b567f8f6ddcd051ab4ab5"
-    sha256 cellar: :any_skip_relocation, catalina:       "fc706bf9bcb8a3fa881fe02b1987618745bfb50be7cfa4ace24b02ad40d7f8dc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "10618282a7eb3078c424117e81046f0d58f87fa98bbae3ad415d8aa8d47b26c8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "34826c963fd624266f511d3fb0dd26b610b8843cebbb16f31220e43c20a4052b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ec5e5ab2337affbf9f5fe26ba7a69b55e10f18a0a0065bf0b54eab0847265a19"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "658575a36018fa71348dea5d451069d336b152344bedb9fcc6e3bc33ca9a5283"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1a1ba89c185ab398f0331f79ffbd47a6f810fc8f7e3e25bedcb2022add56eeb5"
+    sha256 cellar: :any_skip_relocation, ventura:       "784590da34854b738fe5ea0470d518a23576496dc7cddf49102940ba78ff1ec3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "89675f5ea6956c4e188fa9c4ea28b72a951a5ee899d4f06b29e1275dd47a6952"
   end
 
   head do
@@ -37,10 +35,6 @@ class Fping < Formula
   test do
     assert_match "Version #{version}", shell_output("#{bin}/fping --version")
     assert_match "Probing options:", shell_output("#{bin}/fping --help")
-    if OS.mac?
-      assert_equal "::1 is alive", shell_output("#{bin}/fping -A localhost").chomp
-    else
-      assert_match "can't create socket", shell_output("#{bin}/fping -A localhost 2>&1", 4)
-    end
+    assert_equal "127.0.0.1 is alive", shell_output("#{bin}/fping -4 -A localhost").chomp
   end
 end

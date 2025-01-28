@@ -1,8 +1,8 @@
 class Gromacs < Formula
   desc "Versatile package for molecular dynamics calculations"
   homepage "https://www.gromacs.org/"
-  url "https://ftp.gromacs.org/pub/gromacs/gromacs-2023.2.tar.gz"
-  sha256 "bce1480727e4b2bb900413b75d99a3266f3507877da4f5b2d491df798f9fcdae"
+  url "https://ftp.gromacs.org/pub/gromacs/gromacs-2024.5.tar.gz"
+  sha256 "fecf06b186cddb942cfb42ee8da5f3eb2b9993e6acc0a2f18d14ac0b014424f3"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,13 +11,12 @@ class Gromacs < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "a7a0967a6a32d0aa14aab0c1f251f4d43e93b622b2540d216dd211735b627d5a"
-    sha256 arm64_monterey: "a04ff3fc0d7685ae63927307fd07a2278c773c2d188789f33fdca1304b1697fd"
-    sha256 arm64_big_sur:  "2f7fe800fe0ba5c7ef55fea32b81886db90669b7f472b3ea00f35f694d244baa"
-    sha256 ventura:        "848e972271e7abee5c871be0fa2992bce4a881656a973171c080cd6812dea9e2"
-    sha256 monterey:       "298f09d76f22b3f789c109b4a3e3882de841e363e4c4e15edd354444e073821a"
-    sha256 big_sur:        "697398fc20ff1409331e83545e0a8f23c169b37fd8f40c161922922e119c8571"
-    sha256 x86_64_linux:   "034d67c68d584f62172d189e5939bfcbcac352a3565cae4ca27bfe4bcc1cdf37"
+    sha256 arm64_sequoia: "44f56f6256f9fa1fef887b7049692de7a76aab4fcdc184da7874e5cb38e1cddc"
+    sha256 arm64_sonoma:  "b2a693c17dca973a459496021fa1bd83d25c361af9438cba5ba1d395cc6d5daf"
+    sha256 arm64_ventura: "cc397203c9c8b1951205e6a28670f072b4103fc29b30586bd636dacf7d22d2d1"
+    sha256 sonoma:        "8eec8e174badc80050dc8039f075fc048ced62a312b525dc9b2149893aa18a53"
+    sha256 ventura:       "6823221c0eee4ecbf4c0f4df722a42f993a7d3c1e6d6f8ab6a52efbbb84128fc"
+    sha256 x86_64_linux:  "14733c2fbae27301cefcb3ac77cccd2699a46223f2fdb9fe6782661baa10c19d"
   end
 
   depends_on "cmake" => :build
@@ -26,8 +25,6 @@ class Gromacs < Formula
   depends_on "openblas"
 
   fails_with :clang
-  fails_with gcc: "5"
-  fails_with gcc: "6"
 
   def install
     # Non-executable GMXRC files should be installed in DATADIR
@@ -56,8 +53,17 @@ class Gromacs < Formula
       -DGMX_VERSION_STRING_OF_FORK=#{tap.user}
       -DGMX_INSTALL_LEGACY_API=ON
     ]
+
     # Force SSE2/SSE4.1 for compatibility when building Intel bottles
-    args << "-DGMX_SIMD=#{MacOS.version.requires_sse41? ? "SSE4.1" : "SSE2"}" if Hardware::CPU.intel? && build.bottle?
+    if Hardware::CPU.intel?
+      gmx_simd = if OS.mac? && MacOS.version.requires_sse4?
+        "SSE4.1"
+      else
+        "SSE2"
+      end
+      args << "-DGMX_SIMD=#{gmx_simd}"
+    end
+
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args, *args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
@@ -76,6 +82,6 @@ class Gromacs < Formula
   end
 
   test do
-    system "#{bin}/gmx", "help"
+    system bin/"gmx", "help"
   end
 end

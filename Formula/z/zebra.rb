@@ -4,7 +4,7 @@ class Zebra < Formula
   url "https://ftp.indexdata.com/pub/zebra/idzebra-2.2.7.tar.gz"
   sha256 "b465ffeb060f507316e6cfc20ebd46022472076d0d4e96ef7dab63e798066420"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 4
 
   livecheck do
     url "https://ftp.indexdata.com/pub/zebra/"
@@ -12,16 +12,15 @@ class Zebra < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "2c1c575bfbb006d3f14b5c8c195baafe9645ef628a667b525c636b484ba7687d"
-    sha256 arm64_monterey: "c728eb75cec0392bca517fec5269b6b58f010863108453d726e09ccd07f31417"
-    sha256 arm64_big_sur:  "64789711abef79fff026a85e8fa8cf1fc3e08a12057cfe46947f215f6005fde4"
-    sha256 ventura:        "dc998e52eb4015f39637fbacf3b84ecb521d613695dd0aa7225aa36d6abc1662"
-    sha256 monterey:       "9bce4f66dd42f152cd4f1920b8e4d9bd4a20ce9c59e36b6876f79658254e8c17"
-    sha256 big_sur:        "d5d8c1daf8eee3ec6708883aca253259ade3b1f969ac188f0ea4fe2a86ac18b8"
-    sha256 x86_64_linux:   "04dc42ea2bf2529032c1cebbf9fe16a9315a9a99f586d3dbebbacf540a15e65b"
+    sha256 arm64_sequoia: "400c8de8a1d7071b69e6b511ea50bcde9acd8132bf6fd67706d47955caf083c7"
+    sha256 arm64_sonoma:  "3e9d34d91050236c2276a5883fd5468019581df138bf7c9452e7097f926cbc94"
+    sha256 arm64_ventura: "8daed2232e33c838bb333ea7e1429153578bcc1383171d8684e4e474345c0a88"
+    sha256 sonoma:        "27b8e0d296adb17a5756452180750f15bfa8db633728b5176bd56b49b540214a"
+    sha256 ventura:       "906e808a4541d0cf331893443ee5c2b30b4032fce3ef886d80527c34dd825674"
+    sha256 x86_64_linux:  "e9fa00ff2ff605e9070fc39f74fb24f19751c73db94e43f3a97025e28052d507"
   end
 
-  depends_on "icu4c"
+  depends_on "icu4c@76"
   depends_on "yaz"
 
   uses_from_macos "bzip2"
@@ -32,15 +31,15 @@ class Zebra < Formula
   uses_from_macos "zlib"
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
+    system "./configure", "--disable-silent-rules",
                           "--enable-mod-text",
                           "--enable-mod-grs-regx",
                           "--enable-mod-grs-marc",
                           "--enable-mod-grs-xml",
                           "--enable-mod-dom",
                           "--enable-mod-alvis",
-                          "--enable-mod-safari"
+                          "--enable-mod-safari",
+                          *std_configure_args
     system "make", "install"
   end
 

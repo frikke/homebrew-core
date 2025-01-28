@@ -3,7 +3,8 @@ class Sylpheed < Formula
   homepage "https://sylpheed.sraoss.jp/en/"
   url "https://sylpheed.sraoss.jp/sylpheed/v3.7/sylpheed-3.7.0.tar.bz2"
   sha256 "eb23e6bda2c02095dfb0130668cf7c75d1f256904e3a7337815b4da5cb72eb04"
-  revision 5
+  license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later", "MIT", :public_domain]
+  revision 7
 
   livecheck do
     url "https://sylpheed.sraoss.jp/en/download.html"
@@ -11,19 +12,32 @@ class Sylpheed < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "bb7261752ea2aa71d885be5958619a4c29ce7695c9e1283ef20d511e5cf72612"
-    sha256 arm64_monterey: "8a86432333e80c75bf6bc4130c3a025147bd24537db18999c648cb0d1c68db8e"
-    sha256 arm64_big_sur:  "c592c4608ad89aaba66c8e5e4616f82a8618816074a577d8f804ade18a96823b"
-    sha256 ventura:        "7727583d3d171cc0f9ad91a06f8b8b132243adf1abb99ff75177b30d2ebe4fc9"
-    sha256 monterey:       "858ccb14e9acb6829826f318c907bc591a16b323af88f0d6d44ad064e2b4fda3"
-    sha256 big_sur:        "73b567343fcab79f4ce085937e4a4aaf34045299927aa6ec71fe2e8d8ba38176"
-    sha256 x86_64_linux:   "2473c806a8960f5b3b190e4836bde47bac4e7276463310b6c3e5d6cc090442bc"
+    sha256 arm64_sonoma:   "b495ed0f57f6d69fb00f2295e90114d2f84383bea9265b7745a5879d93c8b28f"
+    sha256 arm64_ventura:  "ae1224cc9e932e455ce0beabf837e2e461ebc3c94e12dfe0049a27b2ab5fbbaf"
+    sha256 arm64_monterey: "8a61d3c007130922a3401fa21126224af1150e42c0505a71b001025a339104e9"
+    sha256 sonoma:         "318cdef672289eef299f997f611bdb0b04289a2df140f11f486750d1e9caee2f"
+    sha256 ventura:        "90d177673ba7c5cbcc5379ff58d6fe0dfc53bfaf5d56dd83b9c5b63e897793df"
+    sha256 monterey:       "5fc319eacb46d715a6d65afd9415037d51201bdd9990e8551ea2565acfec591d"
+    sha256 x86_64_linux:   "2acbda751260830e9e9388a9745bc6df4668b2c3799b200335d0c19d2018882c"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
+  depends_on "cairo"
+  depends_on "gdk-pixbuf"
+  depends_on "glib"
   depends_on "gpgme"
   depends_on "gtk+"
   depends_on "openssl@3"
+  depends_on "pango"
+
+  on_macos do
+    depends_on "at-spi2-core"
+    depends_on "gettext"
+    depends_on "harfbuzz"
+    depends_on "libassuan"
+    depends_on "libgpg-error"
+  end
 
   # Fix -flat_namespace being used on Big Sur and later.
   patch do
@@ -32,13 +46,11 @@ class Sylpheed < Formula
   end
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--disable-updatecheck"
+    system "./configure", "--disable-updatecheck", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/sylpheed", "--version"
+    system bin/"sylpheed", "--version"
   end
 end

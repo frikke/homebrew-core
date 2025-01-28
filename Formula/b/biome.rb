@@ -1,9 +1,9 @@
 class Biome < Formula
   desc "Toolchain of the web"
   homepage "https://biomejs.dev/"
-  url "https://github.com/biomejs/biome/archive/refs/tags/cli/v1.2.2.tar.gz"
-  sha256 "744847d50e716a5ada7eea2f9862fdad6c5321c5aa3ad15c3169e170b2fa09e7"
-  license "MIT"
+  url "https://github.com/biomejs/biome/archive/refs/tags/cli/v1.9.4.tar.gz"
+  sha256 "fc06a89e1b925e8b1dfaca98f7af1d8e04d27acdcaeff786e2806f8bc26283f9"
+  license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/biomejs/biome.git", branch: "main"
 
   livecheck do
@@ -12,13 +12,12 @@ class Biome < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "541602aadf5477d9d7bba969d867adfc2967172a3ef1b92aacefde46304f2a98"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "89be6120d6731b8e61735e9ba5a6b3225da76aa281d5e2f4b27248a6be372f49"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7c23fe026c4f80ed608e6d60b760afccde5eb92f727ae59d35c7eadf567324d1"
-    sha256 cellar: :any_skip_relocation, ventura:        "c3f2569e0ec60e73e5bdf78b7176272edfc128f64fc05944446bfd1f9c555c71"
-    sha256 cellar: :any_skip_relocation, monterey:       "573d350b342d47ebef71c59d12d1de948756c9c5be5ae2820790712cf979b60d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "168bc4975dc9a59654b76f6b263aa74cf8b2b0feba003b1e0c33097b182fea49"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dcb251f3e2f5c34ccc2ad02ecada2cf79d8bf76cfdb4cc2103a3202f02f0922e"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8646b6bdf4f2b0996e739aee80668eb17d32a7aad4a356986521d812cc984cc2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "43540d1b4f59a61da1b7baca7cfa5db8a1aeb06e9a0f0673e49dfcf214a31af8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "cb13597637d0123db60acc9e97cc4f08075f6734689d5e0a270a8a1ff419c756"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9c37ee00fd5771d88747a57e6957b8c7a2df6901f8f58a1883b8a77e909b6d9c"
+    sha256 cellar: :any_skip_relocation, ventura:       "b6c80a4f53293569e04d7c6b25b27535521ac75ce858b128f7c0070023bf5648"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9fa4e736896fa3289074b6eec6accff439ed4484e1d8ef909e03945a93a3a60f"
   end
 
   depends_on "rust" => :build
@@ -33,6 +32,6 @@ class Biome < Formula
     system bin/"biome", "format", "--semicolons=always", "--write", testpath/"test.js"
     assert_match "const x = 1;", (testpath/"test.js").read
 
-    assert_match version.to_s, shell_output("#{bin}/biome --version", 1)
+    assert_match version.to_s, shell_output("#{bin}/biome --version")
   end
 end

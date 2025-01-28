@@ -1,26 +1,23 @@
 class Zbar < Formula
   desc "Suite of barcodes-reading tools"
   homepage "https://github.com/mchehab/zbar"
-  url "https://linuxtv.org/downloads/zbar/zbar-0.23.90.tar.bz2"
-  sha256 "9152c8fb302b3891e1cb9cc719883d2f4ccd2483e3430783a2cf2d93bd5901ad"
+  url "https://linuxtv.org/downloads/zbar/zbar-0.23.93.tar.bz2"
+  sha256 "83be8f85fc7c288fd91f98d52fc55db7eedbddcf10a83d9221d7034636683fa0"
   license "LGPL-2.1-only"
-  revision 4
+  revision 2
 
   livecheck do
-    url :homepage
-    strategy :github_latest
+    url "https://linuxtv.org/downloads/zbar/"
+    regex(/href=.*?zbar[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_sonoma:   "10e9b50f2750fe6c05402bea84ea136ab047e54621132101b1de4a0ea7a44447"
-    sha256 arm64_ventura:  "a556e1d3761eef86b007225b17c1e2e3bd3d8f5c0586c96b9db95261012623e5"
-    sha256 arm64_monterey: "ecb4a7174906195486f0f9badabc2e5affd732022fc9e3b832c1b7a462a3e203"
-    sha256 arm64_big_sur:  "2e7a16f085ca08bd70c1ab3b8d88683281ea51481c3f1c26402c2b59f949fa6d"
-    sha256 sonoma:         "aef3d415f2b525ed91f9037c85b2645dd52a4867900eb0b0d560ad160fbf88f4"
-    sha256 ventura:        "8349004627c6741ecc50f1e9410be7ac4149ec7ad326c2c8e6896f23986d2f70"
-    sha256 monterey:       "853aa15556c0ccd130dd35074cfd67840720583d3e8564f7c9c1fee101c5d9ac"
-    sha256 big_sur:        "3b8169dcfeaed1f704084073f93c619510c415b37454d1a0858d5bd689b89911"
-    sha256 x86_64_linux:   "ef7a2cf8345087907b68a3ba10874aca3bcc9a8f8f3bafcd30dc8df4c5255fab"
+    sha256 arm64_sequoia: "fe42da9d30318b93a75645b76806c1ffe684db56c7f6c0e608c718f9cc7f8f37"
+    sha256 arm64_sonoma:  "c6a2988931330f8b9330b259d53096e58b25c9c54a3dc167688774412f885993"
+    sha256 arm64_ventura: "22dcfaed8be4e8e396d6e7f6ca5b9dafc04d83e16c78674a665c0742ba9c0c67"
+    sha256 sonoma:        "63ecefc21c58f41dcc73346b81fd1defabf3f2db855ec4a18fd0b63ec0cd5326"
+    sha256 ventura:       "420f056fecb135dd17684d4f7c62825368e2a0a52df6aabbaaf9823c819d6ba6"
+    sha256 x86_64_linux:  "ecb7269a350f91339a4c6c05d014e27f38311431e54e948fa575aacb2056f03e"
   end
 
   head do
@@ -32,27 +29,39 @@ class Zbar < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "xmlto" => :build
+
   depends_on "imagemagick"
   depends_on "jpeg-turbo"
+
+  on_macos do
+    depends_on "fontconfig"
+    depends_on "freetype"
+    depends_on "gettext"
+    depends_on "glib"
+    depends_on "liblqr"
+    depends_on "libomp"
+    depends_on "libtool"
+    depends_on "little-cms2"
+  end
 
   on_linux do
     depends_on "dbus"
   end
 
-  fails_with gcc: "5" # imagemagick is built with GCC
-
   def install
     ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
+
     system "autoreconf", "--force", "--install", "--verbose" if build.head?
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules",
+
+    system "./configure", "--disable-silent-rules",
                           "--disable-video",
                           "--without-python",
                           "--without-qt",
                           "--without-gtk",
-                          "--without-x"
+                          "--without-x",
+                          *std_configure_args
     system "make", "install"
   end
 

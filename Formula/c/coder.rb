@@ -1,18 +1,25 @@
 class Coder < Formula
   desc "Tool for provisioning self-hosted development environments with Terraform"
   homepage "https://coder.com"
-  url "https://github.com/coder/coder/archive/refs/tags/v2.1.5.tar.gz"
-  sha256 "1a84e22d9dfd63fc0f25ab2a65d6c968f44d32c8048b9770ac57282221abb171"
+  url "https://github.com/coder/coder/archive/refs/tags/v2.18.4.tar.gz"
+  sha256 "2d6648c34dc6f5915736d9c817fb69aecd6247c370c25197cc4f13ad56c99660"
   license "AGPL-3.0-only"
 
+  # There can be a notable gap between when a version is tagged and a
+  # corresponding release is created, so we check the "latest" release instead
+  # of the Git tags.
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "222f401e5096646024d4006352987fa0c1540f37dde8562461ab298ef57dfbae"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f41d00fd8a9c63ab21214712f41ad7316402cdc66041fe4270301c7485590a39"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "27fe72ffda47fc878939eaecb9a07e2bd47129657da919c3d43f5bc2642da69a"
-    sha256 cellar: :any_skip_relocation, ventura:        "fa654f59a4f5b3b303ad0bb791ef4d7b6edc7c44eea6b9c81ab87b76ba1d4f21"
-    sha256 cellar: :any_skip_relocation, monterey:       "c2ad246790e36b6ab1785174569abf66cc0ef3968ad0d5ac3aef7d89eaaf2170"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f89c7440eda2e5981254917a4b3900e20e175b2b56e5a907c07ad9543682296a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "19acd3ec7080028a64710264551eec6746fc60e218955b884a59a26427d71f8b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9dd6ea4c6d31a4c55fdbf922d2bef67cf29a242d396f20d1686b1d086a929088"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a6be2202c99e9bc3c4c2d7ad4ea328e126d041fe3a833b8de9a071203fd8e510"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "7acfa5f859df85eb609d001ce033a442f1c5f5aeec2f6971415e89fef199fcef"
+    sha256 cellar: :any_skip_relocation, sonoma:        "7a20b6bafc5bdd9f3fe2e9ed8537c1a2fa155fd97f09d3a0c8690aab88b0f1d7"
+    sha256 cellar: :any_skip_relocation, ventura:       "632231755d2f3a59521b7b7c6787a446afb79e6d61ec14fa1c8a39ecab33c92c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a88cdeb489c40a600c94176f02938becc19c80433c1d68d9dd1b2ff8d126dd41"
   end
 
   depends_on "go" => :build
@@ -23,7 +30,7 @@ class Coder < Formula
       -X github.com/coder/coder/v2/buildinfo.tag=#{version}
       -X github.com/coder/coder/v2/buildinfo.agpl=true
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags), "-tags", "slim", "./cmd/coder"
+    system "go", "build", *std_go_args(ldflags:), "-tags", "slim", "./cmd/coder"
   end
 
   test do

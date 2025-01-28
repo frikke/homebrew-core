@@ -1,19 +1,29 @@
 class Shellcheck < Formula
   desc "Static analysis and lint tool, for (ba)sh scripts"
   homepage "https://www.shellcheck.net/"
-  url "https://github.com/koalaman/shellcheck/archive/v0.9.0.tar.gz"
-  sha256 "3cec1fec786feee79dacdabf9de784a117b7f82388dbcca97ba56a5c9ff7d148"
   license "GPL-3.0-or-later"
   head "https://github.com/koalaman/shellcheck.git", branch: "master"
 
+  stable do
+    url "https://github.com/koalaman/shellcheck/archive/refs/tags/v0.10.0.tar.gz"
+    sha256 "149ef8f90c0ccb8a5a9e64d2b8cdd079ac29f7d2f5a263ba64087093e9135050"
+
+    # Backport upper bound increase for filepath, needed for GHC 9.12
+    patch do
+      url "https://github.com/koalaman/shellcheck/commit/0ee46a0f33ebafde128e2c93dd45f2757de4d4ec.patch?full_index=1"
+      sha256 "c73663bee3577068700b580140d468834cd42f88f7753f950f501e8781656ff5"
+    end
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "bebeffc6b702b0684977937af20bd6dec9241f1f6bb206cf8c002bff76f0ab25"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f0c8f83c50c5adae71abc074b69932249354869bb7c67161e0a783a11e6004f7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9d81c9557cec60f65820ac4727dafbd0871276b66038d1c82f8e04ee03ed3df0"
-    sha256 cellar: :any_skip_relocation, ventura:        "5eb6e89880dcb5cc6baeff63f6c2453342cee15ec35c525351c2099545ad4d62"
-    sha256 cellar: :any_skip_relocation, monterey:       "957348802279e04cba39b7b9d4a3300f1891e73646dcba5ca36a30b15d6e2e6b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "1513cc886e5117e572a642864edee6882409f9800a57315e9c87d17c52156847"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6e9e847cc3ad50ae9bdbe9215bfaf9f33836378b54b07b716b25bc66f65a0d23"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "5045be1e530288251353848343322f5a423617d061830b7ea7465fe550787364"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "ef742b6992cfcdcd7289718ac64b27174e421d29ce3ad9b81e1856349059b117"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6e60ee03edb09ac5bc852b8eb813849fa654400e21ffb4c746989678172f5a26"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d5e8407806dbf757e71930ce2cb9b0d23bae286f0c058d9ff246d851dd7aa871"
+    sha256 cellar: :any_skip_relocation, sonoma:         "b53cf1e5464406ee49743fc2db84850b6d34d3a2098cf729e629b23f9d6dd6e0"
+    sha256 cellar: :any_skip_relocation, ventura:        "15ba88c48a5ae3b08e085791e3c5e514d9d78ce88414c96bd21ed33f29fb4aca"
+    sha256 cellar: :any_skip_relocation, monterey:       "b3d14cb62e325d0f7221cd24a7fb4533936feae4ed4dce00e8983ec6e55123f8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6d0867f144686a5caa025cb15ecac49286654b78e7b89979a54eedc9a0cc9b6b"
   end
 
   depends_on "cabal-install" => :build
@@ -29,12 +39,12 @@ class Shellcheck < Formula
 
   test do
     sh = testpath/"test.sh"
-    sh.write <<~EOS
+    sh.write <<~SH
       for f in $(ls *.wav)
       do
         echo "$f"
       done
-    EOS
+    SH
     assert_match "[SC2045]", shell_output("#{bin}/shellcheck -f gcc #{sh}", 1)
   end
 end

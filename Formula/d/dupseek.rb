@@ -11,8 +11,8 @@ class Dupseek < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "027dd10f7bd0d393e01a0ea75e43a09428dd2d4aa4c18d2178b77d4a59229f96"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, all: "af5b3ecacae9c0ace4403ba786d09138413571a9dc52d95ed59b289118683ff4"
   end
 
   def install
@@ -23,7 +23,7 @@ class Dupseek < Formula
   test do
     mkdir "folder"
     touch "folder/file1"
-    assert_equal "", shell_output("#{bin}/dupseek -b report -f de folder").chomp
+    assert_empty shell_output("#{bin}/dupseek -b report -f de folder").chomp
     touch "folder/file2"
     assert_match %r{^folder\\/file[12]$}, shell_output("#{bin}/dupseek -b report -f de folder").chomp
     assert_equal "folder\\/file1\nfolder\\/file2", shell_output("#{bin}/dupseek -b report -f e folder | sort").chomp

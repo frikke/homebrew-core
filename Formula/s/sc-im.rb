@@ -1,22 +1,23 @@
 class ScIm < Formula
   desc "Spreadsheet program for the terminal, using ncurses"
   homepage "https://github.com/andmarti1424/sc-im"
-  url "https://github.com/andmarti1424/sc-im/archive/v0.8.3.tar.gz"
-  sha256 "5568f9987b6d26535c0e7a427158848f1bc03d829f74e41cbcf007d8704e9bd3"
+  url "https://github.com/andmarti1424/sc-im/archive/refs/tags/v0.8.4.tar.gz"
+  sha256 "ebb1f10006fe49f964a356494f96d86a4f06eb018659e3b9bde63b25c03abdf0"
   license "BSD-4-Clause"
   head "https://github.com/andmarti1424/sc-im.git", branch: "main"
 
   bottle do
-    sha256 arm64_ventura:  "75f632db6ed4794e25cebcc46c023255be662b3aafa09e457629adb83b87e2e9"
-    sha256 arm64_monterey: "a19adff4e5f065abc68995fdc338fb16d0a9cc77857eaf69724826e8d0b9f0fd"
-    sha256 arm64_big_sur:  "f2f0c70eaf59e601836c64622f3dcb9f07152f1744ab1325ff97cba36e7f0b8f"
-    sha256 ventura:        "39afae40b8fe65bb8acf478ab9eb7f58106c98b7237342055879ab2969156c8e"
-    sha256 monterey:       "84fa70f78bdaff7c0f6d8ee2e5a5ebc0454114c5a582b0fbf6bffcabbccf9899"
-    sha256 big_sur:        "00f0fe5c274b84d3780032f7cc96ca7a3f6173ac97e26adc53978ec36187f8d2"
-    sha256 x86_64_linux:   "a55c207ca7b4c572c0890c86f254933133d49605a3adbf2e2b79c07f4ea82b6a"
+    sha256 arm64_sequoia:  "7c0d1853ada3fe9bec1a41a9c847f652151495eed510d541ae3b599bcc32e1ad"
+    sha256 arm64_sonoma:   "cbd1e873c3488d61e71d3d3f320f196be3b52a60b225a3cbd34bac86417fa867"
+    sha256 arm64_ventura:  "3f7989b3e41a89308b432e6f8f7ce85ef2665899f6c628db9b27f11da9496dcd"
+    sha256 arm64_monterey: "26e8c661c4ce9a3ef7f34f6050a7558eb6a9d6140aaa6620ce9ba71ebddffdd9"
+    sha256 sonoma:         "f8fd4583452db9f3c10bbd37358d6bb0f605d7902d148e7da38528a8ebb54b53"
+    sha256 ventura:        "cbfbccfcb5ca3ecc692e4f6140a1e989ba2ada089038ba865eeac10281bb7c76"
+    sha256 monterey:       "4e5aeef147a8a57070ca71919eaa2d07a55bd140c549278a87613f9735870d85"
+    sha256 x86_64_linux:   "a597c79ce61df47871de641099781406f41918f54aa7572f5ebd34ee8cffcd78"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libxls"
   depends_on "libxlsxwriter"
   depends_on "libxml2"
@@ -27,6 +28,9 @@ class ScIm < Formula
   uses_from_macos "bison" => :build
 
   def install
+    # Workaround for Xcode 14.3
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
     # Enable plotting with `gnuplot` if available.
     ENV.append_to_cflags "-DGNUPLOT"
 

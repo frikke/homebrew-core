@@ -1,10 +1,10 @@
 class Openrtsp < Formula
   desc "Command-line RTSP client"
   homepage "http://www.live555.com/openRTSP"
-  url "http://www.live555.com/liveMedia/public/live.2023.07.24.tar.gz"
-  mirror "https://download.videolan.org/pub/videolan/testing/contrib/live555/live.2023.07.24.tar.gz"
+  url "http://www.live555.com/liveMedia/public/live.2025.01.17.tar.gz"
+  mirror "https://download.videolan.org/pub/videolan/testing/contrib/live555/live.2025.01.17.tar.gz"
   # Keep a mirror as upstream tarballs are removed after each version
-  sha256 "2e2225678f6284ade93ba8558dc5a3e53c844408fc1944571175369e060551ce"
+  sha256 "273d9cf77468015c2377e50e384e3eea67cf255c75fe60a175e9e0917afe847b"
   license "LGPL-3.0-or-later"
 
   livecheck do
@@ -13,13 +13,12 @@ class Openrtsp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "705eb8e93a13b5b74603ef326e48d935029e568d3d54ddc5f88734607b928995"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ccc61de8ab0ebf1991189e0756a378759fb3b23b67eb085636975cf55323e222"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "91bc26e0dae15b0ac097ab10faef3aba58df5b7bd037fcf85eea740469199834"
-    sha256 cellar: :any_skip_relocation, ventura:        "720784246e3ad127f0338809fbacef2ae31ab41bb34fa634c69cc9ff302908d2"
-    sha256 cellar: :any_skip_relocation, monterey:       "31bc17063c1d2cf7c213f7105df18197bf653d6a7cbfb2c4b7f1c7aaedc0aad7"
-    sha256 cellar: :any_skip_relocation, big_sur:        "73d9d2dfc5c6a9a016e0818e932041893329f4ae814f634a1ae1b56a245b5d9b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "068d83d49b4cdf79582475c2778d342041a8cd83ce8f658524bf602a670e705e"
+    sha256 cellar: :any,                 arm64_sequoia: "be6c756cce25700799f95e2636eb587cd546b4f88ff0e787e2633127bdfeaa32"
+    sha256 cellar: :any,                 arm64_sonoma:  "0f205dc3339d3f34dd2487b258b7c68a97fa8a3c41b4511368caa0c3dfb88ff2"
+    sha256 cellar: :any,                 arm64_ventura: "30b4ad53256eb145f7b1da8b8fdd58d519c1ec8fec542be4c1ab2a7219f143ac"
+    sha256 cellar: :any,                 sonoma:        "153560f4f26f7984f96a829b1b81c7ebddb3625088c5d3eb7bf96975f38e9924"
+    sha256 cellar: :any,                 ventura:       "b86809df4e85c6355b1e44597933ccc47a890a4d51b2d9e3b74cc7d9cf0480a5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "60c18032ccec7d5064ba01fc06f930db73fab62ea5f6ac59ace590c572033b44"
   end
 
   depends_on "openssl@3"

@@ -1,8 +1,8 @@
 class Lzip < Formula
   desc "LZMA-based compression program similar to gzip or bzip2"
   homepage "https://www.nongnu.org/lzip/"
-  url "https://download-mirror.savannah.gnu.org/releases/lzip/lzip-1.23.tar.gz"
-  sha256 "4792c047ddf15ef29d55ba8e68a1a21e0cb7692d87ecdf7204419864582f280d"
+  url "https://download-mirror.savannah.gnu.org/releases/lzip/lzip-1.25.tar.gz"
+  sha256 "09418a6d8fb83f5113f5bd856e09703df5d37bae0308c668d0f346e3d3f0a56f"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,16 +11,12 @@ class Lzip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "638c261e86336c8cb9d89fa072e5119624981bcb6d759d73fb6de051d882847c"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "46163662cff0e3cb9c4358c73849d22080ab72928beaf52b3557f67f6b985a6c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "fa06da82d08249d2e0db4a1293198a078bc580e374b81802724f45831e0e1958"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "174810e3b1231739b79e446f2587fea14174ce8c8e6881497ed08fbc02997b0c"
-    sha256 cellar: :any_skip_relocation, sonoma:         "11e639528d9bffe8a00babb63043f425a48e04ca5349757630a880afec13c35b"
-    sha256 cellar: :any_skip_relocation, ventura:        "aba8468f8c8d1cb2ca90c1337256498b4f05cb43522d7df9c1f291f4af34ae86"
-    sha256 cellar: :any_skip_relocation, monterey:       "b1401a8dfc54c0232aa17846ca0faef93c4a8dc9582ee48c125e64f89154c18b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "db2f8103042e39c5471c3dbe9600dc0c55aa1d2ad693a75849488864d3208eed"
-    sha256 cellar: :any_skip_relocation, catalina:       "c347c85a891de174408618a9d2ba1ded61c4ff276a7072334a9bd4ef731aaf44"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eb70d29539d6ae13b2a6638c79dbb5149eacec480557fc2f3567c4adfc228829"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bc54609160314b30e5aed34e8d2a05fc49850a5ad3440837aaf99692bbbbbb6d"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b78f49d3c8ac2bf3247ae3d1940d221f9d957a2a1440c64b2350e864ce9d7df1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f5b0a4e60ba4c516752d4f3584be960eb6f5403669cedf58b91bc37b4e312d20"
+    sha256 cellar: :any_skip_relocation, sonoma:        "c4e8fc78d0c7151b6f22ca94ab07306a693bf0ae7c1c9e8ee0850c118fe5339c"
+    sha256 cellar: :any_skip_relocation, ventura:       "ac49101bfc627f72d28324f6bd2572c5ece36e1b3966e345407220573e68b426"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "308786bcb638bd26b84aeef239c9fbbd03c221922bcd2cc595fdc9fd2a3e758f"
   end
 
   def install
@@ -38,11 +34,11 @@ class Lzip < Formula
     path.write original_contents
 
     # compress: data.txt -> data.txt.lz
-    system "#{bin}/lzip", path
+    system bin/"lzip", path
     refute_predicate path, :exist?
 
     # decompress: data.txt.lz -> data.txt
-    system "#{bin}/lzip", "-d", "#{path}.lz"
+    system bin/"lzip", "-d", "#{path}.lz"
     assert_equal original_contents, path.read
   end
 end

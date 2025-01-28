@@ -1,62 +1,53 @@
 class CargoOutdated < Formula
   desc "Cargo subcommand for displaying when Rust dependencies are out of date"
   homepage "https://github.com/kbknapp/cargo-outdated"
-  # TODO: check if we can use unversioned `libgit2` at version bump.
-  # See comments below for details.
-  url "https://github.com/kbknapp/cargo-outdated/archive/refs/tags/v0.13.1.tar.gz"
-  sha256 "571910b0c44f0bcf0b6e5c24184247e4603f474c7bde5f0eaa1203ce802b4a4a"
+  # We use crates.io url since the corresponding GitHub tag is missing. This is the latest
+  # release as the official installation method of `cargo install --locked cargo-outdated`
+  # pulls same source from crates.io. v0.15.0+ is needed to avoid an older unsupported libgit2.
+  # We can switch back to GitHub releases when upstream decides to upload.
+  # Issue ref: https://github.com/kbknapp/cargo-outdated/issues/388
+  url "https://static.crates.io/crates/cargo-outdated/cargo-outdated-0.16.0.crate"
+  sha256 "965d39dfcc7afd39a0f2b01e282525fc2211f6e8acc85f1ee27f704420930678"
   license "MIT"
-  revision 2
+  revision 1
   head "https://github.com/kbknapp/cargo-outdated.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "aa2214131cf25fd2d538428aa6619335604545a082b0437c2860f8e9b87e59cf"
-    sha256 cellar: :any,                 arm64_monterey: "d5dd9bf61bcd2564a2902d52325780c01de19ee03e458d403aca3f223e9ad857"
-    sha256 cellar: :any,                 arm64_big_sur:  "3b00d458873a9e22f1992ba05e5e670fd4517b4463eafe42ff6c412ac67c2b14"
-    sha256 cellar: :any,                 ventura:        "0f3c8226b69b412c10d7176527c9dd40ff4d0781fef709283c3171db3a1563b9"
-    sha256 cellar: :any,                 monterey:       "9a72734928b3551faeae251b6955b4dc060dac4e3bed37af7554db570aab5b36"
-    sha256 cellar: :any,                 big_sur:        "b53fbcad34125c6f15de105c15c76eef98c1751a6ddf3d66ac983ff921ec81f1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d2a7c074738a25b95854fd998ac0231b76862c38d889b975eef94b42347e0c66"
+    sha256 cellar: :any,                 arm64_sequoia: "6049f49c035ed7bb3e593d48821239c93b03643ef60aacb847d86db52037c8a0"
+    sha256 cellar: :any,                 arm64_sonoma:  "d702cdb138bab9eb25da3782caaeaad6702bc604e0f99551472ac0b926557d87"
+    sha256 cellar: :any,                 arm64_ventura: "1060e9672f0ced9f9e2f62f3140c79a9561062ab24439a3c1ea669244bf323a6"
+    sha256 cellar: :any,                 sonoma:        "61985936a86ff5a4848bd6fe7c9fec1346065ec0ef16dad3ae6b880a86cd50cc"
+    sha256 cellar: :any,                 ventura:       "aea8615845515169d44ee3cbdb4cc8b29b591a0530f5142a8eaef64ee1bf5fe9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "23c83b573ccf7c64e862557f2bd62a398476ee426fb91826746f68114f0335ee"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
-  depends_on "rustup-init" => :test
-  # To check for `libgit2` version:
-  # 1. Search for `libgit2-sys` version at https://github.com/kbknapp/cargo-outdated/blob/v#{version}/Cargo.lock
-  # 2. If the version suffix of `libgit2-sys` is newer than +1.6.*, then:
-  #    - Migrate to the corresponding `libgit2` formula.
-  #    - Change the `LIBGIT2_SYS_USE_PKG_CONFIG` env var below to `LIBGIT2_NO_VENDOR`.
-  #      See: https://github.com/rust-lang/git2-rs/commit/59a81cac9ada22b5ea6ca2841f5bd1229f1dd659.
-  depends_on "libgit2@1.6"
+  depends_on "rustup" => :test
+  depends_on "libgit2@1.8" # needs https://github.com/rust-lang/git2-rs/issues/1109 to support libgit2 1.9
   depends_on "openssl@3"
 
+  uses_from_macos "zlib"
+
   def install
-    ENV["LIBGIT2_SYS_USE_PKG_CONFIG"] = "1"
+    ENV["LIBGIT2_NO_VENDOR"] = "1"
     ENV["OPENSSL_NO_VENDOR"] = "1"
     ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
     system "cargo", "install", *std_cargo_args
   end
 
-  def check_binary_linkage(binary, library)
-    binary.dynamically_linked_libraries.any? do |dll|
-      next false unless dll.start_with?(HOMEBREW_PREFIX.to_s)
-
-      File.realpath(dll) == File.realpath(library)
-    end
-  end
-
   test do
+    require "utils/linkage"
+
     # Show that we can use a different toolchain than the one provided by the `rust` formula.
     # https://github.com/Homebrew/homebrew-core/pull/134074#pullrequestreview-1484979359
-    ENV["RUSTUP_INIT_SKIP_PATH_CHECK"] = "yes"
-    rustup_init = Formula["rustup-init"].bin/"rustup-init"
-    system rustup_init, "-y", "--profile", "minimal", "--default-toolchain", "beta", "--no-modify-path"
-    ENV.prepend_path "PATH", HOMEBREW_CACHE/"cargo_cache/bin"
+    ENV.prepend_path "PATH", Formula["rustup"].bin
+    system "rustup", "default", "beta"
+    system "rustup", "set", "profile", "minimal"
 
     crate = testpath/"demo-crate"
     mkdir crate do
-      (crate/"Cargo.toml").write <<~EOS
+      (crate/"Cargo.toml").write <<~TOML
         [package]
         name = "demo-crate"
         version = "0.1.0"
@@ -66,7 +57,7 @@ class CargoOutdated < Formula
 
         [dependencies]
         libc = "0.1"
-      EOS
+      TOML
 
       (crate/"lib.rs").write "use libc;"
 
@@ -76,11 +67,11 @@ class CargoOutdated < Formula
     end
 
     [
-      Formula["libgit2@1.6"].opt_lib/shared_library("libgit2"),
+      Formula["libgit2@1.8"].opt_lib/shared_library("libgit2"),
       Formula["openssl@3"].opt_lib/shared_library("libssl"),
       Formula["openssl@3"].opt_lib/shared_library("libcrypto"),
     ].each do |library|
-      assert check_binary_linkage(bin/"cargo-outdated", library),
+      assert Utils.binary_linked_to_library?(bin/"cargo-outdated", library),
              "No linkage with #{library.basename}! Cargo is likely using a vendored version."
     end
   end

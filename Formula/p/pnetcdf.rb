@@ -1,10 +1,9 @@
 class Pnetcdf < Formula
   desc "Parallel netCDF library for scientific data using the OpenMPI library"
   homepage "https://parallel-netcdf.github.io/index.html"
-  url "https://parallel-netcdf.github.io/Release/pnetcdf-1.12.3.tar.gz"
-  sha256 "439e359d09bb93d0e58a6e3f928f39c2eae965b6c97f64e67cd42220d6034f77"
+  url "https://parallel-netcdf.github.io/Release/pnetcdf-1.14.0.tar.gz"
+  sha256 "e5a7e87dcf7d526b97e8ffdce05df0d2845965787a7d21242fafa9656950e402"
   license "NetCDF"
-  revision 1
 
   livecheck do
     url "https://parallel-netcdf.github.io/wiki/Download.html"
@@ -12,14 +11,12 @@ class Pnetcdf < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "3cc09465237f96557310cbb640b65b64361ec6b5bc953260b95d54a122006b5a"
-    sha256 arm64_monterey: "1543e607fd7d317f0d235655c746f6e23e9b1f2646d366c4503008cab3b2ee1d"
-    sha256 arm64_big_sur:  "3835889299b0058c33d17b94b2f1c57b21d10a00694d9a43c19ea95079035200"
-    sha256 ventura:        "b854eb65a2c00049c3dc4fc5dc73894b6c611b22aa5b641099e6d138a1b3d9bf"
-    sha256 monterey:       "026bca86c31dc0ce029f790e93db11616877121173a780aa4a3954864ebd347a"
-    sha256 big_sur:        "2708f28a2cc2b81cb4ef5338219fdc644e23a666001ab0c622f3cfe97c731479"
-    sha256 catalina:       "1d5b9405435f5c0621fd1214e2678e8a52c84b27da7f7540a3a6e7a4ccac7c50"
-    sha256 x86_64_linux:   "315a952a703528f06ded6287166bfd92373ae53a8de6774ac32a638d322431a8"
+    sha256 arm64_sequoia: "19b8144af18eadad7d9d794d37864fa81c62e6907b5a118b9b14a8b27e4d30b0"
+    sha256 arm64_sonoma:  "3385c56d53190c61d92bf85b9b3c7b92086c58b644bec5a8b66fdf4555a8ac66"
+    sha256 arm64_ventura: "360874963214b4e9b9338ee78448420a150b9cb00756ebb8d5df0b97ae359320"
+    sha256 sonoma:        "a46e740e91a836a35faf7ef12039280dcf14cd35a908dc6d6f65d30202436d8f"
+    sha256 ventura:       "1caabb8afcf508fc98e0afc9af8d1f449c9f61c49fc003b81c040ea75147fa4d"
+    sha256 x86_64_linux:  "a94a617103f87b61c162f9bd9eeff3887a5e44c507406c662034231cfd38441e"
   end
 
   depends_on "gcc"
@@ -34,23 +31,20 @@ class Pnetcdf < Formula
   end
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--enable-shared"
+    # Work around asm incompatibility with new linker (FB13194320)
+    # https://github.com/Parallel-NetCDF/PnetCDF/issues/139
+    ENV.append "LDFLAGS", "-Wl,-ld_classic" if DevelopmentTools.clang_build_version >= 1500
 
-    cd "src/utils" do
-      # Avoid references to Homebrew shims
-      inreplace ["pnetcdf-config", "pnetcdf_version/Makefile"], Superenv.shims_path, "/usr/bin"
-    end
+    system "./configure", *std_configure_args,
+                          "--disable-silent-rules",
+                          "--enable-shared"
 
     system "make", "install"
   end
 
   # These tests were converted from the netcdf formula.
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include "pnetcdf.h"
       int main()
@@ -58,12 +52,12 @@ class Pnetcdf < Formula
         printf(PNETCDF_VERSION);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-I#{include}", "-lpnetcdf",
                    "-o", "test"
     assert_equal `./test`, version.to_s
 
-    (testpath/"test.f90").write <<~EOS
+    (testpath/"test.f90").write <<~FORTRAN
       program test
         use mpi
         use pnetcdf
@@ -84,7 +78,7 @@ class Pnetcdf < Formula
           if (status /= nf_noerr) call abort
         end subroutine check
       end program test
-    EOS
+    FORTRAN
     system "mpif90", "test.f90", "-L#{lib}", "-I#{include}", "-lpnetcdf",
                        "-o", "testf"
     system "./testf"

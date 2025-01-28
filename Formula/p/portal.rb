@@ -1,37 +1,37 @@
 class Portal < Formula
   desc "Quick and easy command-line file transfer utility from any computer to another"
   homepage "https://github.com/SpatiumPortae/portal"
-  url "https://github.com/SpatiumPortae/portal/archive/v1.2.3.tar.gz"
+  url "https://github.com/SpatiumPortae/portal/archive/refs/tags/v1.2.3.tar.gz"
   sha256 "7a457ab1efa559b89eb5d7edbebccb1342896a42e30dbd943ffb6eea14179b36"
   license "MIT"
   head "https://github.com/SpatiumPortae/portal.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5582fc03d1182135f8c7e73cb4503a8cedcd5350264185551f07ce37e09986d4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f858964534d5af5cef3195b4ad2fa818f07bf79deeea55f328b9db9d04c5616a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "98ad1510eb543d4c3129e6d17c1a844f99cb039615a1a281489bd4c4bb2485ea"
-    sha256 cellar: :any_skip_relocation, ventura:        "885a629b00af358c5d919abede7ea6b7be6604b2805279e0a5d9d9d435633101"
-    sha256 cellar: :any_skip_relocation, monterey:       "ed4cde3174861f1109761cf4934093fe18330a2b60a4266b0efb692b4d390214"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5ff2035231f98a1cc9c4e5c945619feb5336b9bf8b4736e8245be36cceb41270"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "db75b7a2beec3a4b2920bc8b44c6045206930a73d08cbccf481a98b176de56d7"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2c0f1d260c58e98e4fd7899ef87280ffe8efcc67d77764203a9d54fe35e47ab4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2c0f1d260c58e98e4fd7899ef87280ffe8efcc67d77764203a9d54fe35e47ab4"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "2c0f1d260c58e98e4fd7899ef87280ffe8efcc67d77764203a9d54fe35e47ab4"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b091e6d917f3c32d54ae00142dbecf84c98b74985626b43df1dc4ea4c4bcf54c"
+    sha256 cellar: :any_skip_relocation, ventura:       "b091e6d917f3c32d54ae00142dbecf84c98b74985626b43df1dc4ea4c4bcf54c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4416bc3aa73043e6120fd97676142abae1de1f131454036ff9baecf61253068d"
   end
 
   depends_on "go" => :build
 
   def install
-    ldflags = "-s -X main.version=v#{version}"
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/portal/"
+    ldflags = "-s -w -X main.version=v#{version}"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/portal/"
+
+    generate_completions_from_executable(bin/"portal", "completion")
   end
 
   test do
-    # Simple version check test.
     assert_match version.to_s, shell_output("#{bin}/portal version")
 
     # Start a local relay server on an open port.
     port=free_port
     fork do
-      exec "#{bin}/portal", "serve", "--port=#{port}"
+      exec bin/"portal", "serve", "--port=#{port}"
     end
     sleep 2
 
@@ -45,7 +45,7 @@ class Portal < Formula
     password_file=(testpath/"password.txt")
     fork do
       $stdout.reopen(password_file)
-      exec "#{bin}/portal", "send", "-s=raw", "--relay=:#{port}", test_file_sender
+      exec bin/"portal", "send", "-s=raw", "--relay=:#{port}", test_file_sender
     end
     sleep 2
 
@@ -54,7 +54,7 @@ class Portal < Formula
     fork do
       mkdir_p receiver_path
       cd receiver_path do
-        exec "#{bin}/portal", "receive", "-s=raw", "-y", "--relay=:#{port}", password_file.read.strip
+        exec bin/"portal", "receive", "-s=raw", "-y", "--relay=:#{port}", password_file.read.strip
       end
     end
     sleep 2

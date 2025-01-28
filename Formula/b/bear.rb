@@ -1,27 +1,28 @@
 class Bear < Formula
   desc "Generate compilation database for clang tooling"
   homepage "https://github.com/rizsotto/Bear"
-  url "https://github.com/rizsotto/Bear/archive/refs/tags/3.1.3.tar.gz"
-  sha256 "8314438428069ffeca15e2644eaa51284f884b7a1b2ddfdafe12152581b13398"
+  url "https://github.com/rizsotto/Bear/archive/refs/tags/3.1.5.tar.gz"
+  sha256 "4ac7b041222dcfc7231c6570d5bd76c39eaeda7a075ee2385b84256e7d659733"
   license "GPL-3.0-or-later"
-  revision 5
+  revision 11
   head "https://github.com/rizsotto/Bear.git", branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "1ffbca354254be3710fddd12ff57d102fba1dc5208fa8e68cfc86b097f00b076"
-    sha256 arm64_monterey: "7390f006f2c6fc1c4b17d2ac23f212bf2834aaa5642db1507bbe1c7b594358de"
-    sha256 arm64_big_sur:  "7be33d01dbc1aca16fd042f0ba27c4341942c04dcb5c86b63540fd8d675dbd48"
-    sha256 ventura:        "4e193c0be393d197912217c5f9a878c41bef079cec077bd4230f4cbfdbb2b160"
-    sha256 monterey:       "dda9575d8fd606f4dba4343c77ee6a24b94534e98e83cd87e4d5d7582d36c6cf"
-    sha256 big_sur:        "ccc4f07e1cf35dd2089f2134eaa41f21a07871bebae5ae2da8855ea8c20fa937"
-    sha256 x86_64_linux:   "eb41bd2b354bfb32f48cbddb4d7fa0467e935788d4806e7b5158e90f48325e26"
+    sha256 arm64_sequoia: "12bb708e6f4188c2a04ed50070d7180c80a2ab2e7e013d8a44dc77986d7734ce"
+    sha256 arm64_sonoma:  "a89003203140dc1c69931f742ee57cd2c6213438f789c6f009159ddd9d8e4777"
+    sha256 arm64_ventura: "6e531bd29115bf118a01319758c2ef1c4310c9464da9924f6fddaed9f687155a"
+    sha256 sonoma:        "5bdde65cbd80c380f2fd8696f24d3709be23907b43279d3ba0a988a8a6fcc2a7"
+    sha256 ventura:       "d9888e92140d9152b9225756dbd6b025a914d4bb5167c67823829b50c9c753dd"
+    sha256 x86_64_linux:  "c03da50aead875eb0d6b5843936e94d54769bf32c891a92c6640b4e623b46ee4"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "abseil"
   depends_on "fmt"
   depends_on "grpc"
   depends_on "nlohmann-json"
+  depends_on "protobuf"
   depends_on "spdlog"
 
   uses_from_macos "llvm" => :test
@@ -30,11 +31,9 @@ class Bear < Formula
     depends_on "llvm" if DevelopmentTools.clang_build_version <= 1100
   end
 
-  fails_with gcc: "5" # needs C++17
-
   fails_with :clang do
     build 1100
-    cause <<-EOS
+    cause <<~EOS
       Undefined symbols for architecture x86_64:
         "std::__1::__fs::filesystem::__current_path(std::__1::error_code*)"
     EOS
@@ -54,14 +53,14 @@ class Bear < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       int main() {
         printf("hello, world!\\n");
         return 0;
       }
-    EOS
+    C
     system bin/"bear", "--", "clang", "test.c"
-    assert_predicate testpath/"compile_commands.json", :exist?
+    assert_path_exists testpath/"compile_commands.json"
   end
 end

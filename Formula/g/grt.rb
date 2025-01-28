@@ -1,14 +1,17 @@
 class Grt < Formula
   desc "Gesture Recognition Toolkit for real-time machine learning"
   homepage "https://nickgillian.com/grt/"
-  url "https://github.com/nickgillian/grt/archive/v0.2.4.tar.gz"
+  url "https://github.com/nickgillian/grt/archive/refs/tags/v0.2.4.tar.gz"
   sha256 "55bcabe7a58916461dc4341758eff2a45bd5b236c263dfe6e58c176c1a7e1ac4"
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "074ba306d1024617ace8a0f056a9c55cf8cdb53ede10471eb77eeab5435f6e6d"
+    sha256 cellar: :any,                 arm64_sonoma:   "4fb256ad0e810c361d218210ba816f27e7f36d0b03547dba8a503d804c7928d3"
     sha256 cellar: :any,                 arm64_ventura:  "b6aa8b0ecb30a18b3a1ddeb21a08f9b7aa12226bea2174a5bfce165e1e56e477"
     sha256 cellar: :any,                 arm64_monterey: "a875908262d55401a19c3f03fc58c6c44aaa380a3f28c7d0c7686bf3226e33b5"
     sha256 cellar: :any,                 arm64_big_sur:  "e7fb295223786373ecfb9a7bfd323b234a2c9034f9fc2f4705ff1209be93dcfb"
+    sha256 cellar: :any,                 sonoma:         "6cbbeba38afd1267c3db39c759771e7a58d28a82eeaac6c3e90e0bba92185f02"
     sha256 cellar: :any,                 ventura:        "bc61d78a6e3788cfbd018970acdcb4d60bcf7b66da889c5dd908dcda2e701d1a"
     sha256 cellar: :any,                 monterey:       "91ca908ff9c97a1cc86b8899d97e7f4d97d1d0a0dcbf959bd8f6d2a44ed04ce3"
     sha256 cellar: :any,                 big_sur:        "1d4777cee44f7b99247cc34cda090ca59e720a14f20b9d2336d21e06bc309d4a"
@@ -27,13 +30,13 @@ class Grt < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <GRT/GRT.h>
       int main() {
         GRT::GestureRecognitionPipeline pipeline;
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-std=c++11", "-I#{include}", "-L#{lib}", "-lgrt", "-o", "test"
     system "./test"
   end

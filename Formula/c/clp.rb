@@ -1,8 +1,8 @@
 class Clp < Formula
   desc "Linear programming solver"
   homepage "https://github.com/coin-or/Clp"
-  url "https://github.com/coin-or/Clp/archive/releases/1.17.8.tar.gz"
-  sha256 "f9931b5ba44f0daf445c6b48fc2c250dc12e667e59ace8ea7b025f158fe31556"
+  url "https://github.com/coin-or/Clp/archive/refs/tags/releases/1.17.10.tar.gz"
+  sha256 "0d79ece896cdaa4a3855c37f1c28e6c26285f74d45f635046ca0b6d68a509885"
   license "EPL-2.0"
 
   livecheck do
@@ -11,16 +11,17 @@ class Clp < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "efe170c0bf8394a5db5fab7fe2eacd52471337cd7cb2d144b39c8ad621e7ff2e"
-    sha256 cellar: :any,                 arm64_monterey: "9d2980cc39519cf78053c951cafee4b0fb11f900a6cef87eaff3c50f3612dcfc"
-    sha256 cellar: :any,                 arm64_big_sur:  "6dc3cc5e3b85420d45d610f7743e45541b3bf62511040d5046092fd9361a73b3"
-    sha256 cellar: :any,                 ventura:        "88d6a80f4da99110a34a5b37cf44324e7cad52c063db6d7fac5ae48d753b4f82"
-    sha256 cellar: :any,                 monterey:       "6e458f50c974e968c541288ae791a70768caacc4f03819a0ac886edf86e6c25d"
-    sha256 cellar: :any,                 big_sur:        "0562833cfb1dac1a446690e0633b64421920628f9df7dbfa0f8ce9071efabe99"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e784d51dc920a31d3134473c8d92cd5ead97e34fa90d8bf1a205abe31586f4c4"
+    sha256 cellar: :any,                 arm64_sequoia:  "5ddbd8974678d1107ae7c8a2fe698263e0cf12e8c5e2b03d13ce58a11d80c62e"
+    sha256 cellar: :any,                 arm64_sonoma:   "523d06de70cf0898e482d4e7145cb74cc40ff7bae931db5aeb252c2b047842d4"
+    sha256 cellar: :any,                 arm64_ventura:  "3f3334798b217d9de284e6cce8072a63b8df974dc55f43f506a388bdfc98ee3d"
+    sha256 cellar: :any,                 arm64_monterey: "de2b76d01b18509c8db1af0b8bf777eb6ab5083feb3517f0be57b7e158495484"
+    sha256 cellar: :any,                 sonoma:         "73f92e5e65141f07f3b878b8fa5a212f70dadc4b9d19f803cf45e3a00edddd0c"
+    sha256 cellar: :any,                 ventura:        "d6f0d8287373e84ba11e9db75999a442879a6802f24520616c4bf6b204d63ffc"
+    sha256 cellar: :any,                 monterey:       "a1bca012e38bffd8377562a7fcf4ec3739dc57cd08fd7918f16e0a56a202eeca"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3de80fe042a6689294193c7efbb4d794ee37c3e1194dcdb311b740acb6ffba09"
   end
 
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "coinutils"
   depends_on "openblas"
   depends_on "osi"
@@ -37,24 +38,21 @@ class Clp < Formula
 
     args = [
       "--datadir=#{pkgshare}",
-      "--disable-debug",
-      "--disable-dependency-tracking",
       "--disable-silent-rules",
       "--includedir=#{include}/clp",
-      "--prefix=#{prefix}",
       "--with-blas-incdir=#{Formula["openblas"].opt_include}",
       "--with-blas-lib=-L#{Formula["openblas"].opt_lib} -lopenblas",
       "--with-lapack-incdir=#{Formula["openblas"].opt_include}",
       "--with-lapack-lib=-L#{Formula["openblas"].opt_lib} -lopenblas",
     ]
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
   test do
     resource("coin-or-tools-data-sample-p0033-mps").stage testpath
     system bin/"clp", "-import", testpath/"p0033.mps", "-primals"
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <ClpSimplex.hpp>
       int main() {
         ClpSimplex model;
@@ -63,8 +61,8 @@ class Clp < Formula
         status = model.primal();
         return status;
       }
-    EOS
-    pkg_config_flags = `pkg-config --cflags --libs clp`.chomp.split
+    CPP
+    pkg_config_flags = shell_output("pkg-config --cflags --libs clp").chomp.split
     system ENV.cxx, "test.cpp", *pkg_config_flags
     system "./a.out"
   end

@@ -1,46 +1,50 @@
 class Scrcpy < Formula
   desc "Display and control your Android device"
   homepage "https://github.com/Genymobile/scrcpy"
-  url "https://github.com/Genymobile/scrcpy/archive/v2.1.1.tar.gz"
-  sha256 "6f3d055159cb125eabe940a901bef8a69e14e2c25f0e47554f846e7f26a36c4d"
+  url "https://github.com/Genymobile/scrcpy/archive/refs/tags/v3.1.tar.gz"
+  sha256 "beaa5050a3c45faa77cedc70ad13d88ef26b74d29d52f512b7708671e037d24d"
   license "Apache-2.0"
 
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 arm64_ventura:  "8fd1ae7b9d4241048a218f99475f29fac9650d3de7ff527a68524975fe1b47d9"
-    sha256 arm64_monterey: "6a2d920d0763d1fac9facd4d59bc43273eeea22e867c2ac73a4a7d8f1ce6be43"
-    sha256 arm64_big_sur:  "4c1b82c9e96fe9199c70b89ba1a6cc8da1796d1b206e3844d885e8d1d51d0e35"
-    sha256 ventura:        "28cfa8ce0b627b22a52bba40b140d5db462f6325d02a964206f4302f02af784e"
-    sha256 monterey:       "aeac2ec3ab6cb3b6a5bec2c59601893f4cead77c76f7cbad4d6116a3b61d4601"
-    sha256 big_sur:        "269024b209605443de8393a698a9e6d528f4bc8fb72a605749894d53f0def49f"
-    sha256 x86_64_linux:   "f3d222c2d5df53ccfb7af83d4a96fd1acb89c5c07456f91344205411062e9a51"
+    sha256 arm64_sequoia: "c6f8ef723ce1f374f08240647c1a997e4c25b9150a4e8e88e4aaaefd42f2d99f"
+    sha256 arm64_sonoma:  "a8ad50bd1e07b3d2f15b7da4ff3e2bd6404fc6036e373d5b352b5a2e71e3b91c"
+    sha256 arm64_ventura: "5c0f85e90519f82c24ffeb7b8f57f9adb2b7bb1a8e1c3eb4c445b4b279e7a53b"
+    sha256 sonoma:        "e5d5cf95805ccfc0c2bed6166b70c36965b33f28be5076d5bbfb492d2e7866f5"
+    sha256 ventura:       "53bc8478c52ee3a73d0c96099136b40b3be6e2ce75971516794a1d6de19ea0c5"
+    sha256 x86_64_linux:  "c2bb4b247f8143214c3b80310ee2a65b919f8cac2c58d24ec0fd1e568f92e60f"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "ffmpeg"
   depends_on "libusb"
   depends_on "sdl2"
 
-  fails_with gcc: "5"
-
   resource "prebuilt-server" do
-    url "https://github.com/Genymobile/scrcpy/releases/download/v2.1.1/scrcpy-server-v2.1.1"
-    sha256 "9558db6c56743a1dc03b38f59801fb40e91cc891f8fc0c89e5b0b067761f148e"
+    url "https://github.com/Genymobile/scrcpy/releases/download/v3.1/scrcpy-server-v3.1", using: :nounzip
+    sha256 "958f0944a62f23b1f33a16e9eb14844c1a04b882ca175a738c16d23cb22b86c0"
+
+    livecheck do
+      formula :parent
+    end
   end
 
   def install
-    r = resource("prebuilt-server")
-    r.fetch
-    cp r.cached_download, buildpath/"prebuilt-server.jar"
+    odie "prebuilt-server resource needs to be updated" if version != resource("prebuilt-server").version
 
-    mkdir "build" do
-      system "meson", *std_meson_args,
-                      "-Dprebuilt_server=#{buildpath}/prebuilt-server.jar",
-                      ".."
+    buildpath.install resource("prebuilt-server")
+    cp "scrcpy-server-v#{version}", "prebuilt-server.jar"
 
-      system "ninja", "install"
-    end
+    system "meson", "setup", "build", "-Dprebuilt_server=#{buildpath}/prebuilt-server.jar",
+                                      *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   def caveats
@@ -64,7 +68,7 @@ class Scrcpy < Formula
     # However, exiting on $3 = shell didn't work properly, so instead
     # fakeadb exits on $3 = reverse
 
-    fakeadb.write <<~EOS
+    fakeadb.write <<~SH
       #!/bin/sh
       echo "$@" >> #{testpath/"fakeadb.log"}
 
@@ -76,14 +80,14 @@ class Scrcpy < Formula
       if [ "$3" = "reverse" ]; then
         exit 42
       fi
-    EOS
+    SH
 
     fakeadb.chmod 0755
     ENV["ADB"] = fakeadb
 
     # It's expected to fail after adb reverse step because fakeadb exits
     # with code 42
-    out = shell_output("#{bin}/scrcpy --no-display --record=file.mp4 -p 1337 2>&1", 1)
+    out = shell_output("#{bin}/scrcpy --no-window --record=file.mp4 -p 1337 2>&1", 1)
     assert_match(/ 42/, out)
 
     log_content = File.read(testpath/"fakeadb.log")

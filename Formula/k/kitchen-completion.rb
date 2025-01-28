@@ -1,13 +1,14 @@
 class KitchenCompletion < Formula
   desc "Bash completion for Kitchen"
   homepage "https://github.com/MarkBorcherding/test-kitchen-bash-completion"
-  url "https://github.com/MarkBorcherding/test-kitchen-bash-completion/archive/v1.0.0.tar.gz"
+  url "https://github.com/MarkBorcherding/test-kitchen-bash-completion/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "6a9789359dab220df0afad25385dd3959012cfa6433c8c96e4970010b8cfc483"
   license "MIT"
   head "https://github.com/MarkBorcherding/test-kitchen-bash-completion.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4477a44357f241518a1ebd61583623cfccee33e67c2046cd85ce6702a2ea54ce"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "2db54abff94a93a95e8cee31a46ad86210e556d2f2c25d1f7f3d8a8dd1853514"
   end
 
   def install

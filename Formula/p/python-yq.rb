@@ -3,53 +3,62 @@ class PythonYq < Formula
 
   desc "Command-line YAML and XML processor that wraps jq"
   homepage "https://kislyuk.github.io/yq/"
-  url "https://files.pythonhosted.org/packages/e3/c6/adfbfb59eda5d2eccf2e0af9e906b9919febe62bc444f2f5891944c2be9f/yq-3.2.3.tar.gz"
-  sha256 "29c8fe1d36b4f64163f4d01314c6ae217539870f610216dee6025dfb5eafafb1"
+  url "https://files.pythonhosted.org/packages/38/6a/eb9721ed0929d0f55d167c2222d288b529723afbef0a07ed7aa6cca72380/yq-3.4.3.tar.gz"
+  sha256 "ba586a1a6f30cf705b2f92206712df2281cd320280210e7b7b80adcb8f256e3b"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "db3864640973d526af738763f6da4d807bd3b19c91dd1d172ac58c3aaa07e2ba"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "476feec14d96b655ff455e29c414d7e4f06332b00c2fe28045c842e7d92fb806"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5f9732056b6f510c14477c7f892752e73168dd21ca69153592885f32fbf18f29"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c97e327af55020778a3bdfdf9c90f022b3f88f6dcf933982877dd6e566e0c015"
-    sha256 cellar: :any_skip_relocation, sonoma:         "edf692f05311402dad10d01cfcf17f9af83a1d46b29dc674e3f470de1486ce9d"
-    sha256 cellar: :any_skip_relocation, ventura:        "525a1bd76e8951314f4f5838f22bab9e8faefd72ee35a77731a5bc60dc0bf1b8"
-    sha256 cellar: :any_skip_relocation, monterey:       "829ded8db7bb36d0782733f442b590be0b8431559f07703fca947aff298a44eb"
-    sha256 cellar: :any_skip_relocation, big_sur:        "94c7565cc78e0fcfd51c4308839f05d474b2bad98083098367b18edd148a5942"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dff3e7410fcd55fd98ec77d1d2d267191c0a66cf61353f6045ce53eeb42d23df"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "fc51885dc4afeb945b9da323e5ab75751a5b861f20c0523a79360343cf4f57db"
+    sha256 cellar: :any,                 arm64_sonoma:  "8b33d265380df20b66a575e0b84592c86ba02422298dfb9a095fd46c407f913a"
+    sha256 cellar: :any,                 arm64_ventura: "b7cfa07975355ba6d17eb32c40d7fc6ca2814de0ce84707e242bbf0050758902"
+    sha256 cellar: :any,                 sonoma:        "148ae1e845bfbbc487ae9b2d152eaff0aca6650233a5c613fe06b1fddcf7ccf8"
+    sha256 cellar: :any,                 ventura:       "509f944e20ed31d27571ae35409f52a3af4d2856295882edc4435bc2cd0243a2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "30bfa94a1f5bc51fffcfebb345afc1e4de7997833264112ce802774131b14278"
   end
 
   depends_on "jq"
-  depends_on "python@3.11"
-  depends_on "pyyaml"
+  depends_on "libyaml"
+  depends_on "python@3.13"
 
   conflicts_with "yq", because: "both install `yq` executables"
+  conflicts_with "xq", because: "both install `xq` binaries"
 
   resource "argcomplete" do
-    url "https://files.pythonhosted.org/packages/54/c9/41c4dfde7623e053cbc37ac8bc7ca03b28093748340871d4e7f1630780c4/argcomplete-3.1.1.tar.gz"
-    sha256 "6c4c563f14f01440aaffa3eae13441c5db2357b5eec639abe7c0b15334627dff"
+    url "https://files.pythonhosted.org/packages/7f/03/581b1c29d88fffaa08abbced2e628c34dd92d32f1adaed7e42fc416938b0/argcomplete-3.5.2.tar.gz"
+    sha256 "23146ed7ac4403b70bd6026402468942ceba34a6732255b9edf5b7354f68a6bb"
+  end
+
+  resource "pyyaml" do
+    url "https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz"
+    sha256 "d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"
   end
 
   resource "tomlkit" do
-    url "https://files.pythonhosted.org/packages/0d/07/d34a911a98e64b07f862da4b10028de0c1ac2222ab848eaf5dd1877c4b1b/tomlkit-0.12.1.tar.gz"
-    sha256 "38e1ff8edb991273ec9f6181244a6a391ac30e9f5098e7535640ea6be97a7c86"
+    url "https://files.pythonhosted.org/packages/b1/09/a439bec5888f00a54b8b9f05fa94d7f901d6735ef4e55dcec9bc37b5d8fa/tomlkit-0.13.2.tar.gz"
+    sha256 "fff5fe59a87295b278abd31bec92c15d9bc4a06885ab12bcea52c71119392e79"
   end
 
   resource "xmltodict" do
-    url "https://files.pythonhosted.org/packages/39/0d/40df5be1e684bbaecdb9d1e0e40d5d482465de6b00cbb92b84ee5d243c7f/xmltodict-0.13.0.tar.gz"
-    sha256 "341595a488e3e01a85a9d8911d8912fd922ede5fecc4dce437eb4b6c8d037e56"
+    url "https://files.pythonhosted.org/packages/98/f7/d29b8cdc9d8d075673be0f800013c1161e2fd4234546a140855a1bcc9eb4/xmltodict-0.14.1.tar.gz"
+    sha256 "338c8431e4fc554517651972d62f06958718f6262b04316917008e8fd677a6b0"
   end
 
   def install
     virtualenv_install_with_resources
+    %w[yq xq tomlq].each do |script|
+      generate_completions_from_executable(libexec/"bin/register-python-argcomplete", script,
+                                           base_name: script, shell_parameter_format: :arg)
+    end
   end
 
   test do
-    input = <<~EOS
+    input = <<~YAML
       foo:
        bar: 1
        baz: {bat: 3}
-    EOS
+    YAML
     expected = <<~EOS
       3
       ...

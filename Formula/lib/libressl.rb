@@ -2,9 +2,9 @@ class Libressl < Formula
   desc "Version of the SSL/TLS protocol forked from OpenSSL"
   homepage "https://www.libressl.org/"
   # Please ensure when updating version the release is from stable branch.
-  url "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.7.3.tar.gz"
-  mirror "https://mirrorservice.org/pub/OpenBSD/LibreSSL/libressl-3.7.3.tar.gz"
-  sha256 "7948c856a90c825bd7268b6f85674a8dcd254bae42e221781b24e3f8dc335db3"
+  url "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-4.0.0.tar.gz"
+  mirror "https://mirrorservice.org/pub/OpenBSD/LibreSSL/libressl-4.0.0.tar.gz"
+  sha256 "4d841955f0acc3dfc71d0e3dd35f283af461222350e26843fea9731c0246a1e4"
   license "OpenSSL"
 
   livecheck do
@@ -13,20 +13,16 @@ class Libressl < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_sonoma:   "cc538bbd34294caede346b3258e1555dd149f8358851099c604fbfb7d325de26"
-    sha256 arm64_ventura:  "92af271440e96175044bc6976f171eab677d3c2cadccb37f92dffdb73f56d4d1"
-    sha256 arm64_monterey: "41bda964c02b2e5de90918e46979ab251ea865227c936fd3c89b641a7570a98e"
-    sha256 arm64_big_sur:  "1b8de42a012f5c7bf6ba0c6ba9bb75cf292a0695fc64e4d5579c3d78cfda2537"
-    sha256 sonoma:         "866dea3038a81e672c54384096bc5005caa1fabb782987cbea7f9421ff0f12a9"
-    sha256 ventura:        "101035f5a4ce0fe52b7340e710470b9932de57d85810730c8f7ead7c671b9196"
-    sha256 monterey:       "2c54083fc264c565013434ec47d3c8f27e9e8e2c6c9a3aadbe71a9510926b726"
-    sha256 big_sur:        "068a040109a368aca77822ef96db06f4695642adce1c7e134df069a23a2eaea5"
-    sha256 x86_64_linux:   "dab5dda456e0e745a240a2886e6f82fe71c64e1e71e9d303b25b1f00e59e22c3"
+    sha256 arm64_sequoia: "d872bc77f07c8b7d51065b4ec12611c30d3cfc6e66f6735202c32e46f32f6dfd"
+    sha256 arm64_sonoma:  "f463b501984c62eaefaf917fec65b388ac1938bb70d716dd12a96303d7297a8f"
+    sha256 arm64_ventura: "e83620fdcb60177b1531dfcb2157580d339132777ac2af1957f6a56992d56dd4"
+    sha256 sonoma:        "56e8e7ea14298b088752ee5c3a37083f1d9b653a19ee65a28790e75c4e86ef64"
+    sha256 ventura:       "899940fdf03eae351390da05d90332b6406a6d62411f1beb7f7e20fdbd3ba00e"
+    sha256 x86_64_linux:  "f0f91cfc09270db75053460d976249b68c5163f5d5443858b8e8994da6b18697"
   end
 
   head do
-    url "https://github.com/libressl-portable/portable.git", branch: "master"
+    url "https://github.com/libressl/portable.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -53,7 +49,7 @@ class Libressl < Formula
   end
 
   def post_install
-    rm_f pkgetc/"cert.pem"
+    rm(pkgetc/"cert.pem") if (pkgetc/"cert.pem").exist?
     pkgetc.install_symlink Formula["ca-certificates"].pkgetc/"cert.pem"
   end
 
@@ -77,7 +73,7 @@ class Libressl < Formula
     # Check LibreSSL itself functions as expected.
     (testpath/"testfile.txt").write("This is a test file")
     expected_checksum = "e2d0fe1585a63ec6009c8016ff8dda8b17719a637405a4e23c0ff81339148249"
-    system "#{bin}/openssl", "dgst", "-sha256", "-out", "checksum.txt", "testfile.txt"
+    system bin/"openssl", "dgst", "-sha256", "-out", "checksum.txt", "testfile.txt"
     open("checksum.txt") do |f|
       checksum = f.read(100).split("=").last.strip
       assert_equal checksum, expected_checksum

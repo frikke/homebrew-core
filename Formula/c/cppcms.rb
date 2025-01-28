@@ -5,6 +5,7 @@ class Cppcms < Formula
   homepage "http://cppcms.com/wikipp/en/page/main"
   url "https://downloads.sourceforge.net/project/cppcms/cppcms/1.2.1/cppcms-1.2.1.tar.bz2"
   sha256 "10fec7710409c949a229b9019ea065e25ff5687103037551b6f05716bf6cac52"
+  license "MIT"
   revision 1
 
   livecheck do
@@ -13,19 +14,21 @@ class Cppcms < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "1e231383932392067c2f82db565e7c89fdf262257dc18ae3c7069b661b7e37ad"
-    sha256 cellar: :any,                 arm64_monterey: "fbe7cecff46a4e2bc8f799354a4fe510d195721e56c769f077a0573e54d71739"
-    sha256 cellar: :any,                 arm64_big_sur:  "4bd9653322f70e9300800e2b221af694d228667967a6ee8df6069bc3496344af"
-    sha256 cellar: :any,                 ventura:        "ae8964621f8e24d7494a9f7370dbbf4369a36e3dc0533632e101a6eb37adf4e1"
-    sha256 cellar: :any,                 monterey:       "295e57a50103781f5f6d9d00f0693f8fa23802068fd53ee1fa0964bb1c9e556a"
-    sha256 cellar: :any,                 big_sur:        "91451434afc317d71cee36e03047d170f453efcf4bcd61487750b353da4bb303"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3abf8511c89ef7221ef752f3bc3bca222b89babd25605b33dae88d1584a0050b"
+    rebuild 2
+    sha256 cellar: :any,                 arm64_sequoia: "15a16c5b5f573a43871ff8c74cc01c314fb0e4972d4c70ca7f168c662bf20ef5"
+    sha256 cellar: :any,                 arm64_sonoma:  "40b9a78d35c4a82ca461589a699a578b9af04a2db0bd04e996585bd4caab6b00"
+    sha256 cellar: :any,                 arm64_ventura: "fd4431e3606205326aec8f484f3244201795ac5d23343489bcbebcee30dab312"
+    sha256 cellar: :any,                 sonoma:        "fa701ccf8fdb79cdef8b0a690ef5f77f167d63568349aefaca9ede863a3b16f1"
+    sha256 cellar: :any,                 ventura:       "adc2a352809a202ca39cfa42ca5674512311d7e58a13bb1a4db8e844bfb7b310"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1882da73e8db41b00a7fa01095d3d59314814cbaeb351e8cb7ca6611d44c02c2"
   end
 
   depends_on "cmake" => :build
   depends_on "openssl@3"
   depends_on "pcre"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  uses_from_macos "zlib"
 
   def install
     ENV.cxx11
@@ -47,7 +50,7 @@ class Cppcms < Formula
   end
 
   test do
-    (testpath/"hello.cpp").write <<~EOS
+    (testpath/"hello.cpp").write <<~CPP
       #include <cppcms/application.h>
       #include <cppcms/applications_pool.h>
       #include <cppcms/service.h>
@@ -86,10 +89,10 @@ class Cppcms < Formula
               return -1;
           }
       }
-    EOS
+    CPP
 
     port = free_port
-    (testpath/"config.json").write <<~EOS
+    (testpath/"config.json").write <<~JSON
       {
           "service" : {
               "api" : "http",
@@ -103,7 +106,7 @@ class Cppcms < Formula
               "script_names" : [ "/hello" ]
           }
       }
-    EOS
+    JSON
     system ENV.cxx, "hello.cpp", "-std=c++11", "-L#{lib}", "-lcppcms", "-o", "hello"
     pid = fork { exec "./hello", "-c", "config.json" }
 

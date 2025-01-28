@@ -1,43 +1,50 @@
-require "language/node"
-
 class ProtocGenGrpcWeb < Formula
   desc "Protoc plugin that generates code for gRPC-Web clients"
   homepage "https://github.com/grpc/grpc-web"
-  url "https://github.com/grpc/grpc-web/archive/1.4.2.tar.gz"
-  sha256 "376937b22095bdbea00f8bcd9442c1824419a99cbc37caf0967e4a0fa8b16658"
+  url "https://github.com/grpc/grpc-web/archive/refs/tags/1.5.0.tar.gz"
+  sha256 "d3043633f1c284288e98e44c802860ca7203c7376b89572b5f5a9e376c2392d5"
   license "Apache-2.0"
+  revision 8
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "54e59010fc995ac571f6c76369721c28dad336723404e858cce02e893db30e61"
-    sha256 cellar: :any,                 arm64_monterey: "b7ad14af33ee7f73663972c1ceb97727bc0fea026c1e4c16ba2913272208578d"
-    sha256 cellar: :any,                 arm64_big_sur:  "9d8551246e95b74f03875968666431ed0a5b9db6282c752ed49e106eb5e70034"
-    sha256 cellar: :any,                 ventura:        "70b8eac814308965112d0101ab8033ad5897c4e3c509ee9c9755583a0bccb55b"
-    sha256 cellar: :any,                 monterey:       "f5435c6bc4f25d62a67d56904a593640ddf4a7c868e8255f9d86620693a34873"
-    sha256 cellar: :any,                 big_sur:        "52b8503b1b9053fc90043c83d7d3b86767a97616955b89841f4d59ab6269daa8"
-    sha256 cellar: :any,                 catalina:       "b839a0129eca03ab237945ff1a81249b860bb3421814dc42ca52132cb5303ecb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "95f9dcef9a241e6104e446900dc34fc9daafa8bc38886d3ba55cbf49b1f66cd4"
+    sha256 cellar: :any,                 arm64_sequoia: "30dd0a651796f75265b4b0fe9bf9f054624db2d6f580046d0f8ea53f3883851f"
+    sha256 cellar: :any,                 arm64_sonoma:  "260ac56d4d09cd8bcb5555dfc27ec1b0ba4163b1d14a825d1325c3a2d72acad4"
+    sha256 cellar: :any,                 arm64_ventura: "3a156731dd5f7f73438a0e03051fb35f1a3d9c1edc13a1d96e47eeb8f7042655"
+    sha256 cellar: :any,                 sonoma:        "9ca144190fd8e1c91da480c8fd1ee1cdf02eeb80c5e26999d8c3632f1bb967cc"
+    sha256 cellar: :any,                 ventura:       "841391e26f36ce0bae1a18ddca59b43e030faa9491c6fddd2826be22acb6104f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b6716b249cd8a3f36a35dc2538c17f2469710c282b5cff78e403dc935bd4e95d"
   end
 
   depends_on "cmake" => :build
+  depends_on "pkgconf" => :build
   depends_on "node" => :test
   depends_on "typescript" => :test
-  depends_on "protobuf@3"
+  depends_on "abseil"
+  depends_on "protobuf"
+  depends_on "protoc-gen-js"
+
+  # Backport of https://github.com/grpc/grpc-web/commit/2c39859be8e5bcf55eef129e5a5330149ce460ab
+  patch :DATA
 
   def install
-    bin.mkpath
-    system "make", "install-plugin", "PREFIX=#{prefix}"
+    # Workarounds to build with latest `protobuf` which needs Abseil link flags and C++17
+    ENV.append "LDFLAGS", Utils.safe_popen_read("pkgconf", "--libs", "protobuf").chomp
+    inreplace "javascript/net/grpc/web/generator/Makefile", "-std=c++11", "-std=c++17"
 
-    # Remove these two lines when this formula depends on unversioned `protobuf`.
-    libexec.install bin/"protoc-gen-grpc-web"
-    (bin/"protoc-gen-grpc-web").write_env_script libexec/"protoc-gen-grpc-web",
-                                                 PATH: "#{Formula["protobuf@3"].opt_bin}:${PATH}"
+    args = ["PREFIX=#{prefix}", "STATIC=no"]
+    args << "MIN_MACOS_VERSION=#{MacOS.version}" if OS.mac?
+
+    system "make", "install-plugin", *args
   end
 
   test do
-    ENV.prepend_path "PATH", Formula["protobuf@3"].opt_bin
-
     # First use the plugin to generate the files.
-    testdata = <<~EOS
+    testdata = <<~PROTO
       syntax = "proto3";
       package test;
       message TestCase {
@@ -52,21 +59,74 @@ class ProtocGenGrpcWeb < Formula
       service TestService {
         rpc RunTest(Test) returns (TestResult);
       }
-    EOS
+    PROTO
     (testpath/"test.proto").write testdata
     system "protoc", "test.proto", "--plugin=#{bin}/protoc-gen-grpc-web",
                      "--js_out=import_style=commonjs:.",
                      "--grpc-web_out=import_style=typescript,mode=grpcwebtext:."
 
     # Now see if we can import them.
-    testts = <<~EOS
+    (testpath/"test.ts").write <<~TYPESCRIPT
       import * as grpcWeb from 'grpc-web';
       import {TestServiceClient} from './TestServiceClientPb';
       import {Test, TestResult} from './test_pb';
-    EOS
-    (testpath/"test.ts").write testts
-    system "npm", "install", *Language::Node.local_npm_install_args, "grpc-web", "@types/google-protobuf"
+    TYPESCRIPT
+    system "npm", "install", *std_npm_args(prefix: false), "grpc-web", "@types/google-protobuf"
     # Specify including lib for `tsc` since `es6` is required for `@types/google-protobuf`.
     system "tsc", "--lib", "es6", "test.ts"
   end
 end
+
+__END__
+diff --git a/javascript/net/grpc/web/generator/grpc_generator.cc b/javascript/net/grpc/web/generator/grpc_generator.cc
+index 158a335bb..1eb97b35d 100644
+--- a/javascript/net/grpc/web/generator/grpc_generator.cc
++++ b/javascript/net/grpc/web/generator/grpc_generator.cc
+@@ -841,13 +841,11 @@ void PrintProtoDtsMessage(Printer* printer, const Descriptor* desc,
+                      "set$js_field_name$(value?: $js_field_type$): "
+                      "$class_name$;\n");
+     }
+-    if (field->has_optional_keyword() ||
+-        (field->type() == FieldDescriptor::TYPE_MESSAGE &&
+-            !field->is_repeated() && !field->is_map())) {
++    if (field->has_presence()) {
+       printer->Print(vars, "has$js_field_name$(): boolean;\n");
+     }
+-    if (field->type() == FieldDescriptor::TYPE_MESSAGE || field->has_optional_keyword() ||
+-        field->is_repeated() || field->is_map()) {
++    if (field->type() == FieldDescriptor::TYPE_MESSAGE ||
++        field->has_presence() || field->is_repeated() || field->is_map()) {
+       printer->Print(vars, "clear$js_field_name$(): $class_name$;\n");
+     }
+     if (field->is_repeated() && !field->is_map()) {
+@@ -867,14 +865,12 @@ void PrintProtoDtsMessage(Printer* printer, const Descriptor* desc,
+     printer->Print("\n");
+   }
+
+-  for (int i = 0; i < desc->oneof_decl_count(); i++) {
+-    const OneofDescriptor* oneof = desc->oneof_decl(i);
+-    if (!oneof->is_synthetic()) {
+-      vars["js_oneof_name"] = ToUpperCamel(ParseLowerUnderscore(oneof->name()));
+-      printer->Print(
+-          vars, "get$js_oneof_name$Case(): $class_name$.$js_oneof_name$Case;\n");
+-      printer->Print("\n");
+-    }
++  for (int i = 0; i < desc->real_oneof_decl_count(); i++) {
++    const OneofDescriptor *oneof = desc->real_oneof_decl(i);
++    vars["js_oneof_name"] = ToUpperCamel(ParseLowerUnderscore(oneof->name()));
++    printer->Print(
++        vars, "get$js_oneof_name$Case(): $class_name$.$js_oneof_name$Case;\n");
++    printer->Print("\n");
+   }
+
+   printer->Print(
+@@ -904,8 +900,7 @@ void PrintProtoDtsMessage(Printer* printer, const Descriptor* desc,
+     }
+     vars["js_field_name"] = js_field_name;
+     vars["js_field_type"] = AsObjectFieldType(field, file);
+-    if ((field->type() != FieldDescriptor::TYPE_MESSAGE && !field->has_optional_keyword()) ||
+-        field->is_repeated()) {
++    if (!field->has_presence()) {
+       printer->Print(vars, "$js_field_name$: $js_field_type$,\n");
+     } else {
+       printer->Print(vars, "$js_field_name$?: $js_field_type$,\n");

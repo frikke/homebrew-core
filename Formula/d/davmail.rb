@@ -1,17 +1,18 @@
 class Davmail < Formula
   desc "POP/IMAP/SMTP/Caldav/Carddav/LDAP exchange gateway"
   homepage "https://davmail.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/davmail/davmail/6.1.0/davmail-6.1.0-3423.zip"
-  sha256 "fc9b0916d19a94db8ecf6d5e7823d1fcbbcbb9e32d40047b55228df12a673ef0"
+  url "https://downloads.sourceforge.net/project/davmail/davmail/6.2.2/davmail-6.2.2-3546.zip"
+  version "6.2.2"
+  sha256 "e39a5a1b2e927d41572babd8f0be2d1c56228a8d7fe5a87dbd3c86226760c072"
   license "GPL-2.0-or-later"
 
   livecheck do
     url "https://sourceforge.net/projects/davmail/rss?path=/davmail"
-    regex(%r{url=.*?/davmail[._-]v?(\d+(?:[.-]\d+)+)\.(?:t|zip)}i)
+    regex(%r{url=.*?/davmail[._-]v?(\d+(?:\.\d+)+)(?:-\d+)?\.(?:t|zip)}i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "0ef33d036af22fa05fe77b3ffba61e9f4e7b3b98859aab6ea0023910157a8e07"
+    sha256 cellar: :any_skip_relocation, all: "c55c26e3679337482c014409c4fec1ba607af4e644a47063c3d81785f30bf3b0"
   end
 
   depends_on "openjdk"
@@ -29,8 +30,8 @@ class Davmail < Formula
     interval 300
     keep_alive false
     environment_variables PATH: std_service_path_env
-    log_path "/dev/null"
-    error_log_path "/dev/null"
+    log_path File::NULL
+    error_log_path File::NULL
   end
 
   test do

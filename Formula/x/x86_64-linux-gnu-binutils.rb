@@ -1,9 +1,9 @@
 class X8664LinuxGnuBinutils < Formula
   desc "GNU Binutils for x86_64-linux-gnu cross development"
   homepage "https://www.gnu.org/software/binutils/binutils.html"
-  url "https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.bz2"
-  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.41.tar.bz2"
-  sha256 "a4c4bec052f7b8370024e60389e194377f3f48b56618418ea51067f67aaab30b"
+  url "https://ftp.gnu.org/gnu/binutils/binutils-2.43.1.tar.bz2"
+  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.43.1.tar.bz2"
+  sha256 "becaac5d295e037587b63a42fad57fe3d9d7b83f478eb24b67f9eec5d0f1872f"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,14 +11,19 @@ class X8664LinuxGnuBinutils < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "9e6a5eca124acb249ec7c309c901901b8ce3e01b7abb830394e949c7e35eae54"
-    sha256 arm64_monterey: "529b09dd895cd252ccc89e70873dceb9b48d9fb5cd49e6a750dc1617f6ee9135"
-    sha256 arm64_big_sur:  "2ce56322498fd2f0f37c372e402e3f89b91f851c4ebcc48d3c527dca862d5050"
-    sha256 ventura:        "8d1e84b29b0cb2cb3f879a0440a329e9a4d82d13d9e03db294830957112b187d"
-    sha256 monterey:       "26a415990e39704f59dd2edcb32d9272c0268088e513e7866050d591f46ba59b"
-    sha256 big_sur:        "5ace1f5fe636ae8a44cb68fc9d59cdc0189d1aa34059748f32b7615aad87e4b2"
-    sha256 x86_64_linux:   "a682430e349878636cd02f87248927839741d839688d2f970fce750a8d0fa371"
+    sha256 arm64_sequoia: "bed40fd4b54c0a3cac51aa71585f5cef24d464ea3c38afa01babbd1f05df11a3"
+    sha256 arm64_sonoma:  "60cafd9e4c28e6224c899a455dd892910b4c24a46e6d64a9d53f876a054d8a24"
+    sha256 arm64_ventura: "7d075d3cf521e48d0480327318070e3de414fecfff5bce1637ad47ef9dac3404"
+    sha256 sonoma:        "9e63513d5d2a0b82a1cde53be02aee5a14214897a184db0af6fbde6c904bed94"
+    sha256 ventura:       "2d5d7f1330758c0a0d9a3a3580bb265f0db51390c1f27a815ccbcf55bb548927"
+    sha256 x86_64_linux:  "28b05e9d5c0673be09dedcca3f2f9664b65a59d4c65a2aa9dff2fb6c8e9a4712"
   end
+
+  depends_on "pkgconf" => :build
+  # Requires the <uchar.h> header
+  # https://sourceware.org/bugzilla/show_bug.cgi?id=31320
+  depends_on macos: :ventura
+  depends_on "zstd"
 
   uses_from_macos "zlib"
 
@@ -28,11 +33,6 @@ class X8664LinuxGnuBinutils < Formula
 
   on_linux do
     keg_only "it conflicts with `binutils`"
-  end
-
-  resource "homebrew-sysroot" do
-    url "https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/2028cdaf24259d23adcff95393b8cc4f0eef714b/debian_bullseye_amd64_sysroot.tar.xz"
-    sha256 "1be60e7c456abc590a613c64fab4eac7632c81ec6f22734a61b53669a4407346"
   end
 
   def install
@@ -54,6 +54,7 @@ class X8664LinuxGnuBinutils < Formula
                           "--enable-ld=yes",
                           "--enable-interwork",
                           "--with-system-zlib",
+                          "--with-zstd",
                           "--disable-nls",
                           "--disable-gprofng" # Fails to build on Linux
     system "make"
@@ -61,14 +62,19 @@ class X8664LinuxGnuBinutils < Formula
   end
 
   test do
+    resource "homebrew-sysroot" do
+      url "https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/2028cdaf24259d23adcff95393b8cc4f0eef714b/debian_bullseye_amd64_sysroot.tar.xz"
+      sha256 "1be60e7c456abc590a613c64fab4eac7632c81ec6f22734a61b53669a4407346"
+    end
+
     assert_match "f()", shell_output("#{bin}/x86_64-linux-gnu-c++filt _Z1fv")
     return if OS.linux?
 
     (testpath/"sysroot").install resource("homebrew-sysroot")
-    (testpath/"hello.c").write <<~EOS
+    (testpath/"hello.c").write <<~C
       #include <stdio.h>
       int main() { printf("hello!\\n"); }
-    EOS
+    C
 
     ENV.remove_macosxsdk
     system ENV.cc, "-v", "--target=x86_64-pc-linux-gnu", "--sysroot=#{testpath}/sysroot", "-c", "hello.c"

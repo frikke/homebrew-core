@@ -1,19 +1,20 @@
 class RaxmlNg < Formula
   desc "RAxML Next Generation: faster, easier-to-use and more flexible"
-  homepage "https://sco.h-its.org/exelixis/web/software/raxml/"
+  homepage "https://cme.h-its.org/exelixis/web/software/raxml/"
   url "https://github.com/amkozlov/raxml-ng.git",
-      tag:      "1.2.0",
-      revision: "fd32e7f73c3ee44c526c7555a8d04e84b03bd51c"
+      tag:      "1.2.2",
+      revision: "805318cef87bd5d67064efa299b5d1cf948367fd"
   license "AGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "5dd0d18757ed8322bf8672537cceeb471282fa9b04524e3fe8585c9f791afc37"
-    sha256 cellar: :any,                 arm64_monterey: "cf0cb888b93104fffe0cced735061f7cf3a88979972dec9766c6a116368e1303"
-    sha256 cellar: :any,                 arm64_big_sur:  "708f6103476f7b943910ecc3048537e44592c336e60a89c434eabed1b1794957"
-    sha256 cellar: :any,                 ventura:        "2ea060156ee247a24ba70f338eb23d8a90563624f77418e7df55dc0586a05879"
-    sha256 cellar: :any,                 monterey:       "f126aea85e829545d56f1632354e7e12de6e62bc9b72504f63a27fc938c9d40e"
-    sha256 cellar: :any,                 big_sur:        "5a5a3ab547ff228ed8a5283ed133d2bbe498eeee5bd1735264977d6ef82b7526"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e69bccbc5f0a041d07a157481e885ed3bf94b31abf8d242f9313c5aa711ea14a"
+    sha256 cellar: :any,                 arm64_sequoia:  "4f7e500c5a3615a4c814bf38bd8720a745c4155827910f4cd5638113e129d2c6"
+    sha256 cellar: :any,                 arm64_sonoma:   "bd6bd94ccee20b21d5c9146a8bc4a484c261a11586224ec4303a2d269590b32f"
+    sha256 cellar: :any,                 arm64_ventura:  "6fcf4ec42def10fd485108f16f3d9c03f59f06ff72b663e469d7985332b99222"
+    sha256 cellar: :any,                 arm64_monterey: "a2e435fabdb95292270d576aa6fd6dceda14ad722cd12ccb916371b8aa01e0a4"
+    sha256 cellar: :any,                 sonoma:         "63100f2fe0b660b831fcb16cc08b299bf62a978d4c97949d87d5e09716b4670d"
+    sha256 cellar: :any,                 ventura:        "456c5f39dacdc8ce957c17d67f53410977c8217bc98ca45ba97c1df187442aa9"
+    sha256 cellar: :any,                 monterey:       "7bbd86f8a89f92287d21cab56e055333a5c5ec90e955b76f78d3c8a36cb9dda4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "53e258a6db4cb2d05aa6013741ac3c2345a9d92da103a23d34dda647b8e8d532"
   end
 
   depends_on "bison" => :build # fix syntax error with `parse_utree.y`
@@ -27,7 +28,7 @@ class RaxmlNg < Formula
   end
 
   resource "homebrew-example" do
-    url "https://sco.h-its.org/exelixis/resource/download/hands-on/dna.phy"
+    url "https://cme.h-its.org/exelixis/resource/download/hands-on/dna.phy"
     sha256 "c2adc42823313831b97af76b3b1503b84573f10d9d0d563be5815cde0effe0c2"
   end
 

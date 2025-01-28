@@ -2,8 +2,8 @@ class Openj9 < Formula
   desc "High performance, scalable, Java virtual machine"
   homepage "https://www.eclipse.org/openj9/"
   url "https://github.com/eclipse-openj9/openj9.git",
-      tag:      "openj9-0.40.0",
-      revision: "d12d10c9ea2de2cf363095e609536ffe451bd25f"
+      tag:      "openj9-0.48.0",
+      revision: "1d5831436ec378c7dd9f57415bec39d3f5817d57"
   license any_of: [
     "EPL-2.0",
     "Apache-2.0",
@@ -17,11 +17,11 @@ class Openj9 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_monterey: "aed97a9ad250d831d56e98fe4cc42a04accc9573105d35b720786e97615f53f9"
-    sha256 cellar: :any, arm64_big_sur:  "6c138a8cb5d443c3f3fedf74a820cfe7dacc8c3f1dd8fdd633cd3bbf93a829a1"
-    sha256 cellar: :any, ventura:        "d03b9d60f11cd19ccb14438849675d1314c2306a7091b6d6ca16a2d1c9d6bd72"
-    sha256 cellar: :any, monterey:       "506c3ce6be273f87b953d5b7820aa567e29693e39243ed120f9d06c0031c8cda"
-    sha256 cellar: :any, big_sur:        "bd6cfe66db144260f4d961b4a462414de966f5ab585c05b2850ab9c1d99db65b"
+    sha256 cellar: :any, arm64_sequoia: "42f88b26142b77aa04e33db08f936ca8fc084c07fe30e3cf004d5229993d8985"
+    sha256 cellar: :any, arm64_sonoma:  "aa55527e448dbf9f904c32dc671ec2b163f86b5a665a332e8a43fc0cafa69234"
+    sha256 cellar: :any, arm64_ventura: "9fca55b06788b918d9679b1083c36f6a1b1d87a08703975dd1f086a9fa3359c3"
+    sha256 cellar: :any, sonoma:        "2d557481ba4732191f5149648ea328c6b0a7585fbf72b47839b40adac0c33d7d"
+    sha256 cellar: :any, ventura:       "3acbe59a7d14b86a7be2e4112fc3eccc75e048502dbf4c59b02f39beb4c21432"
   end
 
   keg_only :shadowed_by_macos
@@ -30,7 +30,7 @@ class Openj9 < Formula
   depends_on "bash" => :build
   depends_on "cmake" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "fontconfig"
   depends_on "giflib"
   depends_on "harfbuzz"
@@ -63,34 +63,34 @@ class Openj9 < Formula
   end
 
   # From https://github.com/eclipse-openj9/openj9/blob/openj9-#{version}/doc/build-instructions/
-  # We use JDK 20 to bootstrap.
+  # We use JDK 22 to bootstrap.
   resource "boot-jdk" do
     on_macos do
       on_arm do
-        url "https://github.com/AdoptOpenJDK/semeru20-binaries/releases/download/jdk-20.0.2%2B9_openj9-0.40.0/ibm-semeru-open-jdk_aarch64_mac_20.0.2_9_openj9-0.40.0.tar.gz"
-        sha256 "e9c7df3897877350b577d80a47cbc9a7b4589419ca0c2df7c185a20bca8423dd"
+        url "https://github.com/AdoptOpenJDK/semeru22-binaries/releases/download/jdk-22.0.1%2B8_openj9-0.45.0/ibm-semeru-open-jdk_aarch64_mac_22.0.1_8_openj9-0.45.0.tar.gz"
+        sha256 "623cc15daa3b4c7f21d47f225c94a163e2261074cc3c11f30d2938fc249b9355"
       end
       on_intel do
-        url "https://github.com/AdoptOpenJDK/semeru20-binaries/releases/download/jdk-20.0.2%2B9_openj9-0.40.0/ibm-semeru-open-jdk_x64_mac_20.0.2_9_openj9-0.40.0.tar.gz"
-        sha256 "ece0d6e2a5cd07b2e0e05a6361026c73838cfd14556c0aeb7f9367a13d19de38"
+        url "https://github.com/AdoptOpenJDK/semeru22-binaries/releases/download/jdk-22.0.1%2B8_openj9-0.45.0/ibm-semeru-open-jdk_x64_mac_22.0.1_8_openj9-0.45.0.tar.gz"
+        sha256 "f0e459df70b5a3c8fc0abc099d5c06a596da40b95f8226d76474516a646a3861"
       end
     end
     on_linux do
-      url "https://github.com/AdoptOpenJDK/semeru20-binaries/releases/download/jdk-20.0.2%2B9_openj9-0.40.0/ibm-semeru-open-jdk_x64_linux_20.0.2_9_openj9-0.40.0.tar.gz"
-      sha256 "925b555050eb3ad9bcb444c4713f5bb221025ba9c309e95235d4b2e060c84ee0"
+      url "https://github.com/AdoptOpenJDK/semeru22-binaries/releases/download/jdk-22.0.1%2B8_openj9-0.45.0/ibm-semeru-open-jdk_x64_linux_22.0.1_8_openj9-0.45.0.tar.gz"
+      sha256 "6e54d984bc0c058ffb7a604810dfffba210d79e12855e5c61e9295fedeff32db"
     end
   end
 
   resource "omr" do
     url "https://github.com/eclipse-openj9/openj9-omr.git",
-        tag:      "openj9-0.40.0",
-        revision: "e80bff83b7fda8875071d89de7c73184d847085d"
+        tag:      "openj9-0.48.0",
+        revision: "d10a4d553a3cfbf35db0bcde9ebccb24cdf1189f"
   end
 
   resource "openj9-openjdk-jdk" do
-    url "https://github.com/ibmruntimes/openj9-openjdk-jdk20.git",
-        tag:      "openj9-0.40.0",
-        revision: "19eb54abdace78d5009138c6e27457dfe2df6cf1"
+    url "https://github.com/ibmruntimes/openj9-openjdk-jdk22.git",
+        tag:      "openj9-0.46.1",
+        revision: "b77827589c585158319340068dae8497b75322c6"
   end
 
   def install
@@ -160,7 +160,7 @@ class Openj9 < Formula
       libexec.install Dir["build/*/images/jdk-bundle/*"].first => "openj9.jdk"
       jdk /= "openj9.jdk/Contents/Home"
       rm jdk/"lib/src.zip"
-      rm_rf Dir.glob(jdk/"**/*.dSYM")
+      rm_r(Dir.glob(jdk/"**/*.dSYM"))
     else
       libexec.install Dir["build/linux-x86_64-server-release/images/jdk/*"]
     end
@@ -181,13 +181,13 @@ class Openj9 < Formula
   end
 
   test do
-    (testpath/"HelloWorld.java").write <<~EOS
+    (testpath/"HelloWorld.java").write <<~JAVA
       class HelloWorld {
         public static void main(String args[]) {
           System.out.println("Hello, world!");
         }
       }
-    EOS
+    JAVA
 
     system bin/"javac", "HelloWorld.java"
 

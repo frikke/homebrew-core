@@ -1,19 +1,18 @@
 class Envd < Formula
   desc "Reproducible development environment for AI/ML"
   homepage "https://envd.tensorchord.ai"
-  url "https://github.com/tensorchord/envd/archive/v0.3.40.tar.gz"
-  sha256 "3923fad229064604c3539d0b03de7a4491962a7e724df748cdf84aaa817b319a"
+  url "https://github.com/tensorchord/envd/archive/refs/tags/v0.4.3.tar.gz"
+  sha256 "4524206b20e371507bfc4d7eaaa631188e6542132d47638280a641c1656071a4"
   license "Apache-2.0"
   head "https://github.com/tensorchord/envd.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d09e92d281df3aa5a70a3e4fd5e2062f4abb6b6892404bc8e8981f07e6947886"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "84036e95c70396fd7328f15c3508247def2c739a6f5ccf07fe157bd137259788"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "438e989b081c8bae164fc4daa1e43f50c648699d996b49d3ee1b766a4aad8990"
-    sha256 cellar: :any_skip_relocation, ventura:        "39fd97edde76168f9bca689f683f447bb935a83fa1db91fb04c78d1fe1576787"
-    sha256 cellar: :any_skip_relocation, monterey:       "23033fc133f5318c95001b62e5285b0b2fc28859aecc3ce5b5f1c4955fb02af2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "dadd7bd9411b901e6b33ac0e1d967d76f96b08fc410f2c0fc32132bcae3b7e66"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "454818164c5842db2c85d7db94cfc48bd24235ae2058da62621a2a5eda734093"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e27cc64092b3fae645f85cc04fbedb4544db7e66f850fc287c932aac058df287"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "380655aaa5b9c458320bba15603fccaa8b37f97644ffdd2efb3be8d99a172709"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "9670557698e24a077ff59e82056b210cf107ec8c458132969f0e5617f35304fc"
+    sha256 cellar: :any_skip_relocation, sonoma:        "12b5bfe20ad6451276b6c5f51a509d76a8655ae401246f3d72b46d877f8f3231"
+    sha256 cellar: :any_skip_relocation, ventura:       "a760096210ca7768bb142e5529af18c416b3f69257bc7044219b18e96e45ccd1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f2a078fe8d9d3ac1b0e3f91e988e98145d6f107483d531c2bf8b7f64ad0d44fc"
   end
 
   depends_on "go" => :build
@@ -27,23 +26,15 @@ class Envd < Formula
       -X github.com/tensorchord/envd/pkg/version.gitCommit=#{tap.user}
       -X github.com/tensorchord/envd/pkg/version.gitTreeState=clean
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/envd"
-    generate_completions_from_executable(bin/"envd", "completion", "--no-install",
-                                         shell_parameter_format: "--shell=",
-                                         shells:                 [:bash, :zsh, :fish])
+    system "go", "build", *std_go_args(ldflags:), "./cmd/envd"
+    generate_completions_from_executable(bin/"envd", "completion", "--no-install", "--shell")
   end
 
   test do
-    output = shell_output("#{bin}/envd version --short")
-    assert_equal "envd: v#{version}", output.strip
+    assert_match version.to_s, shell_output("#{bin}/envd version --short")
 
-    expected = if OS.mac?
-      "failed to list containers: Cannot connect to the Docker daemon"
-    else
-      "failed to list containers: Got permission denied while trying to connect to the Docker daemon"
-    end
-
-    stderr = shell_output("#{bin}/envd env list 2>&1", 1)
-    assert_match expected, stderr
+    ENV["DOCKER_HOST"] = "unix://#{testpath}/invalid.sock"
+    expected = /failed to list containers: (Cannot|permission denied while trying to) connect to the Docker daemon/
+    assert_match expected, shell_output("#{bin}/envd env list 2>&1", 1)
   end
 end

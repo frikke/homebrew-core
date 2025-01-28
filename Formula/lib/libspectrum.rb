@@ -22,9 +22,9 @@ class Libspectrum < Formula
     depends_on "libtool" => :build
   end
 
-  deprecate! date: "2023-02-14", because: :unmaintained
+  disable! date: "2024-02-12", because: :unmaintained
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "audiofile"
   depends_on "glib"
   depends_on "libgcrypt"
@@ -36,7 +36,7 @@ class Libspectrum < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "libspectrum.h"
       #include <assert.h>
 
@@ -45,7 +45,7 @@ class Libspectrum < Formula
         assert(strcmp(libspectrum_version(), "#{version}") == 0);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lspectrum", "-o", "test"
     system "./test"
   end

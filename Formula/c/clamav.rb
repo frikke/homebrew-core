@@ -1,9 +1,9 @@
 class Clamav < Formula
   desc "Anti-virus software"
   homepage "https://www.clamav.net/"
-  url "https://github.com/Cisco-Talos/clamav/releases/download/clamav-1.2.0/clamav-1.2.0.tar.gz"
-  mirror "https://www.clamav.net/downloads/production/clamav-1.2.0.tar.gz"
-  sha256 "97a192dffe141480b56cabf1063d79a9fc55cd59203241fa41bfc7a98a548020"
+  url "https://github.com/Cisco-Talos/clamav/releases/download/clamav-1.4.2/clamav-1.4.2.tar.gz"
+  mirror "https://www.clamav.net/downloads/production/clamav-1.4.2.tar.gz"
+  sha256 "8c92f8ade2a8f2c9d6688d1d63ee57f6caf965d74dce06d0971c6709c8e6c04c"
   license "GPL-2.0-or-later"
   head "https://github.com/Cisco-Talos/clamav.git", branch: "main"
 
@@ -13,17 +13,16 @@ class Clamav < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "fd638307f830a404756174db11191ba74f4fd8998d46dadde6e75cd78dc1b26c"
-    sha256 arm64_monterey: "493f53d403bb2ef411f75c5536f4980f1a949272d52b107cdbe8424c18faa128"
-    sha256 arm64_big_sur:  "61479084f9a8ebf52262db7da991fc176fd2ddbad091d3d67324b517b3a06e38"
-    sha256 ventura:        "439057e74bc0ffe16c513e1498ff3fc753a370905c66d6163dddd8ed18316d5a"
-    sha256 monterey:       "b539a9a4dbcbc7f8f992f739ac2142c7e5559620fb2d9e2070a54c9d69f3327d"
-    sha256 big_sur:        "9dc3f5ac74f101656047fc9e2a8680a9dded50dfb7cba57ac82178060b7ba4e7"
-    sha256 x86_64_linux:   "bb824d3ad1d8525327efc28379c0bbc7b7f42e074f8d245de9c6d0fed26ff888"
+    sha256 arm64_sequoia: "4905fe4fabf8a82b668f3459579bbe866411e11e40b67186954e4e04a3bf24d3"
+    sha256 arm64_sonoma:  "57e3cb64b82dbdbed45b7ca09772d0386a8d87d0841805af72e18ee2b10092dd"
+    sha256 arm64_ventura: "0d04eec631abc4cefba76b84d0ff19370e9cd9784f5d02e9eeceb06f92aae4c5"
+    sha256 sonoma:        "555d9306b8715927159cd870985253cd1ca04b6c1e4ecea7bf189edafbe21ec4"
+    sha256 ventura:       "538e09f3f9d312667e9f8fc75092f7a66e4776cdd329941787d1101b15761b38"
+    sha256 x86_64_linux:  "94b058838c51f394fbe71a74bb68a77b6e5f50909f7d34c7419b48a233dea6eb"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
   depends_on "json-c"
   depends_on "openssl@3"
@@ -74,11 +73,13 @@ class Clamav < Formula
 
   test do
     assert_match "Database directory: #{var}/lib/clamav", shell_output("#{bin}/clamconf")
+
     (testpath/"freshclam.conf").write <<~EOS
       DNSDatabaseInfo current.cvd.clamav.net
       DatabaseMirror database.clamav.net
     EOS
-    system "#{bin}/freshclam", "--datadir=#{testpath}", "--config-file=#{testpath}/freshclam.conf"
-    system "#{bin}/clamscan", "--database=#{testpath}", testpath
+
+    system bin/"freshclam", "--datadir=#{testpath}", "--config-file=#{testpath}/freshclam.conf"
+    system bin/"clamscan", "--database=#{testpath}", testpath
   end
 end

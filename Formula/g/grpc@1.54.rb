@@ -8,17 +8,6 @@ class GrpcAT154 < Formula
   license "Apache-2.0"
   revision 1
 
-  # There can be a notable gap between when a version is tagged and a
-  # corresponding release is created, so we check releases instead of the Git
-  # tags. Upstream maintains multiple major/minor versions and the "latest"
-  # release may be for a different version, so we have to check multiple
-  # releases to identify the highest 1.54.x version.
-  livecheck do
-    url :stable
-    regex(/^v?(1\.54(?:\.\d+)+)$/i)
-    strategy :github_releases
-  end
-
   bottle do
     sha256 cellar: :any,                 arm64_sonoma:   "cf92a1cc58e01fea2cc5344d1bf56cc4599a621a19221afefb973b8b54c8c324"
     sha256 cellar: :any,                 arm64_ventura:  "0631cf6a63fca83abd8ff53b0a41811957c8efaf7a422a9f1987f5ee2fa4f88e"
@@ -33,11 +22,13 @@ class GrpcAT154 < Formula
 
   keg_only :versioned_formula
 
+  disable! date: "2024-10-31", because: :versioned_formula
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "cmake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :test
+  depends_on "pkgconf" => :test
   depends_on "abseil"
   depends_on "c-ares"
   depends_on "openssl@3"
@@ -54,8 +45,6 @@ class GrpcAT154 < Formula
     build 1100
     cause "Requires C++17 features not yet implemented"
   end
-
-  fails_with gcc: "5" # C++17
 
   def install
     ENV.llvm_clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1100)
@@ -99,14 +88,14 @@ class GrpcAT154 < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <grpc/grpc.h>
       int main() {
         grpc_init();
         grpc_shutdown();
         return GRPC_STATUS_OK;
       }
-    EOS
+    CPP
     ENV.prepend_path "PKG_CONFIG_PATH", lib/"pkgconfig"
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["protobuf@21"].opt_lib/"pkgconfig"
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["openssl@3"].opt_lib/"pkgconfig"

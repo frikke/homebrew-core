@@ -2,18 +2,19 @@ class Dpp < Formula
   desc "Directly include C headers in D source code"
   homepage "https://github.com/atilaneves/dpp"
   url "https://github.com/atilaneves/dpp.git",
-      tag:      "v0.5.5",
-      revision: "c74291190d5fe81ff23ec1d21290fd7047c256a9"
+      tag:      "v0.6.0",
+      revision: "9c2b175b32cc46581a94a7ee1c0026f0cda045fc"
   license "BSL-1.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "8200b30a5c22f48a57b405e8ce590e290cffd8f07fbc502b6bb18ecc358bb2f1"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f2ecf24bc0fcff5d4096990f971d4e983bc35d359d312e89123da7d886d14123"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "db600cf00396d5916f3ef95dfa5a110fabf4aa1b002104ca00c0a3eb844b3954"
-    sha256 cellar: :any_skip_relocation, ventura:        "b9cad2da102dbb1911107e26b89c57259aa9ea3dee09049e3dcbceb87dc8f7b1"
-    sha256 cellar: :any_skip_relocation, monterey:       "b586c87b08bc7168af973c9ab28f3b61cce69ad71b3274b5032959a0cdb099a9"
-    sha256 cellar: :any_skip_relocation, big_sur:        "fefa9a0975985b6a9a7b5df27279df35382f44b091ead310ac898bb0fabc515a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b01ee202e3bf70bb66304fc20566d2140a565daeb65a6f4386babc2fcb065990"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "b9bac32440464a7d775ef641fff284d5de50ab7ecf6c1ad37e3a137898435504"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "2476590c375c79bc2b694bf10a2edd7721d3603f7738b8d6c935d487ac9655f9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a55479222fdfcb5350b7a06f509ce37a7af58d6b2f0c36807a3250b0a3169618"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "56f17de3bca828d4d844a811f40ed824827876530e8c4f3bef427c1f1c934678"
+    sha256 cellar: :any_skip_relocation, sonoma:         "a342da9f8b506999916e8ab83b6a0b7ca1574852e5daa106d4eb5308b1f4e588"
+    sha256 cellar: :any_skip_relocation, ventura:        "cff6526644d8ebdf667ad74b1ef8c420bf76014f0dd57b05bf9706f45efba495"
+    sha256 cellar: :any_skip_relocation, monterey:       "0dea447606ae46a62481252ea7cd16c2a6545be69918abea6949c787b55c39b7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ac1f792f0814d1b5b07b10b751308dd7efc34f7105f93fc27946d3a649857db4"
   end
 
   depends_on "dtools" => :build
@@ -23,26 +24,29 @@ class Dpp < Formula
   uses_from_macos "llvm" # for libclang
 
   # Match versions from dub.selections.json
+  # VERSION=#{version} && curl https://raw.githubusercontent.com/atilaneves/dpp/v$VERSION/dub.selections.json
   resource "libclang" do
-    url "https://code.dlang.org/packages/libclang/0.3.2.zip"
-    sha256 "c54c01b65f2a62c93a2929c4d7acee05ed502d841839bf9f4c212e5d18ded137"
+    url "https://code.dlang.org/packages/libclang/0.3.3.zip"
+    sha256 "281b1b02f96c06ef812c7069e6b7de951f10c9e1962fdcfead367f9244e77529"
   end
 
   resource "sumtype" do
-    url "https://code.dlang.org/packages/sumtype/0.7.1.zip"
-    sha256 "e27e026505bd9a7eb8f11cda12a3030c190a3d93f6b8dccfe7b22ffc36694e4e"
+    url "https://code.dlang.org/packages/sumtype/1.2.8.zip"
+    sha256 "fd273e5b4f97ef6b6f08f9873f7d1dd11da3b9f0596293ba901be7caac05747f"
   end
 
   resource "unit-threaded" do
-    url "https://code.dlang.org/packages/unit-threaded/2.1.3.zip"
-    sha256 "bb306506cc69f51e3ff712590c9ce02dba16832171d34c0a6243a47ba4a936d6"
+    url "https://code.dlang.org/packages/unit-threaded/2.1.9.zip"
+    sha256 "1e06684e7f542e2c3d20f3b0f6179c16af2d80806a3a322d819aec62b6446d74"
   end
 
   def install
     resources.each do |r|
       r.stage buildpath/"dub-packages"/r.name
-      system "dub", "add-local", buildpath/"dub-packages"/r.name, r.version
+      system "dub", "add-local", buildpath/"dub-packages"/r.name, r.version.to_s
     end
+    # Avoid linking brew LLVM on Intel macOS
+    inreplace "dub-packages/libclang/dub.sdl", %r{^lflags "-L/usr/local/opt/llvm/lib"}, "//\\0"
 
     if OS.mac?
       toolchain_paths = []
@@ -63,14 +67,14 @@ class Dpp < Formula
   end
 
   test do
-    (testpath/"c.h").write <<~EOS
+    (testpath/"c.h").write <<~C
       #define FOO_ID(x) (x*3)
       int twice(int i);
-    EOS
+    C
 
-    (testpath/"c.c").write <<~EOS
+    (testpath/"c.c").write <<~C
       int twice(int i) { return i * 2; }
-    EOS
+    C
 
     (testpath/"foo.dpp").write <<~EOS
       #include "c.h"

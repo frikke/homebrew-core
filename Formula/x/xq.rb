@@ -2,21 +2,22 @@ class Xq < Formula
   desc "Command-line XML and HTML beautifier and content extractor"
   homepage "https://github.com/sibprogrammer/xq"
   url "https://github.com/sibprogrammer/xq.git",
-      tag:      "v1.2.1",
-      revision: "8ed07bdd6390e64f126abb832bcab0da317f7f34"
+      tag:      "v1.3.0",
+      revision: "86a755578f7bfb82fddc1f712c96db2f0bf36076"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2cbb07af6bd4a55df5a4c4ed1db217b81c75f5f07cd7c7968c43192c0e9baec8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2cbb07af6bd4a55df5a4c4ed1db217b81c75f5f07cd7c7968c43192c0e9baec8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2cbb07af6bd4a55df5a4c4ed1db217b81c75f5f07cd7c7968c43192c0e9baec8"
-    sha256 cellar: :any_skip_relocation, ventura:        "b60dfc79a740dfc4acbed5b2cb931061bee6d9c1286f9967f640a2ee0a1cb78f"
-    sha256 cellar: :any_skip_relocation, monterey:       "b60dfc79a740dfc4acbed5b2cb931061bee6d9c1286f9967f640a2ee0a1cb78f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b60dfc79a740dfc4acbed5b2cb931061bee6d9c1286f9967f640a2ee0a1cb78f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "848e2e0e923439c1c1b8fb7fe527467aa1d492c062529ed3c52b1e7f4a45ee72"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "acee76fdd23d919d0c9e3bee5ff519742be43f958833f8949972a48f222fb253"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "acee76fdd23d919d0c9e3bee5ff519742be43f958833f8949972a48f222fb253"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "acee76fdd23d919d0c9e3bee5ff519742be43f958833f8949972a48f222fb253"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3f27afa855799f0e43c3d7d878349dba62998d23a2504a3e0979998183b410e0"
+    sha256 cellar: :any_skip_relocation, ventura:       "3f27afa855799f0e43c3d7d878349dba62998d23a2504a3e0979998183b410e0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a3bfe60511be1ea50e381c53d56e8b7125315c189e3e7c23809c8eefa73df627"
   end
 
   depends_on "go" => :build
+
+  conflicts_with "python-yq", because: "both install `xq` binaries"
 
   def install
     ENV["CGO_ENABLED"] = "0"
@@ -27,7 +28,7 @@ class Xq < Formula
       -X main.date=#{time.iso8601}
     ]
 
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
     man1.install "docs/xq.man" => "xq.1"
   end
 

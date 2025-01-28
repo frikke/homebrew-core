@@ -4,39 +4,49 @@ class Cassandra < Formula
 
   desc "Eventually consistent, distributed key-value store"
   homepage "https://cassandra.apache.org"
-  url "https://www.apache.org/dyn/closer.lua?path=cassandra/4.1.3/apache-cassandra-4.1.3-bin.tar.gz"
-  mirror "https://archive.apache.org/dist/cassandra/4.1.3/apache-cassandra-4.1.3-bin.tar.gz"
-  sha256 "da014999723f4e1e2c15775dac6aaa9ff69a48f6df6465740fcd52ca9d19ea88"
+  url "https://www.apache.org/dyn/closer.lua?path=cassandra/5.0.2/apache-cassandra-5.0.2-bin.tar.gz"
+  mirror "https://archive.apache.org/dist/cassandra/5.0.2/apache-cassandra-5.0.2-bin.tar.gz"
+  sha256 "d721834207838b9d01919dfc33625ad17b50fea03bf9f76cdd8d3ae3a8fd2947"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0610b55b05846c59f1d3f6d44bd7c80738de3d4cffac733774dd927c48b9845d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3db0db93085264e252aa354c945b215cc8b3b8e8add5be2cee7520349dc7e02a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b12b02aef016ae17586982fbb679adb98f1568c3d4eb3214c8a060d1075610a9"
-    sha256 cellar: :any_skip_relocation, ventura:        "51d3199282a83aceea9988699a9ce57f0155e472f22a1a93f51e35ffb30e2989"
-    sha256 cellar: :any_skip_relocation, monterey:       "809072721b7ba47f772821081247e219dc0541a9779cdaa71b2ecaac08f6045c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "590831ccddc447c276fe39fd248e40d4aa4d108f953aefbf51987c6b1e825b63"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ca731177a00a9bfc4227ebb1502972648dd0221ced0cffd8deb42d7e9e287699"
+    sha256 cellar: :any,                 arm64_sequoia: "d93811c988659dac067376da548017ae75ed5386588c0ab46f616dc3de91b06c"
+    sha256 cellar: :any,                 arm64_sonoma:  "8aacacac5194c0b57467acc457c7267457f11b323fad6e8e1501cfe85caa2d93"
+    sha256 cellar: :any,                 arm64_ventura: "ae588dbb3d91beddea60d6c22635f8bc42a443425cefabb35f899e85f24c50dd"
+    sha256 cellar: :any,                 sonoma:        "5ae4378828dcbf84131cef2132a2ea91b9c4ccb75d7e0ba42abd14bd802f24b8"
+    sha256 cellar: :any,                 ventura:       "7a35926ce1e8f6bda081ff85fd32421eadd643b67dcc6a7b4fa3d3df2ee1ec22"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4c79b9928798c75d5a32d1dd71c62cb7343a7c89713a5d500325302206403b9c"
   end
 
-  depends_on "libcython" => :build
-  depends_on "openjdk@11"
-  depends_on "python@3.11"
-  depends_on "six"
+  depends_on "libev"
+  depends_on "openjdk@17"
+  depends_on "python@3.11" # required 3.8-3.11, https://github.com/apache/cassandra/blob/trunk/bin/cqlsh#L65-L73
+
+  conflicts_with "emqx", because: "both install `nodetool` binaries"
 
   resource "cassandra-driver" do
-    url "https://files.pythonhosted.org/packages/f5/ab/417dc6c1bfea24042c97e381036b02864db8d918d3f65926e1884b98f086/cassandra-driver-3.28.0.tar.gz"
-    sha256 "64ff130d19f994b80997c14343a8306be52a0e7ab92520a534eed944c88d70df"
+    url "https://files.pythonhosted.org/packages/b2/6f/d25121afaa2ea0741d05d2e9921a7ca9b4ce71634b16a8aaee21bd7af818/cassandra-driver-3.29.2.tar.gz"
+    sha256 "c4310a7d0457f51a63fb019d8ef501588c491141362b53097fbc62fa06559b7c"
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/72/bd/fedc277e7351917b6c4e0ac751853a97af261278a4c7808babafa8ef2120/click-8.1.6.tar.gz"
-    sha256 "48ee849951919527a045bfe3bf7baa8a959c423134e1a5b98c05c20ba75a1cbd"
+    url "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz"
+    sha256 "ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de"
   end
 
   resource "geomet" do
-    url "https://files.pythonhosted.org/packages/7a/27/f6fc66e0629cfdcd301ebcb737b55041c238742420dce7728f208d75731c/geomet-1.0.0.tar.gz"
-    sha256 "0020a4426469934fb58f541cdc23f27c0c0fbbb3d003ee2cb76bb7ffa96a7506"
+    url "https://files.pythonhosted.org/packages/cf/21/58251b3de99e0b5ba649ff511f7f9e8399c3059dd52a643774106e929afa/geomet-0.2.1.post1.tar.gz"
+    sha256 "91d754f7c298cbfcabd3befdb69c641c27fe75e808b27aa55028605761d17e95"
+  end
+
+  resource "six" do
+    url "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz"
+    sha256 "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"
+  end
+
+  resource "wcwidth" do
+    url "https://files.pythonhosted.org/packages/6c/63/53559446a878410fc5a5974feb13d31d78d752eb18aeba59c7fef1af7598/wcwidth-0.2.13.tar.gz"
+    sha256 "72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5"
   end
 
   def install
@@ -69,7 +79,7 @@ class Cassandra < Formula
               "cassandra_storagedir=\"#{var}/lib/cassandra\""
 
       s.gsub! "#JAVA_HOME=/usr/local/jdk6",
-              "JAVA_HOME=#{Language::Java.overridable_java_home_env("11")[:JAVA_HOME]}"
+              "JAVA_HOME=#{Language::Java.overridable_java_home_env("17")[:JAVA_HOME]}"
     end
 
     rm Dir["bin/*.bat", "bin/*.ps1"]

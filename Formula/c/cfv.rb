@@ -3,21 +3,21 @@ class Cfv < Formula
 
   desc "Test and create various files (e.g., .sfv, .csv, .crc., .torrent)"
   homepage "https://github.com/cfv-project/cfv"
-  url "https://files.pythonhosted.org/packages/db/54/c5926a7846a895b1e096854f32473bcbdcb2aaff320995f3209f0a159be4/cfv-3.0.0.tar.gz"
-  sha256 "2530f08b889c92118658ff4c447ccf83ac9d2973af8dae4d33cf5bed1865b376"
+  url "https://files.pythonhosted.org/packages/29/ca/91cca3d1799d0e74b672e30c41f82a8135fe8d5baf7e6a8af2fdea282449/cfv-3.1.0.tar.gz"
+  sha256 "8f352fe4e99837720face2a339ac793f348dd967bacf2a0ff0f5e771340261e3"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f826a41136bc033c173de5b9759e9e6ce0902895558db00cb0a0fd403bdb312a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f826a41136bc033c173de5b9759e9e6ce0902895558db00cb0a0fd403bdb312a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f826a41136bc033c173de5b9759e9e6ce0902895558db00cb0a0fd403bdb312a"
-    sha256 cellar: :any_skip_relocation, ventura:        "bb57fa29453a2dd671eae3ecdfeb5d54e7139a28e5d231e488ddd36edd42f99f"
-    sha256 cellar: :any_skip_relocation, monterey:       "bb57fa29453a2dd671eae3ecdfeb5d54e7139a28e5d231e488ddd36edd42f99f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bb57fa29453a2dd671eae3ecdfeb5d54e7139a28e5d231e488ddd36edd42f99f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f25c7b64de0e58996b6b1f0315799082bea2149a2be5e88aafe6355b7cf50d41"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4364889501244abb0dec42000034cbb135f74ed15f6bdd7ac2ad21e580297997"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4364889501244abb0dec42000034cbb135f74ed15f6bdd7ac2ad21e580297997"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "4364889501244abb0dec42000034cbb135f74ed15f6bdd7ac2ad21e580297997"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b166757b27f5ba3c246536507dee3c460909e17a5329a897c9280ee81f424d66"
+    sha256 cellar: :any_skip_relocation, ventura:       "b166757b27f5ba3c246536507dee3c460909e17a5329a897c9280ee81f424d66"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4364889501244abb0dec42000034cbb135f74ed15f6bdd7ac2ad21e580297997"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     virtualenv_install_with_resources
@@ -25,6 +25,7 @@ class Cfv < Formula
 
   test do
     (testpath/"test/test.txt").write "Homebrew!"
+
     cd "test" do
       system bin/"cfv", "-t", "sha1", "-C", "test.txt"
       assert_predicate Pathname.pwd/"test.sha1", :exist?

@@ -1,11 +1,19 @@
 class Root < Formula
-  desc "Object oriented framework for large scale data analysis"
-  homepage "https://root.cern.ch/"
-  url "https://root.cern.ch/download/root_v6.28.04.source.tar.gz"
-  sha256 "70f7f86a0cd5e3f2a0befdc59942dd50140d990ab264e8e56c7f17f6bfe9c965"
+  desc "Analyzing petabytes of data, scientifically"
+  homepage "https://root.cern"
   license "LGPL-2.1-or-later"
-  revision 1
   head "https://github.com/root-project/root.git", branch: "master"
+
+  stable do
+    url "https://root.cern/download/root_v6.32.08.source.tar.gz"
+    sha256 "29ad4945a72dff1a009c326a65b6fa5ee2478498823251d3cef86a2cbeb77b27"
+
+    # Backport fix for RPATH on macOS
+    patch do
+      url "https://github.com/root-project/root/commit/0569d5d7bfb30d96e06c4192658aed4b78e4da64.patch?full_index=1"
+      sha256 "24553b16f66459fe947d192854f5fa6832c9414cc711d7705cb8e8fa67d2d935"
+    end
+  end
 
   livecheck do
     url "https://root.cern/install/all_releases/"
@@ -16,17 +24,17 @@ class Root < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "9a7f63b4f48d4a1f17c84a2c5d82c6a6f4810d52efede9a5164da556ace72ee8"
-    sha256 arm64_monterey: "c8f5b189d1bf513dc5364f7eb59bda7c2a6e371e396921840a01c8d7c381c65d"
-    sha256 arm64_big_sur:  "8c40d0287a364b615ae3cdc19299c08b08f4b486d2aea634a994157a64bcff21"
-    sha256 ventura:        "439a87fd71be71e698e8a1e3e2e77bd866e1193745e0c31c783c1dc4a04fa933"
-    sha256 monterey:       "116b0975551c682829afabb60a9468c04a6d45d55076fa1ab04f4d9c5da8314a"
-    sha256 big_sur:        "98444e149c138c4f07d626fc93c44226933d08d966aa0945cca70957dede0357"
+    sha256 arm64_sequoia: "c1bfbeb7e3b575aae166c61272d178037aaf520fd92d62412cf53693e174f98b"
+    sha256 arm64_sonoma:  "c9493b1209d72dde8a29ebe3c5b7cf8cab840399bbada9f3205393b82dd29c8b"
+    sha256 arm64_ventura: "55d9cb47591f8802fc38c1f84d4dbc5114ade1d46598099bf89867cbfe84ec54"
+    sha256 sonoma:        "41b8bb0e19a62eec938a89e8aa5ed5cbefa49d2298f9f9d16010f5c44a7b6230"
+    sha256 ventura:       "7c4bd4f672dfe680fb02353c0a7c7d315601079e9797c863bde708696e6caddd"
+    sha256 x86_64_linux:  "b324dbc173966910292f9bbc64b2d66837f604eb6a6eb4930421b1b69f35c544"
   end
 
   depends_on "cmake" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "cfitsio"
   depends_on "davix"
   depends_on "fftw"
@@ -38,16 +46,16 @@ class Root < Formula
   depends_on "graphviz"
   depends_on "gsl"
   depends_on "lz4"
-  depends_on "mysql-client"
+  depends_on "mariadb-connector-c"
   depends_on "nlohmann-json"
   depends_on "numpy" # for tmva
   depends_on "openblas"
   depends_on "openssl@3"
   depends_on "pcre"
-  depends_on "python@3.11"
+  depends_on "pcre2"
+  depends_on "python@3.13"
   depends_on "sqlite"
   depends_on "tbb"
-  depends_on :xcode
   depends_on "xrootd"
   depends_on "xxhash"
   depends_on "xz" # for LZMA
@@ -55,24 +63,33 @@ class Root < Formula
 
   uses_from_macos "libxcrypt"
   uses_from_macos "libxml2"
+  uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
   on_linux do
+    depends_on "giflib"
+    depends_on "jpeg-turbo"
+    depends_on "libpng"
+    depends_on "libtiff"
+    depends_on "libx11"
+    depends_on "libxext"
     depends_on "libxft"
     depends_on "libxpm"
+    depends_on "mesa"
+    depends_on "mesa-glu"
   end
 
   skip_clean "bin"
 
-  fails_with gcc: "5"
-
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
-    ENV.append "LDFLAGS", "-Wl,-rpath,#{lib}/root"
-    ENV.remove "HOMEBREW_INCLUDE_PATHS", Formula["util-linux"].opt_include if OS.mac?
+    # Skip modification of CLING_OSX_SYSROOT to the unversioned SDK path
+    # Related: https://github.com/Homebrew/homebrew-core/issues/135714
+    # Related: https://github.com/root-project/cling/issues/457
+    inreplace "interpreter/cling/lib/Interpreter/CMakeLists.txt", '"MacOSX[.0-9]+\.sdk"', '"SKIP"'
 
     inreplace "cmake/modules/SearchInstalledSoftware.cmake" do |s|
       # Enforce secure downloads of vendored dependencies. These are
@@ -82,13 +99,12 @@ class Root < Formula
       s.gsub! "CMAKE_VERSION VERSION_GREATER 3.15", "CMAKE_VERSION VERSION_GREATER 99.99"
     end
 
-    args = std_cmake_args + %W[
+    args = %W[
       -DCLING_CXX_PATH=clang++
       -DCMAKE_CXX_STANDARD=17
       -DCMAKE_INSTALL_ELISPDIR=#{elisp}
-      -DPYTHON_EXECUTABLE=#{python3}
+      -DPYTHON_EXECUTABLE=#{which(python3)}
       -DXROOTD_ROOT_DIR=#{Formula["xrootd"].opt_prefix}
-      -Dbuiltin_afterimage=ON
       -Dbuiltin_cfitsio=OFF
       -Dbuiltin_clang=ON
       -Dbuiltin_cling=ON
@@ -130,7 +146,6 @@ class Root < Formula
       -Dgnuinstall=ON
       -Dimt=ON
       -Dmathmore=ON
-      -Dminuit2=ON
       -Dmysql=ON
       -Docaml=OFF
       -Doracle=OFF
@@ -146,8 +161,14 @@ class Root < Formula
       -GNinja
     ]
 
+    compiledata = if build.head?
+      "cmake/unix/compiledata.sh"
+    else
+      args << "-Dbuiltin_afterimage=ON"
+      "build/unix/compiledata.sh"
+    end
     # Workaround the shim directory being embedded into the output
-    inreplace "build/unix/compiledata.sh", "`type -path $CXX`", ENV.cxx
+    inreplace compiledata, "`type -path $CXX`", ENV.cxx
 
     # Homebrew now sets CMAKE_INSTALL_LIBDIR to /lib, which is incorrect
     # for ROOT with gnuinstall, so we set it back here.
@@ -163,7 +184,7 @@ class Root < Formula
   end
 
   def caveats
-    <<~EOS
+    <<~TEXT
       As of ROOT 6.22, you should not need the thisroot scripts; but if you
       depend on the custom variables set by them, you can still run them:
 
@@ -175,16 +196,16 @@ class Root < Formula
         source #{HOMEBREW_PREFIX}/bin/thisroot.csh
       For fish users:
         . #{HOMEBREW_PREFIX}/bin/thisroot.fish
-    EOS
+    TEXT
   end
 
   test do
-    (testpath/"test.C").write <<~EOS
+    (testpath/"test.C").write <<~CPP
       #include <iostream>
       void test() {
         std::cout << "Hello, world!" << std::endl;
       }
-    EOS
+    CPP
 
     # Test ROOT command line mode
     system bin/"root", "-b", "-l", "-q", "-e", "gSystem->LoadAllLibraries(); 0"
@@ -198,14 +219,14 @@ class Root < Formula
                  shell_output("#{bin}/root -l -b -n -q test.C+")
 
     # Test linking
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <iostream>
       #include <TString.h>
       int main() {
         std::cout << TString("Hello, world!") << std::endl;
         return 0;
       }
-    EOS
+    CPP
     flags = %w[cflags libs ldflags].map { |f| "$(#{bin}/root-config --#{f})" }
     flags << "-Wl,-rpath,#{lib}/root"
     shell_output("$(#{bin}/root-config --cxx) test.cpp #{flags.join(" ")}")

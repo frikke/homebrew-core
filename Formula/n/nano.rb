@@ -1,8 +1,8 @@
 class Nano < Formula
   desc "Free (GNU) replacement for the Pico text editor"
   homepage "https://www.nano-editor.org/"
-  url "https://www.nano-editor.org/dist/v7/nano-7.2.tar.xz"
-  sha256 "86f3442768bd2873cec693f83cdf80b4b444ad3cc14760b74361474fc87a4526"
+  url "https://www.nano-editor.org/dist/v8/nano-8.3.tar.xz"
+  sha256 "551b717b2e28f7e90f749323686a1b5bbbd84cfa1390604d854a3ca3778f111e"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,18 +11,15 @@ class Nano < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "31ea8496e1c04f70abdd25e24c4492c1e6fd783ea0a18bcf9545f15ef89c6aae"
-    sha256 arm64_ventura:  "b12fe58c8d442f8f338d319d7934fe439d441cb15da40a8db25b709226cf3a3e"
-    sha256 arm64_monterey: "f0554d184323c34a57cef42df8fd3b56afd723af5e97275a3a5628220d4e8e9a"
-    sha256 arm64_big_sur:  "50fbf0b54f56afe0a05c98b393e61257c965eca162a32367583d6bf8bf34865c"
-    sha256 sonoma:         "3f8738b95f7f786a0575a4d2796b09d4f9b11b9edd7ccce8ada8da62203630ad"
-    sha256 ventura:        "2a27a1f2d44f1c82388d8952f05bfcf6ffadc0d08c87a6f62bbda2eda4d50826"
-    sha256 monterey:       "db212d2c6de758fc9c0c213ae5285dbb3bbf6978363548cafa4ac3af356a7b75"
-    sha256 big_sur:        "65b76ac9bce041b20a5a91d1ff21e511c28f4995f7e8a604395eed57d35c5b10"
-    sha256 x86_64_linux:   "e29112cb799708f597542f8bd8bb13fa0a7ba2807ec2634892e78536c08939a9"
+    sha256 arm64_sequoia: "cbf8107bdd1dff5a6a2e8c42223b10398c92a62874a31a633e541e7cacb72256"
+    sha256 arm64_sonoma:  "8aebff630cb1d0cf018239848c4bc6349d9bc80578229cd37fb1d4cf92b5df40"
+    sha256 arm64_ventura: "5e2dd3eb0c19979b77595014a4d15c3f3a3286ccd22a72801274c2ee6df23512"
+    sha256 sonoma:        "c2634f57ce9a9d7c342fc9778035c79285bfa37faa01f753e037bb5f14068ec4"
+    sha256 ventura:       "ec4649d0625e95e3c6061bf97f81dd45199c9512663f0363744662eab83838d2"
+    sha256 x86_64_linux:  "412fa6be2b3d91c3a15609d5e56ae88819d01e366a50895c4164101cc7cebd98"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gettext"
   depends_on "ncurses"
 
@@ -31,20 +28,18 @@ class Nano < Formula
   end
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
-                          "--enable-color",
+    system "./configure", "--enable-color",
                           "--enable-extra",
                           "--enable-multibuffer",
                           "--enable-nanorc",
-                          "--enable-utf8"
+                          "--enable-utf8",
+                          "--sysconfdir=#{etc}",
+                          *std_configure_args
     system "make", "install"
     doc.install "doc/sample.nanorc"
   end
 
   test do
-    system "#{bin}/nano", "--version"
+    system bin/"nano", "--version"
   end
 end

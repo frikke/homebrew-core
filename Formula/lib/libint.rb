@@ -1,31 +1,28 @@
 class Libint < Formula
   desc "Library for computing electron repulsion integrals efficiently"
   homepage "https://github.com/evaleev/libint"
-  url "https://github.com/evaleev/libint/archive/v2.7.2.tar.gz"
-  sha256 "fd0466ce9eb6786b8c5bbe3d510e387ed44b198a163264dfd7e60b337e295fd9"
+  url "https://github.com/evaleev/libint/archive/refs/tags/v2.9.0.tar.gz"
+  sha256 "4929b2f2d3e53479270be052e366e8c70fa154a7f309e5c2c23b7d394159687d"
   license all_of: ["GPL-3.0-or-later", "LGPL-3.0-or-later"]
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "0eb0871904cc53613326bc0bab868580ff0325bd8fce872761a0a4bda2662420"
-    sha256 cellar: :any,                 arm64_ventura:  "523320b75906b2bdac83d064a49e19901ad7cab5d0cc74c280e9000872a522d7"
-    sha256 cellar: :any,                 arm64_monterey: "105ae017c2932910f75659b0578e38a32dc176872dc2b0c7e63c966137701de0"
-    sha256 cellar: :any,                 arm64_big_sur:  "8542ba3fe2ee8df6b741cf8ee6875d1c953eb4d16b73938b4e8fa9a419f602ae"
-    sha256 cellar: :any,                 sonoma:         "f32d65406ffb07e5c5fd780d41a9b878372c5ffdb944d4f6e1d3e579e1abc11a"
-    sha256 cellar: :any,                 ventura:        "0846283a6924201526a50344630388673e24ff20827323bc6d1e9c8ff4923df1"
-    sha256 cellar: :any,                 monterey:       "ceadf0a44442635a8f096ebfe3c46ed586e672c678fb3726443d12d926676096"
-    sha256 cellar: :any,                 big_sur:        "9817ff01a79a7a7a8f8e72f03b705d2535de6962f54cc3175a7e2ddab11ecba0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "acaebd25a4de28337f45b7a0168e0730e849408778fffd2f8b036a2578ec2504"
+    sha256 cellar: :any,                 arm64_sequoia:  "6519df8379bd847957c081d2dacdffb95ef347a66f2838d714e37428f1c77f41"
+    sha256 cellar: :any,                 arm64_sonoma:   "8b9c9799736c041a79eabe1e5c0ff219572ad2c96dfaca6f325ac947ff76fff8"
+    sha256 cellar: :any,                 arm64_ventura:  "5e6451aca0b1d84433f2b81c9eec8e4ab2440d2894018a70950c2eec74ef84b4"
+    sha256 cellar: :any,                 arm64_monterey: "67e3ef568131a5a97526fb5481980cfb615826fff081db883abc59a32b622b80"
+    sha256 cellar: :any,                 sonoma:         "3e2d4930bd84325000adab1448506c1f563f76b871dec92799b131bbd57a8b1e"
+    sha256 cellar: :any,                 ventura:        "c534506c058ec810432b988c53503c794e4d3deebcb6e5f08fb1569ccdb92bdf"
+    sha256 cellar: :any,                 monterey:       "90bc5d348cfd819e75af619d002d353399f9389a65f06955c2085fa7874766ba"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d2f489f45da4c7b33eb0fb5f0827045ae9d14f2ede7011678d70bf8128d75bcd"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "boost"
   depends_on "eigen"
   depends_on "mpfr"
-  depends_on "python@3.11"
 
   def install
     system "glibtoolize", "--install", "--force"
@@ -38,10 +35,9 @@ class Libint < Formula
   end
 
   test do
-    system ENV.cxx, "-std=c++11", pkgshare/"hartree-fock.cc",
-      *shell_output("pkg-config --cflags --libs libint2").chomp.split,
-      "-I#{Formula["eigen"].opt_include}/eigen3",
-      "-o", "hartree-fock"
+    system ENV.cxx, "-std=c++11", pkgshare/"hartree-fock.cc", "-o", "hartree-fock",
+                    "-I#{Formula["eigen"].opt_include}/eigen3",
+                    *shell_output("pkgconf --cflags --libs libint2").chomp.split
     system "./hartree-fock", pkgshare/"h2o.xyz"
   end
 end

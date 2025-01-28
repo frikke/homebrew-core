@@ -1,69 +1,61 @@
 class Numpy < Formula
   desc "Package for scientific computing with Python"
   homepage "https://www.numpy.org/"
-  url "https://files.pythonhosted.org/packages/55/b3/b13bce39ba82b7398c06d10446f5ffd5c07db39b09bd37370dc720c7951c/numpy-1.26.0.tar.gz"
-  sha256 "f93fc78fe8bf15afe2b8d6b6499f1c73953169fad1e9a8dd086cdff3190e7fdf"
+  url "https://files.pythonhosted.org/packages/ec/d0/c12ddfd3a02274be06ffc71f3efc6d0e457b0409c4481596881e748cb264/numpy-2.2.2.tar.gz"
+  sha256 "ed6906f61834d687738d25988ae117683705636936cc605be0bb208b23df4d8f"
   license "BSD-3-Clause"
   head "https://github.com/numpy/numpy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "a2fb7bec92f82adc47fe6fde5782d7ec759a6c4dc4b254e73eab762eef2b9a27"
-    sha256 cellar: :any,                 arm64_ventura:  "84871269dd88e566e45580502281344476f24b18f42981cf3508b435549a7f09"
-    sha256 cellar: :any,                 arm64_monterey: "160404ff6361282a7123f134057ee7b14c59c217e8a6decb8e7d4348da48ca17"
-    sha256 cellar: :any,                 arm64_big_sur:  "b64d66ec268a9f3a74e451ddb7f4d720a1e9d4f87a913120d771e50bb4785aa5"
-    sha256 cellar: :any,                 ventura:        "ab9192c90029797beaa981f07897852b1451588a885f0f7bb92735f054d8bc2f"
-    sha256 cellar: :any,                 monterey:       "f5cb725503d3a1c7d5ad71eb229863385f9445355f39398ab4c22e8b6075c924"
-    sha256 cellar: :any,                 big_sur:        "d5f6d20fc2eadea5c6564541e99270cb7657731de82324c412037b27241fb888"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9d10a731a2d99c61a6eca2227f395abd3298c50de0f28ff99074bf7258274cba"
+    sha256 cellar: :any,                 arm64_sequoia: "15cf20d0aea78106ce25189c48fc7357887d90b95412b05ffa13145a2d775267"
+    sha256 cellar: :any,                 arm64_sonoma:  "e3c171aedb059d07be9c03336bf5feb7d562cac774e98e0c52a8d908ff5ae36d"
+    sha256 cellar: :any,                 arm64_ventura: "ad8a60a698802fa51e254e8286cf6e0200bc63376b5f042f300b78e8be6496ad"
+    sha256 cellar: :any,                 sonoma:        "9eb098ae8e2808998f84e9fd6243dc2971fed01b00bb7d9dbefbfd24c4cf8cea"
+    sha256 cellar: :any,                 ventura:       "1a18d737886399ef77c1e6890cc81e055eb21c26c5eae66dab23d7fda1c700d4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1157d96cf7f66bad29a97665daa35db303b174543579c270f9dad6637e2492b6"
   end
 
   depends_on "gcc" => :build # for gfortran
-  depends_on "libcython" => :build
-  depends_on "python@3.10" => [:build, :test]
-  depends_on "python@3.11" => [:build, :test]
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
   depends_on "openblas"
 
-  fails_with gcc: "5"
+  on_linux do
+    depends_on "patchelf" => :build
+  end
 
   def pythons
     deps.map(&:to_formula)
-        .select { |f| f.name.match?(/^python@\d\.\d+$/) }
-        .sort_by(&:version) # so that `bin/f2py` and `bin/f2py3` use python3.10
-        .map { |f| f.opt_libexec/"bin/python" }
+        .select { |f| f.name.start_with?("python@") }
+        .sort_by(&:version) # so scripts like `bin/f2py` use newest python
   end
 
   def install
-    openblas = Formula["openblas"]
-    ENV["ATLAS"] = "None" # avoid linking against Accelerate.framework
-    ENV["BLAS"] = ENV["LAPACK"] = openblas.opt_lib/shared_library("libopenblas")
-
-    config = <<~EOS
-      [openblas]
-      libraries = openblas
-      library_dirs = #{openblas.opt_lib}
-      include_dirs = #{openblas.opt_include}
-    EOS
-
-    Pathname("site.cfg").write config
-
     pythons.each do |python|
-      site_packages = Language::Python.site_packages(python)
-      ENV.prepend_path "PYTHONPATH", Formula["libcython"].opt_libexec/site_packages
-
-      system python, "setup.py", "build", "--fcompiler=#{Formula["gcc"].opt_bin}/gfortran",
-                                          "--parallel=#{ENV.make_jobs}"
-      system python, *Language::Python.setup_install_args(prefix, python)
+      python3 = python.opt_libexec/"bin/python"
+      system python3, "-m", "pip", "install", "-Csetup-args=-Dblas=openblas",
+                                              "-Csetup-args=-Dlapack=openblas",
+                                              *std_pip_args(build_isolation: true), "."
     end
+  end
+
+  def caveats
+    <<~EOS
+      To run `f2py`, you may need to `brew install #{pythons.last}`
+    EOS
   end
 
   test do
     pythons.each do |python|
-      system python, "-c", <<~EOS
+      python3 = python.opt_libexec/"bin/python"
+      system python3, "-c", <<~PYTHON
         import numpy as np
         t = np.ones((3,3), int)
         assert t.sum() == 9
         assert np.dot(t, t).sum() == 27
-      EOS
+      PYTHON
     end
   end
 end

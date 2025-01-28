@@ -8,6 +8,7 @@ class Libkml < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "16858cec446e361bcf9e982681d9283e990e2ffca3ab0d85f54b23bd48557623"
     sha256 cellar: :any,                 arm64_sonoma:   "179af536831d605bf028ef8c8f343ae9463b60b2864bc473b4266659d994f4cf"
     sha256 cellar: :any,                 arm64_ventura:  "ee02b6adeccc3033cc99a2e8a45f8d21a4df7c487c0be1f05f623a7d3ac6ffa1"
     sha256 cellar: :any,                 arm64_monterey: "39b02cd2375b13cf321a80d04bdd90e07139bd99bd9e0f8b0ac816b96ec5920e"
@@ -22,12 +23,14 @@ class Libkml < Formula
   depends_on "boost" => [:build, :test]
   depends_on "cmake" => :build
   depends_on "googletest" => :test
-  depends_on "pkg-config" => :test
+  depends_on "pkgconf" => :test
+
   depends_on "minizip"
   depends_on "uriparser"
 
   uses_from_macos "curl"
   uses_from_macos "expat"
+  uses_from_macos "zlib"
 
   def install
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args
@@ -42,7 +45,7 @@ class Libkml < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include "kml/regionator/regionator_qid.h"
       #include "gtest/gtest.h"
 
@@ -68,10 +71,10 @@ class Libkml < Formula
         testing::InitGoogleTest(&argc, argv);
         return RUN_ALL_TESTS();
       }
-    EOS
+    CPP
 
-    pkg_config_flags = shell_output("pkg-config --cflags --libs libkml gtest").chomp.split
-    system ENV.cxx, "test.cpp", *pkg_config_flags, "-std=c++14", "-o", "test"
-    assert_match("PASSED", shell_output("./test"))
+    flags = shell_output("pkgconf --cflags --libs libkml gtest").chomp.split
+    system ENV.cxx, "test.cpp", "-std=c++14", "-o", "test", *flags
+    assert_match "PASSED", shell_output("./test")
   end
 end

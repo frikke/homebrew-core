@@ -1,14 +1,17 @@
 class Llnode < Formula
   desc "LLDB plugin for live/post-mortem debugging of node.js apps"
   homepage "https://github.com/nodejs/llnode"
-  url "https://github.com/nodejs/llnode/archive/v4.0.0.tar.gz"
+  url "https://github.com/nodejs/llnode/archive/refs/tags/v4.0.0.tar.gz"
   sha256 "abc295c077443f823444faffb165ada4c6ca377f2b1af4c002e8a9eea0f30135"
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "33bb56546706b569104a07631b10c2b57fd0c6a95ddb5cfc8fed017856e2f57a"
+    sha256 cellar: :any,                 arm64_sonoma:   "7215a957ceb5664321af92bfcc1b8cc9e42ae9911a7b91ffacbd9127270b1552"
     sha256 cellar: :any,                 arm64_ventura:  "c11ee956c445277d3a77bfe5ab6b3fa9553c922aabf22731af6e2135d1c2b361"
     sha256 cellar: :any,                 arm64_monterey: "e1c93fd5aefebd887138fd244b50db737433cc30c278c6d18a3e87f0d6316f29"
     sha256 cellar: :any,                 arm64_big_sur:  "a86c196564ac07429bc188fbeb4780d408865721cc7e929e9aceaf24f8e79109"
+    sha256 cellar: :any,                 sonoma:         "3551ad8a5cc42a007da92190d786a92e3aacffa7c017ada497ddaef17dd3ab69"
     sha256 cellar: :any,                 ventura:        "ec584fb90528046e31353b134abf6e017a72da189ff394a72d3d9e1affc6b9f6"
     sha256 cellar: :any,                 monterey:       "0737158c515f49e2cb56c68df835f789daa8d13f5b85a9a300532078318a86e5"
     sha256 cellar: :any,                 big_sur:        "fb32b0d19ff9f0c760a79bafdc830f0574a85165601ab493a9b8c7737e5dfef7"

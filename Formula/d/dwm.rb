@@ -1,8 +1,8 @@
 class Dwm < Formula
   desc "Dynamic window manager"
   homepage "https://dwm.suckless.org/"
-  url "https://dl.suckless.org/dwm/dwm-6.4.tar.gz"
-  sha256 "fa9c0d69a584485076cfc18809fd705e5c2080dafb13d5e729a3646ca7703a6e"
+  url "https://dl.suckless.org/dwm/dwm-6.5.tar.gz"
+  sha256 "21d79ebfa9f2fb93141836c2666cb81f4784c69d64e7f1b2352f9b970ba09729"
   license "MIT"
   head "https://git.suckless.org/dwm", using: :git, branch: "master"
 
@@ -12,42 +12,46 @@ class Dwm < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "3ea89386f0283643f4034d9223c9c5cd39172b630ddf3046769a8655537f3ea4"
-    sha256 cellar: :any,                 arm64_monterey: "10e4acc8a0acf14b00397ddca12a3324e5cbf2ac881974472e473fe4a555b783"
-    sha256 cellar: :any,                 arm64_big_sur:  "45a4e170d418e0c7caeace0c4ddea6e8986b53e59906f056b95f42aa2d4201fe"
-    sha256 cellar: :any,                 ventura:        "da198c90c358db49b0d9827f1b9702099fb7e7d5b9f74d4fb5caba0a89a1a651"
-    sha256 cellar: :any,                 monterey:       "9774dc44a72ebf8831d07261e49d5607036b03895af484091828452fed9e09b2"
-    sha256 cellar: :any,                 big_sur:        "1620a1e55c9bbce30c5c0247bd02425120fb317e39c5a97ff34ea163641b388d"
-    sha256 cellar: :any,                 catalina:       "0632b1fa0115e7f403e2cd6e05ad4df2554dabc1018825eb16976798b1a84e61"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "24c0fe1f422ba854396d792b3fe28225f5658edca9e0fd98cadff55eeb8b0f13"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "1aea6c7c3cc131887b7d471659137384ac7e415dd9fbe7d15e3d8ae9c6dbe180"
+    sha256 cellar: :any,                 arm64_sonoma:  "922787e07a3be0599f223d64f413f62ca8b7bb2a6d6fefec4565a7357c359564"
+    sha256 cellar: :any,                 arm64_ventura: "b7971ddb4bf6f52bfc8a844ff6ea0681a0c9d6645cea923b0851e94771068785"
+    sha256 cellar: :any,                 sonoma:        "ddc7a7f3fbae58d7c4e8924ef3f53cff4906ac384f91a039bca5bdf097eb60d8"
+    sha256 cellar: :any,                 ventura:       "bb5ad3a4079c76769e85ebda55ad12a1260e946be09c5b611bdbfdff3146fdf1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "107dc6ce40aaa02fca9690bd3a7ac7804664cbfc49776b76354beccc8ba6da10"
   end
 
   depends_on "dmenu"
+  depends_on "fontconfig"
   depends_on "libx11"
   depends_on "libxft"
   depends_on "libxinerama"
 
   def install
-    # The dwm default quit keybinding Mod1-Shift-q collides with
-    # the Mac OS X Log Out shortcut in the Apple menu.
-    inreplace "config.def.h",
-    "{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },",
-    "{ MODKEY|ControlMask,           XK_q,      quit,           {0} },"
-    inreplace "dwm.1", '.B Mod1\-Shift\-q', '.B Mod1\-Control\-q'
+    if OS.mac?
+      # The dwm default quit keybinding Mod1-Shift-q collides with
+      # the Mac OS X Log Out shortcut in the Apple menu.
+      inreplace "config.def.h",
+      "{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },",
+      "{ MODKEY|ControlMask,           XK_q,      quit,           {0} },"
+      inreplace "dwm.1", '.B Mod1\-Shift\-q', '.B Mod1\-Control\-q'
+    end
     system "make", "FREETYPEINC=#{Formula["freetype2"].opt_include}/freetype2", "PREFIX=#{prefix}", "install"
   end
 
   def caveats
-    <<~EOS
-      In order to use the Mac OS X command key for dwm commands,
-      change the X11 keyboard modifier map using xmodmap (1).
+    on_macos do
+      <<~EOS
+        In order to use the Mac OS X command key for dwm commands,
+        change the X11 keyboard modifier map using xmodmap (1).
 
-      e.g. by running the following command from $HOME/.xinitrc
-      xmodmap -e 'remove Mod2 = Meta_L' -e 'add Mod1 = Meta_L'&
+        e.g. by running the following command from $HOME/.xinitrc
+        xmodmap -e 'remove Mod2 = Meta_L' -e 'add Mod1 = Meta_L'&
 
-      See also https://gist.github.com/311377 for a handful of tips and tricks
-      for running dwm on Mac OS X.
-    EOS
+        See also https://gist.github.com/311377 for a handful of tips and tricks
+        for running dwm on Mac OS X.
+      EOS
+    end
   end
 
   test do

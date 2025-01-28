@@ -5,21 +5,15 @@ class Touca < Formula
   url "https://files.pythonhosted.org/packages/c8/6d/e1986d8c9b4f6cd2b583d0df8bd1769989b5ce5cb91dcc613b0d187e4a7a/touca-1.8.7.tar.gz"
   sha256 "244a52be4cf4670077fda0b740ac067470745da7084c241bc619b332f771d940"
   license "Apache-2.0"
+  revision 3
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "de3ec73f50c358aeb0ef87b232c35da8c77ed7370b066bf25fc07e8df761b245"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "938d41e6c293cfa07bc7131b852b7e004c49805da282c0aca37452a94b1bf9b5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1bd1b8afc3c213d9d52c00f780c2bd0268d28f5d9df02ee95415f7102469f64f"
-    sha256 cellar: :any_skip_relocation, ventura:        "5ea0f2322121d96ad68e7c9eede817a14e3ccf6badc8eb9f13affe34c42142c6"
-    sha256 cellar: :any_skip_relocation, monterey:       "0a8f77793518fa3f6e23b8ae9633e293e948415035c9d46846f7ca725a209e69"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a61e432c44799fa7c00c3a861dfbb01444608fde7724c5bc03542cdc5bbd5967"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5114d7af819f141ddeac8e77f804cc294735d20dde38cff2953a0e0dd15456a8"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, all: "28347dcea2a95cf714fad75fb909df2202c64a2ba9f9b83af3f99a7659e0bf17"
   end
 
-  depends_on "pygments"
-  depends_on "python-certifi"
-  depends_on "python@3.11"
+  depends_on "certifi"
+  depends_on "python@3.13"
 
   resource "commonmark" do
     url "https://files.pythonhosted.org/packages/60/48/a60f593447e8f0894ebb7f6e6c1f25dafc5e89c5879fdc9360ae93ff83f0/commonmark-0.9.1.tar.gz"
@@ -27,8 +21,13 @@ class Touca < Formula
   end
 
   resource "flatbuffers" do
-    url "https://files.pythonhosted.org/packages/0d/0a/2e88943de46df2d69a037427099323a973489d4697058043e99ace188f3b/flatbuffers-23.1.21.tar.gz"
-    sha256 "a948913bbb5d83c43a1193d7943c90e6c0ab732e7f2983111104250aeb61ff85"
+    url "https://files.pythonhosted.org/packages/0c/6e/3e52cd294d8e7a61e010973cce076a0cb2c6c0dfd4d0b7a13648c1b98329/flatbuffers-23.5.26.tar.gz"
+    sha256 "9ea1144cac05ce5d86e2859f431c6cd5e66cd9c78c558317c7955fb8d4c78d89"
+  end
+
+  resource "pygments" do
+    url "https://files.pythonhosted.org/packages/8e/62/8336eff65bcbc8e4cb5d05b55faf041285951b6e80f33e2bff2024788f31/pygments-2.18.0.tar.gz"
+    sha256 "786ff802f32e91311bff3889f6e9a86e81505fe99f2735bb6d60ae0c5004f199"
   end
 
   resource "rich" do
@@ -42,11 +41,13 @@ class Touca < Formula
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/c5/52/fe421fb7364aa738b3506a2d99e4f3a56e079c0a798e9f4fa5e14c60922f/urllib3-1.26.14.tar.gz"
-    sha256 "076907bf8fd355cde77728471316625a4d2f7e713c125f51953bb5b3eecf4f72"
+    url "https://files.pythonhosted.org/packages/e4/e8/6ff5e6bc22095cfc59b6ea711b687e2b7ed4bdb373f7eeec370a97d7392f/urllib3-1.26.20.tar.gz"
+    sha256 "40c2dc0c681e47eb8f90e7e27bf6ff7df2e677421fd46756da1161c39ca70d32"
   end
 
   def install
+    # Allow latest `certifi`: https://github.com/trytouca/trytouca/pull/663
+    inreplace "pyproject.toml", 'certifi = "^2022.12.7"', 'certifi = ">=2022.12.7"'
     virtualenv_install_with_resources
   end
 

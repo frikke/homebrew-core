@@ -1,46 +1,27 @@
-require "language/node"
 require "json"
 
 class Babel < Formula
   desc "Compiler for writing next generation JavaScript"
   homepage "https://babeljs.io/"
-  url "https://registry.npmjs.org/@babel/core/-/core-7.22.20.tgz"
-  sha256 "550add59dc0ec6dda0e7f195ba1d0f5efcf552f713bc3d566d5d04aa3e52f289"
+  url "https://registry.npmjs.org/@babel/cli/-/cli-7.26.4.tgz"
+  sha256 "b334c176a6da1629fcff423b59960f7c47715ae17318c3cbcbfe626c605e6e81"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "93e4e51d37949a81a239bd3c3ca84893620f07d795ece0b1d90eb40f26652d08"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "93e4e51d37949a81a239bd3c3ca84893620f07d795ece0b1d90eb40f26652d08"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "93e4e51d37949a81a239bd3c3ca84893620f07d795ece0b1d90eb40f26652d08"
-    sha256 cellar: :any_skip_relocation, ventura:        "93e4e51d37949a81a239bd3c3ca84893620f07d795ece0b1d90eb40f26652d08"
-    sha256 cellar: :any_skip_relocation, monterey:       "93e4e51d37949a81a239bd3c3ca84893620f07d795ece0b1d90eb40f26652d08"
-    sha256 cellar: :any_skip_relocation, big_sur:        "93e4e51d37949a81a239bd3c3ca84893620f07d795ece0b1d90eb40f26652d08"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2d2429b5b69bf7be6bee69f7ae86d7b0524d619d65b4ed052a437cc431bbcd44"
+    sha256 cellar: :any_skip_relocation, all: "4179a113aff518d3222571c6bd502ef897cacc7a073e333cf76fbe9ed8f3a879"
   end
 
   depends_on "node"
 
-  resource "babel-cli" do
-    url "https://registry.npmjs.org/@babel/cli/-/cli-7.22.15.tgz"
-    sha256 "6ac27dc7ff329c4c21813e71686734ce57721c8ef39b526a14617a4e1a6e7c1c"
-  end
-
   def install
-    (buildpath/"node_modules/@babel/core").install Dir["*"]
-    buildpath.install resource("babel-cli")
-
-    cd buildpath/"node_modules/@babel/core" do
-      system "npm", "install", *Language::Node.local_npm_install_args, "--production"
-    end
-
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
-    (testpath/"script.js").write <<~EOS
+    (testpath/"script.js").write <<~JS
       [1,2,3].map(n => n + 1);
-    EOS
+    JS
 
     system bin/"babel", "script.js", "--out-file", "script-compiled.js"
     assert_predicate testpath/"script-compiled.js", :exist?, "script-compiled.js was not generated"

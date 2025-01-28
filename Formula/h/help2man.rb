@@ -5,18 +5,15 @@ class Help2man < Formula
   mirror "https://ftpmirror.gnu.org/help2man/help2man-1.49.3.tar.xz"
   sha256 "4d7e4fdef2eca6afe07a2682151cea78781e0a4e8f9622142d9f70c083a2fd4f"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 3
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "6e0e054553f047c31cdfe90cf4e8fa79c4454b85f50652a8446f4855b4cb0a96"
-    sha256 cellar: :any,                 arm64_ventura:  "ce35577716d9a055e403e65e2c2c13171820cac8bfdb0e366fba51ba633fe9bb"
-    sha256 cellar: :any,                 arm64_monterey: "de3584ad8112414015cc277926be6307cfdc4169d71c57c43f7d65e0b000b57e"
-    sha256 cellar: :any,                 arm64_big_sur:  "7f62a4c96936f3b8ed5c9c59f0906f4c3f3574b809989a9b272d743c5ec13374"
-    sha256 cellar: :any,                 sonoma:         "c8ed0f64b1210587cc293ddae576f763c60b055cfcae66dfef7ae9cfdff2edeb"
-    sha256 cellar: :any,                 ventura:        "0e51ad46b9ede5dd5a26d9c7c4da6a142717e3aaf411bed86b3bfa39180960ab"
-    sha256 cellar: :any,                 monterey:       "c472d37b92dc138e948afe53f4f54bb102dc48e613a7ed82e7a81e633a50d189"
-    sha256 cellar: :any,                 big_sur:        "03a4d9f94c6ad34b663e0a08cb66e436e672f0842479dcecc6bd60733a383e34"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "277a57825c150e4b81ec2fb17e1df684cc271140d920f02d15b0a0dfe482213b"
+    sha256 cellar: :any,                 arm64_sequoia: "253c91cfe267b4e6d99516e9b6243db8de63cd2090feba9a411f0de56ffdc003"
+    sha256 cellar: :any,                 arm64_sonoma:  "6fff08f6e2f1e2c1a116771d2cec67f02fd4e5157c5a7468299d625d8708c9c2"
+    sha256 cellar: :any,                 arm64_ventura: "ec4c0a8ad5435ebce1cdcc50850121a465da5d591e02cb3264d0b1ddd367dfd5"
+    sha256 cellar: :any,                 sonoma:        "e7fee7c80e8f8b0db71ed8f91789676f01f0c25ea7a36dddbe6ac4132a371ffe"
+    sha256 cellar: :any,                 ventura:       "f50814222c4bf9afb2f0430b65e058bd893eabd43036e2e8083cb8213b69f10b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b2fe8b82eddc849ea8cb7b7c2f5a2452bf3bfb5fd8af84e18f5689c1f6966a02"
   end
 
   depends_on "gettext"
@@ -44,7 +41,7 @@ class Help2man < Formula
 
     system "./configure", "--prefix=#{prefix}", *args
     system "make", "install"
-    (libexec/"bin").install "#{bin}/help2man"
+    (libexec/"bin").install bin/"help2man"
     (bin/"help2man").write_env_script("#{libexec}/bin/help2man", PERL5LIB: ENV["PERL5LIB"])
   end
 

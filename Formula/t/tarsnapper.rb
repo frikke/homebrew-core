@@ -9,25 +9,22 @@ class Tarsnapper < Formula
   revision 1
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "8690c0a428a6aec75099a4074a09fec690b075b637faf4516e31689ba0895997"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "115d72f69bbae2c7d0bcb2a6fd29c6a81b4d4c396f323291260de87ec994ed69"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "68cd9c18598e426c1543864175e1750c79b3226cba74dc2407c8458bbb1f38ec"
-    sha256 cellar: :any_skip_relocation, ventura:        "491055fc9954b048f053a207620e530ccf0c9f6316165be99c68304d04276c22"
-    sha256 cellar: :any_skip_relocation, monterey:       "132423d27552e162f1559a74619216f82989b45ba6180023eab2f819de89e3cc"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a1b48f1909e44f5c9e80320b4c3f3b8a73393c23aab7e6a37d35a33ff403b04d"
-    sha256 cellar: :any_skip_relocation, catalina:       "2e8d49bfaef413323218d6ef7f49e55d360d554c29abcd4e64a1b3c20198955a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f08e3a8c30c95c7242dd60019f249fc5de32e1b4483d403976c986d06632b4de"
+    rebuild 7
+    sha256 cellar: :any,                 arm64_sequoia: "a3f3c24d9015ea8c6e555746211e7af56deb8ce020c047776cd06166f70c77d2"
+    sha256 cellar: :any,                 arm64_sonoma:  "feef9a3a01ccc2d8f7e5c7ed0ae91a68c60e0d23e0a80c79a92cd52898e7cb33"
+    sha256 cellar: :any,                 arm64_ventura: "4e2dabbd85a18274fc49ff1fbb31c21c6f4e020d796d0630a67d3a404774a715"
+    sha256 cellar: :any,                 sonoma:        "553bf81ba1e5331ec8dbc1c0d26bfcc023882d7c71e9815b513623ac330ffece"
+    sha256 cellar: :any,                 ventura:       "cf90d02ba37a6bd37df704e14912f700cdd9d2e5c5c107979240bf2a46c8c791"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "53e2d180f17f2f51cfd069e23eed736bd4ddbc71e930b83e66b2d6c1efb66456"
   end
 
-  depends_on "python@3.11"
-  depends_on "pyyaml"
-  depends_on "six"
+  depends_on "libyaml"
+  depends_on "python@3.13"
   depends_on "tarsnap"
 
   resource "pexpect" do
-    url "https://files.pythonhosted.org/packages/e5/9b/ff402e0e930e70467a7178abb7c128709a30dfb22d8777c043e501bc1b10/pexpect-4.8.0.tar.gz"
-    sha256 "fc65a43959d153d0114afe13997d439c22823a27cefceb5ff35c2178c6784c0c"
+    url "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz"
+    sha256 "ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f"
   end
 
   resource "ptyprocess" do
@@ -36,8 +33,24 @@ class Tarsnapper < Formula
   end
 
   resource "python-dateutil" do
-    url "https://files.pythonhosted.org/packages/4c/c4/13b4776ea2d76c115c1d1b84579f3764ee6d57204f6be27119f13a61d0a9/python-dateutil-2.8.2.tar.gz"
-    sha256 "0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"
+    url "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz"
+    sha256 "37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"
+  end
+
+  resource "pyyaml" do
+    url "https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz"
+    sha256 "d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"
+  end
+
+  resource "six" do
+    url "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz"
+    sha256 "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"
+  end
+
+  # Drop unneeded argparse requirement: https://github.com/miracle2k/tarsnapper/pull/72
+  patch do
+    url "https://github.com/miracle2k/tarsnapper/commit/def72ae8499b38ab4726d826d7363490de6564fb.patch?full_index=1"
+    sha256 "927ff17243b2e751afc7034b059365ca0373db74dcc8d917b8489058a66b2d1c"
   end
 
   def install

@@ -1,25 +1,24 @@
 class C2rust < Formula
   desc "Migrate C code to Rust"
-  homepage "https://github.com/immunant/c2rust"
-  url "https://github.com/immunant/c2rust/archive/refs/tags/v0.18.0.tar.gz"
-  sha256 "cf72bd59cac5ff31553c5d1626f130167d4f72eaabcffc27630dee2a95f4707e"
+  homepage "https://c2rust.com/"
+  url "https://github.com/immunant/c2rust/archive/refs/tags/v0.19.0.tar.gz"
+  sha256 "912c28e5e289d1a9ef1e0f6c89db97eba19eda58625ca8bdc5b513fdb3c19ba4"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "98a206d507f2da3996fd319e341de81c76254d98b3a5d607db5403b1cf6ac711"
-    sha256 cellar: :any,                 arm64_monterey: "85ad71fbc83acf2e5c6828e71d1d8490767c825652eeffe14c8bde8daa46f57d"
-    sha256 cellar: :any,                 arm64_big_sur:  "7f2009a3a0edd49c972c3466b5914439e4b13510a041c4b250729d574fa26bed"
-    sha256 cellar: :any,                 ventura:        "615d64b0907a80653c3a86072fa94fe70bc9fa9918d1c7a42bc09e8902e8b724"
-    sha256 cellar: :any,                 monterey:       "eec3bde1181c4dac28702aea6fdf9b8c520394a60e1db26c19af660868eb624f"
-    sha256 cellar: :any,                 big_sur:        "de6199fff18618ea3e68a913387508b167cd62defe60b939184cee2cdb9819a7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5740665ba6822fd9287c3ce2516b5ab95a714962ea7a738b597bde7d7297a667"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "6eefd13cc36a0b3ab1cbfa9ec802bacd36ef00206ed3cf827c62f9c403c48676"
+    sha256 cellar: :any,                 arm64_sonoma:  "069b88aa5e4065712b9dd17c778bcda625d3ed6c1f1a5e781238fed63bed1783"
+    sha256 cellar: :any,                 arm64_ventura: "39fd69af63e922ea4238fd482f100abb7b16c4cd780f25405c85212542400fc1"
+    sha256 cellar: :any,                 sonoma:        "d8142840f7b061e9a1fe8a7abc122a02241d085da8b9be1a2a37ee3f3bdcfe1b"
+    sha256 cellar: :any,                 ventura:       "aa1fe9c8bab9e74dc4eb4a95587b26723eb37cdd9a409251073d3a55fa51a723"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f5016b79a5d6b22e582fd3ac7aaecf39bffa3677f3247408f725e77b42502bba"
   end
 
   depends_on "cmake" => [:build, :test]
   depends_on "rust" => :build
   depends_on "llvm"
-
-  fails_with gcc: "5"
 
   def install
     system "cargo", "install", *std_cargo_args(path: "c2rust")
@@ -31,6 +30,6 @@ class C2rust < Formula
     system "cmake", "-S", ".", "-B", "build", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1"
     system "cmake", "--build", "build"
     system bin/"c2rust", "transpile", "build/compile_commands.json"
-    assert_predicate testpath/"qsort.c", :exist?
+    assert_path_exists testpath/"qsort.c"
   end
 end

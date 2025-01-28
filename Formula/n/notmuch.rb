@@ -1,9 +1,12 @@
 class Notmuch < Formula
+  include Language::Python::Shebang
+
   desc "Thread-based email index, search, and tagging"
   homepage "https://notmuchmail.org/"
-  url "https://notmuchmail.org/releases/notmuch-0.38.tar.xz"
-  sha256 "a17901adbe43f481a6bf53c15a2a20268bc8dc7ad5ccf685a0d17c1456dbaf6e"
+  url "https://notmuchmail.org/releases/notmuch-0.38.3.tar.xz"
+  sha256 "9af46cc80da58b4301ca2baefcc25a40d112d0315507e632c0f3f0f08328d054"
   license "GPL-3.0-or-later"
+  revision 2
   head "https://git.notmuchmail.org/git/notmuch", using: :git, branch: "master"
 
   livecheck do
@@ -12,31 +15,37 @@ class Notmuch < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "dd9ce318f993e932a562519a047e9bb8509549c1c7baf23e51894fcf2ccc97dd"
-    sha256 cellar: :any,                 arm64_monterey: "d5e2f6c85fe241e503f3d427308476a453bcbbd573253d191a22ef6ac69a997d"
-    sha256 cellar: :any,                 arm64_big_sur:  "03b4bd37d3208ee63332ab72a06c9547e59a6ab8b07a87b7a7ba909292a22acb"
-    sha256 cellar: :any,                 ventura:        "1142fb66ea9482b075f399fa8214e39ef15b9afec690b5963a33af81e8a0fdbe"
-    sha256 cellar: :any,                 monterey:       "0e85ce4e585e7d4fb12853f2e3db4a8203e92849aaf5681e36cfb5134d3c7d04"
-    sha256 cellar: :any,                 big_sur:        "d14ee543acd0c0155ea53c33030fffcdbaaad7fb43c1755ff2a0a888c64f4958"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5461181e8ec5fda26da1a67f9a08c34dc3d598aa0a1b783824d021ddd7d9f260"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "cd717cdea34175ce4b3ecb26f15594ed015483ce17e14204864b208afed3cf5e"
+    sha256 cellar: :any,                 arm64_sonoma:  "7844df568b86b1b6309c3aa0f6c4cf68ccb8a9b35fc90121b109d05a208b7cac"
+    sha256 cellar: :any,                 arm64_ventura: "592e3240392b89a60c68eba4c9bcb7d705c60733a3a8366642336c6369811cc4"
+    sha256 cellar: :any,                 sonoma:        "10fa6fbceadb544587d026f3591a1a43c3054cfce290f5d56beda33a201fc98b"
+    sha256 cellar: :any,                 ventura:       "3de2605deb58d1854e07fa28ac0730ee6ea82599510297a910d03df7cabbbb4a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1572f5f82da23d1493d0651c6294c7694f473c36c77d0d08c6f8d535c3ad700b"
   end
 
   depends_on "doxygen" => :build
   depends_on "emacs" => :build
   depends_on "libgpg-error" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "sphinx-doc" => :build
+
   depends_on "cffi"
   depends_on "glib"
   depends_on "gmime"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+  depends_on "sfsexp"
   depends_on "talloc"
   depends_on "xapian"
 
   uses_from_macos "zlib", since: :sierra
 
+  on_macos do
+    depends_on "gettext"
+  end
+
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
@@ -52,24 +61,26 @@ class Notmuch < Formula
                             "--without-ruby"
       system "make", "V=1", "install"
     end
+    bin.install "notmuch-git"
+    rewrite_shebang detected_python_shebang, bin/"notmuch-git"
 
     elisp.install Pathname.glob("emacs/*.el")
-    bash_completion.install "completion/notmuch-completion.bash"
+    bash_completion.install "completion/notmuch-completion.bash" => "notmuch"
 
     (prefix/"vim/plugin").install "vim/notmuch.vim"
     (prefix/"vim/doc").install "vim/notmuch.txt"
     (prefix/"vim").install "vim/syntax"
 
     ["python", "python-cffi"].each do |subdir|
-      system python3, "-m", "pip", "install", *std_pip_args, "./bindings/#{subdir}"
+      system python3, "-m", "pip", "install", *std_pip_args(build_isolation: true), "./bindings/#{subdir}"
     end
   end
 
   test do
-    (testpath/".notmuch-config").write <<~EOS
+    (testpath/".notmuch-config").write <<~INI
       [database]
       path=#{testpath}/Mail
-    EOS
+    INI
     (testpath/"Mail").mkpath
     assert_match "0 total", shell_output("#{bin}/notmuch new")
 
@@ -81,5 +92,7 @@ class Notmuch < Formula
       assert str(db.path) == '#{testpath}/Mail', 'Wrong db.path!'
       db.close()
     PYTHON
+    system bin/"notmuch-git", "-C", "#{testpath}/git", "init"
+    assert_path_exists testpath/"git"
   end
 end

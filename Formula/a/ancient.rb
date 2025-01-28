@@ -1,34 +1,35 @@
 class Ancient < Formula
   desc "Decompression routines for ancient formats"
   homepage "https://github.com/temisu/ancient"
-  url "https://github.com/temisu/ancient/archive/refs/tags/v2.1.1.tar.gz"
-  sha256 "6f63e2765866925f1b188baee958d4518720bd0009ab4f50b390ea5028649ec2"
+  url "https://github.com/temisu/ancient/archive/refs/tags/v2.2.0.tar.gz"
+  sha256 "d814b0a1f2c08cb7e8dc94506c096f21471719a6f9d3d2f93ab9416f1ea98712"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "3f4d5623bd2b124de3df19da083eab30a4c50a209fd5c3669c254bfb2ecfa7eb"
-    sha256 cellar: :any,                 arm64_monterey: "149881aa043f4133bdb6dac622b3cc606a44de26105b154bfa3a934f18fbb089"
-    sha256 cellar: :any,                 arm64_big_sur:  "e46d1a5d1e6c8b08489a6f3d3a81fcc0ef8b9dc2c1421ccd8a3849d6f163e3ef"
-    sha256 cellar: :any,                 ventura:        "37845ef9416ea76ca618aaa29bda88d46e011c24bb5fc772c27ea52b3f61dcd3"
-    sha256 cellar: :any,                 monterey:       "c5dc5fa32a48cd5916c563690203da74e731a1d8a197de97ead68ce6c480a2f1"
-    sha256 cellar: :any,                 big_sur:        "47ae9e68f35e4cb300c85957ef7a4f6c2bef532d32b49a476fb2eddb0967f8cd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "91efa218bbb1adbb9dffa24d2e932df91ae5de07a7a95afb3726e271e2a7f972"
+    sha256 cellar: :any,                 arm64_sequoia:  "6f1107e987a8027289e5c8e7c95b71e85b75a94d0219df48eac31504bbb427b4"
+    sha256 cellar: :any,                 arm64_sonoma:   "1dd610a8f47fb9887ed822f63899eb3cbadcad4d0be848aac8e4dd2bd12105ee"
+    sha256 cellar: :any,                 arm64_ventura:  "cb400c604791468287b32dbb9d5f44b591f0ab9ca2cfccf4b12204eb7f1029ae"
+    sha256 cellar: :any,                 arm64_monterey: "038e7397ac6c20fa7a424bf5565504fc669e986bda08600379c297c9e15bffc4"
+    sha256 cellar: :any,                 sonoma:         "63a480cf9de0421b71aa903cb413749468b3fb6d6d7298566512fae532218d17"
+    sha256 cellar: :any,                 ventura:        "a449ffd0b1f136e18e93f8c9f7e12a41c06f8e3fc29096f8b17a356cff43fe64"
+    sha256 cellar: :any,                 monterey:       "c4f2396ffc6013ba685be7a0193afac0a7fa5563471829bf97c5241ca9146cdd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cd132df16f6c1a05eb3eda0807ba65ec02deb30aa03d5b7ca39ee4172b725321"
   end
 
   depends_on "autoconf" => :build
   depends_on "autoconf-archive" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   def install
     system "./autogen.sh"
-    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <ancient/ancient.hpp>
 
       int main(int argc, char **argv)
@@ -36,7 +37,7 @@ class Ancient < Formula
         std::optional<ancient::Decompressor> decompressor;
         return 0;
       }
-    EOS
+    CPP
 
     system ENV.cxx, "-std=c++17", "test.cpp", "-I#{include}", "-L#{lib}", "-lancient", "-o", "test"
     system "./test"

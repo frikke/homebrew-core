@@ -1,7 +1,7 @@
 class Rtptools < Formula
   desc "Set of tools for processing RTP data"
-  homepage "https://web.archive.org/web/20190924020700/www.cs.columbia.edu/irt/software/rtptools/"
-  url "https://github.com/irtlab/rtptools/archive/1.22.tar.gz"
+  homepage "https://github.com/irtlab/rtptools"
+  url "https://github.com/irtlab/rtptools/archive/refs/tags/1.22.tar.gz"
   sha256 "ac6641558200f5689234989e28ed3c44ead23757ccf2381c8878933f9c2523e0"
   license "BSD-3-Clause"
   head "https://github.com/irtlab/rtptools.git", branch: "master"
@@ -13,9 +13,12 @@ class Rtptools < Formula
 
   bottle do
     rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "06e5ec34e865108c33c8e34cc136a7d12758ace00639494adeafeabccea7d1e0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "3f7a817f96226b0cc4a1bd1dd656fcbd37b9a2bb4c0a562fdc5c8f40db60530b"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "5d06d42bddd550eb32476e7412d204a11795fa1295c9c68e0b608e652b5092df"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "3b656aa50230fbf083a0acd2bb82b6c9911b0c1e450280f2beba636aea4dd444"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a760c9b142e55aba7732406eeb2603c49b9b7514e02bd01bc245d0661772bf20"
+    sha256 cellar: :any_skip_relocation, sonoma:         "691da9365bc23c711cefb7628f72e910113437022a5d8c820058b0912fdbc2df"
     sha256 cellar: :any_skip_relocation, ventura:        "d9f2ab7acb5516a14a0da93a58364e92cd396275a687947d4c1fa6e66419f2d5"
     sha256 cellar: :any_skip_relocation, monterey:       "cc4355761bc5d55ef0bf7ed1b81946cecb40db52832d63dca2ba4a01c5655168"
     sha256 cellar: :any_skip_relocation, big_sur:        "a9f1e8f18d40ba8b435f619de132a5fbc00e0ef84d5a1e10378700e0f3ce417b"

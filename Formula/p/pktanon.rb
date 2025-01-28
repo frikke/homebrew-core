@@ -4,7 +4,7 @@ class Pktanon < Formula
   url "https://www.tm.kit.edu/software/pktanon/download/pktanon-1.4.0-dev.tar.gz"
   sha256 "db3f437bcb8ddb40323ddef7a9de25a465c5f6b4cce078202060f661d4b97ba3"
   license "GPL-2.0-or-later"
-  revision 4
+  revision 5
 
   # The regex below matches development versions, as a stable version isn't yet
   # available. If stable versions appear in the future, we should modify the
@@ -15,34 +15,27 @@ class Pktanon < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "786ffbd6c138d0d1f9ecac03e3638a681b539d81c3d03a98ec18c397937a748e"
-    sha256 cellar: :any,                 arm64_monterey: "7bce2aef63a3a786500090ec47feeee781f3ea815c1e290138df41a8d44663f6"
-    sha256 cellar: :any,                 arm64_big_sur:  "36905bed56897e7151f048047b5696c36d7cdc2ef8ee310568daf29022e9b2ec"
-    sha256 cellar: :any,                 ventura:        "63600257c413f301e3f82c2714c8e1e4daae6e05f07f8f51a3ccced2522d77b8"
-    sha256 cellar: :any,                 monterey:       "077c0faf136fd7ec5a0d5596fb84e720d376dfce83d85563ceb74bfcae48f61e"
-    sha256 cellar: :any,                 big_sur:        "1cb761204f479937cb389f2754dbb1bd4227a6759fa4b9c9ca3d8011e3fbcd22"
-    sha256 cellar: :any,                 catalina:       "52761b594fd6ade559756d25174e5ce53fa6db21db5d1795e750a58c6ef85b10"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "54a53776fa3c529c82d9f1ae3725b9a5a82fe6ff9c35cae2133859f7245f161e"
+    sha256 cellar: :any,                 arm64_sequoia: "44134c55be8a09ccfa54203ccf2ce297df8c8a76e4ef3c94040a523c0bf50cda"
+    sha256 cellar: :any,                 arm64_sonoma:  "2cbb5ed4c7c0e22a3de3025fe12860026c7b8264a08374c4f662467ab91187f3"
+    sha256 cellar: :any,                 arm64_ventura: "0016600c5e396a07b502fe6060b8e83ad0659479a433e4baf7b0d1a3afba27eb"
+    sha256 cellar: :any,                 sonoma:        "202a34eac518440e7d191d05e083a66a424ba49e1df4bca38f83175ca6eafab8"
+    sha256 cellar: :any,                 ventura:       "af27c678d49a0928c17ee03cb2af56e3997ffa71c53efbb5edb9c2db3bab1491"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a169dd1f2a8226cb31c4039f5a34e62c2077d9667da21f4f6c9a23a7198ca852"
   end
 
-  depends_on "boost"
+  depends_on "boost" => :build
   depends_on "xerces-c"
-
-  fails_with gcc: "5"
 
   def install
     # fix compile failure caused by undefined function 'sleep'.
     inreplace "src/Timer.cpp", %Q(#include "Timer.h"\r\n),
-      %Q(#include "Timer.h"\r\n#include "unistd.h"\r\n)
+                               %Q(#include "Timer.h"\r\n#include "unistd.h"\r\n)
 
-    # include the boost system library to resolve compilation errors
-    ENV["LIBS"] = "-lboost_system-mt"
-
-    system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/pktanon", "--version"
+    system bin/"pktanon", "--version"
   end
 end

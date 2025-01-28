@@ -6,6 +6,7 @@ class Libxscrnsaver < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "0b3b6f538e4e11629f54b74f0603e9fca13439e3ab37ff3899c9081d4dc80258"
     sha256 cellar: :any,                 arm64_sonoma:   "b2b4a894b7f7ee7f077af223b68814ab6c4a4e8d41de227642fbd373de36e0f7"
     sha256 cellar: :any,                 arm64_ventura:  "0a1e6445b137a59fcb7b2abf72065758997cfefcd36e8ba8f9875e52bb01fd3c"
     sha256 cellar: :any,                 arm64_monterey: "c04b841bd76e8d06c9b37ae51c091ee1724d7b72df939cc8361bbe0441d4166e"
@@ -17,34 +18,32 @@ class Libxscrnsaver < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "d538938eb52738da95c07cb87f895673633ed55667a394991c6847cd62d40c5b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libx11"
   depends_on "libxext"
   depends_on "xorgproto"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/extensions/scrnsaver.h"
 
       int main(int argc, char* argv[]) {
         XScreenSaverNotifyEvent event;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

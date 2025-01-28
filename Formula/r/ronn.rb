@@ -1,10 +1,10 @@
 class Ronn < Formula
   desc "Builds manuals - the opposite of roff"
   homepage "https://rtomayko.github.io/ronn/"
-  url "https://github.com/rtomayko/ronn/archive/0.7.3.tar.gz"
+  url "https://github.com/rtomayko/ronn/archive/refs/tags/0.7.3.tar.gz"
   sha256 "808aa6668f636ce03abba99c53c2005cef559a5099f6b40bf2c7aad8e273acb4"
   license "MIT"
-  revision 2
+  revision 4
 
   livecheck do
     url :stable
@@ -12,16 +12,12 @@ class Ronn < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256                               arm64_sonoma:   "7526b1ad1d254447a0f65555276a8c5e1c9e0183dbd27fb77ec8fcc226a4bb00"
-    sha256                               arm64_ventura:  "c87410b78c23e22e1e5af95f6daa63e8873f84e620503897b98350aa91b05b9a"
-    sha256                               arm64_monterey: "fb99f591b790de0b20615aec5da0fae2e44c448b34aa97a98aa294a730146d48"
-    sha256                               arm64_big_sur:  "c7ff16ba6de865321cb09c07b558813c40931085c82a218e24b0e43c866e0aaf"
-    sha256                               sonoma:         "9318370e6db0e770f712a13bbf1f0954a3ca461e827dcbdc2b598f5b161b3bc1"
-    sha256                               ventura:        "400d40793a1f87b91a9fe71de8b7daed4ca8a7973152f59c744d4b52b4fef374"
-    sha256                               monterey:       "f3451322dab44f011821248060aefd9a955aecbbc32300598d5c9a36bca3f860"
-    sha256                               big_sur:        "9173eef3a1adf288f93d79a92b1c9872d522e58378a3cf70029ed913bfe01ef7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bd650317ea2402ecb03924d58635b338f03f3af5ea3b36954ecbfe48d30b5ef0"
+    sha256                               arm64_sequoia: "ae47bcebfb7b492d6a6aa8f9dedcb248c79f657f37dd851b8148299120750253"
+    sha256                               arm64_sonoma:  "2aa277c67249e543b65df95bd8ae64e88276b8be25497c27edf923aa20933049"
+    sha256                               arm64_ventura: "4a5a015611099aa8618e53d517cbb481528383ca8a7bcaa9a9684d403378308a"
+    sha256                               sonoma:        "2bdef28fa1cc074a01fe71f08be92eb459e5c6ff481af10cba987a69857cf89c"
+    sha256                               ventura:       "ae254f18931f756ddbbdbff72edeafe83c69be33b59b8dd809e8ccd5dabf4a96"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7039deef414574510a014b1ee4f0b676b0535b1af20fad6c46af736425608795"
   end
 
   depends_on "groff" => :test
@@ -31,6 +27,8 @@ class Ronn < Formula
   on_linux do
     depends_on "util-linux" => :test # for `col`
   end
+
+  conflicts_with "ronn-ng", because: "both install `ronn` binaries"
 
   def install
     ENV["GEM_HOME"] = libexec
@@ -43,12 +41,12 @@ class Ronn < Formula
   end
 
   test do
-    (testpath/"test.ronn").write <<~EOS
+    (testpath/"test.ronn").write <<~MARKDOWN
       simple(7) -- a simple ronn example
       ==================================
 
       This document is created by ronn.
-    EOS
+    MARKDOWN
     system bin/"ronn", "--date", "1970-01-01", "test.ronn"
     assert_equal <<~EOS, pipe_output("col -bx", shell_output("groff -t -man -Tascii -P -c test.7"))
       SIMPLE(7)                                                            SIMPLE(7)

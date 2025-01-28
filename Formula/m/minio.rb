@@ -2,9 +2,9 @@ class Minio < Formula
   desc "High Performance, Kubernetes Native Object Storage"
   homepage "https://min.io"
   url "https://github.com/minio/minio.git",
-      tag:      "RELEASE.2023-09-16T01-01-47Z",
-      revision: "b733e6e83cee28820e815787b0562d17b14f9759"
-  version "20230916010147"
+      tag:      "RELEASE.2025-01-20T14-49-07Z",
+      revision: "827004cd6d3da8f49a5320c94ae74ae128156ed6"
+  version "20250120144907"
   license "AGPL-3.0-or-later"
   head "https://github.com/minio/minio.git", branch: "master"
 
@@ -17,13 +17,12 @@ class Minio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "370fd715a9ee4f775893e82ea462bcee4f32eed047dec042a4ba0a93220a32ad"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "14f5c28cf6fd8fc78edc653001aec6595632d8cdcc7a692ffb179a8f67a025f7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8c4476fd8f2bac75a3af921744cb08839862cf094582ab70ed368c03907b0cee"
-    sha256 cellar: :any_skip_relocation, ventura:        "930b177e5565812240763450a1cea73cb389ac9306fad2d3656521dbc3f5d013"
-    sha256 cellar: :any_skip_relocation, monterey:       "b49a71f619842ff6784c92467faf208cd08439ef0e649307ea56fd09d08499e7"
-    sha256 cellar: :any_skip_relocation, big_sur:        "eb035b2c164cb3d9ef52ad76789f0c113ea1568358088ab815e45304d584e477"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ea8cb3440e7b2e73e90b8f93ede172ef8a257e7bdd506a1eb4211b2b7e17b54b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5301e17f12211f3e9b739f4e21017ec4a2dbde88e6bdc8d9ff46f5a354534612"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d5ab970692b66108723ec74098e5c85afd1e278f985cab415c364c40f306dd81"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "7726f026c4ae78f32ef90f319a8b085671c798818c100b475e8573737f9757a6"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9a01633d4c7119b00519907d8cb1656074a8aaf75357b8b5904c9e353be6dbcb"
+    sha256 cellar: :any_skip_relocation, ventura:       "a7f27a33d08961d21f6e20542bdec9186f962581b08d2f50cc179f4f0d50ef58"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "433ae1e3b10974af601af8819e41226c00354ad01bcfac473bfee8e20c8d3829"
   end
 
   depends_on "go" => :build
@@ -32,8 +31,8 @@ class Minio < Formula
     if build.head?
       system "go", "build", *std_go_args
     else
-      release = `git tag --points-at HEAD`.chomp
-      version = release.gsub(/RELEASE\./, "").chomp.gsub(/T(\d+)-(\d+)-(\d+)Z/, 'T\1:\2:\3Z')
+      release = stable.specs[:tag]
+      version = release.gsub("RELEASE.", "").chomp.gsub(/T(\d+)-(\d+)-(\d+)Z/, 'T\1:\2:\3Z')
 
       ldflags = %W[
         -s -w
@@ -42,7 +41,7 @@ class Minio < Formula
         -X github.com/minio/minio/cmd.CommitID=#{Utils.git_head}
       ]
 
-      system "go", "build", *std_go_args(ldflags: ldflags)
+      system "go", "build", *std_go_args(ldflags:)
     end
   end
 
@@ -52,7 +51,7 @@ class Minio < Formula
   end
 
   service do
-    run [opt_bin/"minio", "server", "--config-dir=#{etc}/minio", "--address=:9000", var/"minio"]
+    run [opt_bin/"minio", "server", "--certs-dir=#{etc}/minio/certs", "--address=:9000", var/"minio"]
     keep_alive true
     working_dir HOMEBREW_PREFIX
     log_path var/"log/minio.log"
@@ -60,6 +59,13 @@ class Minio < Formula
   end
 
   test do
+    assert_equal version.to_s,
+                 shell_output("#{bin}/minio --version 2>&1")
+                   .match(/(?:RELEASE[._-]?)?([\dTZ-]+)/)
+                   .to_s
+                   .gsub(/[^\d]/, ""),
+                 "`version` is incorrect"
+
     assert_match "minio server - start object storage server",
       shell_output("#{bin}/minio server --help 2>&1")
   end

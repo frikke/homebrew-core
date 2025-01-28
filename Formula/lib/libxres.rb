@@ -6,6 +6,7 @@ class Libxres < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "e7f72b305f5c62fa3bd025cb437a533e0d5fd903bbf165d8b86f0e19e163474a"
     sha256 cellar: :any,                 arm64_sonoma:   "d75dbe208195822aa95957e8037d80dec8c5c86c60a5669afb7ec2187210d64b"
     sha256 cellar: :any,                 arm64_ventura:  "fbf27991234578c082292975c64ee98b2ab2b69dd2cbc71056dfb3c2fd94ffb9"
     sha256 cellar: :any,                 arm64_monterey: "e3fa4b14265315d1dd48439e241df505cef320c6a25a33a91e58e2245bb2f203"
@@ -17,27 +18,25 @@ class Libxres < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "b0a84c746909317e32b8e527e20d56df64836bf461e8719d5bbab2be1f249cc0"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "xorgproto" => :build
   depends_on "libx11"
   depends_on "libxext"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/Xlib.h"
       #include "X11/extensions/XRes.h"
 
@@ -45,7 +44,7 @@ class Libxres < Formula
         XResType client;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lXRes"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

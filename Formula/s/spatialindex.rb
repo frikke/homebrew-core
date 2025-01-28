@@ -1,39 +1,38 @@
 class Spatialindex < Formula
   desc "General framework for developing spatial indices"
   homepage "https://libspatialindex.org/"
-  url "https://github.com/libspatialindex/libspatialindex/releases/download/1.9.3/spatialindex-src-1.9.3.tar.bz2"
-  sha256 "4a529431cfa80443ab4dcd45a4b25aebbabe1c0ce2fa1665039c80e999dcc50a"
-  # `LGPL-2.0` to `MIT` for 1.8.0+ releases
+  url "https://github.com/libspatialindex/libspatialindex/releases/download/2.1.0/spatialindex-src-2.1.0.tar.bz2"
+  sha256 "c59932395e98896038d59199f2e2453595df6d730ffbe09d69df2a661bcb619b"
   license "MIT"
 
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "7b70926966d026440d780207a5f7ec0432ce2e5284b62c2907a94393392e6699"
-    sha256 cellar: :any,                 arm64_monterey: "1e01a5347e7bc5c45e0f4b06a92265c08868ee384f9e375f0b7cb42a13106fd2"
-    sha256 cellar: :any,                 arm64_big_sur:  "5786e51306b202e51c9a81b4bc6c7b593027c8e88b777d142e486bf012eebe34"
-    sha256 cellar: :any,                 ventura:        "436732ecbc6b625c4a712c918baf869b9e670bf4a7dea7e18866dce970a9ccfa"
-    sha256 cellar: :any,                 monterey:       "2a4b3dfa9dce372c262f91985c7fae864c799ce642725beb237a0a2f6338bad4"
-    sha256 cellar: :any,                 big_sur:        "49ef8e79ee6c7348b438d2b174effd66a2a7136a12c58645a0a37a5c22740ce3"
-    sha256 cellar: :any,                 catalina:       "fbcbfaf6510137f3168a0dc57cbac8c8b1435094b1ede9d35a30fa6ccaea28f4"
-    sha256 cellar: :any,                 mojave:         "a5cbdfb3acddb053e596fc56e7653559581923e48ed6815503fffc47c7a16660"
-    sha256 cellar: :any,                 high_sierra:    "cace27981cc1e5143a48e8b700d6823dff9d8049140683e0e536c476894ede91"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fc7ec6fab28b23661a825c46d29b861fca6a6115048be5f42355da59deed84bb"
+    sha256 cellar: :any,                 arm64_sequoia: "2a84ec0d1a739824971183632c46cd8e1a6e0c8584e00d4ad1d9460d712ee481"
+    sha256 cellar: :any,                 arm64_sonoma:  "071b7e50fbe7ac47aa578e69edc53c87de74808c8287aa937bdaa50de0e3fa97"
+    sha256 cellar: :any,                 arm64_ventura: "ccdbb7d96b49d3a30ad83530034142629350a725e64e1cba2e260b41c7ef15d0"
+    sha256 cellar: :any,                 sonoma:        "ffd3cfa50eb1ed66c896081d61ce335c968c1f432a95770ffc80233f41ab0571"
+    sha256 cellar: :any,                 ventura:       "117276faf402a1afed33a420fc9e59f66434612f4f735e307cc13e3d45669f7e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "359128f10b75e3ef834f3fbc988856b763caddb96bc006302cf2e6d2a9fb2a99"
   end
 
   depends_on "cmake" => :build
 
   def install
-    ENV.cxx11
-
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
     # write out a small program which inserts a fixed box into an rtree
     # and verifies that it can query it
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <spatialindex/SpatialIndex.h>
 
       using namespace std;
@@ -79,7 +78,7 @@ class Spatialindex < Formula
 
           return (q_vis.matches.size() == 1) ? 0 : 1;
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cpp", "-L#{lib}", "-lspatialindex", "-o", "test"
     system "./test"
   end

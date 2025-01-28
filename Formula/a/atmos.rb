@@ -1,31 +1,32 @@
 class Atmos < Formula
   desc "Universal Tool for DevOps and Cloud Automation"
   homepage "https://github.com/cloudposse/atmos"
-  url "https://github.com/cloudposse/atmos/archive/v1.45.3.tar.gz"
-  sha256 "b70dfd5d4f74f87b6a1ef8c2f5ddc780cecf6b1c22d357f8b0005df2a7dbe953"
+  url "https://github.com/cloudposse/atmos/archive/refs/tags/v1.156.0.tar.gz"
+  sha256 "b621cb339443a3ecc1876c60195866abe772d90d8a02be62321c8d683bd30b86"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "afac3ea53a31ba6afff1fd45525d2f4221286bd9aad04b5671c9c685e9ff150c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b8022848cf63dece18c0675000410da480fa3b82711e0dbbbbf047e2b92184c5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f5dad549510c069bbda79ed7989c81ec8ea65de5b6c8dbdd14e4a625d6cfc967"
-    sha256 cellar: :any_skip_relocation, ventura:        "d490c0de8224d176dd6bf0030a6deac378940b1d1388197bef960a665c0404e2"
-    sha256 cellar: :any_skip_relocation, monterey:       "7fccbdd282eca8f4aa98a11f6f68d2f31843c109815a88d17b09823f37285416"
-    sha256 cellar: :any_skip_relocation, big_sur:        "02ab8e619727a6c6c9af9efcb4c97831653304adf91124f2551c48b9502c902a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "75e29a211f590287bc3a2781d36d44010f0f46113259c6bd94fe2c1d9217d196"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b08967be1fba1278f95dd0063546a01054422aed18ee1767d26f495cb5b16a89"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b08967be1fba1278f95dd0063546a01054422aed18ee1767d26f495cb5b16a89"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b08967be1fba1278f95dd0063546a01054422aed18ee1767d26f495cb5b16a89"
+    sha256 cellar: :any_skip_relocation, sonoma:        "d429232997c2ab72928c1932938b70aebfdd11fcdef3d094148cc80c8826ea37"
+    sha256 cellar: :any_skip_relocation, ventura:       "d429232997c2ab72928c1932938b70aebfdd11fcdef3d094148cc80c8826ea37"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "41ce5b018b234ff2b62f97e7fe8d13dde9bac64285d2b5ac07d2bd6da69a2849"
   end
 
   depends_on "go" => :build
 
+  conflicts_with "tenv", because: "tenv symlinks atmos binaries"
+
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w -X 'github.com/cloudposse/atmos/cmd.Version=#{version}'")
+    system "go", "build", *std_go_args(ldflags: "-s -w -X 'github.com/cloudposse/atmos/pkg/version.Version=#{version}'")
 
     generate_completions_from_executable(bin/"atmos", "completion")
   end
 
   test do
     # create basic atmos.yaml
-    (testpath/"atmos.yaml").write <<~EOT
+    (testpath/"atmos.yaml").write <<~YAML
       components:
         terraform:
           base_path: "./components/terraform"
@@ -49,12 +50,12 @@ class Atmos < Formula
       logs:
         verbose: false
         colors: true
-    EOT
+    YAML
 
     # create scaffold
     mkdir_p testpath/"stacks"
     mkdir_p testpath/"components/terraform/top-level-component1"
-    (testpath/"stacks/tenant1-ue2-dev.yaml").write <<~EOT
+    (testpath/"stacks/tenant1-ue2-dev.yaml").write <<~YAML
       terraform:
         backend_type: s3 # s3, remote, vault, static, etc.
         backend:
@@ -78,10 +79,10 @@ class Atmos < Formula
       components:
         terraform:
           top-level-component1: {}
-    EOT
+    YAML
 
     # create expected file
-    (testpath/"backend.tf.json").write <<~EOT
+    (testpath/"backend.tf.json").write <<~JSON
       {
         "terraform": {
           "backend": {
@@ -98,11 +99,13 @@ class Atmos < Formula
           }
         }
       }
-    EOT
+    JSON
 
     system bin/"atmos", "terraform", "generate", "backend", "top-level-component1", "--stack", "tenant1-ue2-dev"
     actual_json = JSON.parse(File.read(testpath/"components/terraform/top-level-component1/backend.tf.json"))
     expected_json = JSON.parse(File.read(testpath/"backend.tf.json"))
     assert_equal expected_json["terraform"].to_set, actual_json["terraform"].to_set
+
+    assert_match "Atmos #{version}", shell_output("#{bin}/atmos version")
   end
 end

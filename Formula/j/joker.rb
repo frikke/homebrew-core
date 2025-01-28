@@ -1,19 +1,20 @@
 class Joker < Formula
   desc "Small Clojure interpreter, linter and formatter"
   homepage "https://joker-lang.org/"
-  url "https://github.com/candid82/joker/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "b05a9f15553f748b9ef827e6c96b42ad9c9d0d6bdf76ae592e77fae640b9d198"
+  url "https://github.com/candid82/joker/archive/refs/tags/v1.4.0.tar.gz"
+  sha256 "8744e077e420a40a78c215fe9c61adad2aa59e8a985ec5d59aeb75f93b2706f3"
   license "EPL-1.0"
   head "https://github.com/candid82/joker.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "89681b46dab383e92abf204c4977f3e526c5b160e37fb5e7d66df85c9a4d9187"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6105453965b056722ab39eee591105c4626c3e5875121c515fcb25245c434a77"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f6a3bd6e773bc2023b970cf61daf312eb8987ec3b4bad0920274a0a9e13e5146"
-    sha256 cellar: :any_skip_relocation, ventura:        "d095c283b61c62a0df3ea337f8415c74fad1f2e5d2d5764d00cce5c7a0884e5f"
-    sha256 cellar: :any_skip_relocation, monterey:       "1e9a5b1193bab0b5248dc552ed29ec02a2ec65f1e619211e08fc7665ff43c28b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "39bfde9a15159b20717c0af76849726c7879e1b26075ce7b53cdaa06a9ab76ba"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2e28429584a8a7be16f1d5a0cdc6e0acedf761744767c86d2a859bb6bf6b3da9"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d3dd3f5c3079375a0c270b02ed15dcd70e2b3b1c961339316a6c372b097ddd67"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "45f922906c1e3e0b22ab4c7dd32c66b8ac7e0592108fce64ecc89e0845a9f7df"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f311bf231ff5825e3142c472693279006ba5c1fbdec8c69b40fe17b0bf4484de"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "58313fc78a9229e99bc802cbd89d70f750cd93e26b560b68fbf0577be0382d18"
+    sha256 cellar: :any_skip_relocation, sonoma:         "5c99770603ec565d3f94b6b1d83fe3ac27267a543d437fe647677f7c59b970b8"
+    sha256 cellar: :any_skip_relocation, ventura:        "cbb4b1ee7c4cef4f043361b73086d695a1406198ff06cdf37e49e7f53c11daa2"
+    sha256 cellar: :any_skip_relocation, monterey:       "703526cbbde67f9eea2850ea7c8ef7c6dd5b4b537a45371b73f307afd4677c1a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bd2f8a60afb0bba85d14fb489a94481076b07b3eae3a4e3a790a43460da7b1fc"
   end
 
   depends_on "go" => :build
@@ -25,11 +26,11 @@ class Joker < Formula
 
   test do
     test_file = testpath/"test.clj"
-    test_file.write <<~EOS
+    test_file.write <<~CLOJURE
       (ns brewtest)
       (defn -main [& args]
         (let [a 1]))
-    EOS
+    CLOJURE
 
     system bin/"joker", "--format", test_file
     output = shell_output("#{bin}/joker --lint #{test_file} 2>&1", 1)

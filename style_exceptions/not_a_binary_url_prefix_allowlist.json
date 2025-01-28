@@ -1,14 +1,11 @@
 [
-  "astyle",
   "bittwist",
   "cspice",
   "flashrom",
-  "folderify",
-  "launch4j",
+  "mlx",
   "organize-tool",
   "reattach-to-user-namespace",
   "term",
-  "vifm",
   "wallpaper",
   "x264"
 ]

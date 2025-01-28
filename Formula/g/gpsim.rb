@@ -1,9 +1,9 @@
 class Gpsim < Formula
   desc "Simulator for Microchip's PIC microcontrollers"
   homepage "https://gpsim.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/gpsim/gpsim/0.31.0/gpsim-0.31.0.tar.gz"
-  sha256 "110ee6be3a5d02b32803a91e480cbfc9d423ef72e0830703fc0bc97b9569923f"
-  license "GPL-2.0"
+  url "https://downloads.sourceforge.net/project/gpsim/gpsim/0.32.0/gpsim-0.32.1.tar.gz"
+  sha256 "c704d923ae771fabb7f63775a564dfefd7018a79c914671c4477854420b32e69"
+  license "GPL-2.0-or-later"
   head "https://svn.code.sf.net/p/gpsim/code/trunk"
 
   livecheck do
@@ -12,38 +12,60 @@ class Gpsim < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_big_sur: "7c2f982e48f43bd5b4bf96bc789292d2e786be2cba23cda8b23303cb4f323ad9"
-    sha256 cellar: :any,                 monterey:      "67592314e36ca6c5c0bfa338ec40ba7b2c168665bbff42f280429866da401e3c"
-    sha256 cellar: :any,                 big_sur:       "65f8044f61bd55813e73385c46ec6bb167c45ac9af373d14c544cdbdff932fb4"
-    sha256 cellar: :any,                 catalina:      "7f92c6ae94438c73050aea08fa41c56b93efa9464855b3b0861b0bb3c6a08621"
-    sha256 cellar: :any,                 mojave:        "00c585480ada4e552a32ee3f0e11bc68142ce4f6671eeb14badc51007d07be9f"
-    sha256 cellar: :any,                 high_sierra:   "612ce9c2f03a5c6464aee9b9bdcd6884e434e457f515bbbc2adceb8417f1c6d1"
-    sha256 cellar: :any,                 sierra:        "5a366b0dccfe1ff92aaed6d29f9bd5ca66806471b17e8941206e985f6bd8817a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5b7d6c3c3efa789c2087087ce41658a08cb659273ac61dc5c8df05fa3a8bf6b7"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "0e00390c7ead8acdb2ecffe0c1181c0fdd1fbaa325cd50304c98652e61c2e15a"
+    sha256 cellar: :any,                 arm64_sonoma:   "888ef0d3830e09344fe6f4851d2df34a9793dc3de9178e1d2dc99451fa612fde"
+    sha256 cellar: :any,                 arm64_ventura:  "fcfd3aa9b7bbfd39292005f97e046513efb63f5f35723ed28d846fe63969c596"
+    sha256 cellar: :any,                 arm64_monterey: "7d7bdb973048a0accf1f87f5773883e80cb98a3e80ec3e6a2ae2240f06b4f8d9"
+    sha256 cellar: :any,                 sonoma:         "e04f087424cabf6638050b7a4a477184ab1814a8d08116f6fe4bd997fb98e174"
+    sha256 cellar: :any,                 ventura:        "21b9949b633afe932ca30e23cc291a8a6d760cb38413f1728b4f8e7b1349f10c"
+    sha256 cellar: :any,                 monterey:       "cd3488cd018dfaefdd5b4e253b6e6879c9a75ef1e6c377dc7928daf20825c882"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "062b82cfd0c548f5935b7f09f455d56a0fcc9693f044c553dc161233d89add2a"
   end
 
   depends_on "gputils" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gettext"
   depends_on "glib"
   depends_on "popt"
   depends_on "readline"
 
+  # https://sourceforge.net/p/gpsim/bugs/289/
+  patch :DATA
+
   def install
-    ENV.cxx11
-
-    # Upstream bug filed: https://sourceforge.net/p/gpsim/bugs/245/
-    inreplace "src/modules.cc", "#include \"error.h\"", ""
-
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-gui",
+    system "./configure", "--disable-gui",
                           "--disable-shared",
-                          "--prefix=#{prefix}"
+                          *std_configure_args
     system "make", "all"
     system "make", "install"
   end
 
   test do
-    system "#{bin}/gpsim", "--version"
+    system bin/"gpsim", "--version"
   end
 end
+
+__END__
+Index: program_files.cc
+===================================================================
+--- a/src/program_files.cc  (revision 2623)
++++ b/src/program_files.cc  (working copy)
+@@ -85,8 +85,7 @@
+   * ProgramFileTypeList
+   * Singleton class to manage the many (as of now three) file types.
+   */
+-ProgramFileTypeList * ProgramFileTypeList::s_ProgramFileTypeList =
+-  new ProgramFileTypeList();
++ProgramFileTypeList * ProgramFileTypeList::s_ProgramFileTypeList = nullptr;
+ // We will instantiate g_HexFileType and g_CodFileType here to be sure
+ // they are instantiated after s_ProgramFileTypeList. The objects will
+ // move should the PIC code moved to its own external module.
+@@ -97,6 +96,8 @@
+ 
+ ProgramFileTypeList &ProgramFileTypeList::GetList()
+ {
++  if (!s_ProgramFileTypeList)
++      s_ProgramFileTypeList = new ProgramFileTypeList();
+   return *s_ProgramFileTypeList;
+ }

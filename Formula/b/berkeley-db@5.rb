@@ -7,6 +7,7 @@ class BerkeleyDbAT5 < Formula
   revision 1
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "ac64ff01e9897372c22dd2f9c90a2e5ffc5b66876c243d20d1e107b7c3785fba"
     sha256 cellar: :any,                 arm64_sonoma:   "7e1f6f67ce491e8636f9095fa45854e7b5720745b909e3b84cad8400b28418fd"
     sha256 cellar: :any,                 arm64_ventura:  "65a70e28dcf089e0ec6d247c32df257c8bc2532ece6f4c447200a48e7ad17a8d"
     sha256 cellar: :any,                 arm64_monterey: "8c9ea685725256b2b50e856c23d20af734f20bc69fc92383e1819e4f867c8ac3"
@@ -58,8 +59,10 @@ class BerkeleyDbAT5 < Formula
   def install
     # BerkeleyDB dislikes parallel builds
     ENV.deparallelize
-    # Work around issues ./configure has with Xcode 12
-    ENV.append "CFLAGS", "-Wno-implicit-function-declaration"
+
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1200
+
     # Work around ancient config files not recognizing aarch64 linux
     # configure: error: cannot guess build type; you must specify one
     if OS.linux? && Hardware::CPU.arm?
@@ -88,7 +91,7 @@ class BerkeleyDbAT5 < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <assert.h>
       #include <string.h>
       #include <db_cxx.h>
@@ -108,7 +111,7 @@ class BerkeleyDbAT5 < Formula
 
         assert(db.close(0) == 0);
       }
-    EOS
+    CPP
     flags = %W[
       -I#{include}
       -L#{lib}

@@ -1,8 +1,8 @@
 class Libunibreak < Formula
   desc "Implementation of the Unicode line- and word-breaking algorithms"
   homepage "https://github.com/adah1972/libunibreak"
-  url "https://github.com/adah1972/libunibreak/releases/download/libunibreak_5_1/libunibreak-5.1.tar.gz"
-  sha256 "dd1a92d4c5646aa0e457ff41d89812ec5243863be6c20bbcb5ee380f3dd78377"
+  url "https://github.com/adah1972/libunibreak/releases/download/libunibreak_6_1/libunibreak-6.1.tar.gz"
+  sha256 "cc4de0099cf7ff05005ceabff4afed4c582a736abc38033e70fdac86335ce93f"
   license "Zlib"
 
   livecheck do
@@ -14,15 +14,14 @@ class Libunibreak < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "3e2150380d94e0adf1aba9eaa99db4684a02894f285b639b1480803f494d9277"
-    sha256 cellar: :any,                 arm64_ventura:  "7dfc308bb0fdaf546e5d27a9c0c871778231e8f8624e5cf375da8e634b9e21f4"
-    sha256 cellar: :any,                 arm64_monterey: "83a5da767d81cc13dbd79a926769487ad9e27b312a064d6d103116045ca00e69"
-    sha256 cellar: :any,                 arm64_big_sur:  "8d491d6d388f52ec3eb2f8966e5cb996ccf1453d11da714d6eff56c66af0af78"
-    sha256 cellar: :any,                 sonoma:         "e785da6b43150cf0459775758b3a0ad841fce35184dc23ca99e7a25f12f9bde9"
-    sha256 cellar: :any,                 ventura:        "5dd562fc1618a99274e48e1d1401134bf64af893b2659bbb61167885e340b55f"
-    sha256 cellar: :any,                 monterey:       "6a12dc2fefb6fa8d558194d964410f0f4858415749898a9107902a2762a9a177"
-    sha256 cellar: :any,                 big_sur:        "b030a2efa4e9ef197a28a6db5b174a0682a757920ddb93d569aea159d88545d4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b2603a6cda73dad46b8929b3a155aa5326fa74c1ed927b812b4fc404e547dbba"
+    sha256 cellar: :any,                 arm64_sequoia:  "0bed33fbc272073291fa047e1f72422aff56e83276de789d02a0f3f82f117b45"
+    sha256 cellar: :any,                 arm64_sonoma:   "687db532bdd75f70882b9b40e0f5b14fdac91ce6c81a94067757e46cc6f84566"
+    sha256 cellar: :any,                 arm64_ventura:  "66f1874dbc3a0761b53cf03a7a72d2ca161b129c251a922a4109f93be947086e"
+    sha256 cellar: :any,                 arm64_monterey: "f14809e82b501d33b043d4943c9dcf5b8667adeddcefff7356d41c993575de35"
+    sha256 cellar: :any,                 sonoma:         "e567abc03dc6d7df4bb3f5e6347dd58b8738d1b79cb03e151b44fce2ea9b6ce1"
+    sha256 cellar: :any,                 ventura:        "60c6227dc928dca0478e06214ecb17f1e8103cfb42c7109509d4ed565acfde91"
+    sha256 cellar: :any,                 monterey:       "871afc806ba2cae52184f857040c6b74f354025f502edebef37a443355994902"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a2662de1e1149d0aa2ed06f7bed26ab1ad27f7fc1bc5aa1689a9a320179b124a"
   end
 
   def install
@@ -31,7 +30,7 @@ class Libunibreak < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <unibreakbase.h>
       #include <linebreak.h>
       #include <assert.h>
@@ -54,7 +53,7 @@ class Libunibreak < Formula
 
         return memcmp(output, expected, sizeof(output)) != 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c", "-I#{include}",
                    "-L#{lib}", "-lunibreak"
     system "./test"

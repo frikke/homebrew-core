@@ -1,19 +1,18 @@
 class Inxi < Formula
   desc "Full featured CLI system information tool"
   homepage "https://smxi.org/docs/inxi.htm"
-  url "https://github.com/smxi/inxi/archive/3.3.29-1.tar.gz"
-  sha256 "5802cc6fe780fb9f24a097c326ffce9b31abe2f5b70957e21c6973e008bbf44b"
+  url "https://codeberg.org/smxi/inxi/archive/3.3.37-1.tar.gz"
+  sha256 "da730f84f4a2ca53bab471860a83995c9d498bb34c2518fbb7ff65ee705e048e"
   license "GPL-3.0-or-later"
-  head "https://github.com/smxi/inxi.git", branch: "master"
+  head "https://codeberg.org/smxi/inxi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "95614d0c99300f386142dc66811192efb1134449de5f0a20963784f686de3851"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "95614d0c99300f386142dc66811192efb1134449de5f0a20963784f686de3851"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "95614d0c99300f386142dc66811192efb1134449de5f0a20963784f686de3851"
-    sha256 cellar: :any_skip_relocation, ventura:        "8a9bd17e375977f50d9d8eed11884a44d0547d9134fc319c19e12e3236907140"
-    sha256 cellar: :any_skip_relocation, monterey:       "8a9bd17e375977f50d9d8eed11884a44d0547d9134fc319c19e12e3236907140"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8a9bd17e375977f50d9d8eed11884a44d0547d9134fc319c19e12e3236907140"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "95614d0c99300f386142dc66811192efb1134449de5f0a20963784f686de3851"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "190f696b65279d91a9ef502668e49eb5e702205245016888f2469a36b6a4534f"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "190f696b65279d91a9ef502668e49eb5e702205245016888f2469a36b6a4534f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "190f696b65279d91a9ef502668e49eb5e702205245016888f2469a36b6a4534f"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e0dc059e9f7ab886820bc7fb3a5c94d4fd60413a12ffbc057a0016f763c51efb"
+    sha256 cellar: :any_skip_relocation, ventura:       "e0dc059e9f7ab886820bc7fb3a5c94d4fd60413a12ffbc057a0016f763c51efb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "190f696b65279d91a9ef502668e49eb5e702205245016888f2469a36b6a4534f"
   end
 
   uses_from_macos "perl"
@@ -28,7 +27,7 @@ class Inxi < Formula
   end
 
   test do
-    inxi_output = shell_output("#{bin}/inxi")
+    inxi_output = shell_output(bin/"inxi")
     uname_r = shell_output("uname -r").strip
     assert_match uname_r.to_str, inxi_output.to_s
   end

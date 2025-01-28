@@ -1,22 +1,22 @@
 class Matplotplusplus < Formula
   desc "C++ Graphics Library for Data Visualization"
   homepage "https://github.com/alandefreitas/matplotplusplus"
-  url "https://github.com/alandefreitas/matplotplusplus/archive/v1.2.0.tar.gz"
-  sha256 "42e24edf717741fcc721242aaa1fdb44e510fbdce4032cdb101c2258761b2554"
+  url "https://github.com/alandefreitas/matplotplusplus/archive/refs/tags/v1.2.1.tar.gz"
+  sha256 "9dd7cc92b2425148f50329f5a3bf95f9774ac807657838972d35334b5ff7cb87"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "9303a47d6e17b4718fe5536549035dc343c5d62a1545736b9828f221ee0c6a96"
-    sha256 cellar: :any,                 arm64_monterey: "bb569ce1db39420566b77fb8ff0cd62808ee3213d9634dce7fbcd58afb77acc6"
-    sha256 cellar: :any,                 arm64_big_sur:  "be4bfef96282be1c1e1f527237d15917ff10437edbf98f8bed0a105c58f572d2"
-    sha256 cellar: :any,                 ventura:        "89a762d1e032a41a5f5cc8ffb18752c5d00baa0c2a0ea3f0273cb74f5971daff"
-    sha256 cellar: :any,                 monterey:       "c06d3057a3b371ea6887c008d55afb848b48f0df2f8cf4206b8e7a77b8bfc77e"
-    sha256 cellar: :any,                 big_sur:        "4b229eaec3f93b4b872f7f65785c8b717beb31c83c07498798a64f4b1bd9a90d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7f24a36084507d7323bcebfde558746baa92f4508ecd5d5729046a04e079b9e2"
+    sha256 cellar: :any,                 arm64_sonoma:   "c32ca572fd775cc0659be1314e06047f9d9f245e02d3c43ad4500ac84a9a7290"
+    sha256 cellar: :any,                 arm64_ventura:  "4882c11bd408f3e4532558b98f76b831775bb154a9645c8cf7f6d2d72295e1fa"
+    sha256 cellar: :any,                 arm64_monterey: "faf64ded9d8bd33a4992f4e17266c98ccb0299944135afcab9996423c1768068"
+    sha256 cellar: :any,                 sonoma:         "093db12d6f31223aec6dc8624cb1d4034739ebf62b74c188a42d252df7087dbb"
+    sha256 cellar: :any,                 ventura:        "2912de97be2ee340f216877e8f3660ceebd7b3e6d0c603784bd764b409e44e83"
+    sha256 cellar: :any,                 monterey:       "23fa45235767c6d820822eefcdcba209ae48ad175b7261f4c1d244fb08cbc7c2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dff586197efba0a30a6bfd7d7ea51712e6b34d430efc9d6e512b7f65e8306124"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "fftw"
   depends_on "gnuplot"
   depends_on "jpeg-turbo"
@@ -31,12 +31,11 @@ class Matplotplusplus < Formula
     cause "cannot run simple program using std::filesystem"
   end
 
-  fails_with gcc: "5"
-
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
+    system "cmake", "-S", ".", "-B", "build",
                     "-DBUILD_SHARED_LIBS=ON",
-                    "-DBUILD_EXAMPLES=OFF"
+                    "-DBUILD_EXAMPLES=OFF",
+                    *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
     pkgshare.install "examples"
@@ -49,6 +48,6 @@ class Matplotplusplus < Formula
     cp pkgshare/"examples/exporting/save/save_1.cpp", testpath/"test.cpp"
     system ENV.cxx, "-std=c++17", "test.cpp", "-L#{lib}", "-lmatplot", "-o", "test"
     system "./test"
-    assert_predicate testpath/"img/barchart.svg", :exist?
+    assert_path_exists testpath/"img/barchart.svg"
   end
 end

@@ -1,19 +1,18 @@
 class Verilator < Formula
   desc "Verilog simulator"
   homepage "https://www.veripool.org/wiki/verilator"
-  url "https://github.com/verilator/verilator/archive/refs/tags/v5.016.tar.gz"
-  sha256 "66fc36f65033e5ec904481dd3d0df56500e90c0bfca23b2ae21b4a8d39e05ef1"
+  url "https://github.com/verilator/verilator/archive/refs/tags/v5.032.tar.gz"
+  sha256 "5a262564b10be8bdb31ff4fb67d77bcf5f52fc1b4e6c88d5ca3264fb481f1e41"
   license any_of: ["LGPL-3.0-only", "Artistic-2.0"]
   head "https://github.com/verilator/verilator.git", branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "6a376cb8788f2cad4a0a23e6bad07310531d59cc526a341c8fece066b91ab3f5"
-    sha256 arm64_monterey: "0a4726a82573f02a01880814d1ca0ede419a49ca4a2ce25648e62b8bc10fc759"
-    sha256 arm64_big_sur:  "6b0cbcc3c49543b3870d629b6e765ccf3e459b3add1eb0017a788e75989bc315"
-    sha256 ventura:        "f4011ed6f39f200cd60c50e2fc0ece4584ce6dc42a362f561454c1fe01753534"
-    sha256 monterey:       "d8547e788ea1d4cfef5534d1068ad394fe02489c3db5f97b717a67f28bde79e7"
-    sha256 big_sur:        "ad60eff72dbbaa9f73b5b893f462dd455d69e05aa12ee200b49f17121314e8d6"
-    sha256 x86_64_linux:   "3e2a65f36c594a32fc5b60f36548ccb92f962ba28ccb2e6d3f59eb504d2e1947"
+    sha256 arm64_sequoia: "3612fb39c7d25cf350f8f2007bce3f364630e6e571eabe258b7abc8633236452"
+    sha256 arm64_sonoma:  "cba576313468ff895ba287014dd54db630fdc6b82fa1c1f61e3eecede07bb806"
+    sha256 arm64_ventura: "64a7a891493f91a770195675ef00411f9851fab5c38091b88947ee33a91a9578"
+    sha256 sonoma:        "0fea2b55dbd9861c8e4ecf48b6594c1b3e66de6c01d088a5d20e59eda83a13f6"
+    sha256 ventura:       "13b177e4a33d40d0edb8795546d20ec50529c3825bffddc176ab4f8f942cccb1"
+    sha256 x86_64_linux:  "ef4f88f802756b5a40507fcfd44c69a63dcdf0ca49a5ce0147075281202685c6"
   end
 
   depends_on "autoconf" => :build
@@ -26,9 +25,6 @@ class Verilator < Formula
   uses_from_macos "python", since: :catalina
 
   skip_clean "bin" # Allows perl scripts to keep their executable flag
-
-  # error: specialization of 'template<class _Tp> struct std::hash' in different namespace
-  fails_with gcc: "5"
 
   def install
     system "autoconf"
@@ -48,12 +44,12 @@ class Verilator < Formula
   end
 
   test do
-    (testpath/"test.v").write <<~EOS
+    (testpath/"test.v").write <<~VERILOG
       module test;
          initial begin $display("Hello World"); $finish; end
       endmodule
-    EOS
-    (testpath/"test.cpp").write <<~EOS
+    VERILOG
+    (testpath/"test.cpp").write <<~CPP
       #include "Vtest.h"
       #include "verilated.h"
       int main(int argc, char **argv, char **env) {
@@ -63,7 +59,7 @@ class Verilator < Formula
           delete top;
           exit(0);
       }
-    EOS
+    CPP
     system bin/"verilator", "-Wall", "--cc", "test.v", "--exe", "test.cpp"
     cd "obj_dir" do
       system "make", "-j", "-f", "Vtest.mk", "Vtest"

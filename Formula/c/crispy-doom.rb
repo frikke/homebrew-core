@@ -1,26 +1,25 @@
 class CrispyDoom < Formula
   desc "Limit-removing enhanced-resolution Doom source port based on Chocolate Doom"
   homepage "https://github.com/fabiangreffrath/crispy-doom"
-  url "https://github.com/fabiangreffrath/crispy-doom/archive/crispy-doom-6.0.tar.gz"
-  sha256 "2b85649c615efeac7573883370e9434255af301222b323120692cb9649b7f420"
+  url "https://github.com/fabiangreffrath/crispy-doom/archive/refs/tags/crispy-doom-7.0.tar.gz"
+  sha256 "25eea88fdbe1320ad0d1a3e0ed66ae8d985c39b79e442beab5fc36d9d5ddfc42"
   license "GPL-2.0-only"
-  revision 1
-
   head "https://github.com/fabiangreffrath/crispy-doom.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "19e4f1a6e23950ec922e672be298e8ca8d702e503f85d51a9da64ee4083dc314"
-    sha256 cellar: :any,                 arm64_monterey: "9902a1e17493c3a05ef1eee4f20cd9182667ff89fb062988894eacf8af9fc6ec"
-    sha256 cellar: :any,                 arm64_big_sur:  "5efe0048088ffb5ee12472407d421a9712bca17eb8e47686bd9b7e647e8db1de"
-    sha256 cellar: :any,                 ventura:        "8d4a9d5c429d7352e683af1cfe2469d3509a156a764d4c5fc4dd4dd58c5f5acb"
-    sha256 cellar: :any,                 monterey:       "793f15b76ec873e43f0365683644163d017d3f17ad179d63bd820c498ad85a21"
-    sha256 cellar: :any,                 big_sur:        "314dce30413f43e4f7cf986896e89fa3abcc4d9dcf4922f3cf12320a43d17663"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f2812bfd3721d746017e624485ee9a9e57fcdf8e479d061ad3acfbea9cd03535"
+    sha256 cellar: :any,                 arm64_sequoia:  "b9b035b756e9b42de763784b2d232e18edd11778a9417f61155011aafef3c03e"
+    sha256 cellar: :any,                 arm64_sonoma:   "5c440e871b1498809e4372de33366c2c3df9e740bb8b541f9e414e4d96de50fe"
+    sha256 cellar: :any,                 arm64_ventura:  "10f31a1dabdaa5709e63146e3ebb56008afce374116da948002b7e611b35f26b"
+    sha256 cellar: :any,                 arm64_monterey: "327d92bb2cad988d5835718b372a77322f2aa7ba507200767e4d5dbb5c278545"
+    sha256 cellar: :any,                 sonoma:         "325da8f1b4334a227d9f54f65434a84973331bec480d46e4136be618c32636b9"
+    sha256 cellar: :any,                 ventura:        "edf187b019afbc43e5326413f87c603b591c964a1792932e3883e2a565ac0682"
+    sha256 cellar: :any,                 monterey:       "b52ae717094041400af36ecbe0f741c7f32e7ec10c93f054f0e6d3a48d7e5c08"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "32038b4fcd8556a79441e0f482ea6597e1ae6a8ec934a415c7fadc62ed21cf22"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "fluid-synth"
   depends_on "libpng"
   depends_on "libsamplerate"
@@ -28,12 +27,13 @@ class CrispyDoom < Formula
   depends_on "sdl2_mixer"
   depends_on "sdl2_net"
 
+  uses_from_macos "zlib"
+
   def install
-    system "autoreconf", "-fiv"
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--disable-sdltest"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-silent-rules",
+                          "--disable-sdltest",
+                          *std_configure_args
     system "make", "install", "execgamesdir=#{bin}"
   end
 

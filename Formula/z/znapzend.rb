@@ -1,8 +1,8 @@
 class Znapzend < Formula
   desc "ZFS backup with remote capabilities and mbuffer integration"
   homepage "https://www.znapzend.org/"
-  url "https://github.com/oetiker/znapzend/releases/download/v0.21.2/znapzend-0.21.2.tar.gz"
-  sha256 "c3753d663c2f4d87f87da0191441c5cd2cb32aca7ded913d97565472413e3823"
+  url "https://github.com/oetiker/znapzend/releases/download/v0.23.2/znapzend-0.23.2.tar.gz"
+  sha256 "69928caacde7468e5154d81197e257cd0c85ee3eedb3192be67fdfe486defefe"
   license "GPL-3.0-or-later"
   head "https://github.com/oetiker/znapzend.git", branch: "master"
 
@@ -15,15 +15,14 @@ class Znapzend < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "0c3509ccaa62d0d10254c01f769082d47a6faae30dba053b98d10c1d1580c491"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "360e1da87dca16e4aee394895811672b1ff5b2cd2f0d00faf19626c227560653"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2603328f0b6bf5f6264933a29fa014bf766b39c2dca01005633f61d525712772"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "74bec9f6200da20da80c4b23090b4a75ea1813d764082965f21ecfddee02cbf2"
-    sha256 cellar: :any_skip_relocation, sonoma:         "aa49b9155872201e4545d0201c1e99d4308246f7c49518469a80b3d5f04578d6"
-    sha256 cellar: :any_skip_relocation, ventura:        "70c703197262f392c2aa298aa6a12e84369a1a63d7f19b76685c39d905831f4d"
-    sha256 cellar: :any_skip_relocation, monterey:       "73849373fd9725c332045cf2b2a32303336b077ad77642d9a8131b7b9b78bce8"
-    sha256 cellar: :any_skip_relocation, big_sur:        "013467cb38cdce3691d36b5bc572320be8b1b2fd10c97ac0d3c7470ed8098154"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "890ef09e8f87edfcd4b93061daf11250604bb39c027bf71ab77acb357d0a239a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "2a9e6930ad18a76b4bf38a65dccf94f805adb88442ac6515980b936f5214836d"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "894fb42d2fab9740dc12eb446afc08a6884aeff713dfedc7bb4f36758ecbc541"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d8381b64efa6aceba6574825aa1f3088fd32ffbccc0b2ebda001b6a30e8d1931"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e827d72e828c64112d249b8e138b12ab69545d3125b4a548e0b850440054d543"
+    sha256 cellar: :any_skip_relocation, sonoma:         "d1a7026501925fc170e5968391f773f994cf9b0698277e7ca7b3a9c1eedd9da5"
+    sha256 cellar: :any_skip_relocation, ventura:        "39cbe0e4c321ffec7a04efca7b964ce7a5b3ed3565d5d1684cda645e321eea8e"
+    sha256 cellar: :any_skip_relocation, monterey:       "2fc87dc230cf7f66d84062ed1d5ffa1abe5cdb463998834edc0a717825b55a7b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "51c313e2b172e1a50338a811d4d344ff9259cd9e973b9890d7819a4bd846f352"
   end
 
   uses_from_macos "perl", since: :big_sur
@@ -51,14 +50,16 @@ class Znapzend < Formula
 
   test do
     fake_zfs = testpath/"zfs"
-    fake_zfs.write <<~EOS
+    fake_zfs.write <<~SH
       #!/bin/sh
       for word in "$@"; do echo $word; done >> znapzendzetup_said.txt
       exit 0
-    EOS
+    SH
     chmod 0755, fake_zfs
     ENV.prepend_path "PATH", testpath
-    system "#{bin}/znapzendzetup", "list"
+
+    system bin/"znapzendzetup", "list"
+
     assert_equal <<~EOS, (testpath/"znapzendzetup_said.txt").read
       list
       -H

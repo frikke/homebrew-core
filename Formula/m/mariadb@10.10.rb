@@ -1,42 +1,30 @@
 class MariadbAT1010 < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://archive.mariadb.org/mariadb-10.10.6/source/mariadb-10.10.6.tar.gz"
-  sha256 "e1e53011979d29f0ec26e13ab8caf613481bf029520566fb96817546103938d5"
+  url "https://archive.mariadb.org/mariadb-10.10.7/source/mariadb-10.10.7.tar.gz"
+  sha256 "6db3d7be275b77181cf361499b76f40fa41b762a71ba75e78dec95e7b8215eb0"
   license "GPL-2.0-only"
 
-  livecheck do
-    url "https://downloads.mariadb.org/rest-api/mariadb/all-releases/?olderReleases=false"
-    strategy :json do |json|
-      json["releases"]&.map do |release|
-        next unless release["release_number"]&.start_with?(version.major_minor)
-        next if release["status"] != "stable"
-
-        release["release_number"]
-      end
-    end
-  end
-
   bottle do
-    sha256 arm64_ventura:  "395118d3a58f904e2d5b19cfa4954c0626dbfeed9c76255cfca83986a3ed6c3a"
-    sha256 arm64_monterey: "d1bd7efe169303750f320b005b4c23297fbe66727e3154497f3c48351f4cfc42"
-    sha256 arm64_big_sur:  "2a7fd1b426a9f392b351ccd833d9aec27b8b4c5fe3d355dc394fe4a8787a7248"
-    sha256 ventura:        "21353e99497360f02fea72b14869c36a59adbd13bd7262f66f11505f45eab1a7"
-    sha256 monterey:       "8d2819079bf464aa7a36cb11cf82bca51bb6cd4161813ae977047e5021539bb7"
-    sha256 big_sur:        "ede3a042cc47221714d4662ac6ae19d1aac4c35599b95e2b56f153e4d021b913"
-    sha256 x86_64_linux:   "4b9f728d2c6370a83d4fe18c6884ffddddf3d82e5fd18164c3e3ad9570b18f8e"
+    sha256 arm64_sonoma:   "5f460c753a8cf8b47bcd6e35932ad51ec185e4f9c2f4c2ac464c2a537aaeb095"
+    sha256 arm64_ventura:  "efdc0681e993b65fe71f5067886cbfe49ca51c622e46a0f39d688fba58687c94"
+    sha256 arm64_monterey: "2fe7becdef2925dc4c6f5cee6faae4031375fe8037adefc748d944abd6d3b82a"
+    sha256 sonoma:         "f6760a3815638ae6e12c22c649b31c15af291774cabaa809b5ddc38f3a7ad4e4"
+    sha256 ventura:        "6f1ac3e75141a3305852dd34fea5a703820161582d75232f7f7622eaeebc6c0d"
+    sha256 monterey:       "c1d996bb543fd428313b650660eaa2d559759bc5e28504c85be78cf074077b62"
+    sha256 x86_64_linux:   "607fd3dd9ceeab2bc0a761a7022c591ab82f03e21ab9aef3800bc5ba4ce2a07a"
   end
 
   keg_only :versioned_formula
 
   # See: https://mariadb.com/kb/en/changes-improvements-in-mariadb-1010/
   # End-of-life on 2023-11-17: https://mariadb.org/about/#maintenance-policy
-  deprecate! date: "2023-11-17", because: :unsupported
+  disable! date: "2024-07-26", because: :unsupported
 
   depends_on "bison" => :build
   depends_on "cmake" => :build
   depends_on "fmt" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "groonga"
   depends_on "openssl@3"
   depends_on "pcre2"
@@ -51,19 +39,6 @@ class MariadbAT1010 < Formula
   on_linux do
     depends_on "linux-pam"
     depends_on "readline" # uses libedit on macOS
-  end
-
-  fails_with gcc: "5"
-
-  # Fix libfmt usage.
-  # https://github.com/MariaDB/server/pull/2732
-  patch do
-    url "https://github.com/MariaDB/server/commit/f4cec369a392c8a6056207012992ad4a5639965a.patch?full_index=1"
-    sha256 "1851d5ae209c770e8fd1ba834b840be12d7b537b96c7efa3d4e7c9523f188912"
-  end
-  patch do
-    url "https://github.com/MariaDB/server/commit/cd5808eb8da13c5626d4bdeb452cef6ada29cb1d.patch?full_index=1"
-    sha256 "4d288f82f56c61278aefecba8a90d214810b754e234f40b338e8cc809e0369e9"
   end
 
   def install
@@ -118,11 +93,11 @@ class MariadbAT1010 < Formula
 
     # Don't create databases inside of the prefix!
     # See: https://github.com/Homebrew/homebrew/issues/4975
-    rm_rf prefix/"data"
+    rm_r(prefix/"data")
 
     # Save space
-    (prefix/"mysql-test").rmtree
-    (prefix/"sql-bench").rmtree
+    rm_r(prefix/"mysql-test")
+    rm_r(prefix/"sql-bench")
 
     # Link the setup scripts into bin
     bin.install_symlink [
@@ -148,12 +123,12 @@ class MariadbAT1010 < Formula
     end
 
     # Install my.cnf that binds to 127.0.0.1 by default
-    (buildpath/"my.cnf").write <<~EOS
+    (buildpath/"my.cnf").write <<~INI
       # Default Homebrew MySQL server config
       [mysqld]
       # Only allow connections from localhost
       bind-address = 127.0.0.1
-    EOS
+    INI
     etc.install "my.cnf"
   end
 
@@ -166,7 +141,7 @@ class MariadbAT1010 < Formula
 
     unless File.exist? "#{var}/mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
-      system "#{bin}/mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
+      system bin/"mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
         "--basedir=#{prefix}", "--datadir=#{var}/mysql", "--tmpdir=/tmp"
     end
   end
@@ -194,12 +169,12 @@ class MariadbAT1010 < Formula
       "--auth-root-authentication-method=normal"
     port = free_port
     fork do
-      system "#{bin}/mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
+      system bin/"mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
         "--datadir=#{testpath}/mysql", "--port=#{port}", "--tmpdir=#{testpath}/tmp"
     end
     sleep 5
     assert_match "information_schema",
       shell_output("#{bin}/mysql --port=#{port} --user=root --password= --execute='show databases;'")
-    system "#{bin}/mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
+    system bin/"mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
   end
 end

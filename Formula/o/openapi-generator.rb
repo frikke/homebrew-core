@@ -1,8 +1,8 @@
 class OpenapiGenerator < Formula
   desc "Generate clients, server & docs from an OpenAPI spec (v2, v3)"
   homepage "https://openapi-generator.tech/"
-  url "https://search.maven.org/remotecontent?filepath=org/openapitools/openapi-generator-cli/7.0.0/openapi-generator-cli-7.0.0.jar"
-  sha256 "80e8e9d71bdbdf513b8c65cf7d3fc2fe3d88aaeb4e39a2c6e20831f00032c775"
+  url "https://search.maven.org/remotecontent?filepath=org/openapitools/openapi-generator-cli/7.11.0/openapi-generator-cli-7.11.0.jar"
+  sha256 "113c25df5a781d5a1fc2b883f12fe8f263db285ab12e15854d5b15306e1bf7fc"
   license "Apache-2.0"
 
   livecheck do
@@ -11,15 +11,7 @@ class OpenapiGenerator < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "263bed167fa87cebb9b3aff6bebb3339dacab073e281d871d39827d56db2a2df"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "263bed167fa87cebb9b3aff6bebb3339dacab073e281d871d39827d56db2a2df"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "263bed167fa87cebb9b3aff6bebb3339dacab073e281d871d39827d56db2a2df"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "263bed167fa87cebb9b3aff6bebb3339dacab073e281d871d39827d56db2a2df"
-    sha256 cellar: :any_skip_relocation, sonoma:         "263bed167fa87cebb9b3aff6bebb3339dacab073e281d871d39827d56db2a2df"
-    sha256 cellar: :any_skip_relocation, ventura:        "263bed167fa87cebb9b3aff6bebb3339dacab073e281d871d39827d56db2a2df"
-    sha256 cellar: :any_skip_relocation, monterey:       "263bed167fa87cebb9b3aff6bebb3339dacab073e281d871d39827d56db2a2df"
-    sha256 cellar: :any_skip_relocation, big_sur:        "263bed167fa87cebb9b3aff6bebb3339dacab073e281d871d39827d56db2a2df"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "92bcca09b7189d9c85b5cb2579a1e29c6221ed630bd1cbff38c272c9363d71c3"
+    sha256 cellar: :any_skip_relocation, all: "ec269873d2848f8720e22647684662d000d3d0978825b2b7c5682fa30652b890"
   end
 
   head do
@@ -44,7 +36,7 @@ class OpenapiGenerator < Formula
   test do
     # From the OpenAPI Spec website
     # https://web.archive.org/web/20230505222426/https://swagger.io/docs/specification/basic-structure/
-    (testpath/"minimal.yaml").write <<~EOS
+    (testpath/"minimal.yaml").write <<~YAML
       ---
       openapi: 3.0.3
       info:
@@ -68,7 +60,7 @@ class OpenapiGenerator < Formula
                       type: array
                       items:
                         type: string
-    EOS
+    YAML
     system bin/"openapi-generator", "generate", "-i", "minimal.yaml", "-g", "openapi", "-o", "./"
     # Python is broken for (at least) Java 20
     system bin/"openapi-generator", "generate", "-i", "minimal.yaml", "-g", "python", "-o", "./"

@@ -1,29 +1,41 @@
 class Keydb < Formula
   desc "Multithreaded fork of Redis"
   homepage "https://keydb.dev"
-  url "https://github.com/Snapchat/KeyDB/archive/refs/tags/v6.3.3.tar.gz"
-  sha256 "c6798cea3fe4ba4d1b42eea6ca2cfaee261786d12bf30aef1a53211d25ab66d9"
+  url "https://github.com/Snapchat/KeyDB/archive/refs/tags/v6.3.4.tar.gz"
+  sha256 "229190b251f921e05aff7b0d2f04b5676c198131e2abbec1e2cfb2e61215e2f3"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "8eb7f30c414db777e866e4f0f5fa00b8e3406902ed2b7e09a88c369615a7b580"
-    sha256 cellar: :any,                 arm64_monterey: "da4c073cedd43ccf6c3086a9c9c96852475439e2044588e40efd55cfe52f7f79"
-    sha256 cellar: :any,                 arm64_big_sur:  "2e65f90555fba6d2e2254f114d74b7545475cb37d9894c76aefd0cfbf30b3c55"
-    sha256 cellar: :any,                 ventura:        "a93c3a36287d84a546371d5d2d55a1d760f05758e75e2dbaa61d06271b80208f"
-    sha256 cellar: :any,                 monterey:       "2a85bfdf4f739d880c374461d3044ad116fbd7f9bad675f18c48fb9f8fb5c69b"
-    sha256 cellar: :any,                 big_sur:        "4ac158c200544f7f88f252121dbb98fecc4e3f969b97425cd072c468199c55e1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7e2ed376677540d33fd35070da1ce365a164784f9b9dea6f092593d7a7364bc6"
+    sha256 cellar: :any,                 arm64_sequoia:  "40b960924a1ec659a01d19cdbc55a99b1f9f25c12920394f4406f602bf364544"
+    sha256 cellar: :any,                 arm64_sonoma:   "38437979dd3b609815380178028c57880e4e7c4e743aadd5da7721aef2502d3a"
+    sha256 cellar: :any,                 arm64_ventura:  "010db9d77cfd61aa2195db11eb21e7e30be2b565a2b92c837c69c82bd325a237"
+    sha256 cellar: :any,                 arm64_monterey: "eefed6df2c14cfbab28ac8ce65f888d011bed8a1edec7095b891ba2b418ea733"
+    sha256 cellar: :any,                 sonoma:         "9c96a66a65ad45e31aded15e6a4306d1fc4c97d707a060a3c31bba357310449c"
+    sha256 cellar: :any,                 ventura:        "0b94cbbcf2ba980719309b3545c5b63fa7328f3067d66dc8686e6db64a13a745"
+    sha256 cellar: :any,                 monterey:       "ca35b258a5ae50f171e31795616d4fb569a40ae72c12566b511b4442ff91de8a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "66f4992328aeaa000bb75107076cb9d05eb8b3ce229e94a51262d33d853af1b7"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "openssl@3"
   depends_on "snappy"
   depends_on "zstd"
+
   uses_from_macos "bzip2"
   uses_from_macos "curl"
 
   on_linux do
     depends_on "util-linux"
+  end
+
+  # Backport fixes for ARM Sonoma
+  patch do
+    url "https://github.com/Snapchat/KeyDB/commit/674d9fb7eea1e6cca6ac8da3b2d1a63dc38c9d2b.patch?full_index=1"
+    sha256 "aa175e61c8a8b5c12f8608afdb20985a558c14cc94f69be43ab3e0e0c999a3bc"
+  end
+  patch do
+    url "https://github.com/Snapchat/KeyDB/commit/603ebb27fb82a27fb98b0feb6749b0f7661a1c4b.patch?full_index=1"
+    sha256 "3cece0a51cc74606bcfa32f1b745b615078be5c67ba3e97287ce9c5c982c1ba7"
   end
 
   def install

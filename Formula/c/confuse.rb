@@ -6,6 +6,7 @@ class Confuse < Formula
   license "ISC"
 
   bottle do
+    sha256 cellar: :any, arm64_sequoia:  "4a559294bf3ec51132b479ee9b90c5e90dea6183c11707471b89a4d06b0ab371"
     sha256 cellar: :any, arm64_sonoma:   "6d46500c283c20fcf41348fc34293d30a85e0fac9955ea849369deeaf84b3a2b"
     sha256 cellar: :any, arm64_ventura:  "1c7aa3d075082f2742747ac5034f60c90b448c694ccc5b3330b71f1afdd81f81"
     sha256 cellar: :any, arm64_monterey: "633330ab55c7992ac1a9dcb3d990029d1445aab0d3e5c3a8c5759af2554b33d4"
@@ -20,17 +21,16 @@ class Confuse < Formula
     sha256               x86_64_linux:   "a5fbe815c75f10344684dab03501ecab39cec4b157e46d955f6e2c70062d120b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "check"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <confuse.h>
       #include <stdio.h>
 
@@ -48,7 +48,7 @@ class Confuse < Formula
         cfg_free(cfg);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lconfuse", "-o", "test"
     assert_match "world", shell_output("./test")
   end

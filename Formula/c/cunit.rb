@@ -3,8 +3,10 @@ class Cunit < Formula
   homepage "https://cunit.sourceforge.net/"
   url "https://downloads.sourceforge.net/project/cunit/CUnit/2.1-3/CUnit-2.1-3.tar.bz2"
   sha256 "f5b29137f845bb08b77ec60584fdb728b4e58f1023e6f249a464efa49a40f214"
+  license "LGPL-2.0-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "ed2227559e5ab1d8239ee28d11b8728832ac2301041631b31702a12be8f0d3fe"
     sha256 cellar: :any,                 arm64_sonoma:   "92297087d6f77632f4db7fb8c436ba6f70c9da28fdc11e56cb975a86ea27cc90"
     sha256 cellar: :any,                 arm64_ventura:  "346705eb07dd79665dba7f918a7c33af02a2dbacb975d5c99c0d7f45afb1ecaa"
     sha256 cellar: :any,                 arm64_monterey: "fd5bba3a249137e905676e8a80118c9aaaa8f2795ab0d7fab44407d8fe75e07f"
@@ -32,7 +34,7 @@ class Cunit < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <string.h>
       #include "CUnit/Basic.h"
@@ -60,7 +62,7 @@ class Cunit < Formula
          CU_cleanup_registry();
          return CU_get_error();
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-L#{lib}", "-lcunit", "-o", "test"
     assert_match "test of 42 ...passed", shell_output("./test")

@@ -13,6 +13,7 @@ class Libcerf < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "f98b11354a3acc473bd2697aa55845991c99f4e94577882a63a2511c00f6c703"
     sha256 cellar: :any,                 arm64_sonoma:   "34b1ea071894550defd96682761ad9a6e9b9df19ac66ce5e0541bc5f82267946"
     sha256 cellar: :any,                 arm64_ventura:  "b3b61822329b217da59ae7255dda43a504ac83256f6fa0ac8420317a2d73c339"
     sha256 cellar: :any,                 arm64_monterey: "ded6d40e220e6e5258f589f36172ad6e0ddd110b1a38134dca1676b7db43f089"
@@ -27,14 +28,13 @@ class Libcerf < Formula
   depends_on "cmake" => :build
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <cerf.h>
       #include <complex.h>
       #include <math.h>
@@ -48,7 +48,8 @@ class Libcerf < Formula
         if (fabs(cimag(a)+0.156454) > 1.e-6) abort();
         return 0;
       }
-    EOS
+    C
+
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lcerf", "-o", "test"
     system "./test"
   end

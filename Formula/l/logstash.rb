@@ -1,8 +1,8 @@
 class Logstash < Formula
   desc "Tool for managing events and logs"
   homepage "https://www.elastic.co/products/logstash"
-  url "https://github.com/elastic/logstash/archive/v8.9.2.tar.gz"
-  sha256 "d68695777f7edc7579bff361c15159a7a6c324d7927de9ebad853968c640ea36"
+  url "https://github.com/elastic/logstash/archive/refs/tags/v8.17.1.tar.gz"
+  sha256 "e49d8a6bebdad79e2711c359de0e686003a1bfc26693ee2cccbb06789eea9ff2"
   license "Apache-2.0"
   version_scheme 1
   head "https://github.com/elastic/logstash.git", branch: "main"
@@ -13,31 +13,21 @@ class Logstash < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "e34817d1f68d7effe0b0f7310034193a3a5611a37892179d6d204ed88c3aa5e2"
-    sha256 cellar: :any,                 arm64_monterey: "d2d3333d5f2a8d6e6153f628710a2c1ef38bcb6d201c7f2de6fdef73a6ba79c8"
-    sha256 cellar: :any,                 arm64_big_sur:  "caf12aba29b1f6d7967f6cd90c09744b1a38eb9c3021c36cf25d6fdc1a7ed112"
-    sha256 cellar: :any,                 ventura:        "d5eeb1ce4f2e0d2bb9534372356271d5e639a33cafe6b3ca8004d87cb51de71a"
-    sha256 cellar: :any,                 monterey:       "b146b258b177789dd72f1bfb2b79a47adbf9be2c04db1f2c5272d785daf44903"
-    sha256 cellar: :any,                 big_sur:        "1585a56f5ebf9448ee9b87856426330ccaebd6ec90bbaa6f59d21b9fb71f18c0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1d096d4ffd71d1d27963e1558348e2664e8fbd633a0e63c08b7ac26f3bf68cd2"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ced0a8a887342fe206680476d218681b163cb4a72114e1bac668bb58ec7b2800"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0847c1999b8f6b8e2dbed03264f0b7a146b27fc0dfa413f9398f934336955569"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "3c52a7474feb28cc28b1b64e7f44377b0127f345356cfc70c0ebeb043f1d975b"
+    sha256 cellar: :any,                 sonoma:        "7bcd25d3d0093124c7ae3fa80a49d2563031959463e1937cd824723b22770fba"
+    sha256 cellar: :any,                 ventura:       "2ea7f965219ee19f67dde2e618dc0cdceaefabf4f4952e541b9319688892e0dc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bf65b4fb9e73b80a1d423c7d8836b8ee7b3d4e6a310c1c9b204845285033bfda"
   end
 
   depends_on "openjdk@17"
 
   uses_from_macos "ruby" => :build
 
-  # Ruby 3.2 compatibility.
-  # https://github.com/elastic/logstash/pull/14838
-  patch do
-    on_linux do
-      url "https://github.com/elastic/logstash/commit/95870c0f7a7c008c10e848191f85a1065e7db800.patch?full_index=1"
-      sha256 "b09065efe41a0098266d1243df19c6e35f4d075db06b41309c8fa791b25453f5"
-    end
-  end
-
   def install
     # remove non open source files
-    rm_rf "x-pack"
+    rm_r("x-pack")
     ENV["OSS"] = "true"
 
     # Build the package from source
@@ -68,14 +58,23 @@ class Logstash < Formula
 
     # Move config files into etc
     (etc/"logstash").install Dir[libexec/"config/*"]
-    (libexec/"config").rmtree
+    rm_r(libexec/"config")
 
     bin.install libexec/"bin/logstash", libexec/"bin/logstash-plugin"
     bin.env_script_all_files libexec/"bin", LS_JAVA_HOME: "${LS_JAVA_HOME:-#{Language::Java.java_home("17")}}"
+
+    # remove non-native architecture pre-built libraries
+    paths = [
+      libexec/"vendor/jruby/lib/ruby/stdlib/libfixposix/binary",
+    ]
+    paths.each do |path|
+      path.each_child { |dir| rm_r(dir) unless dir.to_s.include? Hardware::CPU.arch.to_s }
+    end
+    rm_r libexec/"vendor/jruby/lib/ruby/stdlib/libfixposix/binary/arm64-darwin" if OS.mac? && Hardware::CPU.arm?
   end
 
   def post_install
-    ln_s etc/"logstash", libexec/"config"
+    ln_s etc/"logstash", libexec/"config" unless (libexec/"config").exist?
   end
 
   def caveats
@@ -98,9 +97,9 @@ class Logstash < Formula
     ["jvm.options", "log4j2.properties", "startup.options"].each do |f|
       cp prefix/"libexec/config/#{f}", testpath/"config"
     end
-    (testpath/"config/logstash.yml").write <<~EOS
+    (testpath/"config/logstash.yml").write <<~YAML
       path.queue: #{testpath}/queue
-    EOS
+    YAML
     (testpath/"data").mkpath
     (testpath/"logs").mkpath
     (testpath/"queue").mkpath

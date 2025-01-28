@@ -1,23 +1,21 @@
 class Cmus < Formula
   desc "Music player with an ncurses based interface"
   homepage "https://cmus.github.io/"
-  url "https://github.com/cmus/cmus/archive/v2.10.0.tar.gz"
-  sha256 "ff40068574810a7de3990f4f69c9c47ef49e37bd31d298d372e8bcdafb973fff"
+  url "https://github.com/cmus/cmus/archive/refs/tags/v2.12.0.tar.gz"
+  sha256 "44b96cd5f84b0d84c33097c48454232d5e6a19cd33b9b6503ba9c13b6686bfc7"
   license "GPL-2.0-or-later"
-  revision 2
   head "https://github.com/cmus/cmus.git", branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "c676d903f551c4358b4fdc38f7b3152cdeb917b2a8390b0983f659fd6ba2d79d"
-    sha256 arm64_monterey: "952c7e7175254572228a1e7a5c6b04be1a613cc4757cbf0d87f1e53263f745e7"
-    sha256 arm64_big_sur:  "563768eef81faa0f544380e1cbe668da81038ad9252e80bb0cee275c8fcbacd8"
-    sha256 ventura:        "65a22e527bfbd3dacd500e123452cf719e97011b95ede36e40b1e4e3496aca26"
-    sha256 monterey:       "d38a5f8f62abd393a8afb60a1bceea1fd48d7668919959d107624fb3576c8c06"
-    sha256 big_sur:        "98c14f791bef5c18758a47fe06da795cfa1f061665f7977959d7fd763cacd5ff"
-    sha256 x86_64_linux:   "78f8cb1c5aa2a1cb0c06fbc53800eef904b4995712e399c9617bf1a82c4c224f"
+    sha256 arm64_sequoia: "8b1739fd6bd6dce2b68c3f86b4587bd501e4d9559d978c1c1b9df5581c0a709b"
+    sha256 arm64_sonoma:  "ce5bba497d1288d378ab93c8947b305928f7306bfdf46a938e5c43ad4e8f13ea"
+    sha256 arm64_ventura: "fe14820def68e642197f8b7c6c0615edc9887b536083a69bd311aefe8c4c6c9b"
+    sha256 sonoma:        "68cc3746e9c2f4f31357685474d76c565e7d28f3f4502b82427f0ee45eb02e5f"
+    sha256 ventura:       "c18386b2327143c996a9b821118884bd511ed47cfc74742894659d1afc460faf"
+    sha256 x86_64_linux:  "36afb0eb6672a1734b4c9cdfcb128b8c21ac925b69c854b6e7a8175bf21d2d20"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "faad2"
   depends_on "ffmpeg"
   depends_on "flac"
@@ -27,10 +25,12 @@ class Cmus < Formula
   depends_on "libvorbis"
   depends_on "mad"
   depends_on "mp4v2"
+  depends_on "ncurses"
   depends_on "opusfile"
 
   on_linux do
     depends_on "alsa-lib"
+    depends_on "pulseaudio"
   end
 
   def install

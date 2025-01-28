@@ -1,6 +1,7 @@
 class Libelf < Formula
   desc "ELF object file access library"
-  homepage "https://web.archive.org/web/20181111033959/www.mr511.de/software/english.html"
+  # Original upstream is gone https://web.archive.org/web/20181111033959/www.mr511.de/software/english.html
+  homepage "https://fossies.org/linux/misc/old/libelf-0.8.13.tar.gz/"
   url "https://www.mirrorservice.org/sites/ftp.netbsd.org/pub/pkgsrc/distfiles/libelf-0.8.13.tar.gz"
   mirror "https://fossies.org/linux/misc/old/libelf-0.8.13.tar.gz"
   sha256 "591a9b4ec81c1f2042a97aa60564e0cb79d041c52faa7416acb38bc95bd2c76d"
@@ -8,6 +9,7 @@ class Libelf < Formula
   revision 1
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "4f4135950b4b898f046e748266d309126a4c87e0e86a19d476192f9619660819"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "b5db356e6f8dc983b40424a17c9b73bfcbb442d08a6db8e952744b55aa53bb6e"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "839fa934a24ba7bff4bd8ed5d8e3440cd70db7027fa2b79201c32469d0947877"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "3987585b99efe287bfe353b420ba423057e6bfb3a27d543f5f0bfe13f76ef42f"
@@ -21,7 +23,6 @@ class Libelf < Formula
     sha256 cellar: :any_skip_relocation, high_sierra:    "e11504a15c64cd7fca3248ca7ed14eead25a5d63d8bbd9a8e00f076c56602295"
     sha256 cellar: :any_skip_relocation, sierra:         "a771e35555810a4910304e3ca5967ea3e4f8cbe45576e5b2dc6b80cd9c1f0f13"
     sha256 cellar: :any_skip_relocation, el_capitan:     "a06b058c7e401942f442f573b63aa2cdd548b45d38b02b7af92393c67093f56e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c72de6e960f70dd98ea52b419d6e254362813c899d4859c4778d385a7c80e0dd"
   end
 
   # Commented out while this formula still has dependents.
@@ -30,14 +31,8 @@ class Libelf < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-
-  on_linux do
-    keg_only "it conflicts with elfutils, which installs a maintained libelf.a"
-
-    # `libelf` should never be used on Linux as `elfutils` is available.
-    # Can make formula `depends_on :macos` afterward.
-    disable! date: "2023-05-13", because: :unmaintained # and upstream site is gone
-  end
+  # `libelf` should never be used on Linux as `elfutils` is available.
+  depends_on :macos
 
   def install
     # Workaround for ancient config files not recognising aarch64 macos.
@@ -47,11 +42,8 @@ class Libelf < Formula
       cp am_share/fn, fn
     end
 
-    system "autoreconf", "-fvi"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--disable-compat"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-compat", *std_configure_args
     # Use separate steps; there is a race in the Makefile.
     system "make"
     system "make", "install"
@@ -64,7 +56,7 @@ class Libelf < Formula
                    "D8031C040CD8048656C6C6F20776F726C640A"
     File.binwrite(testpath/"elf", [elf_content].pack("H*"))
 
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gelf.h>
       #include <fcntl.h>
       #include <stdio.h>
@@ -79,7 +71,7 @@ class Libelf < Formula
         printf("%d-bit ELF\\n", gelf_getclass(e) == ELFCLASS32 ? 32 : 64);
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-L#{lib}", "-I#{include}/libelf",
                    "-lelf", "-o", "test"

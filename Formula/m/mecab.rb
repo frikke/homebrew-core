@@ -4,6 +4,7 @@ class Mecab < Formula
   # Canonical url is https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7cENtOXlicTFaRUE
   url "https://deb.debian.org/debian/pool/main/m/mecab/mecab_0.996.orig.tar.gz"
   sha256 "e073325783135b72e666145c781bb48fada583d5224fb2490fb6c1403ba69c59"
+  license any_of: ["GPL-2.0-only", "LGPL-2.1-only", "BSD-3-Clause"]
 
   livecheck do
     url :homepage
@@ -11,21 +12,15 @@ class Mecab < Formula
   end
 
   bottle do
-    rebuild 3
-    sha256 arm64_sonoma:   "0daf2cce68e6bb2c4886ea5737860447301d8eb6a4395d04f0e382c45b2d1b36"
-    sha256 arm64_ventura:  "492e9bdfcbb7968c03dff7736cd94ba5ad97df0c164bb62c1fe9f9e389881ceb"
-    sha256 arm64_monterey: "868884cacf2503757291056a3cee77daaba404fd43abeeb0b2dc7e0a6fceee29"
-    sha256 arm64_big_sur:  "495c42533a5ea5bdedcf4a95c05e613c3579f626b17d0df0396d8a0ea9328bbe"
-    sha256 sonoma:         "087bf7e7601e967845864f284b1194b0d5f341dbbcd9f62ad52ff81e0df6a483"
-    sha256 ventura:        "9bd251f2b61cab5850ac818ac06b879889c8c9c88c54c7163920099938c76b0d"
-    sha256 monterey:       "839a67ae318170dea1c0ea8f3e55d8c5291da3e77ad0d62491fa656cf5539a18"
-    sha256 big_sur:        "53efb8669f932aac26f4669db62eb858e6e31860923460a6c4e74d84685e8146"
-    sha256 catalina:       "dba6306bcd5ddb9a824cb366b5432a036889440f2253634c99410fbb0abe0047"
-    sha256 mojave:         "ef261d203140305ca8c9e4b7311c61176a17325df9454610d3eb33a312c4d3c5"
-    sha256 high_sierra:    "d48340df17075e4a6237ffb87306a42566f8eabb736c546d790586266758f387"
-    sha256 sierra:         "d98686ec62189de50f6ed5b7e682d59b90239c8dfd08cf32fd23543466586232"
-    sha256 el_capitan:     "03df92bdd092065a7cbca5953a0e352c16cadfff5c9f186bbe1ee882258e56d3"
-    sha256 x86_64_linux:   "47d2d29a34af53a9343cc99277fd19df64d0148e80007a19a2215e79b201a2a4"
+    rebuild 4
+    sha256 arm64_sequoia:  "9a6615d4ecdf87686bcc81e8851929a24661604782f48a0626a2e74762a20fa5"
+    sha256 arm64_sonoma:   "b442dff5851dc2e529a82d84a59b135e6f79ba6af1f295589e776aa2439d71f6"
+    sha256 arm64_ventura:  "b64f24600f7e8cad0dd98a985b72a446db41af35a192261ec489fc059e9a354f"
+    sha256 arm64_monterey: "99d7d453a35685f10cc15e0135d7ec612b9d695e58a2d36032daef5b6dac9a6f"
+    sha256 sonoma:         "d91a5e1bd7fdea15cfc0469705b33a71b02ad5c2ec2a599ab49829d9a6baa916"
+    sha256 ventura:        "361bce3217483e859b5c6d364da2ea098c63058411ed5324af8bf6c018046fef"
+    sha256 monterey:       "754a860b791ac92d825d4ff6b6b1f63e7c31e8983e603e844d1e4675732f343f"
+    sha256 x86_64_linux:   "f730abd5e95a325a9e2e012ac01714e9a22e694d91e5bb026d501495d9899ff6"
   end
 
   conflicts_with "mecab-ko", because: "both install mecab binaries"
@@ -37,7 +32,7 @@ class Mecab < Formula
     system "make", "install"
 
     # Put dic files in HOMEBREW_PREFIX/lib instead of lib
-    inreplace "#{bin}/mecab-config", "${exec_prefix}/lib/mecab/dic", "#{HOMEBREW_PREFIX}/lib/mecab/dic"
+    inreplace bin/"mecab-config", "${exec_prefix}/lib/mecab/dic", "#{HOMEBREW_PREFIX}/lib/mecab/dic"
     inreplace "#{etc}/mecabrc", "#{lib}/mecab/dic", "#{HOMEBREW_PREFIX}/lib/mecab/dic"
   end
 
@@ -47,5 +42,8 @@ class Mecab < Formula
 
   test do
     assert_equal "#{HOMEBREW_PREFIX}/lib/mecab/dic", shell_output("#{bin}/mecab-config --dicdir").chomp
+    return if OS.linux?
+
+    assert_includes (bin/"mecab").dynamically_linked_libraries, "/usr/lib/libiconv.2.dylib"
   end
 end

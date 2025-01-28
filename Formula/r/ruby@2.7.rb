@@ -22,9 +22,9 @@ class RubyAT27 < Formula
 
   # EOL: 2023-03-31
   # https://www.ruby-lang.org/en/downloads/branches/
-  deprecate! date: "2023-05-14", because: :unsupported
+  disable! date: "2024-06-15", because: :unsupported
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libyaml"
   depends_on "openssl@3"
   depends_on "readline"
@@ -53,7 +53,7 @@ class RubyAT27 < Formula
   end
 
   def api_version
-    Utils.safe_popen_read("#{bin}/ruby", "-e", "print Gem.ruby_api_version")
+    "2.7.0"
   end
 
   def rubygems_bindir
@@ -66,7 +66,7 @@ class RubyAT27 < Formula
 
     %w[openssl digest].each do |r_name|
       resource(r_name).stage do
-        %W[ext/#{r_name} test/#{r_name}].each { |stem| (buildpath/stem).rmtree }
+        %W[ext/#{r_name} test/#{r_name}].each { |stem| rm_r(buildpath/stem) }
         (buildpath/"ext").install "ext/#{r_name}"
         Pathname.new("lib").each_child do |child|
           if child.directory?
@@ -122,7 +122,7 @@ class RubyAT27 < Formula
     resource("rubygems").stage do
       ENV.prepend_path "PATH", bin
 
-      system "#{bin}/ruby", "setup.rb", "--prefix=#{buildpath}/vendor_gem"
+      system bin/"ruby", "setup.rb", "--prefix=#{buildpath}/vendor_gem"
       rg_in = lib/"ruby/#{api_version}"
       rg_gems_in = lib/"ruby/gems/#{api_version}"
 
@@ -149,11 +149,11 @@ class RubyAT27 < Formula
     # Since Gem ships Bundle we want to provide that full/expected installation
     # but to do so we need to handle the case where someone has previously
     # installed bundle manually via `gem install`.
-    rm_f %W[
+    rm(%W[
       #{rubygems_bindir}/bundle
       #{rubygems_bindir}/bundler
-    ]
-    rm_rf Dir[HOMEBREW_PREFIX/"lib/ruby/gems/#{api_version}/gems/bundler-*"]
+    ].select { |file| File.exist?(file) })
+    rm_r(Dir[HOMEBREW_PREFIX/"lib/ruby/gems/#{api_version}/gems/bundler-*"])
     rubygems_bindir.install_symlink Dir[libexec/"gembin/*"]
 
     # Customize rubygems to look/install in the global gem directory
@@ -242,8 +242,6 @@ class RubyAT27 < Formula
   end
 
   def caveats
-    return unless latest_version_installed?
-
     <<~EOS
       By default, binaries installed by gem will be placed into:
         #{rubygems_bindir}
@@ -255,8 +253,11 @@ class RubyAT27 < Formula
   test do
     hello_text = shell_output("#{bin}/ruby -e 'puts :hello'")
     assert_equal "hello\n", hello_text
+
+    assert_equal api_version, shell_output("#{bin}/ruby -e 'print Gem.ruby_api_version'")
+
     ENV["GEM_HOME"] = testpath
-    system "#{bin}/gem", "install", "json"
+    system bin/"gem", "install", "json"
 
     (testpath/"Gemfile").write <<~EOS
       source 'https://rubygems.org'

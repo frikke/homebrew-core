@@ -1,26 +1,27 @@
 class Comby < Formula
   desc "Tool for changing code across many languages"
   homepage "https://comby.dev"
-  url "https://github.com/comby-tools/comby/archive/1.8.1.tar.gz"
+  url "https://github.com/comby-tools/comby/archive/refs/tags/1.8.1.tar.gz"
   sha256 "04d51cf742bbbf5e5fda064a710be44537fac49bff598d0e9762a3a799d666e2"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "ead924a94b73aede202b3afc9146124efb1ac7b8416e0b0119a59cf2ab6d3310"
-    sha256 cellar: :any, arm64_monterey: "c75ee2deab2abc20778e51a40cbb7ca305948dc0e10c6e13e9d23004d26f8dfb"
-    sha256 cellar: :any, arm64_big_sur:  "886f0b5d1a6ac7075a18f3d0075578e81ae2462656a578cf61c344622629a5a4"
-    sha256 cellar: :any, ventura:        "535c3320832e70d126405a7535298c615dfdaa66e0ee0ddceaae680d3f189113"
-    sha256 cellar: :any, monterey:       "8e84488e24e0df5a5bbee5a2df201eb1027c90d177ebcd8bf030c91dec47d636"
-    sha256 cellar: :any, big_sur:        "72ce5e95f8772bc54d8d8706ed06e08ab99b9a6eb2682d8fea480ed1be202704"
-    sha256 cellar: :any, catalina:       "7519ef48876a5d5b3636556b0b6987c1c9ec7b568d299c49b849036aafcb61bb"
-    sha256               x86_64_linux:   "275be90d9ac8149c51abc9c5fc972e7aff125326cdadfd1ed0f55a8d6d84dc15"
+    sha256 cellar: :any, arm64_sequoia:  "02e4b812a3a7196017189b30aba83d058f72fbe37107c554c517538eeb153fee"
+    sha256 cellar: :any, arm64_sonoma:   "6547d31a4235741700836ce54b0fdf64bbc0ca2ac42e31ce003c1d86bef079f0"
+    sha256 cellar: :any, arm64_ventura:  "0c2cc4ae48e83842879b731399da84e9eb6891bf2c62a10087250db18c257a38"
+    sha256 cellar: :any, arm64_monterey: "c5e30b40a5bfca4e550da1ff541deeb4a467eef42298de85c72110e373b68c11"
+    sha256 cellar: :any, sonoma:         "1d1399b5fb4f1c0c1fc167a8a758392a8e7fd261ee351f40460079d110dbc27b"
+    sha256 cellar: :any, ventura:        "615cb295eabe9a99891de27aff6950ce729664949a92c705b5e5ce1d61f20687"
+    sha256 cellar: :any, monterey:       "660da52140d4812766f9f942966068c6076d8122b41dfc2a2a2c21e0de2066cb"
+    sha256               x86_64_linux:   "6a87649180d98f7555771ceb9d6062a1ce98f2aaaff996f52f9f8249bf300a8c"
   end
 
   depends_on "autoconf" => :build
   depends_on "gmp" => :build
-  depends_on "ocaml" => :build
+  depends_on "ocaml@4" => :build # https://github.com/comby-tools/comby/issues/358
   depends_on "opam" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gmp"
   depends_on "libev"
   depends_on "pcre"
@@ -37,6 +38,8 @@ class Comby < Formula
     ENV["OPAMYES"] = "1"
 
     system "opam", "init", "--no-setup", "--disable-sandboxing"
+    # Workaround for https://github.com/comby-tools/comby/issues/381
+    system "opam", "exec", "--", "opam", "pin", "add", "tar-unix", "2.6.0"
     system "opam", "exec", "--", "opam", "install", ".", "--deps-only", "-y", "--no-depexts"
 
     ENV.prepend_path "LIBRARY_PATH", opamroot/"default/lib/hack_parallel" # for -lhp
@@ -46,27 +49,25 @@ class Comby < Formula
   end
 
   test do
-    expect = <<~EXPECT
-      --- /dev/null
-      +++ /dev/null
+    expect = <<~DIFF
+      --- test.c
+      +++ test.c
       @@ -1,3 +1,3 @@
        int main(void) {
       -  printf("hello world!");
       +  printf("comby, hello!");
        }
-    EXPECT
+    DIFF
 
-    input = <<~INPUT
-      EOF
+    (testpath/"test.c").write <<~C
       int main(void) {
         printf("hello world!");
       }
-      EOF
-    INPUT
+    C
 
     match = 'printf(":[1] :[2]!")'
     rewrite = 'printf("comby, :[1]!")'
 
-    assert_equal expect, shell_output("#{bin}/comby '#{match}' '#{rewrite}' .c -stdin -diff << #{input}")
+    assert_equal expect, shell_output("#{bin}/comby '#{match}' '#{rewrite}' test.c -diff")
   end
 end

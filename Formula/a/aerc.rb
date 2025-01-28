@@ -1,19 +1,18 @@
 class Aerc < Formula
   desc "Email client that runs in your terminal"
   homepage "https://aerc-mail.org/"
-  url "https://git.sr.ht/~rjarry/aerc/archive/0.15.2.tar.gz"
-  sha256 "722da196e8807c497f5472704b8a1737d7780ad0faa7166ae83348bc67b144f7"
+  url "https://git.sr.ht/~rjarry/aerc/archive/0.20.0.tar.gz"
+  sha256 "1a7d6172b5740ead40bf1400cd45f00400822bb6af00aef76d04b386a4292d8c"
   license "MIT"
   head "https://git.sr.ht/~rjarry/aerc", branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "2b774d0651b29ad19b042dec94798a317f2a7606f5857420f42068e2111d8aca"
-    sha256 arm64_monterey: "7fa8fd4472c675e37bcf4bdd24a6ba7cd433f21e6a999f422672a1e074dcf004"
-    sha256 arm64_big_sur:  "d0c415766fb1f059270d548991926380faf7442fddd1431fabbf6f90adaa271e"
-    sha256 ventura:        "5d999ef114ce22259f9cb9450faa3853449dfe5f9e24c0d10e46bcb6cd7f7915"
-    sha256 monterey:       "614318bfd55d90e03e8615cde9a7c47cfacce4487f54513076bc895ea5daa874"
-    sha256 big_sur:        "25ad7fda059858a57a72d51f1a1188d1c7db8f8a8919df914820d4e8f74064dc"
-    sha256 x86_64_linux:   "3ee5538f6e3c12ea5c7034f3171d4ccc535a49f3f7248b12fcf0877858284e12"
+    sha256 arm64_sequoia: "01922973c2a9418fd50f3a95d9a9522dcc58b13873988518cfe7fe1ba13d4a65"
+    sha256 arm64_sonoma:  "56672bb5bbd58e3923b2def092f2d4827b3e4d3a40a7825019237e7bfdd8a488"
+    sha256 arm64_ventura: "ec86140a04ec8e7f496da526a6c9317983be06636f3605df8a511690509c7436"
+    sha256 sonoma:        "ef7b4fe9c02603776a7164ed05de149f53d3a25c79d6ccfa9ef6d9e38efba4f0"
+    sha256 ventura:       "a8fdaf4e23d8942d46d7201ed739c5aea0c62d5c40bba0e70abe67604188b10f"
+    sha256 x86_64_linux:  "d33a7fe9dc18befa0caf8892bcc54bf5da711ff93b132d17f047f3529fe2d607"
   end
 
   depends_on "go" => :build
@@ -25,6 +24,6 @@ class Aerc < Formula
   end
 
   test do
-    system "#{bin}/aerc", "-v"
+    system bin/"aerc", "-v"
   end
 end

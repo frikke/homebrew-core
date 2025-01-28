@@ -1,18 +1,17 @@
 class Macchina < Formula
   desc "System information fetcher, with an emphasis on performance and minimalism"
   homepage "https://github.com/Macchina-CLI/macchina"
-  url "https://github.com/Macchina-CLI/macchina/archive/refs/tags/v6.1.8.tar.gz"
-  sha256 "e827f640b55fe47a6127dd0c276e76b597e3cb83916be37351cdd6a81d75311e"
+  url "https://github.com/Macchina-CLI/macchina/archive/refs/tags/v6.4.0.tar.gz"
+  sha256 "edd7591565f199c1365420655a144507bcd2838aed09b79fefdc8b661180432f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a84ad65d11dd14e60ee2c8edaed0b2e72d361962282a2ab6d1cfde6a3262c2ab"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "209d70fda58e9b2610d0c8feb9e04c7359f28850e76050b53c179b4ea15c24ea"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d9c48eb3d2043d04a82638cf91205e99dbcc197f3163640bbc0c03d93cd7cb65"
-    sha256 cellar: :any_skip_relocation, ventura:        "f381950c7974cfa9384ccb2800f883c73df3cb435c551d3b8469010c04d66c06"
-    sha256 cellar: :any_skip_relocation, monterey:       "f87bff4db1b3732b9603af15c560cb0e386e5f2ac02ece28e71d941fab7b08aa"
-    sha256 cellar: :any_skip_relocation, big_sur:        "2551a0ae491d1d4f51d72ed804898faf5bacfd9e7db57cf6fd1452c1202275bf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f8f175c9bcdeec3a3974cfb53c4324d1d9dd8dc6b0825182875773e2f6cea94d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7ced4610d20e2d1279ae391a02ef966e22984dc0bf615b6341b9672a45d2d0f0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3e8e972a287563d557df33bfeee21eb54fb2bd13ae2399ed0451e6381aad554b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "0edf9f8eb64c603d3d2a173a0d933902ace99b500e16c8a3cd7daec854703232"
+    sha256 cellar: :any_skip_relocation, sonoma:        "922e43abc17df8b48ffa744fd346f50f60754ea4abb2a5b82703b94686f91620"
+    sha256 cellar: :any_skip_relocation, ventura:       "d544f58c1d3f84ab87fded15c43ee4deb67e18c3f2a3d81e40919875a795942a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c2dee8bb6fa398bbe5e7ed7dc13dbf811d9511a131a9ec678aa487b323e2528b"
   end
 
   depends_on "rust" => :build
@@ -22,6 +21,8 @@ class Macchina < Formula
   end
 
   test do
-    assert_match "Let's check your system for errors...", shell_output("#{bin}/macchina --doctor")
+    assert_match "We've collected a total of 19 readouts", shell_output("#{bin}/macchina --doctor")
+
+    assert_match version.to_s, shell_output("#{bin}/macchina --version")
   end
 end

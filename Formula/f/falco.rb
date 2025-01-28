@@ -1,26 +1,25 @@
 class Falco < Formula
   desc "VCL parser and linter optimized for Fastly"
   homepage "https://github.com/ysugimoto/falco"
-  url "https://github.com/ysugimoto/falco/archive/refs/tags/v0.24.0.tar.gz"
-  sha256 "91f8f4849891e72a5ee732e10e134e81c565df486715b5fca746f4310aa4c9cd"
+  url "https://github.com/ysugimoto/falco/archive/refs/tags/v1.11.2.tar.gz"
+  sha256 "0aa2f046ad1c10aedb0e81b46aabd354d22f161138eb231ee0a11e4b5156c932"
   license "MIT"
   head "https://github.com/ysugimoto/falco.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "654a8161c2922f3f300c9652e5940bfba19abff5cba06945376f2023ee9573b0"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "fe18424315a0c16dc5c6820bd1e5332b2165b05186641e077b7e5f715635f2c2"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5141fcd9e8a9f74051f31880c0f54dfdb4d31dc2bc379e5acd1bbeab4d4bedd8"
-    sha256 cellar: :any_skip_relocation, ventura:        "e3544996d0f846c98f6a511fa62b7ba73a00eebc5f353c9f3ea9cd040a8764a2"
-    sha256 cellar: :any_skip_relocation, monterey:       "ead096cd6b94190c35fa5e9b0d1bf2c8af34eb81565a421e043268870b147a31"
-    sha256 cellar: :any_skip_relocation, big_sur:        "20c9204e3e05a4c79e39aaa7953913535c64c28965748b3f1e697ade301f46b4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "178f7ee9d403f808e2905a3cb8df7335c372026e22bb9594dbbd6d965573d488"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c33b5e090f264f853a74c29717eb053a04af6247fac4ecefcf8a8cda1c44e372"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c33b5e090f264f853a74c29717eb053a04af6247fac4ecefcf8a8cda1c44e372"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c33b5e090f264f853a74c29717eb053a04af6247fac4ecefcf8a8cda1c44e372"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3014e45ab054195a58d75905cea4bdbde9c88bfc8283fec064644200745fbdaa"
+    sha256 cellar: :any_skip_relocation, ventura:       "3014e45ab054195a58d75905cea4bdbde9c88bfc8283fec064644200745fbdaa"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fce072d832aecd7147b9f311746d807a727e104129a29efb2b3c0db93903bc61"
   end
 
   depends_on "go" => :build
 
   def install
     ldflags = "-s -w -X main.version=#{version}"
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/falco"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/falco"
   end
 
   test do
@@ -29,7 +28,7 @@ class Falco < Formula
     pass_vcl = testpath/"pass.vcl"
     pass_vcl.write <<~EOS
       sub vcl_recv {
-      #Fastly recv
+      #FASTLY RECV
         return (pass);
       }
     EOS
@@ -39,7 +38,7 @@ class Falco < Formula
     fail_vcl = testpath/"fail.vcl"
     fail_vcl.write <<~EOS
       sub vcl_recv {
-      #Fastly recv
+      #FASTLY RECV
         set req.backend = httpbin_org;
         return (pass);
       }

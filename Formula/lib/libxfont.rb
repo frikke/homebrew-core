@@ -6,6 +6,7 @@ class Libxfont < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "7274a6c0a84b2d5a62c3c7cbaeeb39467f6cd133c9f1e549d3d343cf6d413e97"
     sha256 cellar: :any,                 arm64_sonoma:   "fa76bdfe924cef05ae6293065ec87537cda1d850116b8d8a9b97ed33e5c7b2ca"
     sha256 cellar: :any,                 arm64_ventura:  "e85ca79059256c31175a8b3ed1b04268f6bf81a05e52df6699f53f6b4d88fdc6"
     sha256 cellar: :any,                 arm64_monterey: "7ca1ffead34e1adfcd19864bd1edd9d54c67cebf9f96bb5901b63e850ffcfc95"
@@ -20,7 +21,7 @@ class Libxfont < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "c2c2202c343f1c42b642eaa9e4410f3886faf1158fd7a271ad928623922a43ee"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "util-macros" => :build
   depends_on "xtrans" => :build
   depends_on "freetype"
@@ -32,23 +33,21 @@ class Libxfont < Formula
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
       --enable-devel-docs=no
       --with-freetype-config=#{Formula["freetype"].opt_bin}/freetype-config
       --with-bzip2
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/fonts/fntfilst.h"
       #include "X11/fonts/bitmap.h"
 
@@ -56,7 +55,7 @@ class Libxfont < Formula
         BitmapExtraRec rec;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

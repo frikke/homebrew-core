@@ -1,9 +1,9 @@
 class Ivykis < Formula
   desc "Async I/O-assisting library"
   homepage "https://sourceforge.net/projects/libivykis/"
-  url "https://github.com/buytenh/ivykis/archive/v0.42.4-trunk.tar.gz"
-  sha256 "b724516d6734f4d5c5f86ad80bde8fc7213c5a70ce2d46b9a2d86e8d150402b5"
-  license "LGPL-2.1"
+  url "https://github.com/buytenh/ivykis/archive/refs/tags/v0.43.2-trunk.tar.gz"
+  sha256 "22621ae6a7144039cfb8666ed509b99ea1876d7642021a3505c7351502641103"
+  license "LGPL-2.1-only"
 
   livecheck do
     url :stable
@@ -11,17 +11,14 @@ class Ivykis < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "81c383eb047987000be061f4beaa4f0621900fdf299405a32bd0d875f4cb6bc8"
-    sha256 cellar: :any,                 arm64_monterey: "117efe3df301c5489c623091a19c5b81957343e0fbc93da8165034772caae24a"
-    sha256 cellar: :any,                 arm64_big_sur:  "cd87cff2d6552030ba5b277853bf4f386bc28411ca0c9283e1ed90981f0ba6aa"
-    sha256 cellar: :any,                 ventura:        "70a2f7977517abd77a4c446196340c9a2cc41d5929df8ba79cec43265d23f7b1"
-    sha256 cellar: :any,                 monterey:       "e1cdca7723759314df53420febdf1407ed1dec93b7969ce59a584b28694ab399"
-    sha256 cellar: :any,                 big_sur:        "b3a788209e93dab2e5056bacbe24b7efe5554131d9b26ace853ca68f42e9d23c"
-    sha256 cellar: :any,                 catalina:       "5da36891f20e60db1a94b7eafeaf35605a0a4b18e833721aec01ab68399653a3"
-    sha256 cellar: :any,                 mojave:         "dd4fa86f2988dd4c913fc443131ce519ebf034ff492b4760f323ca663fb1744c"
-    sha256 cellar: :any,                 high_sierra:    "1409aa60298ac27959cf5370b70d158843524e5f5638e28e9607ac7e8783b11e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0953b9d2f273aeba941031332ea3cc9233ca70d1c451026192f2f9e0d9bb408d"
+    sha256 cellar: :any,                 arm64_sequoia:  "d76bb73ff8c5001a8347d9f382e2ee49b500773ce56d0a611b8828c856d5b93b"
+    sha256 cellar: :any,                 arm64_sonoma:   "041ef153175797ab1ffdc43c6f66792ccab6bf7bb30b0458e9a0e2796c208135"
+    sha256 cellar: :any,                 arm64_ventura:  "075569d21dab788f26ae067e2d3b68de653041f8964df56fb49212162657cf77"
+    sha256 cellar: :any,                 arm64_monterey: "97757eff18712b8e6e994bf1d84aa89f4d371793117f11e802570af83a2b8fc0"
+    sha256 cellar: :any,                 sonoma:         "c70c4ccd6872f0be9b0d0ab49218fca35d43077d6a82be5b541aa4b5573af1f2"
+    sha256 cellar: :any,                 ventura:        "ed59e7e11206ff76514c05ab2bbe5bc302bfff40e73959ee3294cb6759640dda"
+    sha256 cellar: :any,                 monterey:       "8246dcfdc88e144a353448209a0f86c06e9fce2c4ad05a493648b4db7d70e496"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "63cc7d328a6c1816803b8a4a90377dfe86dfe0ce21d895bc1968e27c46ed083f"
   end
 
   depends_on "autoconf" => :build
@@ -29,15 +26,15 @@ class Ivykis < Formula
   depends_on "libtool" => :build
 
   def install
-    system "autoreconf", "-i"
-    system "./configure", "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args
     system "make"
     system "make", "check"
     system "make", "install"
   end
 
   test do
-    (testpath/"test_ivykis.c").write <<~EOS
+    (testpath/"test_ivykis.c").write <<~C
       #include <stdio.h>
       #include <iv.h>
       int main()
@@ -46,7 +43,7 @@ class Ivykis < Formula
         iv_deinit();
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test_ivykis.c", "-L#{lib}", "-livykis", "-o", "test_ivykis"
     system "./test_ivykis"
   end

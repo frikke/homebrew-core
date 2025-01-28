@@ -1,30 +1,26 @@
 class Fplll < Formula
   desc "Lattice algorithms using floating-point arithmetic"
   homepage "https://github.com/fplll/fplll"
-  url "https://github.com/fplll/fplll/releases/download/5.4.4/fplll-5.4.4.tar.gz"
-  sha256 "0fd9d378f04ff886d8864728baf5d90b8b0b82c1e541e92550644fb54f75691d"
+  url "https://github.com/fplll/fplll/releases/download/5.5.0/fplll-5.5.0.tar.gz"
+  sha256 "f0af6bdd0ebd5871e87ff3ef7737cb5360b1e38181a4e5a8c1236f3476fec3b2"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256                               arm64_ventura:  "1ba1a1085084572ef340831e6a3ac9bde2cf6cda68e71075ccd8e1ee05dfa5ec"
-    sha256                               arm64_monterey: "f6b54eef42956eb6d47951a5050fe5b38a420fc160086d20e38751d113b896ef"
-    sha256                               arm64_big_sur:  "ce9be65f08ef8ecb291ae15916ca0d1cb6f160b09629649739754b93300f7717"
-    sha256                               ventura:        "2b19d4550c1ba260b0a4d8809d9ad6e4db767d53243ed4b974020628fb693070"
-    sha256                               monterey:       "3c4eb9b7a09063287a71ffae596ddbd13d515e3cd13e4253e6bc7dd082f7935d"
-    sha256                               big_sur:        "c63834cc0c9dd96522545abbe3e68459b019910e59cc42692c053f56991d8098"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4550c39058db9b126338325f9ee65a93e13bc39336a96c5a5805d08d740d930f"
+    sha256                               arm64_sequoia: "a25629aa8d961b12af85b7c04935f1133c8a18dee209ff4a593692e11543dc3b"
+    sha256                               arm64_sonoma:  "b9bd6d1a49c4cc589234f87a12a08a24f5c4e43a5cd8a300467ef1dedfb2f05f"
+    sha256                               arm64_ventura: "1d79f55394b4e2d055ca691e5618b63b84b6d0db58195222acecd5390c27eb93"
+    sha256                               sonoma:        "2333676f4b1a145a78f8143882a81a9b2b9c309ae7ab2f54f4736b4c88db2cb7"
+    sha256                               ventura:       "592795ee10822fe22704b9e4907af58022ac78bbdc2942a3d25c22801f265f04"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0c9679fb7aa760cc54e7fb45622595f1c2364bacbd340275682292fe18fa89db"
   end
 
   depends_on "automake" => :build
-  depends_on "pkg-config" => :test
+  depends_on "pkgconf" => :test
   depends_on "gmp"
   depends_on "mpfr"
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
@@ -35,7 +31,7 @@ class Fplll < Formula
     (testpath/"m2.fplll").write("[[17 42 4][50 75 108][11 47 33]][100 101 102]")
     assert_equal "[107 88 96]\n", `#{bin/"fplll"} -a cvp m2.fplll`
 
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <fplll.h>
       #include <vector>
       #include <stdio.h>
@@ -48,11 +44,9 @@ class Fplll < Formula
         }
         return 0;
       }
-    EOS
-    system "pkg-config", "fplll", "--cflags"
-    system "pkg-config", "fplll", "--libs"
-    pkg_config_flags = `pkg-config --cflags --libs gmp mpfr fplll`.chomp.split
-    system ENV.cxx, "-std=c++11", "test.cpp", *pkg_config_flags, "-o", "test"
+    CPP
+    pkgconf_flags = shell_output("pkgconf --cflags --libs gmp mpfr fplll").chomp.split
+    system ENV.cxx, "-std=c++11", "test.cpp", *pkgconf_flags, "-o", "test"
     system "./test"
   end
 end

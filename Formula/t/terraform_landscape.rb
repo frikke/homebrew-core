@@ -1,13 +1,13 @@
 class TerraformLandscape < Formula
   desc "Improve Terraform's plan output"
   homepage "https://github.com/coinbase/terraform-landscape"
-  url "https://github.com/coinbase/terraform-landscape/archive/v0.3.4.tar.gz"
+  url "https://github.com/coinbase/terraform-landscape/archive/refs/tags/v0.3.4.tar.gz"
   sha256 "9e9b8e00aacf821fd07c9e3194e1e9f5824032dad4b12995649bcd9c59731ee1"
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7275a3976bae258dff79bcee0885a4d3de430f06eb366d19f1a2415b88890d1b"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "6e403181c8828200717e99f9c86505f294c787db63060d1a356b4d95bff92f62"
   end
 
   depends_on "ruby"

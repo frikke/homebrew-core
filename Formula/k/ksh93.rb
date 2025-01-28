@@ -1,22 +1,24 @@
 class Ksh93 < Formula
   desc "KornShell, ksh93"
-  homepage "https://github.com/ksh93/ksh#readme"
-  url "https://github.com/ksh93/ksh/archive/refs/tags/v1.0.7.tar.gz"
-  sha256 "a5ea1e493f0343c644e12ff03bc464d682b8e61ec034b8e20e95965f62f0b870"
+  homepage "https://github.com/ksh93/ksh"
+  url "https://github.com/ksh93/ksh/archive/refs/tags/v1.0.10.tar.gz"
+  sha256 "9f4c7a9531cec6941d6a9fd7fb70a4aeda24ea32800f578fd4099083f98b4e8a"
   license "EPL-2.0"
   head "https://github.com/ksh93/ksh.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e3fc13a75c291e28e40e3464f184c548690e2fa0842f06e99c13fa200cd36f3b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "12c116df90fbb33260470ea0d4ab610373845d252b0a6c19a32f8f86fa87abb6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a4a7f851a0b19462d3da1c32014cc7d239a31f3ab652ecc86165c349e16e3d23"
-    sha256 cellar: :any_skip_relocation, ventura:        "9c711e85c2aac9cd02cd40e20d4f6bec6db6edccf1306b488ff1f18dec4e47c2"
-    sha256 cellar: :any_skip_relocation, monterey:       "42f23778ca66202d1274c0fb02ce382d962780f3fdfc2a4c7246cb7b2f64a8e3"
-    sha256 cellar: :any_skip_relocation, big_sur:        "37a3d61e3e6dee0a2689a682dca040056724f2329b8637b3bd8aebfcd2c774e8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5a3cca5cdebc4843b7f8ccc871e8f2375ae6b0cb7ce637099d9a0bb1245fc348"
+    sha256 cellar: :any,                 arm64_sequoia:  "5deb3b81fd3f590988dd88c80311891ca93a33af176c47156a1451bd7aabac87"
+    sha256 cellar: :any,                 arm64_sonoma:   "c19642595db560b792a462a2754cdd1c9dcf9cce1206f831e9445f364ddeee9d"
+    sha256 cellar: :any,                 arm64_ventura:  "35617322f558cb0e43a0f265eefaffbe447061bc24acd75452b2b5b084e56acd"
+    sha256 cellar: :any,                 arm64_monterey: "2f7f6d16223a34599d8f5d7a109e3c0b9bf16dbd98758b8c643d9c43ba40001d"
+    sha256                               sonoma:         "b15cd1a4a1052c29217a92cdcc890755a1af17031b0375d2c48218e37de17ed3"
+    sha256                               ventura:        "fd2c2ab5ef6b79db5b99b18775c36806ab45f06dbfde1a19dbba879c88ff02a3"
+    sha256                               monterey:       "4a18d30f5bd6874f925b389150c77864955c33d546025ab87ba95dc36e6287be"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6e1e57baceef185a21b476c489ec150cbf00729c4b0b31243dd13d5f560376b1"
   end
 
   def install
+    ENV.append "LDFLAGS", "-Wl,-rpath,#{lib}"
     system "bin/package", "verbose", "make"
     system "bin/package", "verbose", "install", prefix
     %w[ksh93 rksh rksh93].each do |alt|

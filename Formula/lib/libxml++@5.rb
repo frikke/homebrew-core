@@ -1,8 +1,8 @@
 class LibxmlxxAT5 < Formula
   desc "C++ wrapper for libxml"
-  homepage "https://libxmlplusplus.sourceforge.net/"
-  url "https://download.gnome.org/sources/libxml++/5.0/libxml++-5.0.3.tar.xz"
-  sha256 "13074f59e3288a378cafe9e6847df17f764c23fa29bc94f3305b8bf81efb2cf7"
+  homepage "https://libxmlplusplus.github.io/libxmlplusplus/"
+  url "https://download.gnome.org/sources/libxml++/5.4/libxml++-5.4.0.tar.xz"
+  sha256 "e9a23c436686a94698d2138e6bcbaf849121d63bfa0f50dc34fefbfd79566848"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,33 +11,30 @@ class LibxmlxxAT5 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "9651a25ac316b0274af92c5a90d1525583094c6c8efe895ddc6005fe6694208f"
-    sha256 cellar: :any,                 arm64_ventura:  "44b7d0a7b1df798e24fe089f756d7cb753f61a255032656b98bbd9eaa875d687"
-    sha256 cellar: :any,                 arm64_monterey: "402886e8723705afd171a13979fd1747248dbd84921ddd4bf24b858a7480c016"
-    sha256 cellar: :any,                 arm64_big_sur:  "e65f8bd5d6cb617dc604bf1314e16f63d517bf7093946300009666adc6588c7d"
-    sha256 cellar: :any,                 sonoma:         "a551fe43578e698a94d6f971be04caa8dda23ebce7e65c2ced43eec220cb23ad"
-    sha256 cellar: :any,                 ventura:        "1d885ff317148d2287d6d412588610820ca1d5fe319ef701a3d437d618fc13fc"
-    sha256 cellar: :any,                 monterey:       "628476efe87ca3733d28ba8e2475fd970c06b82329c8abdbd1410d21714de7af"
-    sha256 cellar: :any,                 big_sur:        "3865e4b03542d13e2b08da4cd6e03c6997ea2b60fb67b1b270dadf5247afc701"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cc9d878e7bf2c2d942eb652457f1b4e6ddee47c98c9e931e235a6490ded7e828"
+    sha256 cellar: :any,                 arm64_sequoia:  "8b1741fec20807f621a0565fad5b10fff46bdb5e092f7545ccbe7c776d394b5b"
+    sha256 cellar: :any,                 arm64_sonoma:   "5437f74e7361d06081dc6da97cd8f7726a0ae705e8157e1a0fc631214904eb37"
+    sha256 cellar: :any,                 arm64_ventura:  "4e43cbec05cadeb4a37ac6c820e23e83ab127c5b06660fb2942c3bb9f1bf2927"
+    sha256 cellar: :any,                 arm64_monterey: "ea823fac5dc9c1bb716221a7ebe7567e612ac76bb3b6d2a8c146d69f96b0492e"
+    sha256 cellar: :any,                 sonoma:         "d55199dafe752477e6db5375a0635b9ca76ae444288f6ef3d1de9c5ce6e58ddd"
+    sha256 cellar: :any,                 ventura:        "fc8d4eb8e4bd8d3eb20b7942557202b9628c5933058bb83c5621f93f4c0b047a"
+    sha256 cellar: :any,                 monterey:       "b38022f1cbc5d07e4c5969b98849c218823863f8ec97faf3680cb77545c4c343"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7e0691b094a3ab56f2add27e4cf43a8d7f6d79a13a61d9fe97d243e2956c6fff"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => [:build, :test]
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => [:build, :test]
 
   uses_from_macos "libxml2"
 
   def install
-    ENV.cxx11
     system "meson", "setup", "build", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <libxml++/libxml++.h>
 
       int main(int argc, char *argv[])
@@ -47,8 +44,8 @@ class LibxmlxxAT5 < Formula
          xmlpp::Element *rootnode = document.create_root_node("homebrew");
          return 0;
       }
-    EOS
-    command = "#{Formula["pkg-config"].opt_bin}/pkg-config --cflags --libs libxml++-5.0"
+    CPP
+    command = "#{Formula["pkgconf"].opt_bin}/pkgconf --cflags --libs libxml++-5.0"
     flags = shell_output(command).strip.split
     system ENV.cxx, "-std=c++17", "test.cpp", "-o", "test", *flags
     system "./test"

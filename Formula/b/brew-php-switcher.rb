@@ -1,13 +1,13 @@
 class BrewPhpSwitcher < Formula
   desc "Switch Apache / Valet / CLI configs between PHP versions"
   homepage "https://github.com/philcook/brew-php-switcher"
-  url "https://github.com/philcook/brew-php-switcher/archive/v2.4.tar.gz"
-  sha256 "305627aa4165e760f95453efc75c47027e7ecee233c1dd85911a692ca48549af"
+  url "https://github.com/philcook/brew-php-switcher/archive/refs/tags/v2.6.tar.gz"
+  sha256 "a1d679b9d63d2a7b1e382c1e923bcb1aa717cee9fe605b0aaa70bb778fe99518"
   license "MIT"
   head "https://github.com/philcook/brew-php-switcher.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "93556c4acac08ee72bdc0bf5c12e220b18edb2396a5fdc28470b38ca04d5906a"
+    sha256 cellar: :any_skip_relocation, all: "e41fbf1a76ac7c925c36ece1c26a597245e89a4c9444b3a145a1e6c054042dc0"
   end
 
   depends_on "php" => :test
@@ -19,6 +19,6 @@ class BrewPhpSwitcher < Formula
 
   test do
     assert_match "usage: brew-php-switcher version",
-                 shell_output("#{bin}/brew-php-switcher")
+                 shell_output(bin/"brew-php-switcher")
   end
 end

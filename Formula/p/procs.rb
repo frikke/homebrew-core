@@ -1,18 +1,17 @@
 class Procs < Formula
-  desc "Modern replacement for ps written by Rust"
+  desc "Modern replacement for ps written in Rust"
   homepage "https://github.com/dalance/procs"
-  url "https://github.com/dalance/procs/archive/v0.14.0.tar.gz"
-  sha256 "fa5af0951dc8aa63c0590f8c5c1136594866057704cfb1cdfc22ac3cc49437c6"
+  url "https://github.com/dalance/procs/archive/refs/tags/v0.14.9.tar.gz"
+  sha256 "361982bd88bc84c184433309664598fdfdf5f603331cb21ba1108be40357608c"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "de9c1631762b37a015ef29105948b0d16e040f114d771fc7cebe1f7c8c1ec27c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "43df9e9c419a6746dfa675e4950aa00785d628179e8c01966620970f770e391a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3d51c5e8f70fd83cf4b83586ac4a5a33a97b68850948b905064ede175a869e25"
-    sha256 cellar: :any_skip_relocation, ventura:        "b2358cc32f33927686a09fc9fb380487fde56f79add118fb7d36848bbf8af29f"
-    sha256 cellar: :any_skip_relocation, monterey:       "883c61ba9506ab4540781a29b7c0f5e0cbce671d7712be64b21ece718ff42090"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9f221df219dbf0dc1736132cf9c96b1b7ac6bde0fbd397711b8a50e3503294ca"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "90e02932ce2bedda3120384fdea912f82188f05170b341d7a9a2b8455bae10c8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "13de074bfdb72fbce7baeb6cdb039402bf1ecd6be29f30bc71f72d398f275d6e"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9d2a64627d3ba8707a943c5e3a14fba42d46489c1c184a75cf4269bb18381c87"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "6d7e955d8bfe004817735b9af2bf35c79e2e81952e7875b29b9968c4315fb5ea"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a80af64f33840a9aed859b762c72a9518c7e2ce73811caf89e9cf95f44cdddd4"
+    sha256 cellar: :any_skip_relocation, ventura:       "7a9813b6372a9db96e3e836fcbb2335e7ea9880727806f4de04ebe0af35148fe"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1c55a1fcb9c1f0c7dfc0c67a7c21147bba3fd448f7c63b970b4674da059adc63"
   end
 
   depends_on "rust" => :build

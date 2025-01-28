@@ -1,19 +1,18 @@
 class Cpuid < Formula
   desc "CPU feature identification for Go"
   homepage "https://github.com/klauspost/cpuid"
-  url "https://github.com/klauspost/cpuid/archive/refs/tags/v2.2.5.tar.gz"
-  sha256 "a5021d85a70184f098ebd7e704f8b2330404f4c760de09af6da61b9ce182a49a"
+  url "https://github.com/klauspost/cpuid/archive/refs/tags/v2.2.9.tar.gz"
+  sha256 "d0aa17338c623af41fe17bb542ebaac5313a56c5f0a400577ee89319d054b4ca"
   license "MIT"
   head "https://github.com/klauspost/cpuid.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "809af34ae9e73f2ecc6651c80315c588f8c67592a24872e8db1ae78003d58795"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "809af34ae9e73f2ecc6651c80315c588f8c67592a24872e8db1ae78003d58795"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "809af34ae9e73f2ecc6651c80315c588f8c67592a24872e8db1ae78003d58795"
-    sha256 cellar: :any_skip_relocation, ventura:        "f2068378022c9da1035ed77f3da67a43e86d3e91d39dea9a2ab92c12dc9b4878"
-    sha256 cellar: :any_skip_relocation, monterey:       "f2068378022c9da1035ed77f3da67a43e86d3e91d39dea9a2ab92c12dc9b4878"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f2068378022c9da1035ed77f3da67a43e86d3e91d39dea9a2ab92c12dc9b4878"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "aaae85c66a4c2e343d14bd9b606c232b55bc4fbbb39c87e6c2490d969c8b10f6"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f95188e40b7e55fc5451537908b22ccb1d6ad6c092834a69c2a8d99de6f53fe7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f95188e40b7e55fc5451537908b22ccb1d6ad6c092834a69c2a8d99de6f53fe7"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f95188e40b7e55fc5451537908b22ccb1d6ad6c092834a69c2a8d99de6f53fe7"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1860157d6df98e8353bb72b0201c0a044a4c7766e6d8e0d764abe1e49bfc749f"
+    sha256 cellar: :any_skip_relocation, ventura:       "1860157d6df98e8353bb72b0201c0a044a4c7766e6d8e0d764abe1e49bfc749f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3cb7c366b4d4e397d0a7c0f76ce0319756403b89cc1302a27eae587f201b5646"
   end
 
   depends_on "go" => :build

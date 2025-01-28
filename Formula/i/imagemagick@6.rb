@@ -1,8 +1,8 @@
 class ImagemagickAT6 < Formula
   desc "Tools and libraries to manipulate images in many formats"
   homepage "https://legacy.imagemagick.org/"
-  url "https://imagemagick.org/archive/releases/ImageMagick-6.9.12-94.tar.xz"
-  sha256 "43ba0a0e63a854b4e15cad584af70b3f76c43bcda894e9165ddb963f35372af7"
+  url "https://imagemagick.org/archive/releases/ImageMagick-6.9.13-21.tar.xz"
+  sha256 "985b9bf373c8b67c9df66d53247bdbb44aa79d133e75fb84d73179b238af8471"
   license "ImageMagick"
   head "https://github.com/imagemagick/imagemagick6.git", branch: "main"
 
@@ -12,21 +12,19 @@ class ImagemagickAT6 < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "1841a111e5dc227b708ab22c3aa6ed887af9f46209e32b9f4300fa4d7f28efc2"
-    sha256 arm64_ventura:  "f39ba5f5ceb3b386838350ae58dfe0b6c6a0a78d649f264aeca244770649b505"
-    sha256 arm64_monterey: "ba73a76662bb0ec2bdbf33aca5c16bafb4f4c51718e1d38546a3bf997aaf752b"
-    sha256 arm64_big_sur:  "8ff197025401a557e6addd9688647cfb9f4dc13c3464fb6dbf2d50a9a76e957b"
-    sha256 sonoma:         "0127c0b8860d3beaaee2f8b7c67af093cefce62657bcc9933182ea9761873ca9"
-    sha256 ventura:        "b5e2fa3f1eec2818411c5c3a62f4bf5c592ba4faeaad39c7162092cf11c73840"
-    sha256 monterey:       "47ab446f153af784ed4668d52c9bd6daddf7d8191b1c44a87558df2c804e6fae"
-    sha256 big_sur:        "549249fad2183bb94dcd5767136e8592f05e028c85e8d0e50a9b740d8ef5acb2"
-    sha256 x86_64_linux:   "a67e1dbb1df507085b197fcfd084fb785957013b132c56e1840b32f93cdfa92f"
+    sha256 arm64_sequoia: "883d833cc4b4d73394462e670b2045dadb5fd72890139be300fc3afe7c3e2290"
+    sha256 arm64_sonoma:  "71dc5227c21a696569df729aa7244c63d365ab29b8af623b80709a2eb966e93c"
+    sha256 arm64_ventura: "0a79d069a2133bd49f8f123c1d53153a8918a32e144b84c06605cf59d1fdb7eb"
+    sha256 sonoma:        "65eec90889e97d8de48e25f795286f206c8168f23e7dc94124da50d2d14a525c"
+    sha256 ventura:       "618129f7759c73dc98b5c80049c47ed017a62439194ac69be758c9e751519529"
+    sha256 x86_64_linux:  "dc7fae28370c80192f7c0e798beb80067eebb563af9cba904f9b39a6925bd1bb"
   end
 
   keg_only :versioned_formula
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
+  depends_on "fontconfig"
   depends_on "freetype"
   depends_on "ghostscript"
   depends_on "jpeg-turbo"
@@ -38,7 +36,9 @@ class ImagemagickAT6 < Formula
   depends_on "webp"
   depends_on "xz"
 
+  uses_from_macos "bzip2"
   uses_from_macos "libxml2"
+  uses_from_macos "zlib"
 
   skip_clean :la
 
@@ -68,7 +68,7 @@ class ImagemagickAT6 < Formula
       --without-wmf
     ]
 
-    system "./configure", *std_configure_args, *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 

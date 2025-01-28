@@ -1,18 +1,19 @@
 class Fx < Formula
   desc "Terminal JSON viewer"
   homepage "https://fx.wtf"
-  url "https://github.com/antonmedv/fx/archive/refs/tags/30.0.0.tar.gz"
-  sha256 "bd9c5827c83ba791c13bacbc6223ea190fd9c9d5d03520e6966f59973dccc049"
+  url "https://github.com/antonmedv/fx/archive/refs/tags/35.0.0.tar.gz"
+  sha256 "5ab642bb91ad9c1948de1add2d62acec22d82398e420957c191c1549999eb351"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "dc748fc53237100fd4945021d91f48df08226906c13cc345d0db6d31f103ce52"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "dc748fc53237100fd4945021d91f48df08226906c13cc345d0db6d31f103ce52"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dc748fc53237100fd4945021d91f48df08226906c13cc345d0db6d31f103ce52"
-    sha256 cellar: :any_skip_relocation, ventura:        "349f0c1be36fb425f0f7a6cad2a0ff7ea47e04e15d43f726f85d9e32d5c26a94"
-    sha256 cellar: :any_skip_relocation, monterey:       "349f0c1be36fb425f0f7a6cad2a0ff7ea47e04e15d43f726f85d9e32d5c26a94"
-    sha256 cellar: :any_skip_relocation, big_sur:        "349f0c1be36fb425f0f7a6cad2a0ff7ea47e04e15d43f726f85d9e32d5c26a94"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2bcc8f998238e6b60ccb5de76e7dff070bb08104351e24bbd5c3d1f390fb9d7b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "0b71d8d70e749ebe94c56fcb8e1fd7b6f1011089efa35047b55e555f5a6f7406"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "2ac980c80f98aa4a5ea9bd21d1a17b0080ada804f9e189d0dd91810f4f829048"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2ac980c80f98aa4a5ea9bd21d1a17b0080ada804f9e189d0dd91810f4f829048"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2ac980c80f98aa4a5ea9bd21d1a17b0080ada804f9e189d0dd91810f4f829048"
+    sha256 cellar: :any_skip_relocation, sonoma:         "4b04e666a49281880912c45d2867df85f1bc699e0472161f83f017a2e5e8472c"
+    sha256 cellar: :any_skip_relocation, ventura:        "4b04e666a49281880912c45d2867df85f1bc699e0472161f83f017a2e5e8472c"
+    sha256 cellar: :any_skip_relocation, monterey:       "4b04e666a49281880912c45d2867df85f1bc699e0472161f83f017a2e5e8472c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "70b778921a29c92bb09b7f9e6a889100b90173b49c66c674beec0974fe8d30be"
   end
 
   depends_on "go" => :build
@@ -23,6 +24,6 @@ class Fx < Formula
   end
 
   test do
-    assert_equal "42", pipe_output("#{bin}/fx .", 42).strip
+    assert_equal "42", pipe_output("#{bin}/fx .", "42").strip
   end
 end

@@ -1,8 +1,8 @@
 class Privoxy < Formula
   desc "Advanced filtering web proxy"
   homepage "https://www.privoxy.org/"
-  url "https://downloads.sourceforge.net/project/ijbswa/Sources/3.0.34%20%28stable%29/privoxy-3.0.34-stable-src.tar.gz"
-  sha256 "e6ccbca1656f4e616b4657f8514e33a70f6697e9d7294356577839322a3c5d2c"
+  url "https://downloads.sourceforge.net/project/ijbswa/Sources/4.0.0%20%28stable%29/privoxy-4.0.0-stable-src.tar.gz"
+  sha256 "c08e2ba0049307017bf9d8a63dd2a0dfb96aa0cdeb34ae007776e63eba62a26f"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,32 +11,26 @@ class Privoxy < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "9e9553d35f57d1857a1518216b4263eb9ffce10cf9e93da7a38f688f23606610"
-    sha256 cellar: :any,                 arm64_monterey: "1b0028627cbd63a818a043537b4357b7bb0105fb56ba0b4d92efe3300cc953f9"
-    sha256 cellar: :any,                 arm64_big_sur:  "583123f742ab84d72e189867ec920940e7ecada0cd4bec3dbb7c2784b51e2b9e"
-    sha256 cellar: :any,                 ventura:        "6dbe6c6a8868cf03772a719adfd6c49bfd7da372067147994c56a9c629c7ff0e"
-    sha256 cellar: :any,                 monterey:       "317d73bfe1c16bf887be0627f7aa27f543aa61dc8d1c9748cac74b11abbc0b14"
-    sha256 cellar: :any,                 big_sur:        "46df2df9e4dcaf3f16ba6540fdc8432db8395d5fd03fc9a6fe51c9629e216be2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a4b3fcb5f8fd5f5479462ae9db4fb99a300dab2005b3f383b78f13cb6a8eed4f"
+    sha256 cellar: :any,                 arm64_sequoia: "d83863aa3c2b997f07b85eb2c0508411720d70c7d9e2d8a0d3aad6f6570dd4c7"
+    sha256 cellar: :any,                 arm64_sonoma:  "5ffeba4e02190b9ef05a1991918b68f35816922b1e5ea18222823abd3b04efae"
+    sha256 cellar: :any,                 arm64_ventura: "320b704c330b960bff73567056912529c9840b7be022b2fa36d336755fab634e"
+    sha256 cellar: :any,                 sonoma:        "890bbcfe55da09152be6367010e6a102ea9163b0e95c76a93051f41fc069a84d"
+    sha256 cellar: :any,                 ventura:       "87f744512b9c327b249c529495b8604cb6e4b0dbcd4bccbe8380e300dc1dfde8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "deeadf7f6f8e636fecafd58b7b3c201f1303f7b971af0667d43c54ccf3977bc7"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pcre"
+  depends_on "pcre2"
+
+  uses_from_macos "zlib"
 
   def install
-    # Find Homebrew's libpcre
-    ENV.append "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
-
-    # No configure script is shipped with the source
-    system "autoreconf", "-i"
-
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}/privoxy",
-                          "--localstatedir=#{var}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--sysconfdir=#{pkgetc}",
+                          "--localstatedir=#{var}",
+                          *std_configure_args
     system "make"
     system "make", "install"
   end
@@ -51,14 +45,14 @@ class Privoxy < Formula
   test do
     bind_address = "127.0.0.1:#{free_port}"
     (testpath/"config").write("listen-address #{bind_address}\n")
+    pid = spawn sbin/"privoxy", "--no-daemon", testpath/"config"
     begin
-      server = IO.popen("#{sbin}/privoxy --no-daemon #{testpath}/config")
-      sleep 1
-      assert_match "HTTP/1.1 200 Connection established",
-                   shell_output("/usr/bin/curl -I -x #{bind_address} https://github.com")
+      sleep 5
+      output = shell_output("curl --head --proxy #{bind_address} https://github.com")
+      assert_match "HTTP/1.1 200 Connection established", output
     ensure
-      Process.kill("SIGINT", server.pid)
-      Process.wait(server.pid)
+      Process.kill("SIGINT", pid)
+      Process.wait(pid)
     end
   end
 end

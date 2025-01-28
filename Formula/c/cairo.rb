@@ -1,10 +1,10 @@
 class Cairo < Formula
   desc "Vector graphics library with cross-device output support"
   homepage "https://cairographics.org/"
-  url "https://cairographics.org/releases/cairo-1.16.0.tar.xz"
-  sha256 "5e7b29b3f113ef870d1e3ecf8adf21f923396401604bda16d44be45e66052331"
+  url "https://cairographics.org/releases/cairo-1.18.2.tar.xz"
+  sha256 "a62b9bb42425e844cc3d6ddde043ff39dbabedd1542eba57a2eb79f85889d45a"
   license any_of: ["LGPL-2.1-only", "MPL-1.1"]
-  revision 5
+  head "https://gitlab.freedesktop.org/cairo/cairo.git", branch: "master"
 
   livecheck do
     url "https://cairographics.org/releases/?C=M&O=D"
@@ -12,27 +12,20 @@ class Cairo < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "84e7360cad90474ba243cdb3a523d384ca6ddbba2265615bc70454ccb90f8a01"
-    sha256 arm64_ventura:  "4a0f5f55a3314f6b4223661c3af406d3551349b4dcabfda7a6e7b6a569187764"
-    sha256 arm64_monterey: "50feaae83e93330cc0ee6b90477cfa931fab52cdb98ad37a99a0e518da6a580e"
-    sha256 arm64_big_sur:  "2fc4da6029167f696fc0b3c0553d36abb8e77c75f0096396d4eb89d0ea912612"
-    sha256 sonoma:         "c0b97dce5db0d0d3761c7a5dc3b4755392826e66215f749b4c92bb17f21b5a0c"
-    sha256 ventura:        "6b0cbde9c14ef3995e0caba6c743bf8534ac5be9a32d5b74b7e47015f9e1baca"
-    sha256 monterey:       "ccf4f80f5115aad260e4d3f014dc0aebdd616dfac88f567d211bd8681d60c3a9"
-    sha256 big_sur:        "cb16c1bb070a7cdca7aaf8899a70e407d73636116d62225626b2c8d31aa8d2ff"
-    sha256 catalina:       "4a117545953b9784f78db8261c03d71a1ae7af836dcd995abe7e6d710cdfd39c"
-    sha256 mojave:         "38c7b7b0f6266632a5f04df12180dc36a1ce218a1c54b13cdca18ad024067311"
-    sha256 x86_64_linux:   "678c795a11134b3455002969fc41b8e2512e97cdaa084f792724ace7549a3407"
+    sha256 cellar: :any, arm64_sequoia:  "d74a4f1916b9fe1254268c0b20c50d8a5e8cb101c914450d2c5a34066837a366"
+    sha256 cellar: :any, arm64_sonoma:   "8d7d5bc22a123340ce7092b9bf1438ce8e959157e38b784226f48b616a76122a"
+    sha256 cellar: :any, arm64_ventura:  "b87ffd7bf969bed012cdce5d639fb12849108a6864afa2d1fd990889856405e4"
+    sha256 cellar: :any, arm64_monterey: "3f8d520f1560515c17710512daba768af0ef5b9f7f620cdeec0a619f556b3487"
+    sha256 cellar: :any, sonoma:         "e20ab89a1a82b0ec40af53a5b131b46afb94022a3d97d3434710692ae8a90e32"
+    sha256 cellar: :any, ventura:        "a7a67c29e5456bd755e5a735fbe75421710b3bd3893da9ed854862f7c5281707"
+    sha256 cellar: :any, monterey:       "6069e82da93a9c3d0efe9efee7368674611dcf30c31f7e9e32cd0ab22e99b93d"
+    sha256               x86_64_linux:   "8ed937d16eca80e5acbf0b3ae533f933e2d30915abaafb9840026bd9149ed9ba"
   end
 
-  head do
-    url "https://gitlab.freedesktop.org/cairo/cairo.git"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => [:build, :test]
 
-  depends_on "pkg-config" => :build
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "glib"
@@ -46,38 +39,30 @@ class Cairo < Formula
 
   uses_from_macos "zlib"
 
-  # Avoid segfaults on Big Sur. Remove at version bump.
-  # https://gitlab.freedesktop.org/cairo/cairo/-/issues/420
-  patch do
-    url "https://gitlab.freedesktop.org/cairo/cairo/-/commit/e22d7212acb454daccc088619ee147af03883974.diff"
-    sha256 "3b98004d7321c06d294fa901ac91964b6a4277ce4e53ef0cf98bf89e00d93332"
+  on_macos do
+    depends_on "gettext"
   end
 
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-      --enable-gobject
-      --enable-svg
-      --enable-tee
-      --disable-valgrind
-      --enable-xcb
-      --enable-xlib
-      --enable-xlib-xrender
+    args = %w[
+      -Dfontconfig=enabled
+      -Dfreetype=enabled
+      -Dpng=enabled
+      -Dglib=enabled
+      -Dxcb=enabled
+      -Dxlib=enabled
+      -Dzlib=enabled
+      -Dglib=enabled
     ]
-    args << "--enable-quartz-image" if OS.mac?
+    args << "-Dquartz=enabled" if OS.mac?
 
-    if build.head?
-      ENV["NOCONFIGURE"] = "1"
-      system "./autogen.sh"
-    end
-
-    system "./configure", *args
-    system "make", "install"
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <cairo.h>
 
       int main(int argc, char *argv[]) {
@@ -87,25 +72,9 @@ class Cairo < Formula
 
         return 0;
       }
-    EOS
-    fontconfig = Formula["fontconfig"]
-    freetype = Formula["freetype"]
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    libpng = Formula["libpng"]
-    pixman = Formula["pixman"]
-    flags = %W[
-      -I#{fontconfig.opt_include}
-      -I#{freetype.opt_include}/freetype2
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/cairo
-      -I#{libpng.opt_include}/libpng16
-      -I#{pixman.opt_include}/pixman-1
-      -L#{lib}
-      -lcairo
-    ]
+    C
+
+    flags = shell_output("pkgconf --cflags --libs cairo").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

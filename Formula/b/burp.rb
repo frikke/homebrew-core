@@ -20,9 +20,12 @@ class Burp < Formula
   end
 
   bottle do
+    sha256 arm64_sequoia:  "2e9356b11a8e46c3be3414b7a2f88dc01974d49a9b18372f5e92e5654d59144b"
+    sha256 arm64_sonoma:   "839b8941718ab30883533b6cdaf415cb0b6aa085a2dfc53a5439c3cdd6c8e563"
     sha256 arm64_ventura:  "e1360b199ce42bba04f10443f26954d9c3dafe03b7565b571382f6baaad21bd2"
     sha256 arm64_monterey: "c69b19653c7d88ecb561c6116e50208b79834dc5e547396630b2c9fe6a873153"
     sha256 arm64_big_sur:  "91a2441ee60e0cbacc3e6707be43725a65fc161e24e66cbf67dbd1255aea1ff1"
+    sha256 sonoma:         "074e7ecd4259269a27e59b057a9dc502438caf0d52d4e951db492ba2d05ca668"
     sha256 ventura:        "9a7d37e6cbe57a298cd83d7ab19960895329906bcf828113a98e159ac5baf8d0"
     sha256 monterey:       "a1aeb87a73af8ecf56631e3a3ac97732cc391afbe4d3651e05b390f0777f91de"
     sha256 big_sur:        "bde32d67b881d607349d196ecd79aac7cc92256e3ce94731bf27f90eb99ace53"
@@ -41,13 +44,17 @@ class Burp < Formula
     end
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "librsync"
   depends_on "openssl@3"
 
   uses_from_macos "libxcrypt"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "acl"
+  end
 
   def install
     resource("uthash").stage do
@@ -56,7 +63,7 @@ class Burp < Formula
 
     ENV.prepend "CPPFLAGS", "-I#{buildpath}/uthash/include"
 
-    system "autoreconf", "-fiv" if build.head?
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
 
     system "./configure", "--prefix=#{prefix}",
                           "--sysconfdir=#{etc}/burp",

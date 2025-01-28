@@ -1,8 +1,8 @@
 class Wiredtiger < Formula
   desc "High performance NoSQL extensible platform for data management"
   homepage "https://source.wiredtiger.com/"
-  url "https://github.com/wiredtiger/wiredtiger/archive/refs/tags/11.1.0.tar.gz"
-  sha256 "0d988a8256219b614d855a2504d252975240171a633b882f19149c4a2ce0ec3d"
+  url "https://github.com/wiredtiger/wiredtiger/archive/refs/tags/11.3.1.tar.gz"
+  sha256 "ac0417c10cecc686baff5fdc00a7872003fc007993163bafba387fad903d5091"
   license any_of: ["GPL-2.0-only", "GPL-3.0-only"]
 
   livecheck do
@@ -11,13 +11,12 @@ class Wiredtiger < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "e702595127c63e553e171080dfcece136fba68f49033ae7b31025469033b00f3"
-    sha256 cellar: :any,                 arm64_monterey: "a5c31bedec633c773be322ab3b7aa8e74fd947b27158647ad04cf55be79fe07a"
-    sha256 cellar: :any,                 arm64_big_sur:  "ffd74182dc67713a3752aa15c0cd7bc2811486b059f3211c43f1d879de6153ff"
-    sha256 cellar: :any,                 ventura:        "27db1920028d44d7a4f538212b16864c5992740a21b72f3abf9e3a2f9805b3b5"
-    sha256 cellar: :any,                 monterey:       "c0ec5fb4fc6e989cfd2d204297fabc4992f59faa8a08720d348445cb978be0f5"
-    sha256 cellar: :any,                 big_sur:        "a4352f0a56362dad537c4c2ed02ac3a080e009b9bcf231b918aed064fdb10258"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5718df46cf1737703d1977762a8c4632cb6207ea6a98fa5a7a3450acabf4ffa8"
+    sha256 cellar: :any,                 arm64_sequoia: "fe94103be40ac4d1f2030cf28f3bd93dda5f65f45196884e18e21dc48825a502"
+    sha256 cellar: :any,                 arm64_sonoma:  "6f46b39b9ad85313b1cbcb81e9b86204a15a017b859bbbafac05094a994a5284"
+    sha256 cellar: :any,                 arm64_ventura: "0333748feb3a4d7939b945a6e24dda5a73f7a9fcc7497e21b8af17ce6197e666"
+    sha256 cellar: :any,                 sonoma:        "2c6472b714776076789ecdab468016f3c4b25ebcd84695ca70a67d463537c4a6"
+    sha256 cellar: :any,                 ventura:       "4085e3bbb32627b3dac06760f86dfb6e28a7d580dfa9cbeaab94a3126a4f11da"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "100e4051caa78dbd63c57f3e0a3be5f0272676e187c191d040068cbaf5c67aa4"
   end
 
   depends_on "ccache" => :build
@@ -29,12 +28,6 @@ class Wiredtiger < Formula
 
   uses_from_macos "python" => :build
   uses_from_macos "zlib"
-
-  # Adds include for std::optional. Remove in version 11.2.0.
-  patch do
-    url "https://github.com/wiredtiger/wiredtiger/commit/4418f9d2d7cad3829b47566d374ee73b29d699d7.patch?full_index=1"
-    sha256 "79bc6c1f027cda7742cdca26b361471126c60e8e66198a8dae4782b2a750c1c3"
-  end
 
   def install
     args = %W[
@@ -49,7 +42,7 @@ class Wiredtiger < Formula
   end
 
   test do
-    system "#{bin}/wt", "create", "table:test"
-    system "#{bin}/wt", "drop", "table:test"
+    system bin/"wt", "create", "table:test"
+    system bin/"wt", "drop", "table:test"
   end
 end

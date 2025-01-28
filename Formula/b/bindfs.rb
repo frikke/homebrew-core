@@ -1,12 +1,17 @@
 class Bindfs < Formula
   desc "FUSE file system for mounting to another location"
   homepage "https://bindfs.org/"
-  url "https://bindfs.org/downloads/bindfs-1.17.4.tar.gz"
-  sha256 "6fd4af9ba2ec2bdb603ef8eea2a9d12db2e5fe9cbe52b8640b415734a59f3dcc"
+  url "https://bindfs.org/downloads/bindfs-1.17.7.tar.gz"
+  sha256 "c0b060e94c3a231a1d4aa0bcf266ff189981a4ef38e42fbe23296a7d81719b7a"
   license "GPL-2.0-or-later"
 
+  livecheck do
+    url "https://bindfs.org/downloads/"
+    regex(/href=.*?bindfs[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "b7175afd04e2af48dba44575560a3e99625c681cef8349977111fd8d017ad093"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "515aa180439b344708d23c95b2dfcd64b69c6cd9e3fb6a458e95a4469ebee204"
   end
 
   head do
@@ -17,27 +22,17 @@ class Bindfs < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libfuse"
   depends_on :linux # on macOS, requires closed-source macFUSE
 
   def install
-    args = %W[
-      --disable-debug
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-    ]
-
-    if build.head?
-      system "./autogen.sh", *args
-    else
-      system "./configure", *args
-    end
-
+    configure = build.head? ? "./autogen.sh" : "./configure"
+    system configure, *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/bindfs", "-V"
+    system bin/"bindfs", "-V"
   end
 end

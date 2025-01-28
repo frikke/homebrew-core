@@ -1,12 +1,13 @@
 class Libtins < Formula
   desc "C++ network packet sniffing and crafting library"
   homepage "https://libtins.github.io/"
-  url "https://github.com/mfontanini/libtins/archive/v4.5.tar.gz"
+  url "https://github.com/mfontanini/libtins/archive/refs/tags/v4.5.tar.gz"
   sha256 "6ff5fe1ada10daef8538743dccb9c9b3e19d05d028ffdc24838e62ff3fc55841"
   license "BSD-2-Clause"
   head "https://github.com/mfontanini/libtins.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "5cb848c245b9b880eb92a07133a8ec40238f08cc88ab9707805368efcc4bdf9d"
     sha256 cellar: :any,                 arm64_sonoma:   "12126120e038b274429c55f65891dd2eef0bdcb96cf728de5f3fb80b863896f4"
     sha256 cellar: :any,                 arm64_ventura:  "2c1278e057086dc562909a6e748d782d269cb1969e64841daa0e260ecbdec343"
     sha256 cellar: :any,                 arm64_monterey: "fb3bcc8fe5fc54313c85eb70e579b649b6c27a73a1486fc84913188ddf8218db"
@@ -34,12 +35,12 @@ class Libtins < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <tins/tins.h>
       int main() {
         Tins::Sniffer sniffer("en0");
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cpp", "-L#{lib}", "-ltins", "-o", "test"
   end
 end

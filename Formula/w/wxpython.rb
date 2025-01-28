@@ -1,61 +1,45 @@
 class Wxpython < Formula
   desc "Python bindings for wxWidgets"
   homepage "https://www.wxpython.org/"
-  url "https://files.pythonhosted.org/packages/aa/64/d749e767a8ce7bdc3d533334e03bb1106fc4e4803d16f931fada9007ee13/wxPython-4.2.1.tar.gz"
-  sha256 "e48de211a6606bf072ec3fa778771d6b746c00b7f4b970eb58728ddf56d13d5c"
+  url "https://files.pythonhosted.org/packages/a4/f5/8c272764770f47fd419cc2eff4c4fa1c0681c71bcc2f3158b3a83d1339ff/wxPython-4.2.2.tar.gz"
+  sha256 "5dbcb0650f67fdc2c5965795a255ffaa3d7b09fb149aa8da2d0d9aa44e38e2ba"
   license "LGPL-2.0-or-later" => { with: "WxWindows-exception-3.1" }
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "ecc9ba51d7c1ecccfa9e95a93e6dd9a1b3ae9389bcfd6c59ea78f64a516e21a2"
-    sha256 cellar: :any, arm64_monterey: "c4ec5d486f312f880810185ff172f3cf1ad6e29d3ae134bd35dd49aa435176c3"
-    sha256 cellar: :any, arm64_big_sur:  "1efd83b12803dc94280d18db9faf7c7908b923a84443b2369af4661923690d47"
-    sha256 cellar: :any, ventura:        "9ead65dce312c062a772fad1589434665706e509b6ffd7aa5f320ec9476483e5"
-    sha256 cellar: :any, monterey:       "79304e35ef5f033aa46da09e3f668ce0bb1651f482c6ee853719f34f12dca430"
-    sha256 cellar: :any, big_sur:        "50bbd5fb5ebf30a376cd174829ece3d81be8432fc6ae872c4e69d0fbeb0bf1a7"
-    sha256               x86_64_linux:   "2b0a727845e44862bd0f74d23e0c1e2e8c91959e32d85aebff3ead82a0a10fb5"
+    rebuild 1
+    sha256 cellar: :any, arm64_sequoia: "61df112e56b878d060e4986c1c5f059ea5d4e509388422fb2708ae9987628323"
+    sha256 cellar: :any, arm64_sonoma:  "43a633faf4c1e74f172357e23618177bd9ef32692328a0d065183047d336fda2"
+    sha256 cellar: :any, arm64_ventura: "0ed00ec4bc814a48811cf50b94f57a0403742a6e2fbce997afa8b211fc5d93bf"
+    sha256 cellar: :any, sonoma:        "1a8623673d7ac7aeccbbf323960534cb1abfe7cf6de10398a55e66a2d393d3b8"
+    sha256 cellar: :any, ventura:       "3ba5be7b2eccb72980659e9d1f19919a044790076070bc8b7e1c41ac017dcb4d"
+    sha256               x86_64_linux:  "c84fcddbb55c6ddc2152b2bae4c8ac70a70a0c11a0e110d30ea800209f0425a9"
   end
 
-  # FIXME: Build is currently broken with Doxygen 1.9.7+.
-  # FIXME: depends_on "doxygen" => :build
-  depends_on "bison" => :build # for `doxygen` resource
-  depends_on "cmake" => :build # for `doxygen` resource
+  depends_on "doxygen" => :build
+  depends_on "python-setuptools" => :build
   depends_on "sip" => :build
   depends_on "numpy"
   depends_on "pillow"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "six"
   depends_on "wxwidgets"
-  uses_from_macos "flex" => :build, since: :big_sur # for `doxygen` resource
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "gtk+3"
   end
 
-  # Build is broken with Doxygen 1.9.7+.
-  # TODO: Try to use Homebrew `doxygen` at next release.
-  resource "doxygen" do
-    url "https://doxygen.nl/files/doxygen-1.9.6.src.tar.gz"
-    mirror "https://downloads.sourceforge.net/project/doxygen/rel-1.9.6/doxygen-1.9.6.src.tar.gz"
-    sha256 "297f8ba484265ed3ebd3ff3fe7734eb349a77e4f95c8be52ed9977f51dea49df"
-  end
+  # build patch to build with doxygen 1.11.0+, remove in next release
+  # upstream commit ref, https://github.com/wxWidgets/wxWidgets/commit/2d79dfc7a2a8dd42021ff0ea3dcc8ed05f7c23ef
+  patch :DATA
 
   def python
-    "python3.11"
+    "python3.13"
   end
 
   def install
-    odie "Check if `doxygen` resource can be removed!" if build.bottle? && version > "4.2.1"
-    # TODO: Try removing the block below at the next release.
-    resource("doxygen").stage do
-      system "cmake", "-S", ".", "-B", "build",
-                      "-DPYTHON_EXECUTABLE=#{which(python)}",
-                      *std_cmake_args(install_prefix: buildpath/".brew_home")
-      system "cmake", "--build", "build"
-      system "cmake", "--install", "build"
-    end
-
-    ENV["DOXYGEN"] = buildpath/".brew_home/bin/doxygen" # Formula["doxygen"].opt_bin/"doxygen"
+    ENV.cxx11
+    ENV["DOXYGEN"] = Formula["doxygen"].opt_bin/"doxygen"
     system python, "-u", "build.py", "dox", "touch", "etg", "sip", "build_py",
                    "--release",
                    "--use_syswx",
@@ -63,9 +47,7 @@ class Wxpython < Formula
                    "--jobs=#{ENV.make_jobs}",
                    "--verbose",
                    "--nodoc"
-    system python, *Language::Python.setup_install_args(prefix, python),
-                   "--skip-build",
-                   "--install-platlib=#{prefix/Language::Python.site_packages(python)}"
+    system python, "-m", "pip", "install", "--config-settings=--build-option=--skip-build", *std_pip_args, "."
   end
 
   test do
@@ -73,3 +55,31 @@ class Wxpython < Formula
     assert_match version.to_s, output
   end
 end
+
+__END__
+diff --git a/ext/wxWidgets/include/wx/datetime.h b/ext/wxWidgets/include/wx/datetime.h
+index 6eb2f8c..8c3cf43 100644
+--- a/ext/wxWidgets/include/wx/datetime.h
++++ b/ext/wxWidgets/include/wx/datetime.h
+@@ -148,7 +148,7 @@ public:
+         Local,
+
+         // zones from GMT (= Greenwich Mean Time): they're guaranteed to be
+-        // consequent numbers, so writing something like `GMT0 + offset' is
++        // consequent numbers, so writing something like `GMT0 + offset` is
+         // safe if abs(offset) <= 12
+
+         // underscore stands for minus
+diff --git a/ext/wxWidgets/interface/wx/datetime.h b/ext/wxWidgets/interface/wx/datetime.h
+index ae99947..4604b75 100644
+--- a/ext/wxWidgets/interface/wx/datetime.h
++++ b/ext/wxWidgets/interface/wx/datetime.h
+@@ -96,7 +96,7 @@ public:
+
+         ///@{
+         /// zones from GMT (= Greenwich Mean Time): they're guaranteed to be
+-        /// consequent numbers, so writing something like `GMT0 + offset' is
++        /// consequent numbers, so writing something like `GMT0 + offset` is
+         /// safe if abs(offset) <= 12
+
+         // underscore stands for minus

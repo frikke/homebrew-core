@@ -1,12 +1,17 @@
 class Spotbugs < Formula
   desc "Tool for Java static analysis (FindBugs's successor)"
   homepage "https://spotbugs.github.io/"
-  url "https://repo.maven.apache.org/maven2/com/github/spotbugs/spotbugs/4.7.3/spotbugs-4.7.3.tgz"
-  sha256 "f02e2f1135b23f3edfddb75f64be0491353cfeb567b5a584115aa4fd373d4431"
+  url "https://repo.maven.apache.org/maven2/com/github/spotbugs/spotbugs/4.9.0/spotbugs-4.9.0.tgz"
+  sha256 "d9fec1c0d0d2771153ed3f654a2a793558cefa7796cca3a5cad801f5529ec82d"
   license "LGPL-2.1-or-later"
 
+  livecheck do
+    url "https://repo.maven.apache.org/maven2/com/github/spotbugs/spotbugs/"
+    regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "c4a351e6423603de5b05a114912e6091977f287357ea8c23fbba1944026bba72"
+    sha256 cellar: :any_skip_relocation, all: "5b9d0d3902d4b1e133dc76d1d6dd282e28d8c51c8d78a0eed9147afa8142180b"
   end
 
   head do
@@ -33,7 +38,7 @@ class Spotbugs < Formula
   end
 
   test do
-    (testpath/"HelloWorld.java").write <<~EOS
+    (testpath/"HelloWorld.java").write <<~JAVA
       public class HelloWorld {
         private double[] myList;
         public static void main(String[] args) {
@@ -43,7 +48,7 @@ class Spotbugs < Formula
           return myList;
         }
       }
-    EOS
+    JAVA
     system Formula["openjdk"].bin/"javac", "HelloWorld.java"
     system Formula["openjdk"].bin/"jar", "cvfe", "HelloWorld.jar", "HelloWorld", "HelloWorld.class"
     output = shell_output("#{bin}/spotbugs -textui HelloWorld.jar")

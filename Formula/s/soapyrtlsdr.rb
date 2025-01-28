@@ -1,20 +1,21 @@
 class Soapyrtlsdr < Formula
   desc "SoapySDR RTL-SDR Support Module"
   homepage "https://github.com/pothosware/SoapyRTLSDR/wiki"
-  url "https://github.com/pothosware/SoapyRTLSDR/archive/soapy-rtl-sdr-0.3.3.tar.gz"
+  url "https://github.com/pothosware/SoapyRTLSDR/archive/refs/tags/soapy-rtl-sdr-0.3.3.tar.gz"
   sha256 "757c3c3bd17c5a12c7168db2f2f0fd274457e65f35e23c5ec9aec34e3ef54ece"
   license "MIT"
+  revision 2
   head "https://github.com/pothosware/SoapyRTLSDR.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "7cf87f94faf254537f63d16b75222ad06f91958fbf5ee2a92b9683b0f4eef7d6"
-    sha256 cellar: :any,                 arm64_monterey: "922896ad8d6c44fed91b627c48e740fc797edce83232dc3bb287e325061f2eaf"
-    sha256 cellar: :any,                 arm64_big_sur:  "11c9ba0104eb65d314c06801c54e7c043740a150243a5d08abbf8689c221193a"
-    sha256 cellar: :any,                 ventura:        "1fc521faf832c6cfce7891b0c87ebdca9694e35a60d45c3c9ac61814df7003df"
-    sha256 cellar: :any,                 monterey:       "122ed46b2d8ce6a0b47c5d8d25ba9faa8fe4ad0d54f9d3ebc1192d9f6163bfe2"
-    sha256 cellar: :any,                 big_sur:        "cf8d5bee0688736dfc54b35d003e181f479b0a86e3d82b538f87daa401eaee60"
-    sha256 cellar: :any,                 catalina:       "bfe8b9cac1848868e63cd1226886e0d6c9e3e84dab9f546245f157202e03a232"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "37726a74b5a58d6a59cdf5590797c98f8c293e5536a82d2c21d902b16ff79103"
+    sha256 cellar: :any,                 arm64_sequoia:  "76b22eaf2c71839e2f26068ed671fd7652ed7aac92b582cbc267159d0fb851ca"
+    sha256 cellar: :any,                 arm64_sonoma:   "3b758a501acd8918eddee8cd29669fdbfecb4bfb1c0a1363290ff2534dce9ffe"
+    sha256 cellar: :any,                 arm64_ventura:  "a2deb76bc7882fd8cdc38c11408c0228a99ae91e8e2165ccd27c4fc1aaa908ff"
+    sha256 cellar: :any,                 arm64_monterey: "2968a2967fc49780b5c5a7f0278bb38f7f13f424413389e05a42e807682e27db"
+    sha256 cellar: :any,                 sonoma:         "984fedf5e1b8712bacc86a3e2fcb225233dbd751955e17f61896cdd8cb811cb5"
+    sha256 cellar: :any,                 ventura:        "24c80a7bae5a8ff939c51914fd86ec146b9f8f03f274cf5c4d428ff6273d4f18"
+    sha256 cellar: :any,                 monterey:       "3ab1e0c54d417347e2439daf45f6859f2669fcfbd8fa061cc18741614fc7cb2f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e4169428867a8b2d9fa11b6f601c735b8c2d5ffa0f46d3289cd1d1f58dfea6dc"
   end
 
   depends_on "cmake" => :build
@@ -22,14 +23,13 @@ class Soapyrtlsdr < Formula
   depends_on "soapysdr"
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    assert_match "Checking driver 'rtlsdr'... PRESENT",
-                 shell_output("#{Formula["soapysdr"].bin}/SoapySDRUtil --check=rtlsdr")
+    output = shell_output("#{Formula["soapysdr"].bin}/SoapySDRUtil --check=rtlsdr")
+    assert_match "Checking driver 'rtlsdr'... PRESENT", output
   end
 end

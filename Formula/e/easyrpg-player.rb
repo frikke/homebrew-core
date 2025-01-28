@@ -4,27 +4,27 @@ class EasyrpgPlayer < Formula
   url "https://easyrpg.org/downloads/player/0.8/easyrpg-player-0.8.tar.xz"
   sha256 "06e6d034348d1c52993d0be6b88fc3502a6c7718e366f691401539d5a2195c79"
   license "GPL-3.0-or-later"
-  revision 2
+  revision 6
 
   livecheck do
     url "https://github.com/EasyRPG/Player.git"
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "b1f816ed8d4291b0f4400a19cf831fe098eaf58fc0d52d7cef88e565e321f61d"
-    sha256 cellar: :any,                 arm64_monterey: "4c9cbce83ebf39769b0a51e7a27dd0aba437f0a3979e8784485aae60c215b88c"
-    sha256 cellar: :any,                 arm64_big_sur:  "932a5158ea1f97f7067a896ac40592e466cc0a99d648c0724c21e6f2ffe743d0"
-    sha256 cellar: :any,                 ventura:        "4ff38fabee40fa3a6bfe498e7ec4db7d4f0b2a90c310ef1946f0de8c6dc12d86"
-    sha256 cellar: :any,                 monterey:       "ac2bb22fcfd1dc9691d145ea40611ba63c57e110781d9219def898cda1789f05"
-    sha256 cellar: :any,                 big_sur:        "b9b53f93b5623eea5ef7c2437fdd4325f9792d42abf2a6b7309c44c85dee74da"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1563c44b8f1fefdc027943c24787ad5600c94400a8bd8c5d4c38b6560bb137c2"
+    sha256 cellar: :any,                 arm64_sequoia: "66c7961634bf8c5e03ce836f43305bd1c0b26243b11a18bd891fc373598e4126"
+    sha256 cellar: :any,                 arm64_sonoma:  "18ca681626d5cd3567cb66c707f852c331bbdff76aa3b3d2ed8d4c20ac58333e"
+    sha256 cellar: :any,                 arm64_ventura: "10561454e76eccb05d5a54f019514737275771deba52204d71292247d961da97"
+    sha256 cellar: :any,                 sonoma:        "5334ddbe087aa9294f7b7492cd2d263d27cd20dcaa2f17a81c6f7708b350ce5e"
+    sha256 cellar: :any,                 ventura:       "8b8cfa026ce4c30fa3fb4b3b1ee9a5830a8635555f19f8dde776c35992100bbb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a6a5222eaa4447b239eb868aceae4dbec632cb4aa2ad4573f99efc99c675b57d"
   end
 
   depends_on "cmake" => :build
+  depends_on "expat"
   depends_on "fmt"
   depends_on "freetype"
   depends_on "harfbuzz"
-  depends_on "icu4c"
+  depends_on "icu4c@76"
   depends_on "liblcf"
   depends_on "libpng"
   depends_on "libsndfile"
@@ -35,12 +35,16 @@ class EasyrpgPlayer < Formula
   depends_on "sdl2"
   depends_on "speexdsp"
 
-  on_linux do
-    depends_on "pkg-config" => :build
-    depends_on "alsa-lib"
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "libogg"
   end
 
-  fails_with gcc: "5"
+  on_linux do
+    depends_on "pkgconf" => :build
+    depends_on "alsa-lib"
+  end
 
   # Add support for fmt 10
   patch do
@@ -55,12 +59,12 @@ class EasyrpgPlayer < Formula
 
     if OS.mac?
       prefix.install "build/EasyRPG Player.app"
-      bin.write_exec_script "#{prefix}/EasyRPG Player.app/Contents/MacOS/EasyRPG Player"
-      mv "#{bin}/EasyRPG Player", "#{bin}/easyrpg-player"
+      bin.write_exec_script prefix/"EasyRPG Player.app/Contents/MacOS/EasyRPG Player"
+      mv bin/"EasyRPG Player", bin/"easyrpg-player"
     end
   end
 
   test do
-    assert_match(/EasyRPG Player #{version}/, shell_output("#{bin}/easyrpg-player -v"))
+    assert_match "EasyRPG Player #{version}", shell_output("#{bin}/easyrpg-player -v")
   end
 end

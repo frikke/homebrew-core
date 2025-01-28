@@ -1,10 +1,9 @@
 class Libsodium < Formula
   desc "NaCl networking and cryptography library"
   homepage "https://libsodium.org/"
-  url "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
-  sha256 "6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1"
+  url "https://download.libsodium.org/libsodium/releases/libsodium-1.0.20.tar.gz"
+  sha256 "ebb65ef6ca439333c2bb41a0c1990587288da07f6c7fd07cb3a18cc18d30ce19"
   license "ISC"
-  revision 1
 
   livecheck do
     url "https://download.libsodium.org/libsodium/releases/"
@@ -12,18 +11,14 @@ class Libsodium < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "b704745e5f0c13554118a0c2f4226b72858e051ec9fb6d4a49c6d8977862b718"
-    sha256 cellar: :any,                 arm64_ventura:  "9a473cc4469e5f641ff79fac0331c7b86ac22778becd1155a2395e52346116d8"
-    sha256 cellar: :any,                 arm64_monterey: "493ce4faacb1fba817e73213cde331a68f73531d89260200726cc17c1ca00797"
-    sha256 cellar: :any,                 arm64_big_sur:  "ab7029c599665005a9c9ec9e72c74bf4d543fd7a995d9af9cfe9e6c10de79177"
-    sha256 cellar: :any,                 sonoma:         "69e549243d6de0ecc9a9a6a2014db77f16285505f7c4a5d92b9a39bab73794ef"
-    sha256 cellar: :any,                 ventura:        "bbb929946689440afc6bb47effbc3e8d70db86e86c381d8ba99c1befc07e5602"
-    sha256 cellar: :any,                 monterey:       "522ac3f26c646f3d276b0c997e1a2771559d4766362d28f16ca1a9585bc20206"
-    sha256 cellar: :any,                 big_sur:        "5afc5678e30a174c1e46f1e905124f2619e6d9815ac776836090c0bff85631d6"
-    sha256 cellar: :any,                 catalina:       "db372521cd0b1861a5b578bee22426f3a1f4f7cb3c382be1f842da4715dc65bd"
-    sha256 cellar: :any,                 mojave:         "55245bfcf6654b0914d3f7459b99a08c54ef2560587bf583a1c1aff4cfc81f28"
-    sha256 cellar: :any,                 high_sierra:    "fc972755eb60f4221d7b32e58fc0f94e99b913fefefc84c4c76dc4bca1c5c445"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1ab2c66fc8ae6c1245b49c9bd7a32853c1b348afe7086d4c2d3baf5ea30bbac9"
+    sha256 cellar: :any,                 arm64_sequoia:  "e8ba0aafe8fe7266d68630ff7ab11d7357af35dbf5113bb648a1e02bed397970"
+    sha256 cellar: :any,                 arm64_sonoma:   "66835fcd7e4dd8dde5be4e8d34c5314481c1d724e8dd82d4e97059d9fdaf1a45"
+    sha256 cellar: :any,                 arm64_ventura:  "21b83b95eef039b914d712f4ac5d235d85e1f1143383dfa9c5359f0cc88fa08d"
+    sha256 cellar: :any,                 arm64_monterey: "25377f9e16747b9af732be608a966b580287d0854c2d530f23eea1235bca1ff7"
+    sha256 cellar: :any,                 sonoma:         "ebc452002391195287aef3819c1285ba597bbfe55cb926f18dae5990202afa12"
+    sha256 cellar: :any,                 ventura:        "5de3b5180b73678d93c4c69a77d662afd6aac0bfd71246be6e78cfacf97cc3d7"
+    sha256 cellar: :any,                 monterey:       "0556f27feb8d4b5f31edf42e392eb4901daa5b9dbb8510499aa196c9e77134c6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "94394d217dc5a833492a702a8a9e914573a945da13f3b4f42b59f2513835f439"
   end
 
   head do
@@ -35,7 +30,7 @@ class Libsodium < Formula
   end
 
   def install
-    system "./autogen.sh" if build.head?
+    system "./autogen.sh", "-sb" if build.head?
     system "./configure", "--disable-debug", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
     system "make", "check"
@@ -43,7 +38,7 @@ class Libsodium < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <sodium.h>
 
@@ -52,7 +47,7 @@ class Libsodium < Formula
         assert(sodium_init() != -1);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}",
                    "-lsodium", "-o", "test"
     system "./test"

@@ -1,29 +1,29 @@
 class Webhook < Formula
   desc "Lightweight, configurable incoming webhook server"
   homepage "https://github.com/adnanh/webhook"
-  url "https://github.com/adnanh/webhook/archive/2.8.1.tar.gz"
-  sha256 "a1e3eb2231e5631ebb374b76a79c3bac9cbdc7010974395e2d5e4e2e62ffd187"
+  url "https://github.com/adnanh/webhook/archive/refs/tags/2.8.2.tar.gz"
+  sha256 "c233a810effc24b5ed5653f4fa82152f288ec937d5744a339f7066a6cbccc565"
   license "MIT"
   head "https://github.com/adnanh/webhook.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "17ab323f0bddf3df15751ab8e81bdb8dc9313d86f8885c641725e5bff5def2e3"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "17ab323f0bddf3df15751ab8e81bdb8dc9313d86f8885c641725e5bff5def2e3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "17ab323f0bddf3df15751ab8e81bdb8dc9313d86f8885c641725e5bff5def2e3"
-    sha256 cellar: :any_skip_relocation, ventura:        "134b8aaaa2624e496cc11e0ff0f6b6b077d53a7a5fdf75521eac4c4f9d2a6e1f"
-    sha256 cellar: :any_skip_relocation, monterey:       "134b8aaaa2624e496cc11e0ff0f6b6b077d53a7a5fdf75521eac4c4f9d2a6e1f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "134b8aaaa2624e496cc11e0ff0f6b6b077d53a7a5fdf75521eac4c4f9d2a6e1f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "234b20e6404e53867004ae3a96ea21e59cdf2c72c79a00175193560f61363eae"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "353fae094f87012e6168a3c05d23775364567e9b77e23dadaddc6934de132687"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "353fae094f87012e6168a3c05d23775364567e9b77e23dadaddc6934de132687"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "353fae094f87012e6168a3c05d23775364567e9b77e23dadaddc6934de132687"
+    sha256 cellar: :any_skip_relocation, sonoma:        "93093d997e626387ef2ca21b6e854d2b04f3a974c144d316db61f924f2eb4546"
+    sha256 cellar: :any_skip_relocation, ventura:       "93093d997e626387ef2ca21b6e854d2b04f3a974c144d316db61f924f2eb4546"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9041e5e55f02a911e3203d13432b83aa72bfe5fc3869b1f81ac4639a1976c31c"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do
-    (testpath/"hooks.yaml").write <<~EOS
+    (testpath/"hooks.yaml").write <<~YAML
       - id: test
         execute-command: /bin/sh
         command-working-directory: "#{testpath}"
@@ -32,7 +32,7 @@ class Webhook < Formula
           name: -c
         - source: string
           name: "pwd > out.txt"
-    EOS
+    YAML
 
     port = free_port
     fork do

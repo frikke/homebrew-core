@@ -1,19 +1,19 @@
 class Pueue < Formula
   desc "Command-line tool for managing long-running shell commands"
   homepage "https://github.com/Nukesor/pueue"
-  url "https://github.com/Nukesor/pueue/archive/v3.2.0.tar.gz"
-  sha256 "0c3126579661f894fb02a0d8c0e138ab23b277e97cea2d85e48d3d2b9fb1c372"
+  url "https://github.com/Nukesor/pueue/archive/refs/tags/v3.4.1.tar.gz"
+  sha256 "868710de128db49e0a0c4ddee127dfc0e19b20cbdfd4a9d53d5ed792c5538244"
   license "MIT"
   head "https://github.com/Nukesor/pueue.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d612702eaf7cc670053c14af44e74ca539a94dbdef270baf7b28542666a8549d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6cfffb4cf17d5617281a587028b66e405706f823a285de215065115d79b948cd"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "26804d5d570fd4c44b7c998bca31596ea66a06395c3c36524e241d6d744765c1"
-    sha256 cellar: :any_skip_relocation, ventura:        "cf1b43118a462384d3183faf04c6d36f83f672f4b976a28c1d77f69ce565df6e"
-    sha256 cellar: :any_skip_relocation, monterey:       "2fdf39cab40d98865c4ae01985393f5107d784e87be606057ca1b4bc461150dd"
-    sha256 cellar: :any_skip_relocation, big_sur:        "eb9b4ffa5ac44581147f51586601cb1da7214c48cdbcd810b0973ee905d0cc92"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5385b14fb0da4505c8a30586b7171421c7949442b4043472cba5ab14c16f991f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "069ad84e3ec9d9513ebfbe1272a18352cd6b0594ee9b3a03912b735a5bf97676"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "12dac34c9a768b35c11abd2e91798085c8af6dbe5957741ba2887a2435f2d2d9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f66df95de1cdf2bef246ba8d327779dbeebd77314496c8a90be1c222a22ab72b"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e2cd03a375f5ee42700ba2698ba3a11fb453faebd7c9797b184229cb675dc37a"
+    sha256 cellar: :any_skip_relocation, ventura:       "513cf264a536c71dac1211a840db4aaa18a45103d5486c523f3e42eeea4dbfa5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "36b77846f503d5b2a7ae1262f26b11511b94f151498b103b0ed5aeb4045ad667"
   end
 
   depends_on "rust" => :build
@@ -21,16 +21,7 @@ class Pueue < Formula
   def install
     system "cargo", "install", *std_cargo_args(path: "pueue")
 
-    mkdir "utils/completions" do
-      system "#{bin}/pueue", "completions", "bash", "."
-      bash_completion.install "pueue.bash" => "pueue"
-      system "#{bin}/pueue", "completions", "fish", "."
-      fish_completion.install "pueue.fish" => "pueue.fish"
-      system "#{bin}/pueue", "completions", "zsh", "."
-      zsh_completion.install "_pueue" => "_pueue"
-    end
-
-    prefix.install_metafiles
+    generate_completions_from_executable(bin/"pueue", "completions")
   end
 
   service do

@@ -13,9 +13,11 @@ class Cdparanoia < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sonoma:   "da6e298d56e612c17a306d5ce4ca383b17e73e1cf0c3361159c1c5361a311289"
     sha256 cellar: :any,                 arm64_ventura:  "5fce8011bf8533e069b7f6047defb5ef911f63ba9da06d6675091c97a7e7e227"
     sha256 cellar: :any,                 arm64_monterey: "5d8b1e73627d9349a554277257c4307708cb545241de318059226c30ddaff163"
     sha256 cellar: :any,                 arm64_big_sur:  "7f6df3210edceca8bc7efb2ad83d51bbb07df9d114dff57d0907f8a095eb6317"
+    sha256 cellar: :any,                 sonoma:         "b29a6bdcc46159b6aebf0570b59478303e785447f42a1809fbef558c8175feee"
     sha256 cellar: :any,                 ventura:        "baa6da0e6a60da3c6a3417c48e967bee871661dcdd0fee3fa5d05463b0ae9623"
     sha256 cellar: :any,                 monterey:       "947c11b5f0535b78e5917e3c37ab1e1669bb5984df3e8a833656463a66a4bc9b"
     sha256 cellar: :any,                 big_sur:        "3254c96c3809aed7f6190abe33cfb95056532cc932de14591435e2dddb1d8cd2"
@@ -23,7 +25,7 @@ class Cdparanoia < Formula
   end
 
   # see https://github.com/orgs/Homebrew/discussions/4154
-  deprecate! date: "2023-05-15", because: :unmaintained
+  disable! date: "2024-02-21", because: :unmaintained
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
@@ -46,7 +48,7 @@ class Cdparanoia < Formula
   def install
     ENV.deparallelize
 
-    # Workaround for Xcode 14.3
+    # Fix compile with newer Clang
     ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
 
     # Libs are installed as keg-only because most software that searches for cdparanoia
@@ -59,15 +61,13 @@ class Cdparanoia < Formula
                 "-Wl,-rpath,#{Formula["cdparanoia"].libexec} -L ../interface"
     end
 
-    system "autoreconf", "-fiv"
-    system "./configure", "--prefix=#{prefix}",
-                          "--mandir=#{man}",
-                          "--libdir=#{libexec}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--mandir=#{man}", * std_configure_args
     system "make", "all"
     system "make", "install"
   end
 
   test do
-    system "#{bin}/cdparanoia", "--version"
+    system bin/"cdparanoia", "--version"
   end
 end

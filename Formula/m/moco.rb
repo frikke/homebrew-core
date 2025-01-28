@@ -11,13 +11,8 @@ class Moco < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "be22300213a664c3a18e3912937f148ad920c5de419507e2d4899fe9d49d88b5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "be22300213a664c3a18e3912937f148ad920c5de419507e2d4899fe9d49d88b5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "be22300213a664c3a18e3912937f148ad920c5de419507e2d4899fe9d49d88b5"
-    sha256 cellar: :any_skip_relocation, ventura:        "be22300213a664c3a18e3912937f148ad920c5de419507e2d4899fe9d49d88b5"
-    sha256 cellar: :any_skip_relocation, monterey:       "be22300213a664c3a18e3912937f148ad920c5de419507e2d4899fe9d49d88b5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "be22300213a664c3a18e3912937f148ad920c5de419507e2d4899fe9d49d88b5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a04f771c06da8df507698deb1da9aedeecef6a1b455ebe5e8431a1495a9da545"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "521d8b998c0312dccbb48389843c42e5c3f3edb17618eaa8b017038d040a420c"
   end
 
   depends_on "openjdk"
@@ -28,7 +23,7 @@ class Moco < Formula
   end
 
   test do
-    (testpath/"config.json").write <<~EOS
+    (testpath/"config.json").write <<~JSON
       [
         {
           "response" :
@@ -37,7 +32,7 @@ class Moco < Formula
           }
         }
       ]
-    EOS
+    JSON
 
     port = free_port
     begin

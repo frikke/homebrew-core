@@ -1,8 +1,8 @@
 class Qjackctl < Formula
   desc "Simple Qt application to control the JACK sound server daemon"
   homepage "https://qjackctl.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/qjackctl/qjackctl/0.9.12/qjackctl-0.9.12.tar.gz"
-  sha256 "08ac61980820e1aa9b7e728e04d8ca1d463b50861e3b572c6b46127fb9836540"
+  url "https://downloads.sourceforge.net/project/qjackctl/qjackctl/1.0.3/qjackctl-1.0.3.tar.gz"
+  sha256 "167fd2a8b4c0dc1b825c26feb58842250057f5290b43404b0952fab4baadf173"
   license "GPL-2.0-or-later"
   head "https://git.code.sf.net/p/qjackctl/code.git", branch: "master"
 
@@ -12,31 +12,32 @@ class Qjackctl < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "77a62497e3b98b6f5de4f71a19446ad1b7f7fe4ffa319777e553e3eaea2cc3d7"
-    sha256 arm64_monterey: "5f0e0fecdaef3fda61739f1a58ef7f508829092fc4cedc5ebbe34f708d9460de"
-    sha256 arm64_big_sur:  "f65afa15dec149b2a0f7faf3c9f1903d8a832382f0c7aaced0d31a7ad12f4769"
-    sha256 ventura:        "89d072b5c72578d0d1c0077ebcb6eb317a7105c61e149ab7d744f155f4bdadc1"
-    sha256 monterey:       "07c874746f3209637a7e50e377c49441e6809cadafd8c9c81027c44a55b797f8"
-    sha256 big_sur:        "68bb4d82aed4f5912fdb14be4d0ba63555e89c65675dc8a25fd1e52c44e1c273"
-    sha256 x86_64_linux:   "26f28872e134da8aae759c859edc3f6d66cc667fe59a5253025a01dd90e0cfe9"
+    sha256 arm64_sonoma:  "3ada6e00a333d32a28f1af22085e8d79971aec196b65f21d6c91bca5d0704734"
+    sha256 arm64_ventura: "28a403e1d6b7b3b7981726dc7a2dce3e17e9ba8e3d68489766fcb6df888efbb9"
+    sha256 sonoma:        "0499da41a736c4f0b131018cbd093451cae348268cfdfb30587c5ac65c980bf6"
+    sha256 ventura:       "89c2f994e56f8139a761ebd4700671df769407baaf7e4be9d450d1e02a414166"
+    sha256 x86_64_linux:  "277322f52ed5a1f29bed583f5320621409c013b5339d84df5ef1a3cf376ebbf5"
   end
 
   depends_on "cmake" => :build
+  depends_on "pkgconf" => :build
   depends_on "jack"
   depends_on "qt"
 
-  fails_with gcc: "5"
+  on_linux do
+    depends_on "alsa-lib"
+  end
 
   def install
-    args = std_cmake_args + %w[
+    args = %w[
       -DCONFIG_DBUS=OFF
       -DCONFIG_PORTAUDIO=OFF
       -DCONFIG_XUNIQUE=OFF
     ]
 
-    system "cmake", *args
-    system "cmake", "--build", "."
-    system "cmake", "--install", "."
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
     if OS.mac?
       prefix.install bin/"qjackctl.app"

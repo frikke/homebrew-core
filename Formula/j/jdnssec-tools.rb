@@ -1,9 +1,9 @@
 class JdnssecTools < Formula
   desc "Java command-line tools for DNSSEC"
   homepage "https://github.com/dblacka/jdnssec-tools"
-  url "https://github.com/dblacka/jdnssec-tools/releases/download/v0.17.1/jdnssec-tools-0.17.1.tar.gz"
-  sha256 "d710e8f1d33a20337f6f9bf6e06787d315f4c821d68aa7b347032c2c7331628f"
-  license "LGPL-2.1"
+  url "https://github.com/dblacka/jdnssec-tools/releases/download/v0.20/jdnssec-tools-0.20.tar.gz"
+  sha256 "cddc024726e11e014ff02c04135743f3cb3964ed8fe2487d17544e60230f10d6"
+  license "LGPL-2.1-or-later"
   head "https://github.com/dblacka/jdnssec-tools.git", branch: "master"
 
   livecheck do
@@ -12,13 +12,7 @@ class JdnssecTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9cdfb19fee503d97618bc2987e71eb669405fe7bee91f5e911721300319a6b28"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "9cdfb19fee503d97618bc2987e71eb669405fe7bee91f5e911721300319a6b28"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9cdfb19fee503d97618bc2987e71eb669405fe7bee91f5e911721300319a6b28"
-    sha256 cellar: :any_skip_relocation, ventura:        "9cdfb19fee503d97618bc2987e71eb669405fe7bee91f5e911721300319a6b28"
-    sha256 cellar: :any_skip_relocation, monterey:       "9cdfb19fee503d97618bc2987e71eb669405fe7bee91f5e911721300319a6b28"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9cdfb19fee503d97618bc2987e71eb669405fe7bee91f5e911721300319a6b28"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9924bbccc4783e0490e07259de930f8618cc6da78dcf08fcef664844a8a6c60d"
+    sha256 cellar: :any_skip_relocation, all: "15408395c8e88ae2baa48cfbe3f2cd2850b6805f8b42fe1613734f6fdc131d3b"
   end
 
   depends_on "openjdk"

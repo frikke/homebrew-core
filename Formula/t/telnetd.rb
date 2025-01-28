@@ -1,17 +1,18 @@
 class Telnetd < Formula
   desc "TELNET server"
   homepage "https://opensource.apple.com/"
-  url "https://github.com/apple-oss-distributions/remote_cmds/archive/refs/tags/remote_cmds-69.tar.gz"
-  sha256 "ce917122a88f8bee98686476abf83f1d442e387637a021eabe02f0fe88e02986"
+  url "https://github.com/apple-oss-distributions/remote_cmds/archive/refs/tags/remote_cmds-303.141.1.tar.gz"
+  sha256 "5b434a619008406a798af1d724591f6a71f691292ea20c07bfc32b783b8a08a9"
   license all_of: ["BSD-4-Clause-UC", "BSD-3-Clause"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "dba6dea88d5fc55f04dfb5add2808353bc8a0d92b55da830fef8c0a9e0a4700d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "cf9395dac9ec95948423af592f27d33b4e5b84e3890ed4f331d01d2f76e65441"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "66b6001b5d7d4b96918ea9f1dc09eb5635f1c4b2ffad3b597cce00adf4d6e6b7"
-    sha256 cellar: :any_skip_relocation, ventura:        "59d5ebd74ddd33d27981718ea17686a35940cede1067a06cf6b75fe2051e3288"
-    sha256 cellar: :any_skip_relocation, monterey:       "39a6fd07335f285b0296610c4c7ef6b44bce6ba7528252946751af175271fc57"
-    sha256 cellar: :any_skip_relocation, big_sur:        "767e20e14340204c5e5720320a64128640b983b410897aa116e316e79168b203"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "0981e34d3f11237109f2a8ae1c06fcf74107dac1041db5398ca2c9960ac28410"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "90a0461f0e2548b2b64bf6c84c30654401696632b60b650b532d49e03471281b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "eb4d6ccbfed1c663629001f590d5328dd4bc5235b98aad628d9e0b918ace86b7"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9c4d31ac7909b6b79275d6f08b2e0ac8c5ff67c4af4c55472b9d5244cf63a857"
+    sha256 cellar: :any_skip_relocation, sonoma:         "e4ecd04f334f60b6944402ec2a9a761956b97e77f599aa3a7f10e0bae3e42bab"
+    sha256 cellar: :any_skip_relocation, ventura:        "fbd68a8c5507c6c9ed80a1a3fb9002904424a628d48c6a944b5c28b0eb4add1a"
+    sha256 cellar: :any_skip_relocation, monterey:       "c0f1d50c09d4631571033155a098aefc6d07d09e424e8888f945e86c71cc42b4"
   end
 
   depends_on xcode: :build
@@ -35,11 +36,6 @@ class Telnetd < Formula
       libtelnet_dst.install "build/Products/Release/libtelnet.a"
       libtelnet_dst.install "build/Products/Release/usr/local/include/libtelnet/"
     end
-
-    # fmtcheck(3) is used in several format strings, which is not a literal and thus
-    # throws an error (-Werror, -Wformat-nonliteral). Remove once possible to build
-    # without adding this flag.
-    ENV.append_to_cflags "-Wno-format-nonliteral"
 
     xcodebuild "OBJROOT=build/Intermediates",
                "SYMROOT=build/Products",
@@ -65,5 +61,11 @@ class Telnetd < Formula
 
   test do
     assert_match "usage: telnetd", shell_output("#{sbin}/telnetd usage 2>&1", 1)
+    port = free_port
+    fork do
+      exec "#{sbin}/telnetd -debug #{port}"
+    end
+    sleep 2
+    system "nc", "-vz", "127.0.0.1", port
   end
 end

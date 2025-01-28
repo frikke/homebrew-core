@@ -1,42 +1,41 @@
 class Qtkeychain < Formula
   desc "Platform-independent Qt API for storing passwords securely"
   homepage "https://github.com/frankosterfeld/qtkeychain"
-  url "https://github.com/frankosterfeld/qtkeychain/archive/0.14.1.tar.gz"
-  sha256 "afb2d120722141aca85f8144c4ef017bd74977ed45b80e5d9e9614015dadd60c"
+  url "https://github.com/frankosterfeld/qtkeychain/archive/refs/tags/0.15.0.tar.gz"
+  sha256 "f4254dc8f0933b06d90672d683eab08ef770acd8336e44dfa030ce041dc2ca22"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "97ee9063f01dfa304494526e1065a5501bd9ee752219c8bf0c1dd9625c44d15f"
-    sha256 cellar: :any,                 arm64_monterey: "db22830bcfb4f23985c5d2a2910a134fcf4f903a179a8df7f834f5c56577724e"
-    sha256 cellar: :any,                 arm64_big_sur:  "7b50ac138ac55465f204a745f98e53af68f0bf78fe3bb368901284ec7dbc5e33"
-    sha256 cellar: :any,                 ventura:        "a4a3d37279e7c59f591e40b3022d622c18398b744e1dc3937d6a80a74ba085cd"
-    sha256 cellar: :any,                 monterey:       "7f33800981881204de55f9d401896f9dea8be17466ea39e9940d18591d02c80b"
-    sha256 cellar: :any,                 big_sur:        "a797110599496bc347e32294d2cddab2dd2e6d916233b445ef508377d613eaa9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8554a2961feee2132fe2393c8142a13562930ab7a2e51dd331c0ac78f6eb9f39"
+    sha256 cellar: :any,                 arm64_sonoma:  "f216a5ed18ceca5e77ff086b75a0d02dec76f5cce3a6100c172b32e56088b690"
+    sha256 cellar: :any,                 arm64_ventura: "a9eb0ce450facf448a458fc661474fdf6e11a8205791ffac65d7ada84717ace8"
+    sha256 cellar: :any,                 sonoma:        "fa6264c1da4f266fb4ee57570009e9a5e44a15b0000cfd6bf99f3be6a721c6b3"
+    sha256 cellar: :any,                 ventura:       "63a82f1f3487ffe900540bb42b4baccdfee18d0f689110ab3b2b1b435d010084"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e41763b847c0e19b5fe15d7a61866bd06a0ea001765546462498e5941be9c99d"
   end
 
   depends_on "cmake" => :build
   depends_on "qt"
 
   on_linux do
+    depends_on "glib"
     depends_on "libsecret"
   end
 
-  fails_with gcc: "5"
-
   def install
-    system "cmake", ".", "-DBUILD_TRANSLATIONS=OFF", "-DBUILD_WITH_QT6=ON", *std_cmake_args
-    system "make", "install"
+    args = %w[-DBUILD_TRANSLATIONS=OFF -DBUILD_WITH_QT6=ON]
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <qt6keychain/keychain.h>
       int main() {
         QKeychain::ReadPasswordJob job(QLatin1String(""));
         return 0;
       }
-    EOS
+    CPP
     flags = ["-I#{Formula["qt"].opt_include}"]
     flags += if OS.mac?
       [

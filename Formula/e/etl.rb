@@ -1,44 +1,61 @@
 class Etl < Formula
   desc "Extensible Template Library"
   homepage "https://synfig.org"
-  url "https://downloads.sourceforge.net/project/synfig/development/1.5.1/ETL-1.5.1.tar.gz"
-  mirror "https://github.com/synfig/synfig/releases/download/v1.5.1/ETL-1.5.1.tar.gz"
-  sha256 "125c04f1892f285febc2f9cc06f932f7708e3c9f94c3a3004cd1803197197b4a"
-  license "GPL-2.0-or-later"
+  url "https://github.com/synfig/synfig/releases/download/v1.5.3/ETL-1.5.3.tar.gz"
+  sha256 "640f4d2cbcc1fb580028de8d23b530631c16e234018cefce33469170a41b06bf"
+  license "GPL-3.0-or-later"
 
   livecheck do
     url :stable
-    regex(%r{url=.*?/ETL[._-]v?(\d+(?:\.\d+)+)\.t}i)
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "890b88cbc8b5bdc6b068132feff930406712b1d7a85670e45b5e18dd1d5c0430"
+    sha256 cellar: :any_skip_relocation, all: "3c63ed72c0400281f0b83a9db3437aa84426d37f482feaf4dcf2c9accc70caf6"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "glibmm@2.66"
 
+  # upstream bug report, https://github.com/synfig/synfig/issues/3371
+  patch :DATA
+
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
-      #include <ETL/misc>
-      int main(int argc, char *argv[])
+    (testpath/"test.cpp").write <<~CPP
+      #include <iostream>
+      #include <ETL/etl_profile.h>
+
+      int main()
       {
-        int rv = etl::ceil_to_int(5.5);
-        return 6 - rv;
+        std::cout << "ETL Name: " << ETL_NAME << std::endl;
+        std::cout << "ETL Version: " << ETL_VERSION << std::endl;
+        return 0;
       }
-    EOS
+    CPP
     flags = %W[
       -I#{include}/ETL
       -lpthread
     ]
     system ENV.cxx, "test.cpp", "-o", "test", *flags
-    system "./test"
+    output = shell_output("./test")
+    assert_match "ETL", output
+    assert_match version.to_s, output
   end
 end
+
+__END__
+diff --git a/config/install-sh b/config/install-sh
+index e046efd..ec298b5 100755
+--- a/config/install-sh
++++ b/config/install-sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/sh
++#!/bin/sh
+ # install - install a program, script, or datafile
+
+ scriptversion=2020-11-14.01; # UTC

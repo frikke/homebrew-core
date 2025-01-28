@@ -1,30 +1,27 @@
 class GitExtras < Formula
   desc "Small git utilities"
   homepage "https://github.com/tj/git-extras"
-  url "https://github.com/tj/git-extras/archive/7.0.0.tar.gz"
-  sha256 "3adcbc247d6cb78dc58cace22e9ad789cd6f5061522516660dfb59cc6ec08def"
+  url "https://github.com/tj/git-extras/archive/refs/tags/7.3.0.tar.gz"
+  sha256 "89bae1a05731f4aaafb04066ea0186e181117b74fcfbf89d686cf205459220b7"
   license "MIT"
-  head "https://github.com/tj/git-extras.git", branch: "master"
+  head "https://github.com/tj/git-extras.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "59d95f1583bfadaf3d3088fda40871c703668e8acc9592f544e49de5341956ec"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "59d95f1583bfadaf3d3088fda40871c703668e8acc9592f544e49de5341956ec"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "59d95f1583bfadaf3d3088fda40871c703668e8acc9592f544e49de5341956ec"
-    sha256 cellar: :any_skip_relocation, ventura:        "59d95f1583bfadaf3d3088fda40871c703668e8acc9592f544e49de5341956ec"
-    sha256 cellar: :any_skip_relocation, monterey:       "59d95f1583bfadaf3d3088fda40871c703668e8acc9592f544e49de5341956ec"
-    sha256 cellar: :any_skip_relocation, big_sur:        "59d95f1583bfadaf3d3088fda40871c703668e8acc9592f544e49de5341956ec"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "57de92d7366e7b2f23d2d767bf43bb82c7710a745074eaf7a166a40ac091ea68"
+    sha256 cellar: :any_skip_relocation, all: "0c40b2cdc071464b0edf01e763b279111aa8ec557132a25d3385f7ee92783623"
   end
 
   on_linux do
     depends_on "util-linux" # for `column`
   end
 
-  conflicts_with "git-sync",
-    because: "both install a `git-sync` binary"
+  conflicts_with "git-delete-merged-branches", because: "both install `git-delete-merged-branches` binaries"
+  conflicts_with "git-ignore", because: "both install a `git-ignore` binary"
+  conflicts_with "git-standup", because: "both install `git-standup` binaries"
+  conflicts_with "git-sync", because: "both install a `git-sync` binary"
+  conflicts_with "ugit", because: "both install `git-undo` binaries"
 
   def install
-    system "make", "PREFIX=#{prefix}", "INSTALL_VIA=brew", "install"
+    system "make", "PREFIX=#{prefix}", "COMPL_DIR=#{bash_completion}", "INSTALL_VIA=brew", "install"
     pkgshare.install "etc/git-extras-completion.zsh"
   end
 

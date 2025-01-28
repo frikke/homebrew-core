@@ -1,23 +1,27 @@
 class Pdns < Formula
   desc "Authoritative nameserver"
   homepage "https://www.powerdns.com"
-  url "https://downloads.powerdns.com/releases/pdns-4.8.2.tar.bz2"
-  sha256 "3b173fda4c51bb07b5a51d8c599eedd7962a02056b410e3c9d9d69ed97be35b9"
+  url "https://downloads.powerdns.com/releases/pdns-4.9.3.tar.bz2"
+  sha256 "b2e67046a7b95825c35ddc9119ed6e2e853537a576d0c4ee9080bb5f0ad3e8d5"
   license "GPL-2.0-or-later"
 
+  # The first-party download page (https://www.powerdns.com/downloads) isn't
+  # always updated for newer versions, so for now we have to check the
+  # directory listing page where `stable` tarballs are found. We should switch
+  # back to checking the download page if/when it is reliably updated with each
+  # release, as it doesn't have to transfer nearly as much data.
   livecheck do
     url "https://downloads.powerdns.com/releases/"
     regex(/href=.*?pdns[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_ventura:  "a6658f1bcb021848f0fb7f21c2e1b144edf6adfe2ee412dd4f7c1849579f3aff"
-    sha256 arm64_monterey: "14df5c6ac5665eb5755e74e568e3b19988f89719272ea5eb1ff337cd148d8bf0"
-    sha256 arm64_big_sur:  "a808012fbe120a53f13fbe4c7a60e9a2d7bb6b86b32d7a1b461c607681ef6696"
-    sha256 ventura:        "1274e8cce28f2f96593cff57bfc3c34bc82c8eaec47be32f1a570b7932b8baeb"
-    sha256 monterey:       "54b36fac85ce50fe8c4b12a052a8e1e505c130719a1dd7bb8379f511890922ad"
-    sha256 big_sur:        "530b181365a4dbf206c3d4d4885df1cd7a52af55ed6ae4ee69366e961de411ca"
-    sha256 x86_64_linux:   "7f37b17ae68d5693792938326b6a63532e3c3f3076cbaadc6cca50c4090a3f32"
+    sha256 arm64_sequoia: "41bd873756e9cb31c6eb2c8608973c1bf4f97b6d2eaf53f1eea529785e5e35f0"
+    sha256 arm64_sonoma:  "eb8750b8ef9397a6c03d31ea970a3866d60658a935f9d5faf0187637c14c8e9d"
+    sha256 arm64_ventura: "20c3d03c0019f29be45645e59dd62067ccdb092a55368c16cfdfa6434052562a"
+    sha256 sonoma:        "7ce4b0c0760418446b8ac2aed2a616cfc42010b056144d0eb5f43885020a2d9e"
+    sha256 ventura:       "fae54199e647bc8f0cab39853df93fc54c120d60b49229e8806037b8c6870acb"
+    sha256 x86_64_linux:  "79ac28fa1a8443237b4120f059d009eee485b6b6c47f1bc10e2320d55c9e9377"
   end
 
   head do
@@ -29,15 +33,13 @@ class Pdns < Formula
     depends_on "ragel"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "boost"
   depends_on "lua"
   depends_on "openssl@3"
   depends_on "sqlite"
 
   uses_from_macos "curl"
-
-  fails_with gcc: "5" # for C++17
 
   def install
     args = %W[
@@ -60,7 +62,7 @@ class Pdns < Formula
   end
 
   test do
-    output = shell_output("#{sbin}/pdns_server --version 2>&1", 99)
+    output = shell_output("#{sbin}/pdns_server --version 2>&1")
     assert_match "PowerDNS Authoritative Server #{version}", output
   end
 end

@@ -1,21 +1,19 @@
 class AutoconfArchive < Formula
   desc "Collection of over 500 reusable autoconf macros"
   homepage "https://savannah.gnu.org/projects/autoconf-archive/"
-  url "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2023.02.20.tar.xz"
-  mirror "https://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-2023.02.20.tar.xz"
-  sha256 "71d4048479ae28f1f5794619c3d72df9c01df49b1c628ef85fde37596dc31a33"
+  url "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2024.10.16.tar.xz"
+  mirror "https://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-2024.10.16.tar.xz"
+  sha256 "7bcd5d001916f3a50ed7436f4f700e3d2b1bade3ed803219c592d62502a57363"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "ea643bc91c9234ccfe254e4a510ef3da869c6a7497203b01a94c1c984b25dccc"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "eff12d495e12588faaececedf65651baef736dd31af94bb3025998a2dcc35ee4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "eff12d495e12588faaececedf65651baef736dd31af94bb3025998a2dcc35ee4"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "eff12d495e12588faaececedf65651baef736dd31af94bb3025998a2dcc35ee4"
-    sha256 cellar: :any_skip_relocation, sonoma:         "57d43fd96d81578fe46bc6ddcfe4c0d79be9e50d7704b7ad0a2509ee5b5f95cd"
-    sha256 cellar: :any_skip_relocation, ventura:        "241f7af27fa98b3cde170df669f5041e1af971fb4846890269d01df8ab26e74b"
-    sha256 cellar: :any_skip_relocation, monterey:       "241f7af27fa98b3cde170df669f5041e1af971fb4846890269d01df8ab26e74b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "241f7af27fa98b3cde170df669f5041e1af971fb4846890269d01df8ab26e74b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "270f3e443b7e742f7cd0c6e2c1882d1f6d2912008549a9f8166ea4c0a501b7e2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7652c1e3d7ef6dc9cc8d6ef298f1bfe80d9888876052bedba5f5638b5e280945"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7652c1e3d7ef6dc9cc8d6ef298f1bfe80d9888876052bedba5f5638b5e280945"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "7652c1e3d7ef6dc9cc8d6ef298f1bfe80d9888876052bedba5f5638b5e280945"
+    sha256 cellar: :any_skip_relocation, sonoma:        "ffb73dbda72f41e7b21402df83c9b72f2570e37a8cdad47d0a90768aa5b5d2a3"
+    sha256 cellar: :any_skip_relocation, ventura:       "ffb73dbda72f41e7b21402df83c9b72f2570e37a8cdad47d0a90768aa5b5d2a3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1ce036c58366f08d63911e57d2bf5db88d008ac6fce194f8e8a41a073e92a1a8"
   end
 
   # autoconf-archive is useless without autoconf
@@ -23,27 +21,27 @@ class AutoconfArchive < Formula
 
   conflicts_with "gnome-common", because: "both install ax_check_enable_debug.m4 and ax_code_coverage.m4"
 
+  # Fix quoting of `m4_fatal`
+  # https://github.com/autoconf-archive/autoconf-archive/pull/312
+  # https://github.com/Homebrew/homebrew-core/issues/202234
+  patch do
+    url "https://github.com/autoconf-archive/autoconf-archive/commit/fadde164479a926d6b56dd693ded2a4c36ed89f0.patch?full_index=1"
+    sha256 "4d9a4ca1fc9dc9e28a765ebbd1fa0e1080b6c8401e048b28bb16b9735ff7bf77"
+  end
+
   def install
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.m4").write <<~EOS
-      AC_INIT(myconfig, version-0.1)
-      AC_MSG_NOTICE([Hello, world.])
-
-      m4_include([#{share}/aclocal/ax_have_select.m4])
-
-      # from https://www.gnu.org/software/autoconf-archive/ax_have_select.html
-      AX_HAVE_SELECT(
-        [AX_CONFIG_FEATURE_ENABLE(select)],
-        [AX_CONFIG_FEATURE_DISABLE(select)])
-      AX_CONFIG_FEATURE(
-        [select], [This platform supports select(7)],
-        [HAVE_SELECT], [This platform supports select(7).])
+    (testpath/"configure.ac").write <<~EOS
+      AC_INIT([test], [0.1])
+      AX_CHECK_ENABLE_DEBUG
+      AC_OUTPUT
     EOS
 
-    system "#{Formula["autoconf"].bin}/autoconf", "test.m4"
+    system Formula["autoconf"].bin/"autoconf", "configure.ac"
+    assert_path_exists testpath/"autom4te.cache"
   end
 end

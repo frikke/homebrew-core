@@ -1,21 +1,24 @@
 class TrzszGo < Formula
   desc "Simple file transfer tools, similar to lrzsz (rz/sz), and compatible with tmux"
   homepage "https://trzsz.github.io"
-  url "https://github.com/trzsz/trzsz-go/archive/refs/tags/v1.1.5.tar.gz"
-  sha256 "655ea46ff2b88c7a0530950165b9c005a2cd2afe1ad91516d38edb5fdc56ec2b"
+  url "https://github.com/trzsz/trzsz-go/archive/refs/tags/v1.1.8.tar.gz"
+  sha256 "9ff477c98081ffccecdd61b1bb51d573a0b67c7d205ecfc9d50b20dd4b54f3f1"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d7db826e62f88560d12fb6792b859048dc5dd90a77190f11dc9fb8909352427a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d7db826e62f88560d12fb6792b859048dc5dd90a77190f11dc9fb8909352427a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d7db826e62f88560d12fb6792b859048dc5dd90a77190f11dc9fb8909352427a"
-    sha256 cellar: :any_skip_relocation, ventura:        "e4dec434f41381a15b096ff3a908ff9f7e16e38a5eb2f29b12aa9e13354fc1a4"
-    sha256 cellar: :any_skip_relocation, monterey:       "e4dec434f41381a15b096ff3a908ff9f7e16e38a5eb2f29b12aa9e13354fc1a4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e4dec434f41381a15b096ff3a908ff9f7e16e38a5eb2f29b12aa9e13354fc1a4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "64f8195b2c85f3f080d863e9117d2e1cc6b9f40ea57bd9d206d866e81a579452"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "534ff81d4dff7072e4786d57e64c69fa938e72f50757133d5553c7e29edbaf61"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "c1116b86864ee5874affa1d2c0d099323187af43f213dfeb74aab41cadc10934"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c1116b86864ee5874affa1d2c0d099323187af43f213dfeb74aab41cadc10934"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c1116b86864ee5874affa1d2c0d099323187af43f213dfeb74aab41cadc10934"
+    sha256 cellar: :any_skip_relocation, sonoma:         "fd7d30223b48aadf61451c156036936de0a5492f0f0bf2598d316ec5f822d1dd"
+    sha256 cellar: :any_skip_relocation, ventura:        "fd7d30223b48aadf61451c156036936de0a5492f0f0bf2598d316ec5f822d1dd"
+    sha256 cellar: :any_skip_relocation, monterey:       "fd7d30223b48aadf61451c156036936de0a5492f0f0bf2598d316ec5f822d1dd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "867de3126f27ad11567dced2ecdac5c3f18f754345dae498c14dda8e0da8c1fa"
   end
 
   depends_on "go" => :build
+
+  conflicts_with "trzsz", because: "both install `trz`, `tsz` binaries"
 
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w", output: bin/"trz"), "./cmd/trz"

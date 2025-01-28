@@ -1,19 +1,20 @@
 class Elvish < Formula
   desc "Friendly and expressive shell"
-  homepage "https://github.com/elves/elvish"
-  url "https://github.com/elves/elvish/archive/refs/tags/v0.19.2.tar.gz"
-  sha256 "ef8032507c74c84369d49b098afcf1da65701aa071be9ee762f8bc456576ac94"
+  homepage "https://elv.sh/"
+  url "https://github.com/elves/elvish/archive/refs/tags/v0.21.0.tar.gz"
+  sha256 "3a4b93c3c99fe2f9847de35d64be24e2d4b9c12d429cd9831b4571993a66bb7a"
   license "BSD-2-Clause"
   head "https://github.com/elves/elvish.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b9dd4b68d9a4c944bd4f16540d281149f23052e9049cc1d56c98c0c10869ba45"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3c8b6065d78d525706b0e7a36368a2d5f74f1af434f54c71108b9db816386381"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c5cdcd6f5140d8926857ecf93b1a38968f58ebb74692cc3a2beb894da554b893"
-    sha256 cellar: :any_skip_relocation, ventura:        "52e99d52ff2ec57564b9534143c966692a156c8beb3efcd031e2f0342e1b9f98"
-    sha256 cellar: :any_skip_relocation, monterey:       "79dcb84093d07d2937e0667f0b089926299ad35d7453b23d27f9285db36f5b82"
-    sha256 cellar: :any_skip_relocation, big_sur:        "278eb08f2ea14fcf9f57ad5b75508bdfc01ab14729c4db34cb1cadd46044b1a1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a65fd8f49f47fb279ffdb460db56a91ab9efa533bcf17e4a8edeae280cff3d25"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "84aa59f755bdb4654c0c2e10bb08008df2d72a7f3469f889c68eae28e0dbf227"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "f5e08e6050cceab51df1c54230a03a0c9a55636c44533e18b606c1e07b9d8082"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cdc4fc34f7c55fe5808323f09a32ec4aac813ec2d467e40c001830f9ab1100ee"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4faa173bb273fd7fb4f3e2c11b597c5f0f2926b733df3f6e9eca1205dfcb1c84"
+    sha256 cellar: :any_skip_relocation, sonoma:         "2bebab1544e5e8a296212b246bb12302e5115dc1bcdb5d9722d7b08c5219e126"
+    sha256 cellar: :any_skip_relocation, ventura:        "f14e578bcbe405c2e867d92e048da270f212ccd9335feee4ddf4f132d77b0a93"
+    sha256 cellar: :any_skip_relocation, monterey:       "fd52f724fb5c36b8f393cbd610b6c54867382c202d0d2474bc832534e3303f97"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b9b4d25746ddb91b1c63be65408dd2e2c46b20e4703ebec8943e2697d9a7b990"
   end
 
   depends_on "go" => :build

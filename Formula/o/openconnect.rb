@@ -11,13 +11,15 @@ class Openconnect < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "5046fefc55cc7812e1ffce03f00ff5bd3e8c08f1a743a8af59f5ab9965950806"
-    sha256 arm64_monterey: "b177be2f871aedf5f464ce3ad013de36c8873cf896447619a43b62ae9a8e8fed"
-    sha256 arm64_big_sur:  "c35595ec111e4ca4decf99647017b9461531b3b8f70ab804bae311501ca6c39b"
-    sha256 ventura:        "f8c9b328f46d39e50839fa24f7997244da7deaf2925d1a5f1f3002a88ca57bb9"
-    sha256 monterey:       "984e1c2b131997ad2800fb5a2a184f2b6fe08ed40c939ada2ab70c3d880b49f2"
-    sha256 big_sur:        "1148d11c813378bb5b754c111564ccbf948e624a6925941e54626ea63852a0fd"
-    sha256 x86_64_linux:   "ba03e1ce32924cb034c77db27bb464661769072e31216b9d2224daf84270a394"
+    rebuild 2
+    sha256 arm64_sequoia:  "76a21b129bbc6a7dbcd67f88f4b2e2a0ca6cb3d5188b7ba763ef669013b58b7c"
+    sha256 arm64_sonoma:   "a6594e9c2ba4bfa4f235839a9f504f354e82722ae1a2f6e7f3d9a17727ece429"
+    sha256 arm64_ventura:  "c1f6c601ae384e7ccb83c875c762ab73134dac41ce77a8cfc0fd41d166dda58a"
+    sha256 arm64_monterey: "63304d1ce4715c73c59abd0777fc34f1f77e413c4ce4d1933d78b629abb7d95e"
+    sha256 sonoma:         "330f76952b9e047eaab8fbc0e55378e600367504cded0c4c2879630559a0f6eb"
+    sha256 ventura:        "c6b26f039f0ad3f5ce853111ebb62556885c48fba36cd63f48353f8dd8a12287"
+    sha256 monterey:       "236d104feadaa7f99b8c10fef77adf469fa7499ffd55de499db04da7fd47a710"
+    sha256 x86_64_linux:   "35d66b532fb2760b5265d32eca18f98fb8a938edcef09498fe6126e81c9fd085"
   end
 
   head do
@@ -28,14 +30,32 @@ class Openconnect < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
-  depends_on "gettext"
+  depends_on "gettext" => :build # for msgfmt
+  depends_on "pkgconf" => :build
+
+  depends_on "gmp"
   depends_on "gnutls"
+  depends_on "nettle"
+  depends_on "p11-kit"
   depends_on "stoken"
 
+  uses_from_macos "libxml2"
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "gettext"
+  end
+
   resource "vpnc-script" do
-    url "https://gitlab.com/openconnect/vpnc-scripts/-/raw/473d3e810b8fe8223058ab580fac20c53204e677/vpnc-script"
-    sha256 "4e0d4367806c8b54da76aaae4bb550993d8155894006705d21b16eabdbf47559"
+    url "https://gitlab.com/openconnect/vpnc-scripts/-/raw/5b9e7e4c8e813cc6d95888e7e1d2992964270ec8/vpnc-script"
+    sha256 "dee08feb571dc788018b5d599e4a79177e6acc144d196a776a521ff5496fddb8"
+  end
+
+  # Fix for GnuTLS v3.8.1
+  # https://gitlab.com/openconnect/openconnect/-/merge_requests/490
+  patch do
+    url "https://gitlab.com/openconnect/openconnect/-/commit/7512698217c4104aade7a2df669a20de68f3bb8c.diff"
+    sha256 "8a26be2116b88bf9ad491b56138498a2a18bd80bb081e90a386ee8817a1314c3"
   end
 
   def install
@@ -48,13 +68,12 @@ class Openconnect < Formula
     end
 
     args = %W[
-      --prefix=#{prefix}
       --sbindir=#{bin}
       --localstatedir=#{var}
       --with-vpnc-script=#{etc}/vpnc/vpnc-script
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 

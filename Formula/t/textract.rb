@@ -8,22 +8,25 @@ class Textract < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a5f5c391f5615d5e4abb0f087a2cf5e579b0287966850854dc39b6ebbf183547"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f67ebdc7dcc9ee9adcec6105e16a8cc93c318381a2c5a66c6f25e86dbe0d83fb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a1f3082bd34fd108c69dc582d4c9aa0c3767f9ceaf436bbf66eaa089903de4da"
-    sha256 cellar: :any_skip_relocation, ventura:        "5d520a4c97bd11a66a0e000d34b739d39b33782066f79f4bdcf161b378797d20"
-    sha256 cellar: :any_skip_relocation, monterey:       "bbc1ba9f604222a44dd12258cb8a2749c230892c201c497bd0a5f89ac0252309"
-    sha256 cellar: :any_skip_relocation, big_sur:        "318532dfba7140276340128ada24a8e6790eaf2c8f40edf30893022f598b7a19"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f34dffd7f6facfcbc1ad72802cf799d6e0d8921a0a1151d397a922665935d067"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "9d99fe84d6451dad89f286e0fd1b66279c5f33da07e712f51f6ab3cc51d7e719"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "28dc3b359e04b6aef1709e193f9d9f9ae624e036ceaf0b346f398286b9e6d8af"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6ba581b23948e522b8b98ef0fd8347ae001157a6e2bfe179c53abc7f4a58c88f"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7e6d5d68ae37d5b7ddc85e6a4c0120e4275e16d834deb34c19bf9ed247c1e846"
+    sha256 cellar: :any_skip_relocation, sonoma:         "865a9a3abd5252a93757e6654d408a55c53177d4423c59fc8cf71c237341724b"
+    sha256 cellar: :any_skip_relocation, ventura:        "320a824421208cab9ea2a6f1b01b66ca19681ed8994f3b79e7d255782be7958f"
+    sha256 cellar: :any_skip_relocation, monterey:       "52d8d47213610e4a4b5f7e946ed9c8996b5b8690abe87fbdca439ff459ed7f0d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c586d18c8d63831319b36c7e0904037b363f6fa74ce0c71f15237e9f98fa7a54"
   end
+
+  # https://github.com/deanmalmgren/textract/issues/498
+  deprecate! date: "2024-06-18", because: :unmaintained
 
   depends_on "antiword"
   depends_on "flac"
   depends_on "pillow"
   depends_on "poppler"
-  depends_on "python@3.11"
-  depends_on "six"
+  depends_on "python@3.12"
   depends_on "swig"
   depends_on "tesseract"
   depends_on "unrtf"
@@ -66,19 +69,19 @@ class Textract < Formula
     sha256 "7ebdbd7863a3699080a69f71ec0cd30ed9bfee70bad9acc6a8e6abe9523c78c0"
   end
 
-  resource "IMAPClient" do
+  resource "imapclient" do
     url "https://files.pythonhosted.org/packages/ea/31/883f78210ed7578f6dd41e4dbc3ad5e7c6127a51e56513b8b7bb7efdf9b3/IMAPClient-2.1.0.zip"
     sha256 "60ba79758cc9f13ec910d7a3df9acaaf2bb6c458720d9a02ec33a41352fd1b99"
   end
 
   resource "lxml" do
-    url "https://files.pythonhosted.org/packages/70/bb/7a2c7b4f8f434aa1ee801704bf08f1e53d7b5feba3d5313ab17003477808/lxml-4.9.1.tar.gz"
-    sha256 "fe749b052bb7233fe5d072fcb549221a8cb1a16725c47c37e42b0b9cb3ff2c3f"
+    url "https://files.pythonhosted.org/packages/2b/b4/bbccb250adbee490553b6a52712c46c20ea1ba533a643f1424b27ffc6845/lxml-5.1.0.tar.gz"
+    sha256 "3eea6ed6e6c918e468e693c41ef07f3c3acc310b70ddd9cc72d9ef84bc9564ca"
   end
 
   resource "olefile" do
-    url "https://files.pythonhosted.org/packages/34/81/e1ac43c6b45b4c5f8d9352396a14144bba52c8fec72a80f425f6a4d653ad/olefile-0.46.zip"
-    sha256 "133b031eaf8fd2c9399b78b8bc5b8fcbe4c31e85295749bb17a87cba8f3c3964"
+    url "https://files.pythonhosted.org/packages/69/1b/077b508e3e500e1629d366249c3ccb32f95e50258b231705c09e3c7a4366/olefile-0.47.zip"
+    sha256 "599383381a0bf3dfbd932ca0ca6515acd174ed48870cbf7fee123d698c192c1c"
   end
 
   resource "pdfminer-six" do
@@ -87,18 +90,18 @@ class Textract < Formula
   end
 
   resource "pycryptodome" do
-    url "https://files.pythonhosted.org/packages/11/e4/a8e8056a59c39f8c9ddd11d3bc3e1a67493abe746df727e531f66ecede9e/pycryptodome-3.15.0.tar.gz"
-    sha256 "9135dddad504592bcc18b0d2d95ce86c3a5ea87ec6447ef25cfedea12d6018b8"
+    url "https://files.pythonhosted.org/packages/b9/ed/19223a0a0186b8a91ebbdd2852865839237a21c74f1fbc4b8d5b62965239/pycryptodome-3.20.0.tar.gz"
+    sha256 "09609209ed7de61c2b560cc5c8c4fbf892f8b15b1faf7e4cbffac97db1fffda7"
   end
 
   resource "python-pptx" do
-    url "https://files.pythonhosted.org/packages/eb/c3/bd8f2316a790291ef5aa5225c740fa60e2cf754376e90cb1a44fde056830/python-pptx-0.6.21.tar.gz"
-    sha256 "7798a2aaf89563565b3c7120c0acfe9aff775db0db3580544e3bf4840c2e378f"
+    url "https://files.pythonhosted.org/packages/20/e7/aeaf794b2d440da609684494075e64cfada248026ecb265807d0668cdd00/python-pptx-0.6.23.tar.gz"
+    sha256 "587497ff28e779ab18dbb074f6d4052893c85dedc95ed75df319364f331fedee"
   end
 
-  resource "pytz-deprecation-shim" do
-    url "https://files.pythonhosted.org/packages/94/f0/909f94fea74759654390a3e1a9e4e185b6cd9aa810e533e3586f39da3097/pytz_deprecation_shim-0.1.0.post0.tar.gz"
-    sha256 "af097bae1b616dde5c5744441e2ddc69e74dfdcb0c263129610d85b87445a59d"
+  resource "six" do
+    url "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz"
+    sha256 "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"
   end
 
   resource "sortedcontainers" do
@@ -107,8 +110,8 @@ class Textract < Formula
   end
 
   resource "soupsieve" do
-    url "https://files.pythonhosted.org/packages/f3/03/bac179d539362319b4779a00764e95f7542f4920084163db6b0fd4742d38/soupsieve-2.3.2.post1.tar.gz"
-    sha256 "fc53893b3da2c33de295667a0e19f078c14bf86544af307354de5fcf12a3f30d"
+    url "https://files.pythonhosted.org/packages/ce/21/952a240de1c196c7e3fbcd4e559681f0419b1280c617db21157a0390717b/soupsieve-2.5.tar.gz"
+    sha256 "5663d5a7b3bfaeee0bc4372e7fc48f9cff4940b3eec54a6451cc5299f1097690"
   end
 
   resource "SpeechRecognition" do
@@ -117,14 +120,9 @@ class Textract < Formula
     sha256 "82d3313db383409ddaf3e42625fb0c3518231a1feb5e2ed5473b10b3d5ece7bd"
   end
 
-  resource "tzdata" do
-    url "https://files.pythonhosted.org/packages/1f/7a/ca39b0a6f86686816e675fb8bcd99f5f9ab413b1faff8578ab3f5a4bb9f9/tzdata-2022.4.tar.gz"
-    sha256 "ada9133fbd561e6ec3d1674d3fba50251636e918aa97bd59d63735bef5a513bb"
-  end
-
   resource "tzlocal" do
-    url "https://files.pythonhosted.org/packages/7d/b9/164d5f510e0547ae92280d0ca4a90407a15625901afbb9f57a19d9acd9eb/tzlocal-4.2.tar.gz"
-    sha256 "ee5842fa3a795f023514ac2d801c4a81d1743bbe642e3940143326b3a00addd7"
+    url "https://files.pythonhosted.org/packages/04/d3/c19d65ae67636fe63953b20c2e4a8ced4497ea232c43ff8d01db16de8dc0/tzlocal-5.2.tar.gz"
+    sha256 "8d399205578f1a9342816409cc1e46a93ebd5755e39ea2d85334bea911bf0e6e"
   end
 
   resource "xlrd" do
@@ -132,23 +130,27 @@ class Textract < Formula
     sha256 "546eb36cee8db40c3eaa46c351e67ffee6eeb5fa2650b71bc4c758a29a1b29b2"
   end
 
-  resource "XlsxWriter" do
-    url "https://files.pythonhosted.org/packages/53/04/91ff43803c3e88c32aa272fdbda5859fc3c3b50b0de3a1e439cc57455330/XlsxWriter-3.0.3.tar.gz"
-    sha256 "e89f4a1d2fa2c9ea15cde77de95cd3fd8b0345d0efb3964623f395c8c4988b7f"
+  resource "xlsxwriter" do
+    url "https://files.pythonhosted.org/packages/2b/a3/dd02e3559b2c785d2357c3752cc191d750a280ff3cb02fa7c2a8f87523c3/XlsxWriter-3.1.9.tar.gz"
+    sha256 "de810bf328c6a4550f4ffd6b0b34972aeb7ffcf40f3d285a0413734f9b63a929"
+  end
+
+  # Drop distutils for 3.12: https://github.com/deanmalmgren/textract/pull/502
+  patch do
+    url "https://github.com/deanmalmgren/textract/commit/78f9e644dd502bb721867ce3560d2d0a8b41d648.patch?full_index=1"
+    sha256 "1865a006e8f7a86f18ed488ee004a1f529743bc5048ea650c12091db2e6827db"
   end
 
   def install
-    venv = virtualenv_create(libexec, "python3.11")
-
-    # ebcdic is special
+    ENV["PIP_USE_PEP517"] = "1"
+    venv = virtualenv_create(libexec, "python3.12")
     venv.pip_install resources.reject { |r| r.name == "ebcdic" }
-    resource("ebcdic").stage do
-      venv.pip_install "ebcdic"
-    end
-    # delete the flac binaries that SpeechRecognition installed;
-    # the `flac` formula already provides them
-    rm libexec.glob("lib/python3.11/site-packages/speech_recognition/flac*")
+    resource("ebcdic").stage { venv.pip_install "ebcdic" }
+    # delete SpeechRecognition's flac binaries that our `flac` formula provides
+    rm libexec.glob("lib/python*.*/site-packages/speech_recognition/flac*")
 
+    # https://github.com/deanmalmgren/textract/issues/476
+    inreplace "requirements/python", "extract-msg<=0.29.*", "extract-msg<0.30"
     venv.pip_install_and_link buildpath
   end
 

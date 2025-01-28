@@ -1,9 +1,9 @@
 class Opencascade < Formula
   desc "3D modeling and numerical simulation software for CAD/CAM/CAE"
   homepage "https://dev.opencascade.org/"
-  url "https://git.dev.opencascade.org/gitweb/?p=occt.git;a=snapshot;h=refs/tags/V7_7_2;sf=tgz"
-  version "7.7.2"
-  sha256 "2fb23c8d67a7b72061b4f7a6875861e17d412d524527b2a96151ead1d9cfa2c1"
+  url "https://git.dev.opencascade.org/gitweb/?p=occt.git;a=snapshot;h=refs/tags/V7_8_1;sf=tgz"
+  version "7.8.1"
+  sha256 "33f2bdb67e3f6ae469f3fa816cfba34529a23a9cb736bf98a32b203d8531c523"
   license "LGPL-2.1-only"
   revision 1
 
@@ -16,18 +16,17 @@ class Opencascade < Formula
     url "https://git.dev.opencascade.org/repos/occt.git"
     regex(/^v?(\d+(?:[._]\d+)+(?:p\d+)?)$/i)
     strategy :git do |tags, regex|
-      tags.map { |tag| tag[regex, 1]&.gsub("_", ".") }.compact
+      tags.filter_map { |tag| tag[regex, 1]&.tr("_", ".") }
     end
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "58ccfbc5b3cce2e4526201ae799b57b5b56baa105eaeb7df521407a803ff58ff"
-    sha256 cellar: :any,                 arm64_monterey: "4036d7412743ad4f9fad8a260b1c9d4d178a6181a85458251c2431be25b1df4e"
-    sha256 cellar: :any,                 arm64_big_sur:  "26f8f8d7bfde327d8ce6dfcca92027d65de3cdbf58c2a6ef1c8ef0bc014499ac"
-    sha256 cellar: :any,                 ventura:        "735838ed1b509a878a101690451c0348103292e2b0a89a6d721acc79c01358d1"
-    sha256 cellar: :any,                 monterey:       "4f31d63a97dc8ed4993cc94f1ce0052b0fff4e6c0b0632a592aadaca55ca741c"
-    sha256 cellar: :any,                 big_sur:        "dea2039879a80c1464ea88caedf93d5cfdc094f26b5695cf29b4c7a9985611b7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8121480f2fc82a5806b43323a053dc39626ef8c3612c831633d0d7885819477f"
+    sha256 cellar: :any,                 arm64_sequoia: "0b595733f44fc4274d778db8b823a084c8c7db25340e379f9576a459ced632d7"
+    sha256 cellar: :any,                 arm64_sonoma:  "50d193d6a0919f8f5cd3b015a76093c29a18d2400fcfb87ef1452dde71650dae"
+    sha256 cellar: :any,                 arm64_ventura: "0dbe2be098a5fcc4e0a23bd40885510a28a5121361668ebe0c53ccf3aac26ee9"
+    sha256 cellar: :any,                 sonoma:        "5d9d9858f837687cc5500eb05db8792b37cb31711deb7c5ef43bab7c13f876d0"
+    sha256 cellar: :any,                 ventura:       "077de8a6d15b74ace2cceaf344a6b3e2251df03d0e84bbee6b4ccf677d560b4d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6c10e9c2b101c131e968115e39ba3ae20aa35559f8e2adce8ee7b809c4624444"
   end
 
   depends_on "cmake" => [:build, :test]
@@ -37,14 +36,21 @@ class Opencascade < Formula
   depends_on "freeimage"
   depends_on "freetype"
   depends_on "tbb"
-  depends_on "tcl-tk"
+  depends_on "tcl-tk@8" # TCL 9 issue: https://tracker.dev.opencascade.org/view.php?id=33725
 
   on_linux do
+    depends_on "libx11"
     depends_on "mesa" # For OpenGL
   end
 
+  # Backport fix for incorrect type
+  patch do
+    url "https://github.com/Open-Cascade-SAS/OCCT/commit/7236e83dcc1e7284e66dc61e612154617ef715d6.patch?full_index=1"
+    sha256 "ed8848b3891df4894de56ae8f8c51f6a4b78477c0063d957321c1cace4613c29"
+  end
+
   def install
-    tcltk = Formula["tcl-tk"]
+    tcltk = Formula["tcl-tk@8"]
     libtcl = tcltk.opt_lib/shared_library("libtcl#{tcltk.version.major_minor}")
     libtk = tcltk.opt_lib/shared_library("libtk#{tcltk.version.major_minor}")
 
@@ -72,6 +78,32 @@ class Opencascade < Formula
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
 
+    # The soname / install name of libtbb and libtbbmalloc are versioned only
+    # by the minor version (e.g., `libtbb.so.12`), but Open CASCADE's CMake
+    # config files reference the fully-versioned filenames (e.g.,
+    # `libtbb.so.12.11`).
+    # This mandates rebuilding opencascade upon tbb's minor version updates.
+    # To avoid this, we change the fully-versioned references to the minor-only
+    # version. For example:
+    #   libtbb.so.12.11 => libtbb.so.12
+    #   libtbbmalloc.so.2.11 => libtbbmalloc.so.2
+    #   libtbb.12.11.dylib => libtbb.12.dylib
+    #   libtbbmalloc.2.11.dylib => libtbbmalloc.2.dylib
+    # See also:
+    #   https://github.com/Homebrew/homebrew-core/issues/129111
+    #   https://dev.opencascade.org/content/cmake-files-macos-link-non-existent-libtbb128dylib
+    tbb_regex = /
+      libtbb
+      (malloc)? # 1
+      (\.so)? # 2
+      \.(\d+) # 3
+      \.(\d+) # 4
+      (\.dylib)? # 5
+    /x
+    inreplace (lib/"cmake/opencascade").glob("*.cmake") do |s|
+      s.gsub! tbb_regex, 'libtbb\1\2.\3\5', audit_result: false
+    end
+
     bin.env_script_all_files(libexec, CASROOT: prefix)
 
     # Some apps expect resources in legacy ${CASROOT}/src directory
@@ -82,13 +114,12 @@ class Opencascade < Formula
     output = shell_output("#{bin}/DRAWEXE -b -c \"pload ALL\"")
 
     # Discard the first line ("DRAW is running in batch mode"), and check that the second line is "1"
-    assert_equal "1", output.split(/\n/, 2)[1].chomp
+    assert_equal "1", output.split("\n", 2)[1].chomp
 
     # Make sure hardcoded library name references in our CMake config files are valid.
-    # https://github.com/Homebrew/homebrew-core/issues/129111
-    # https://dev.opencascade.org/content/cmake-files-macos-link-non-existent-libtbb128dylib
     (testpath/"CMakeLists.txt").write <<~CMAKE
       cmake_minimum_required(VERSION 3.5)
+      set(CMAKE_CXX_STANDARD 11)
       project(test LANGUAGES CXX)
       find_package(OpenCASCADE REQUIRED)
       add_executable(test main.cpp)

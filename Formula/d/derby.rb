@@ -1,24 +1,25 @@
 class Derby < Formula
   desc "Apache Derby is an embedded relational database running on JVM"
   homepage "https://db.apache.org/derby/"
-  url "https://www.apache.org/dyn/closer.lua?path=db/derby/db-derby-10.16.1.1/db-derby-10.16.1.1-bin.tar.gz"
-  mirror "https://archive.apache.org/dist/db/derby/db-derby-10.16.1.1/db-derby-10.16.1.1-bin.tar.gz"
-  sha256 "37aef8dca42061d5867afb2009c8d7a80e68c16e56aecaf088f3e30e470d9ef6"
+  url "https://www.apache.org/dyn/closer.lua?path=db/derby/db-derby-10.17.1.0/db-derby-10.17.1.0-bin.tar.gz"
+  mirror "https://archive.apache.org/dist/db/derby/db-derby-10.17.1.0/db-derby-10.17.1.0-bin.tar.gz"
+  sha256 "cbcfe4a0f07aab943cf89978f38d9047a9783233a770c54074bf555a65bedd42"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "de4f510a364389097c3be710ab140928daff7078ac8d7d2757c42d20be07cf2e"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "687e0c8f8bfbcd850af4ef20e9588aa7b6a0ff52087896b3e05f2505abefa70e"
   end
 
-  depends_on "openjdk@17"
+  depends_on "openjdk"
 
   def install
-    rm_rf Dir["bin/*.bat"]
+    rm_r(Dir["bin/*.bat"])
     libexec.install %w[lib test index.html LICENSE NOTICE RELEASE-NOTES.html
                        KEYS docs javadoc demo]
     bin.install Dir["bin/*"]
     bin.env_script_all_files libexec/"bin",
-                             JAVA_HOME:     Language::Java.overridable_java_home_env("17")[:JAVA_HOME],
+                             JAVA_HOME:     Formula["openjdk"].opt_prefix,
                              DERBY_INSTALL: libexec,
                              DERBY_HOME:    libexec
   end

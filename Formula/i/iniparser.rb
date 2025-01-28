@@ -1,31 +1,58 @@
 class Iniparser < Formula
   desc "Library for parsing ini files"
-  homepage "http://ndevilla.free.fr/iniparser/"
-  url "https://github.com/ndevilla/iniparser/archive/v4.1.tar.gz"
-  sha256 "960daa800dd31d70ba1bacf3ea2d22e8ddfc2906534bf328319495966443f3ae"
+  homepage "https://gitlab.com/iniparser/iniparser"
+  url "https://gitlab.com/iniparser/iniparser/-/archive/v4.2.5/iniparser-v4.2.5.tar.bz2"
+  sha256 "a4ad132a4a80a713c2f972c9f9262c5a307526e21eb547ecce274592a63946a3"
   license "MIT"
-  head "https://github.com/ndevilla/iniparser.git", branch: "master"
+  head "https://gitlab.com/iniparser/iniparser.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2b7f315ef24e0b8e9252772fb3ec750dcd13a90796eca266ae9dfefa50ec059f"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "62dbb35ffe023cea60e167ba6f6a7242d01274868df203944298be40159fe123"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3b8550dc64594120847c937c9b1a4e10f6c81622de2610fd0d7818bb35b7f45a"
-    sha256 cellar: :any_skip_relocation, ventura:        "3b4cf68e72fa3eaaceb96f97cdd38d4fb4794492f2baaecae1055d9d4fbe52ca"
-    sha256 cellar: :any_skip_relocation, monterey:       "1fee5c56cf1543f370b6a940a3f11aae2d1fe4517bfd98a3b5f6265d20aad32b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0c46428d183d6cee7f196c7a2a5ba81eebf078900c2825b7c9d3186eb91391b8"
-    sha256 cellar: :any_skip_relocation, catalina:       "bcda9d9c41e5ecf09a748eae0c6054c92ce858df53d835e5454310ea4f731a8c"
-    sha256 cellar: :any_skip_relocation, mojave:         "69dde8e886645f5b89f83f36835c18449afe7f6c4f119d466d7f204e994952c7"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "cec20d33114e7a5811acb41f9f9a36a411ffd2eebb7d537167b9b541b03fff8d"
-    sha256 cellar: :any_skip_relocation, sierra:         "7ad8eb3b8a66c08b78d2d9d3db18bd50e842d1c5962600ad0c9c8244d296dea8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ff54f4bdd772ed7f7695079046c3668ab088e233e4f1939bf699b4b7219b964f"
+    sha256 cellar: :any,                 arm64_sequoia: "c29fc7a34573f1b134acc127eae142cfaec24fbe7e6f4ca2f8823890e042cc27"
+    sha256 cellar: :any,                 arm64_sonoma:  "6620efc68bed97e1d3fe5827e68ac1dbcc95d16324740ce6ad1b681a54531a69"
+    sha256 cellar: :any,                 arm64_ventura: "b83cd2dc0b27c56ea3a6892e6419c710c8628be1511ecbdea59da3b2b83f3802"
+    sha256 cellar: :any,                 sonoma:        "251bc97d7d6747300b652b605f6055f430eb0ad42411c6b3148ead7db41a7019"
+    sha256 cellar: :any,                 ventura:       "5a006e2512a255257c5d3ba620d1303635a661406b752d2bd894b8dc93220484"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "98af185fa0d6d137642948abe69914b267f777465fe2120e5089daf1db69a85c"
   end
+
+  depends_on "cmake" => :build
+  depends_on "doxygen" => :build
 
   conflicts_with "fastbit", because: "both install `include/dictionary.h`"
 
   def install
-    # Only make the *.a file; the *.so target is useless (and fails).
-    system "make", "libiniparser.a", "CC=#{ENV.cc}", "RANLIB=ranlib"
-    lib.install "libiniparser.a"
-    include.install Dir["src/*.h"]
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+  end
+
+  test do
+    test_config = testpath/"test.ini"
+    test_config.write <<~EOS
+      [section]
+      key = value
+    EOS
+
+    (testpath/"test.c").write <<~C
+      #include <stdio.h>
+      #include <string.h>
+      #include <iniparser/iniparser.h>
+
+      int main() {
+        dictionary *ini;
+        ini = iniparser_load("#{test_config}");
+        const char *value = iniparser_getstring(ini, "section:key", NULL);
+        if (value == NULL || strcmp(value, "value") != 0) {
+          fprintf(stderr, "value not found or incorrect\\n");
+          return 1;
+        }
+        printf("Parsed value: %s", value);
+        iniparser_freedict(ini);
+        return 0;
+      }
+    C
+
+    system ENV.cc, "test.c", "-o", "test", "-L#{lib}", "-liniparser"
+    assert_equal "Parsed value: value", shell_output("./test")
   end
 end

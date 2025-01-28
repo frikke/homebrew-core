@@ -3,59 +3,62 @@ class Breezy < Formula
 
   desc "Version control system implemented in Python with multi-format support"
   homepage "https://www.breezy-vcs.org/"
-  url "https://files.pythonhosted.org/packages/5d/6e/cf538824a8ee831c761714f57803da7ba556e2bdfacd039ce8e5f27cbf98/breezy-3.3.4.tar.gz"
-  sha256 "7c412f39fa3c616871fb1ba2a83fca36cb65b28e7f2b55c99c663ae2d90b2301"
+  url "https://files.pythonhosted.org/packages/c4/32/1e95fdf00568790cf6316eb729a99c7754bbcb1773384c46da959eddfef8/breezy-3.3.9.tar.gz"
+  sha256 "c2588bf217c8a4056987ecf6599f0ad9fb8484285953b2e61905141f43c3d5d8"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "a8ea48eeda10863066ca916ba3e566c95cf963f81a99d9d9d6a85d2454ef2751"
-    sha256 cellar: :any,                 arm64_ventura:  "8c16ebb435bfb13ecdbd387d0cbad06c68c1d52e2a2f3979b5cadd0d6a186534"
-    sha256 cellar: :any,                 arm64_monterey: "ec239319c1488a8de5059dbaf1f5558bc8a0df6f74b1fb5142cf10159e5e0008"
-    sha256 cellar: :any,                 arm64_big_sur:  "0be58a2d62beeb5069d0bae721408d5b7e141db0739ea64a281918588eb7bd01"
-    sha256 cellar: :any,                 sonoma:         "47c28571f6d005e738febaea4d8c2fe649fb0bea1d7b780c4f9bacc7e9b3b68d"
-    sha256 cellar: :any,                 ventura:        "72f9c1fe8aec34dfbe33710570244ce167b23e6fc44a212d73a3e191458eba6f"
-    sha256 cellar: :any,                 monterey:       "c59f159ba005d99c3e8dd98ccc211387bdf84e7a7d390b6eb4c09a2e824cdffa"
-    sha256 cellar: :any,                 big_sur:        "c0f61ac752a36e933fc8e98c647c8fd8cf46d48cdba4e267ba81616e31fb88d4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "df9c59819d0fa034007f44f2486607ebe1339a5e64e1757d9bfb55e1bcc3cf4c"
+    sha256 cellar: :any,                 arm64_sequoia: "632597502c8193a468b86edc1e926415e17945a044c55bc6eef0785cdafa025e"
+    sha256 cellar: :any,                 arm64_sonoma:  "32162b4e48bed6abd9223423de11fd10f3e512cb8076aa4b6d60788db4d4c0c4"
+    sha256 cellar: :any,                 arm64_ventura: "a7922bc0194274a0699ebaf107d4124b0ba660da338d178bff2c0ae4db7c7d53"
+    sha256 cellar: :any,                 sonoma:        "05fe3857ce2ab38a93f2697405bbbeced3d528c0f34a98cc3eedcda458e18d74"
+    sha256 cellar: :any,                 ventura:       "09cd865c9142a653f13c9eca3c7a070537a8d4af4fa9c3384067f75cd7ad1e2b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1e2e0d12ce6916e0db46a858a6a91d3f9a676ca7f5d078f2305fd83ffde43368"
   end
 
   depends_on "gettext" => :build
   depends_on "rust" => :build
-  depends_on "python@3.11"
-  depends_on "pyyaml"
-  depends_on "six"
-  uses_from_macos "openssl"
-
-  conflicts_with "bazaar", because: "both install `bzr` binaries"
+  depends_on "libyaml"
+  depends_on "python@3.13"
 
   resource "configobj" do
-    url "https://files.pythonhosted.org/packages/cb/87/17d4c6d634c044ab08b11c0cd2a8a136d103713d438f8792d7be2c5148fb/configobj-5.0.8.tar.gz"
-    sha256 "6f704434a07dc4f4dc7c9a745172c1cad449feb548febd9f7fe362629c627a97"
+    url "https://files.pythonhosted.org/packages/f5/c4/c7f9e41bc2e5f8eeae4a08a01c91b2aea3dfab40a3e14b25e87e7db8d501/configobj-5.0.9.tar.gz"
+    sha256 "03c881bbf23aa07bccf1b837005975993c4ab4427ba57f959afdd9d1a2386848"
   end
 
   resource "dulwich" do
-    url "https://files.pythonhosted.org/packages/57/e0/1b5f95c2651284a5d4fdfb2cc5ecad57fb694084cce59d9d4acb7ac30ecf/dulwich-0.21.6.tar.gz"
-    sha256 "30fbe87e8b51f3813c131e2841c86d007434d160bd16db586b40d47f31dd05b0"
+    url "https://files.pythonhosted.org/packages/da/47/c8bf38f8874829730775fbe5510b54087ff8529dbb9612bd144b76376ea7/dulwich-0.22.3.tar.gz"
+    sha256 "7968c7b8a877b614c46b5ee7c1b28411772123004d7cf6357e763ad2cbeb8254"
   end
 
   resource "fastbencode" do
-    url "https://files.pythonhosted.org/packages/20/ab/33ca3005953d689f1be9c1e0662f5359b7365479f7a8fbd66cb05e9a840d/fastbencode-0.2.tar.gz"
-    sha256 "578eb9c4700d6705d71fbc8d7d57bca2cd987eca2cec1d9e77b9e0702db1e56f"
+    url "https://files.pythonhosted.org/packages/5c/15/98e1cbac7871d9b12823c5869d942715b022c9091ce19a3ff6eb29dbff2b/fastbencode-0.3.1.tar.gz"
+    sha256 "5fe0cb7d1736891af61d2ade40ce948941d46e908b16f5383f55f127848da197"
   end
 
   resource "merge3" do
-    url "https://files.pythonhosted.org/packages/dc/91/647a2942b6f308c7dce358bec770fe62ee0689cfd1dd218b66e244acde7d/merge3-0.0.13.tar.gz"
-    sha256 "8abda1d2d49776323d23d09bfdd80d943a57d43d28d6152ffd2c87956a9b6b54"
+    url "https://files.pythonhosted.org/packages/91/e1/fe09c161f80b5a8d8ede3270eadedac7e59a64ea1c313b97c386234480c1/merge3-0.0.15.tar.gz"
+    sha256 "d3eac213d84d56dfc9e39552ac8246c7860a940964ebeed8a8be4422f6492baf"
   end
 
   resource "patiencediff" do
-    url "https://files.pythonhosted.org/packages/bf/15/313ca3a72a2c23844002b20171e5c8c0688c1bb640752eb1d35bbe62eda0/patiencediff-0.2.13.tar.gz"
-    sha256 "01d642d876186a8f0dd08e77ef1da1940ce49df295477e0713bdc66368e9d8d1"
+    url "https://files.pythonhosted.org/packages/19/51/828577f3b7199fc098d6f440d9af41fbef27067ddd1b60892ad0f9a2d943/patiencediff-0.2.15.tar.gz"
+    sha256 "d00911efd32e3bc886c222c3a650291440313ee94ac857031da6cc3be7935204"
+  end
+
+  resource "pyyaml" do
+    url "https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz"
+    sha256 "d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"
+  end
+
+  resource "tzlocal" do
+    url "https://files.pythonhosted.org/packages/04/d3/c19d65ae67636fe63953b20c2e4a8ced4497ea232c43ff8d01db16de8dc0/tzlocal-5.2.tar.gz"
+    sha256 "8d399205578f1a9342816409cc1e46a93ebd5755e39ea2d85334bea911bf0e6e"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/31/ab/46bec149bbd71a4467a3063ac22f4486ecd2ceb70ae8c70d5d8e4c2a7946/urllib3-2.0.4.tar.gz"
-    sha256 "8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11"
+    url "https://files.pythonhosted.org/packages/ed/63/22ba4ebfe7430b76388e7cd448d5478814d3032121827c12a2cc287e2260/urllib3-2.2.3.tar.gz"
+    sha256 "e7d814a81dad81e6caf2ec9fdedb284ecc9c73076b62654547cc64ccdcae26e9"
   end
 
   def install
@@ -71,26 +74,25 @@ class Breezy < Formula
   end
 
   test do
-    brz = "#{bin}/brz"
     whoami = "Homebrew <homebrew@example.com>"
-    system brz, "whoami", whoami
+    system bin/"brz", "whoami", whoami
     assert_match whoami, shell_output("#{bin}/brz whoami")
 
     # Test bazaar compatibility
-    system brz, "init-repo", "sample"
-    system brz, "init", "sample/trunk"
+    system bin/"brz", "init-repo", "sample"
+    system bin/"brz", "init", "sample/trunk"
     touch testpath/"sample/trunk/test.txt"
     cd "sample/trunk" do
-      system brz, "add", "test.txt"
-      system brz, "commit", "-m", "test"
+      system bin/"brz", "add", "test.txt"
+      system bin/"brz", "commit", "-m", "test"
     end
 
     # Test git compatibility
-    system brz, "init", "--git", "sample2"
+    system bin/"brz", "init", "--git", "sample2"
     touch testpath/"sample2/test.txt"
     cd "sample2" do
-      system brz, "add", "test.txt"
-      system brz, "commit", "-m", "test"
+      system bin/"brz", "add", "test.txt"
+      system bin/"brz", "commit", "-m", "test"
     end
   end
 end

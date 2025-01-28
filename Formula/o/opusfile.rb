@@ -13,6 +13,7 @@ class Opusfile < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "ad3b05a6931361ed1be9fd61d7c378d149071cf50bf0e7741df0799da481849a"
     sha256 cellar: :any,                 arm64_sonoma:   "6de955abe2ffac326b26128bb2001110e1c91cfe171c54673bf23abc47e88283"
     sha256 cellar: :any,                 arm64_ventura:  "d2d8a06a9cf6bae410e9112ec383e928b69986c8f6d1b91cde5961008e1ec077"
     sha256 cellar: :any,                 arm64_monterey: "cd2de61cdf56792c4d6e03d5af1c1319b028d7c0227bbeb8b221f85c6928c301"
@@ -32,7 +33,7 @@ class Opusfile < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libogg"
   depends_on "openssl@3"
   depends_on "opus"
@@ -50,7 +51,7 @@ class Opusfile < Formula
 
   test do
     resource("sample").stage { testpath.install Pathname.pwd.children(false).first => "sample.opus" }
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <opus/opusfile.h>
       #include <stdlib.h>
       int main(int argc, const char **argv) {
@@ -65,7 +66,7 @@ class Opusfile < Formula
         op_free(of);
         return EXIT_SUCCESS;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{Formula["opus"].include}/opus",
                              "-L#{lib}",
                              "-lopusfile",

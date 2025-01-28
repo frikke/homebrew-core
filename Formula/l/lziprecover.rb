@@ -1,8 +1,8 @@
 class Lziprecover < Formula
   desc "Data recovery tool and decompressor for files in the lzip compressed data format"
   homepage "https://www.nongnu.org/lzip/lziprecover.html"
-  url "https://download-mirror.savannah.gnu.org/releases/lzip/lziprecover/lziprecover-1.23.tar.gz"
-  sha256 "f29804177f06dd51c3fa52615ae198a76002b6ce8d961c3575546c3740f4b572"
+  url "https://download-mirror.savannah.gnu.org/releases/lzip/lziprecover/lziprecover-1.25.tar.gz"
+  sha256 "4f392f9c780ae266ee3d0db166b0f1b4d3ae07076e401dc2b199dc3a0fff8b45"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,20 +11,18 @@ class Lziprecover < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "47ea60a44899e5833b8bd0b4daa3e037802ff53681e1cedf6b6acae3d306a5ad"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f304f75f053a6045e0286da2f1761c1a5c73c0333c80446017b8f7a3519b66e7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e750fd2418477ae083f1be0113572af5703d0997971871e046db90450530d4e1"
-    sha256 cellar: :any_skip_relocation, ventura:        "26cbe75e810889f787a764ebc8d9ee13327876f0428e0f3e9f4f8b7efab2adf9"
-    sha256 cellar: :any_skip_relocation, monterey:       "f85eac960d6a8a1a8fcf3711980fb9122e1cd4789161c7d974840c2d1762e650"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0180531f07c7493e58ef145c7de2ee0891db6ec8c2d2a24ca62cad813c5ea95d"
-    sha256 cellar: :any_skip_relocation, catalina:       "5e2168438e6bd3669db3dae1969173737873f46372003ae36a56d832296e5e45"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "61b9cb353269182c3ba0564849ac427d35735389270c565eadc55e8c4b2dfd70"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b9dfd6b15c1d4d1ab02c6aed05ef8ca2b6f21bb9ffd5feed204c06ec606b6770"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cd20c214e86a0a66aafe279db858e5806a775567490e22a92f68c2048dfe5728"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "ddd6ef5287bb52ddc1b4140743e599d6cb821971f3b824e668da2dd9532dfad3"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1965cecf72d16347675ff1f64c278d4fb723e65a505981583d0d5efae7ac0f78"
+    sha256 cellar: :any_skip_relocation, ventura:       "aaba0e8d69a176034618c16c1926e522665fbe7ebfdef634dd22a63302e0c47e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d3f14cf600fd5f4353371429ab79056f48c7f42c95868bd9332a29059b64fa4d"
   end
 
   depends_on "lzip" => :test
 
   def install
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
@@ -53,7 +51,7 @@ class Lziprecover < Formula
     assert_match "Decoder error", shell_output("#{bin}/lziprecover -t #{path}.lz 2>&1", 2)
 
     # Attempt to recover the corrupted archive
-    system bin/"lziprecover", "-R", "#{path}.lz"
+    system bin/"lziprecover", "-B", "#{path}.lz"
 
     # Verify that recovered data is unchanged
     system bin/"lziprecover", "-d", "#{fixed_path}.lz"

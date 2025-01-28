@@ -9,18 +9,16 @@ class Pssh < Formula
   revision 6
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "485a041e54166f986f97aaa0d6e06d36c3cef6246fe1074a3772f8e8a8190d3a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "485a041e54166f986f97aaa0d6e06d36c3cef6246fe1074a3772f8e8a8190d3a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "485a041e54166f986f97aaa0d6e06d36c3cef6246fe1074a3772f8e8a8190d3a"
-    sha256 cellar: :any_skip_relocation, ventura:        "e3afbad672d7e15d741a1efeb98b8f77a75ae88ad1168534df18e1d1dc2feee5"
-    sha256 cellar: :any_skip_relocation, monterey:       "e3afbad672d7e15d741a1efeb98b8f77a75ae88ad1168534df18e1d1dc2feee5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e3afbad672d7e15d741a1efeb98b8f77a75ae88ad1168534df18e1d1dc2feee5"
-    sha256 cellar: :any_skip_relocation, catalina:       "e3afbad672d7e15d741a1efeb98b8f77a75ae88ad1168534df18e1d1dc2feee5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a604a7445ae519d1529349c4ad8f93c1fbb73c4cf1015ce0ba2019e4ceead273"
+    rebuild 5
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d5930def7b287c71f933a5f8cf985135891a2a9e3ca750be4a0960aa5768bdaf"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d5930def7b287c71f933a5f8cf985135891a2a9e3ca750be4a0960aa5768bdaf"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "d5930def7b287c71f933a5f8cf985135891a2a9e3ca750be4a0960aa5768bdaf"
+    sha256 cellar: :any_skip_relocation, sonoma:        "639890de52266e0f738b67ad06579d7783b161c4e68c4b0caba5d8bd10edfd55"
+    sha256 cellar: :any_skip_relocation, ventura:       "639890de52266e0f738b67ad06579d7783b161c4e68c4b0caba5d8bd10edfd55"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d5930def7b287c71f933a5f8cf985135891a2a9e3ca750be4a0960aa5768bdaf"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   conflicts_with "putty", because: "both install `pscp` binaries"
 
@@ -31,8 +29,10 @@ class Pssh < Formula
   end
 
   def install
+    # fix man folder location issue
+    inreplace "setup.py", "'man/man1'", "'share/man/man1'"
+
     virtualenv_install_with_resources
-    share.install libexec/"man"
   end
 
   test do

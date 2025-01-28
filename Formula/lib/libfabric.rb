@@ -1,21 +1,23 @@
 class Libfabric < Formula
   desc "OpenFabrics libfabric"
   homepage "https://ofiwg.github.io/libfabric/"
-  url "https://github.com/ofiwg/libfabric/releases/download/v1.19.0/libfabric-1.19.0.tar.bz2"
-  sha256 "f14c764be9103e80c46223bde66e530e5954cb28b3835b57c8e728479603ef9e"
+  url "https://github.com/ofiwg/libfabric/releases/download/v2.0.0/libfabric-2.0.0.tar.bz2"
+  sha256 "1a8e40f1f331d6ee2e9ace518c0088a78c8a838968f8601c2b77fd012a7bf0f5"
   license any_of: ["BSD-2-Clause", "GPL-2.0-only"]
   head "https://github.com/ofiwg/libfabric.git", branch: "main"
 
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "19aa834846dab44016d5a9486db2fe08e7f3d66f6ca75cd8720bacf5336e4e09"
-    sha256 cellar: :any,                 arm64_ventura:  "eb0faceafd65334ff43eaa02448c4c8e07bcb4affcf445e3e3413c02bdab390c"
-    sha256 cellar: :any,                 arm64_monterey: "71214b099398ca483bfd588b994ead5de4c72b07dcba20d779f599fcca1a511b"
-    sha256 cellar: :any,                 arm64_big_sur:  "f881623b1bbede6a70a13770d396065f5b793885893a0762979a92874adbe34a"
-    sha256 cellar: :any,                 sonoma:         "ad4c4c92b073604c584d8ffe816b824815de89f0ae27a715de4d4c606f88ad7d"
-    sha256 cellar: :any,                 ventura:        "95105d9e4f9845836fb80e26be459988daf00ed9ad6228f2fccf4dc2865afe8f"
-    sha256 cellar: :any,                 monterey:       "ca6e9d5a5a50849ccaa2505c448e16952e7612c8106c5fcb2b595b232c0adcc7"
-    sha256 cellar: :any,                 big_sur:        "95d6fd224569b8104d11373cdb536a523b8ad166dc0675be20fa4f6476bbaefb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "37dec84fcb8532f7017c04bcda2448b47e5cddef8e5293d19508ba929155ac89"
+    sha256 cellar: :any,                 arm64_sequoia: "46238f5c1c9a0166b74cbc9be48c22ff37ed554b06aaccca1e4227ba7e885ce0"
+    sha256 cellar: :any,                 arm64_sonoma:  "f269ca9709004c3083f3a8fbaa3d55ae20e960346aec3668a13e6804cde9281b"
+    sha256 cellar: :any,                 arm64_ventura: "bc816ffc5cc3a3b1f1002013cdd5a3a012e5c932ef48e4855bb1313b8cefd550"
+    sha256 cellar: :any,                 sonoma:        "ea1fcfbb5f56da802f90ee170dc781904c5971f8c5c11a90c8c46dc5d57d9701"
+    sha256 cellar: :any,                 ventura:       "f994b2ea09200f927a6f729cf26d7cd12af8c4a9560914b3fc9f6b6f499b774b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "12ca9881749547fcbb6853d09deff1d6e1c3329ea49869d3cebb9d36ca57e1d8"
   end
 
   depends_on "autoconf" => :build
@@ -27,10 +29,8 @@ class Libfabric < Formula
   end
 
   def install
-    system "autoreconf", "-fiv"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 

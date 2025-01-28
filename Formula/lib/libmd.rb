@@ -11,6 +11,7 @@ class Libmd < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "bbca49fa49f17de525e710aa6e8ae6cca1da2253e6b9eab21dc655389a5a81db"
     sha256 cellar: :any,                 arm64_sonoma:   "98337df7be937bfe745b53b62522cf81160032f945d744d879713a729acc8ab6"
     sha256 cellar: :any,                 arm64_ventura:  "02f452242f49ca67f98dff20e769e290db1d99c6d5874c067dafd8be7bfa0a92"
     sha256 cellar: :any,                 arm64_monterey: "fc0d8c70408cacab6b3b1f2567582ab2281fd308d7e2ce704042705dabe40241"
@@ -28,7 +29,7 @@ class Libmd < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdlib.h>
       #include <stdio.h>
       #include <string.h>
@@ -49,7 +50,7 @@ class Libmd < Formula
           putchar('\\n');
           return EXIT_SUCCESS;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lmd", "-o", "test"
     assert_equal "900150983cd24fb0d6963f7d28e17f72", shell_output("./test").chomp
   end

@@ -2,26 +2,24 @@ class ErlangAT24 < Formula
   desc "Programming language for highly scalable real-time systems"
   homepage "https://www.erlang.org/"
   # Download tarball from GitHub; it is served faster than the official tarball.
-  url "https://github.com/erlang/otp/releases/download/OTP-24.3.4.13/otp_src_24.3.4.13.tar.gz"
-  sha256 "111a00cf3fd512526e35f232fb18e6e95c7a9b1688bb38d7dd8152a82e0ea684"
+  url "https://github.com/erlang/otp/releases/download/OTP-24.3.4.17/otp_src_24.3.4.17.tar.gz"
+  sha256 "0bf449184ef4ca71f9af79fc086d941f4532922e01957e84a4fec192c2db5c0c"
   license "Apache-2.0"
-
-  livecheck do
-    url :stable
-    regex(/^OTP[._-]v?(24(?:\.\d+)+)$/i)
-  end
+  revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "2dc01b89db2837caab9908c4eefd4818a999d7b64a2699ef7058b688c896ce75"
-    sha256 cellar: :any,                 arm64_monterey: "51acd2d297d04a6b4c6fee883efb47f806f690cfabf27b30065627e4847b786a"
-    sha256 cellar: :any,                 arm64_big_sur:  "e3133307556462aef05995e52af4b9ee11423ae69ed29c513a23dfbbf364ff4d"
-    sha256 cellar: :any,                 ventura:        "7fc45e9860fcef5ecc45234a2379a4ea37498237d26139628e9907001f6a2840"
-    sha256 cellar: :any,                 monterey:       "78c0aed31bf5a592a66b57cb6baeec0d0b9d6e80abeab178e50d46a3675be90f"
-    sha256 cellar: :any,                 big_sur:        "6f161623575275acf4bba67262b0e7e3d77584ccf1c83c8f7371bd9a1c6044a6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a8d9cd64e9faeef0344d72900812b11353b22d59e8468db795f6a29e98e84d57"
+    sha256 cellar: :any,                 arm64_sequoia: "4b033ab7693bc346cfcdc745afe84cabb0a67326ec1651cd2294e6f0bb84eb24"
+    sha256 cellar: :any,                 arm64_sonoma:  "034839e7b3d701ed14dfb55a2e025bacc979106e12907a94f65a367bb71c13de"
+    sha256 cellar: :any,                 arm64_ventura: "57b237d5803642973cb653d25c8934a34edbf72ee1b1624ae328d6928ba3144e"
+    sha256 cellar: :any,                 sonoma:        "e3a714e6cb9575535d9f42a82e21757285a1cfd9141055f4924392768bdde52f"
+    sha256 cellar: :any,                 ventura:       "bd2eb3ff1de20d55737b6de2d6fe806f557ed3e1c25ac1c9aa875e50396db8e5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1d7b48ce5b43fe07e78116d0c40ead3da8c54876a94aba05f7e4f893954e76a0"
   end
 
   keg_only :versioned_formula
+
+  # EOL with OTP-27 release (2024-05-20)
+  deprecate! date: "2024-07-24", because: :unsupported
 
   depends_on "openssl@3"
   depends_on "unixodbc"
@@ -30,11 +28,17 @@ class ErlangAT24 < Formula
   uses_from_macos "libxslt" => :build # for xsltproc
 
   resource "html" do
-    url "https://github.com/erlang/otp/releases/download/OTP-24.3.4.13/otp_doc_html_24.3.4.13.tar.gz"
-    sha256 "b67e42d703dff130b3891651d852e08dfc97cf7a13da5e2287ca2ecec7d36cab"
+    url "https://github.com/erlang/otp/releases/download/OTP-24.3.4.17/otp_doc_html_24.3.4.17.tar.gz"
+    sha256 "f9aec1b812dfdbf2dc259f9e93c037f346259b7baf391705b6c1c4e29a4eaac8"
+
+    livecheck do
+      formula :parent
+    end
   end
 
   def install
+    odie "html resource needs to be updated" if version != resource("html").version
+
     # Unset these so that building wx, kernel, compiler and
     # other modules doesn't fail with an unintelligible error.
     %w[LIBS FLAGS AFLAGS ZFLAGS].each { |k| ENV.delete("ERL_#{k}") }
@@ -84,9 +88,8 @@ class ErlangAT24 < Formula
   end
 
   test do
-    assert_equal version, resource("html").version, "`html` resource needs updating!"
+    system bin/"erl", "-noshell", "-eval", "crypto:start().", "-s", "init", "stop"
 
-    system "#{bin}/erl", "-noshell", "-eval", "crypto:start().", "-s", "init", "stop"
     (testpath/"factorial").write <<~EOS
       #!#{bin}/escript
       %% -*- erlang -*-
@@ -109,6 +112,7 @@ class ErlangAT24 < Formula
       fac(0) -> 1;
       fac(N) -> N * fac(N-1).
     EOS
+
     chmod 0755, "factorial"
     assert_match "usage: factorial integer", shell_output("./factorial")
     assert_match "factorial 42 = 1405006117752879898543142606244511569936384000000000", shell_output("./factorial 42")

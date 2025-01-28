@@ -1,8 +1,8 @@
 class Ginac < Formula
   desc "Not a Computer algebra system"
   homepage "https://www.ginac.de/"
-  url "https://www.ginac.de/ginac-1.8.7.tar.bz2"
-  sha256 "71ff4f2d8a00e6f07ce8fee69b76dcc1ebbb727be6760b587c1fbb5ccf7b61ea"
+  url "https://www.ginac.de/ginac-1.8.8.tar.bz2"
+  sha256 "330f57d0ed79dbd8f9c46ca4b408439b8b30e2ea061e3672d904c5dab94ecad6"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,25 +11,26 @@ class Ginac < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 ventura:      "6b1f54f17f7035edd80c36af3402485f99654fe651c8c06e55eebc886ceef480"
-    sha256 cellar: :any,                 monterey:     "2e32ee246037520340c63cb173593b22e88aa49fd67fde26e2a990effe68a36e"
-    sha256 cellar: :any,                 big_sur:      "5a0597e100de5340db7682e7ef2a4609eaa7eb87817f933fd13ff3de243238a3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "dbabf993c6a4453301f92b8697a6e10f865def6d817eebed7c57ae548edaf018"
+    sha256 cellar: :any,                 arm64_sequoia: "6d9ec318fc0e4b6c78b15fadde111f0872df880ec4bb949e3087ad153b672828"
+    sha256 cellar: :any,                 arm64_sonoma:  "552f4fbd7b5622d7ede628471e6fb216877870951276152fcc472539e545637a"
+    sha256 cellar: :any,                 arm64_ventura: "3d1b94dc22aae599565dfe9fea6ac54ca696f11cf5a3f50528c594d1ae39f95f"
+    sha256 cellar: :any,                 sonoma:        "68229ef05f5b82e8750ce12bfb7c84997f85b2c067d49273c21e3c819aeff10a"
+    sha256 cellar: :any,                 ventura:       "eddcfc320d3691fdebfd71a6f642ddeac843a4a319cca1c3a24fc5f9d045ca80"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a010a1afcb6ed3b42ebb387ee863eebaef45c995bea1bbba87c0b7663f8c107b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "cln"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "readline"
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <iostream>
       #include <ginac/ginac.h>
       using namespace std;
@@ -46,11 +47,9 @@ class Ginac < Formula
         cout << poly << endl;
         return 0;
       }
-    EOS
-    system ENV.cxx, "test.cpp", "-L#{lib}",
-                                "-L#{Formula["cln"].lib}",
-                                "-lcln", "-lginac", "-o", "test",
-                                "-std=c++11"
+    CPP
+    system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test",
+                    "-L#{lib}", "-L#{Formula["cln"].lib}", "-lcln", "-lginac"
     system "./test"
   end
 end

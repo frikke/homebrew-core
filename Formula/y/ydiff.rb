@@ -3,26 +3,15 @@ class Ydiff < Formula
 
   desc "View colored diff with side by side and auto pager support"
   homepage "https://github.com/ymattw/ydiff"
-  url "https://github.com/ymattw/ydiff/archive/1.2.tar.gz"
-  sha256 "0a0acf326b1471b257f51d63136f3534a41c0f9a405a1bbbd410457cebfdd6a1"
+  url "https://files.pythonhosted.org/packages/63/d4/578eb2bf5ba1ce874a854d0f926fdce8c413ba29c973e53ea60b48fdced6/ydiff-1.4.2.tar.gz"
+  sha256 "369be623dcde7954d98973fb9db1780d64f0353982bf3ac85818f3d62ff452b0"
   license "BSD-3-Clause"
-  revision 2
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "ee865d68e5f7fefd550012cbfe0d5aa6c0e6ac59ac964fac2551b240f6e1dac6"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7716b4d96423f5e20605b126217b6b9778848b6a141caa85250b646fadf66a84"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7716b4d96423f5e20605b126217b6b9778848b6a141caa85250b646fadf66a84"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7716b4d96423f5e20605b126217b6b9778848b6a141caa85250b646fadf66a84"
-    sha256 cellar: :any_skip_relocation, sonoma:         "858fcc710e5c800deee9c3c74b27fe030e23a6552a63ef2f0905b78530f08c3d"
-    sha256 cellar: :any_skip_relocation, ventura:        "0192ef7a7b3f397d92ba05728af96356869e24fb4de784128b6864e75f891c97"
-    sha256 cellar: :any_skip_relocation, monterey:       "0192ef7a7b3f397d92ba05728af96356869e24fb4de784128b6864e75f891c97"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0192ef7a7b3f397d92ba05728af96356869e24fb4de784128b6864e75f891c97"
-    sha256 cellar: :any_skip_relocation, catalina:       "0192ef7a7b3f397d92ba05728af96356869e24fb4de784128b6864e75f891c97"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "07c4e2ad3135cbcc5ac2478cd0a83d570e2f0d9e0921f2f0fff89d854c25c5a2"
+    sha256 cellar: :any_skip_relocation, all: "967d56d8d5bcd64220c4c88665f5a58509e8c606ac95f761edaad3895eeda09f"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     virtualenv_install_with_resources

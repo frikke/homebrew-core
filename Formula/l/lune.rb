@@ -1,28 +1,28 @@
 class Lune < Formula
   desc "Standalone Luau script runtime"
   homepage "https://lune-org.github.io/docs"
-  url "https://github.com/filiptibell/lune/archive/refs/tags/v0.7.7.tar.gz"
-  sha256 "f6311720ede916d520a427c04be469cd59cb2359a4ca7bc4b8abedaa8c3691ed"
+  url "https://github.com/lune-org/lune/archive/refs/tags/v0.8.9.tar.gz"
+  sha256 "b37bdf53dece55037ba00d82fe33a9ace9777cbb42b4d8d6602bcf704c9e1c59"
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5ea828b044c1abc26d7ab128ad56e826eda8195d6706fbc142e44c313b2ed95e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "05d029cafc6b1189dcd70bca88140e146a36eb8bf6885daf1a246f1c460f4c12"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d1d5b9673a25ff3e4be192991ade81fa119d7f6152bd2672c191eb8ca5cef16f"
-    sha256 cellar: :any_skip_relocation, ventura:        "485a24de18876afa5c2fad739975f35a46c590dccc959276569ad3b6a8e50b62"
-    sha256 cellar: :any_skip_relocation, monterey:       "2c50229eef76293184d0a26ab53fe0523ed9b5f3a682a36c768892d41cc36193"
-    sha256 cellar: :any_skip_relocation, big_sur:        "1df25b8302cf9253d3f80b180799e0b514efb35692a20f11c4fe72f64685a0ab"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a5b5a86e88d056cb51ee27ddb900395025b1bed4d128f5f4d27a8867e6f73d54"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "66dd9283812eed44f847953be3be9f3f20f88a877c7b6e54fef1edf746af62f3"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9c95d39fb6e988e9a3ccc48a598879e42567202cae5b20e132b6f2d40e8307f6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "fc88be7242f2cae984add6a40e9f3efc0f05140dc44ec048a1e0b233378afc25"
+    sha256 cellar: :any_skip_relocation, sonoma:        "766dd9acdb9e5410ee956303e46616e5636e725fddb796c74d672bd29df610b6"
+    sha256 cellar: :any_skip_relocation, ventura:       "76a66458220aba79755329956111f68eab81478cadc9ccc93c744cc52f588f2e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "04c74c1dfc512725d628cfc9900a8844aab44b16b040255c0de08533b55a2768"
   end
 
+  depends_on "cmake" => :build
   depends_on "rust" => :build
 
   def install
-    system "cargo", "install", "--all-features", *std_cargo_args
+    system "cargo", "install", "--all-features", *std_cargo_args(path: "crates/lune")
   end
 
   test do
     (testpath/"test.lua").write("print(2 + 2)")
-    assert_equal "4", shell_output("#{bin}/lune test.lua").chomp
+    assert_equal "4", shell_output("#{bin}/lune run test.lua").chomp
   end
 end

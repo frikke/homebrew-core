@@ -1,20 +1,19 @@
 class GetIplayer < Formula
   desc "Utility for downloading TV and radio programmes from BBC iPlayer"
   homepage "https://github.com/get-iplayer/get_iplayer"
-  url "https://github.com/get-iplayer/get_iplayer/archive/v3.30.tar.gz"
-  sha256 "05a39d5447eecfc2f95a616bf8d4dcf59ca3b3a0ecda1f82882401e6d74e286c"
+  url "https://github.com/get-iplayer/get_iplayer/archive/refs/tags/v3.35.tar.gz"
+  sha256 "048ff5f9bd5c6c0f51a05fd0c97eb137029d1950b594384a920c3c674f121e8c"
   license "GPL-3.0-or-later"
-  revision 2
+  revision 1
   head "https://github.com/get-iplayer/get_iplayer.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "568e8f2399345c5bf93df88fc1bb5e2d1ef0f88984ffb0d37acbbc329c4bcac5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "568e8f2399345c5bf93df88fc1bb5e2d1ef0f88984ffb0d37acbbc329c4bcac5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c682ca0e14757911b8dbfec3bb3fa1700f03c830a791b7170f19c1ce8d43643e"
-    sha256 cellar: :any_skip_relocation, ventura:        "d71cfd6353b2abc4ab054e79358edb24eba7ea12f44020a4a94e00985554ea9c"
-    sha256 cellar: :any_skip_relocation, monterey:       "d71cfd6353b2abc4ab054e79358edb24eba7ea12f44020a4a94e00985554ea9c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "80d896c2c0c0c9cfe09c1999a1efca481122070fe9795c877be73e138a816b82"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "99ca7d21474420a991e0c80244f0e4dd22893d6b02b2eb5ed099d9003033e503"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2afa41ecf4c919fd5aa50ff71dd890a03305f169aed50c5291ce06086cfe64a0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2afa41ecf4c919fd5aa50ff71dd890a03305f169aed50c5291ce06086cfe64a0"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "a33980bca4250bdd0bbf352c024e87c702e089ea33189e28b1112900b31f4bcd"
+    sha256 cellar: :any_skip_relocation, sonoma:        "92c8f4689603554af4b398623e280c7732517face497be8d05a6501c880b3ba1"
+    sha256 cellar: :any_skip_relocation, ventura:       "f0147cd1affbbbbdf25b08a716e2820d63593c29c9fe369434151e33603ff2ac"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4b73722b70117c80021fe22930c045724bb3748154aa05b41db371280241efda"
   end
 
   depends_on "atomicparsley"
@@ -136,7 +135,7 @@ class GetIplayer < Formula
     output = shell_output("\"#{bin}/get_iplayer\" -f --refresh-include=\"BBC None\" -q dontshowanymatches 2>&1")
     assert_match "get_iplayer #{pkg_version}-homebrew", output, "Unexpected version"
     assert_match "INFO: 0 matching programmes", output, "Unexpected output"
-    assert_match "INFO: Indexing tv programmes (concurrent)", output,
+    assert_match "INFO: Indexing tv programme schedules", output,
                          "Mojolicious not found"
   end
 end

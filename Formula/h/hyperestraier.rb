@@ -3,7 +3,7 @@ class Hyperestraier < Formula
   homepage "https://dbmx.net/hyperestraier/"
   url "https://dbmx.net/hyperestraier/hyperestraier-1.4.13.tar.gz"
   sha256 "496f21190fa0e0d8c29da4fd22cf5a2ce0c4a1d0bd34ef70f9ec66ff5fbf63e2"
-  license "LGPL-2.1"
+  license "LGPL-2.1-or-later"
 
   livecheck do
     url :homepage
@@ -11,9 +11,12 @@ class Hyperestraier < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "18f652254c3b115ffe6fad67be39dee791ef6b8f456122618762417eef74f4cb"
+    sha256 cellar: :any,                 arm64_sonoma:   "5ac8a21fdb6d25f1855c3ab56253357c1938d3fe45d35f449e23dc28dd997a38"
     sha256 cellar: :any,                 arm64_ventura:  "381f8cb7f35472802af7f859b9b5369427a9260cf2470917f74f0e43d78915ec"
     sha256 cellar: :any,                 arm64_monterey: "4c7b331c57a8dc648150b89336b93cd18c172bce495a2fe5f7e351037d640305"
     sha256 cellar: :any,                 arm64_big_sur:  "77cc656687e473f7ae65dac6d4efb0ed75538f22890a3f48251791c1947487d0"
+    sha256 cellar: :any,                 sonoma:         "c981ea80d0221e330581cbe313a598f79776c62e8cd4100a274f3dcb2b435feb"
     sha256 cellar: :any,                 ventura:        "ecc6438dbf55e4e3fde88968da4cf9c071b97436e94cb21e3daadd04f5ff4052"
     sha256 cellar: :any,                 monterey:       "e97a30177dd2112ae7ef36b2165213874faa7a4ef1e40dd6433ccfdd3eae7ac2"
     sha256 cellar: :any,                 big_sur:        "98338e8f67c7cba1df436607f09415415e39a38f695805ddd94720326eae9212"
@@ -25,7 +28,7 @@ class Hyperestraier < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "67da1265df5336838e42f563b8b90041d83d848739bf7972950de444cef78650"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "qdbm"
 
   def install
@@ -42,6 +45,6 @@ class Hyperestraier < Formula
   end
 
   test do
-    system "#{bin}/estcmd", "version"
+    system bin/"estcmd", "version"
   end
 end

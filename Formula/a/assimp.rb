@@ -1,37 +1,34 @@
 class Assimp < Formula
   desc "Portable library for importing many well-known 3D model formats"
   homepage "https://www.assimp.org/"
-  url "https://github.com/assimp/assimp/archive/v5.2.5.tar.gz"
-  sha256 "b5219e63ae31d895d60d98001ee5bb809fb2c7b2de1e7f78ceeb600063641e1a"
-  license :cannot_represent
+  url "https://github.com/assimp/assimp/archive/refs/tags/v5.4.3.tar.gz"
+  sha256 "66dfbaee288f2bc43172440a55d0235dfc7bf885dda6435c038e8000e79582cb"
+  # NOTE: BSD-2-Clause is omitted as contrib/Open3DGC/o3dgcArithmeticCodec.c is not used
+  license all_of: [
+    "BSD-3-Clause",
+    "CC-PDDC",   # code/AssetLib/Assjson/cencode.* (code from libb64)
+    "MIT",       # code/AssetLib/M3D/m3d.h, contrib/{openddlparser,pugixml,rapidjson}
+    "BSL-1.0",   # contrib/{clipper,utf8cpp}
+    "Unlicense", # contrib/zip
+    "Zlib",      # contrib/unzip
+  ]
   head "https://github.com/assimp/assimp.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "531ad0dced6130713ac5ede3d6c5e21ac21522c76eb1fee0d2526b248c61aaf1"
-    sha256 cellar: :any,                 arm64_ventura:  "38267be8c3911c4269de574dbb3f7a95523cf3eee9a37867900e35c62304d72a"
-    sha256 cellar: :any,                 arm64_monterey: "41d4dac7a778c2ce90ac37fed8719342f01955f853cc5f22e003039cff473706"
-    sha256 cellar: :any,                 arm64_big_sur:  "3193797fdee877db77e530640ed40ffaedc4faea785e7fb635a33f8f53276cab"
-    sha256 cellar: :any,                 sonoma:         "bdfc9d450272db27fba5301254c99f7b120655715df1fa607b9266ba4f61d3ef"
-    sha256 cellar: :any,                 ventura:        "df603dc822f5590620aada3ec00d52e3d4f701ed2ec5dba6c3fd93674fa10ba8"
-    sha256 cellar: :any,                 monterey:       "45a132fbf709f176c786bc68d46762278bb1becb970af8e1c6eae57536d549fa"
-    sha256 cellar: :any,                 big_sur:        "9e9aaeec7e775d4dabfa0bd8fdd7829e1fe41052ffc94e1463012a9c4a0991ab"
-    sha256 cellar: :any,                 catalina:       "36735fe1df202f856c7a30297b99283497ad7bb4d48e95aca55db30c03009084"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d2014dd56de28ba603d88dc9df9744569abe50b62d631e2d78e0a08f8e9ff62a"
+    sha256 cellar: :any,                 arm64_sequoia:  "3617c461f17de42a22ab7090b1b056b16f854f767bcbd9f46e3df1d1c2374b0b"
+    sha256 cellar: :any,                 arm64_sonoma:   "6e0aead723a0156775a0e547d7c38da9893f0db854e32932e168f09b9f33df1d"
+    sha256 cellar: :any,                 arm64_ventura:  "7ced67d760a444e794361406950f9cf559448bb1820ed27f151c8026df25109e"
+    sha256 cellar: :any,                 arm64_monterey: "e37e55230c1dadd42cc118a8cc7b1ede59226d833731c4da7c7edd2a7f7e89e8"
+    sha256 cellar: :any,                 sonoma:         "97806c9287013e10f6cd45d131e2936639c714048393699d607189f302d4b457"
+    sha256 cellar: :any,                 ventura:        "fdee9585eca259f83b827a0b7f7161599a914150cf3ded457e8d9c51eed5a6a7"
+    sha256 cellar: :any,                 monterey:       "6b2af335f9c9c4a0706e9a111d45e33a1feaf78aaffa00d8c8361e0e2f5bd1cd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "46b2c127678c024d31c2e873fb39739a65ce04718439d1e6661a8dc7aacdd4ec"
   end
 
   depends_on "cmake" => :build
   depends_on "ninja" => :build
 
   uses_from_macos "zlib"
-
-  fails_with gcc: "5"
-
-  # Fix for macOS 13, remove in next version
-  patch do
-    url "https://github.com/assimp/assimp/commit/5a89d6fee138f8bc979b508719163a74ddc9a384.patch?full_index=1"
-    sha256 "a5fa5be12dd782617d81cc867b40a0bca32718fda0c6cedcca60e2325de03453"
-  end
 
   def install
     args = %W[
@@ -47,13 +44,13 @@ class Assimp < Formula
 
   test do
     # Library test.
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <assimp/Importer.hpp>
       int main() {
         Assimp::Importer importer;
         return 0;
       }
-    EOS
+    CPP
     system ENV.cc, "-std=c++11", "test.cpp", "-L#{lib}", "-lassimp", "-o", "test"
     system "./test"
 

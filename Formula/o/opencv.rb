@@ -1,10 +1,21 @@
 class Opencv < Formula
   desc "Open source computer vision library"
   homepage "https://opencv.org/"
-  url "https://github.com/opencv/opencv/archive/refs/tags/4.8.0.tar.gz"
-  sha256 "cbf47ecc336d2bff36b0dcd7d6c179a9bb59e805136af6b9670ca944aef889bd"
   license "Apache-2.0"
-  revision 6
+
+  stable do
+    url "https://github.com/opencv/opencv/archive/refs/tags/4.11.0.tar.gz"
+    sha256 "9a7c11f924eff5f8d8070e297b322ee68b9227e003fd600d4b8122198091665f"
+
+    resource "contrib" do
+      url "https://github.com/opencv/opencv_contrib/archive/refs/tags/4.11.0.tar.gz"
+      sha256 "2dfc5957201de2aa785064711125af6abb2e80a64e2dc246aca4119b19687041"
+
+      livecheck do
+        formula :parent
+      end
+    end
+  end
 
   livecheck do
     url :stable
@@ -12,23 +23,35 @@ class Opencv < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "20f0c4e5f9c5e000bed82f7260ee49f90ee807e5c7ec37c0759a34296a7a7443"
-    sha256 arm64_monterey: "5a54c0961578e05d6b98ce0fee25076db997978008b45507e62dfc6143d5230c"
-    sha256 arm64_big_sur:  "4bf617abe99e8d7470c366801adf8bdf3b7ec02aaf146d02911f52101d6d7a94"
-    sha256 ventura:        "3881c329ab397b713d6b2061d88d69613c5b5f71b39d8952a3a79b4eef2bdb66"
-    sha256 monterey:       "61e7613924348584e03e23621334dc5a0343f6e88026c78d445d109149b48cbe"
-    sha256 big_sur:        "8f04c889356404bc499c8cf5e657f6b818100b1cebdc073644910dc26ee8f4c3"
-    sha256 x86_64_linux:   "2642acf6062eed751bb78d79c7d5653db848337c330115bc41239712b1deae9a"
+    rebuild 1
+    sha256 arm64_sonoma:  "94e02970c7bda9ce47a544cd6b1a716e420c45ab5440ed5419c49659e0722152"
+    sha256 arm64_ventura: "8d7212a2badc196d319fb22a1f81be21d8c3d050cefb085a85bfdc80cca23de8"
+    sha256 sonoma:        "792ad416576124b960df8f38cb49b4b09b2c16e92a4c1694224a904b4b6f1e00"
+    sha256 ventura:       "29b1019de41831c01ede50c8e15eb5a28abfb805f3cbca8ee849d7beda9a9652"
+    sha256 x86_64_linux:  "9814579263537723d893b5785649823d737b111c6cc7408faba58cdec7541895"
+  end
+
+  head do
+    url "https://github.com/opencv/opencv.git", branch: "master"
+
+    resource "contrib" do
+      url "https://github.com/opencv/opencv_contrib.git", branch: "master"
+    end
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python-setuptools" => :build
+  depends_on "abseil"
   depends_on "ceres-solver"
   depends_on "eigen"
   depends_on "ffmpeg"
+  depends_on "freetype"
+  depends_on "gflags"
   depends_on "glog"
   depends_on "harfbuzz"
   depends_on "jpeg-turbo"
+  depends_on "jsoncpp"
   depends_on "libpng"
   depends_on "libtiff"
   depends_on "numpy"
@@ -37,29 +60,29 @@ class Opencv < Formula
   depends_on "openjpeg"
   depends_on "openvino"
   depends_on "protobuf"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "tbb"
+  depends_on "tesseract"
   depends_on "vtk"
   depends_on "webp"
 
   uses_from_macos "zlib"
 
-  fails_with gcc: "5" # ffmpeg is compiled with GCC
-
-  resource "contrib" do
-    url "https://github.com/opencv/opencv_contrib/archive/refs/tags/4.8.0.tar.gz"
-    sha256 "b4aef0f25a22edcd7305df830fa926ca304ea9db65de6ccd02f6cfa5f3357dbb"
+  on_macos do
+    depends_on "glew"
+    depends_on "imath"
+    depends_on "libarchive"
   end
 
-  # Fix static build with OpenVINO (https://github.com/opencv/opencv/pull/23963)
-  # Remove patch when available in release.
-  patch do
-    url "https://github.com/opencv/opencv/commit/ef9d14f181ad8cca71443beaf3874de3197d4e47.patch?full_index=1"
-    sha256 "efdf5534479af2e246c162215d5cbc2ae49e962ca58ccd9fef610fa40ee4a4ed"
+  on_linux do
+    depends_on "cairo"
+    depends_on "gdk-pixbuf"
+    depends_on "glib"
+    depends_on "gtk+3"
   end
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
@@ -73,10 +96,10 @@ class Opencv < Formula
 
     # Remove bundled libraries to make sure formula dependencies are used
     libdirs = %w[ffmpeg libjasper libjpeg libjpeg-turbo libpng libtiff libwebp openexr openjpeg protobuf tbb zlib]
-    libdirs.each { |l| (buildpath/"3rdparty"/l).rmtree }
+    libdirs.each { |l| rm_r(buildpath/"3rdparty"/l) }
 
     args = %W[
-      -DCMAKE_CXX_STANDARD=11
+      -DCMAKE_CXX_STANDARD=17
       -DCMAKE_OSX_DEPLOYMENT_TARGET=
       -DBUILD_JASPER=OFF
       -DBUILD_JPEG=OFF
@@ -120,9 +143,12 @@ class Opencv < Formula
       "-Dprotobuf_MODULE_COMPATIBLE=ON", # https://github.com/protocolbuffers/protobuf/issues/1931
     ]
 
-    # Disable precompiled headers and force opencv to use brewed libraries on Linux
-    if OS.linux?
-      args += %W[
+    args += if OS.mac?
+      # Requires closed-source, pre-built Orbbec SDK on macOS
+      ["-DWITH_OBSENSOR=OFF"]
+    else
+      # Disable precompiled headers and force opencv to use brewed libraries on Linux
+      %W[
         -DENABLE_PRECOMPILED_HEADERS=OFF
         -DJPEG_LIBRARY=#{Formula["jpeg-turbo"].opt_lib}/libjpeg.so
         -DOpenBLAS_LIB=#{Formula["openblas"].opt_lib}/libopenblas.so
@@ -139,7 +165,11 @@ class Opencv < Formula
     # Ref: https://github.com/opencv/opencv/wiki/CPU-optimizations-build-options
     ENV.runtime_cpu_detection
     if Hardware::CPU.intel? && build.bottle?
-      cpu_baseline = MacOS.version.requires_sse42? ? "SSE4_2" : "SSSE3"
+      cpu_baseline = if OS.mac? && MacOS.version.requires_sse42?
+        "SSE4_2"
+      else
+        "SSSE3"
+      end
       args += %W[-DCPU_BASELINE=#{cpu_baseline} -DCPU_BASELINE_REQUIRE=#{cpu_baseline}]
     end
 
@@ -158,16 +188,16 @@ class Opencv < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <opencv2/opencv.hpp>
       #include <iostream>
       int main() {
         std::cout << CV_VERSION << std::endl;
         return 0;
       }
-    EOS
-    system ENV.cxx, "-std=c++11", "test.cpp", "-I#{include}/opencv4", "-o", "test"
-    assert_equal shell_output("./test").strip, version.to_s
+    CPP
+    system ENV.cxx, "-std=c++17", "test.cpp", "-I#{include}/opencv4", "-o", "test"
+    assert_equal version.to_s, shell_output("./test").strip
 
     output = shell_output("#{python3} -c 'import cv2; print(cv2.__version__)'")
     assert_equal version.to_s, output.chomp

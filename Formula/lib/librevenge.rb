@@ -11,6 +11,7 @@ class Librevenge < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "8c3a4c2ed4af0c16cffd5ac758a8dc3ccec9ea4f0e620ef9ddc401d506660515"
     sha256 cellar: :any,                 arm64_sonoma:   "0b4b3683933059632de09508e6d49273a7908cf93a729a2899518eeb2313ce5e"
     sha256 cellar: :any,                 arm64_ventura:  "113a4ee5774cf6c3a58e4ea202b3ff39ef2d25f0500236b202d0d164b302dc8c"
     sha256 cellar: :any,                 arm64_monterey: "39b114185ac16a714309ebfbeb02264016a9b72b75d1a1da33bdd0cba42d8ba6"
@@ -22,26 +23,28 @@ class Librevenge < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "11fd00b1110acb46392ccc91a6fbb54261834a53e256e3d48d6c268e71d7c4b5"
   end
 
-  depends_on "pkg-config" => :build
-  depends_on "boost"
+  depends_on "boost" => :build
+  depends_on "pkgconf" => :build
+
+  uses_from_macos "zlib"
 
   def install
-    system "./configure", *std_configure_args,
-                          "--without-docs",
-                          "--enable-static=no",
+    system "./configure", "--without-docs",
+                          "--disable-static",
                           "--disable-werror",
-                          "--disable-tests"
+                          "--disable-tests",
+                          *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <librevenge/librevenge.h>
       int main() {
         librevenge::RVNGString str;
         return 0;
       }
-    EOS
+    CPP
     system ENV.cc, "test.cpp", "-lrevenge-0.0",
                    "-I#{include}/librevenge-0.0", "-L#{lib}"
   end

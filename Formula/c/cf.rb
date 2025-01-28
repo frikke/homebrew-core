@@ -1,8 +1,9 @@
 class Cf < Formula
   desc "Filter to replace numeric timestamps with a formatted date time"
   homepage "https://ee.lbl.gov/"
-  url "ftp://ee.lbl.gov/cf-1.2.5.tar.gz"
-  sha256 "ef65e9eb57c56456dfd897fec12da8617c775e986c23c0b9cbfab173b34e5509"
+  url "https://ee.lbl.gov/downloads/cf/cf-1.2.8.tar.gz"
+  sha256 "52ce4302f7f9dd67227e5a3d09fc289127bf0ad256d24d8e1698733ea2e1fd48"
+  license "BSD-3-Clause"
 
   livecheck do
     url "https://ee.lbl.gov/downloads/cf/"
@@ -10,18 +11,14 @@ class Cf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3ad0f033738a3550ff202cdb1abe0d73df51f16f15a80da45d0f01b2ebc9d8c9"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4f64bb58b57a9e015abcc130b7189274431fae65cd13520d1b28986455146a46"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0ef3f980b358bb74cba8de7e264897d61e16f5e2cda94ca9c4219dcbb8c9307d"
-    sha256 cellar: :any_skip_relocation, ventura:        "f09d251c3bc22ae85faeba1534b3fe1014e56415d0dcdade6a970626a9d0a9df"
-    sha256 cellar: :any_skip_relocation, monterey:       "d6ff8fe18dbb35dff98a5e5fc00e4c92df2ae079132de0d6f719d1eec8fd7243"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3919568fde666b68d1504741a9c4436bcd60f171fd445e378a718534889b98af"
-    sha256 cellar: :any_skip_relocation, catalina:       "14a240b51f627599ebd4cbbffc27c52d40790c6537f91f20d978d6054e62571b"
-    sha256 cellar: :any_skip_relocation, mojave:         "0cbd888d1a69516d55ce6572208b6adbdcbe9df7195199ac5d6e678e3e794f85"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "b94cceb52c7da6995ed4acd014350e6d9b1dbeb7d03b0c8f2256a12e7f520b01"
-    sha256 cellar: :any_skip_relocation, sierra:         "5f37fd5ff05bdc66d21e9006f8907f1d19c92743bdffc2a5463251f6f681bd20"
-    sha256 cellar: :any_skip_relocation, el_capitan:     "658dbcf6f4868922582db207b8713c8a9009bc99d3d976866ecfacbb9f95dfd5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a8ac2bb22be4e9233091e600136fc430a95c824f7c9aae095dc662dd2c6617b5"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "64ecc0262ba8398d5321ccc5ce9b6d39d0776e9d4d3a79804e0ccbb02fe59139"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "fe6582539aa71c5a8bece92c29a4802f15dd735d147c834ca0bbd8e7213a84d4"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4b5a8edb4e24cdae78ee7b41c64f408d447e80ec4d58e0bebffd23e46e8b2e4c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "889ed10c47853e2fdcdeb6f6bc4fc677f524b26bec7f5e91b94e5f763cb4ac70"
+    sha256 cellar: :any_skip_relocation, sonoma:         "8adfb68d96bb5baf3559102add0b8242e1c2d2eb4f4ec577624adf49b326b034"
+    sha256 cellar: :any_skip_relocation, ventura:        "dbc2e7870bf045b37011c48612b393f9416a3f4e9cb2a8e49b1908eef5bd6adf"
+    sha256 cellar: :any_skip_relocation, monterey:       "43b2f71f97887ebeb6cff4a87be8599161afe5d081db33cf01b1a1bbace464c0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "78ac7581dae658e0e16a2413c5c9fda7725460394f707c3f78c65b99f9557692"
   end
 
   def install

@@ -1,7 +1,7 @@
 class Kyua < Formula
   desc "Testing framework for infrastructure software"
-  homepage "https://github.com/jmmv/kyua"
-  url "https://github.com/jmmv/kyua/releases/download/kyua-0.13/kyua-0.13.tar.gz"
+  homepage "https://github.com/freebsd/kyua"
+  url "https://github.com/freebsd/kyua/releases/download/kyua-0.13/kyua-0.13.tar.gz"
   sha256 "db6e5d341d5cf7e49e50aa361243e19087a00ba33742b0855d2685c0b8e721d6"
   license "BSD-3-Clause"
   revision 2
@@ -16,9 +16,9 @@ class Kyua < Formula
     sha256 x86_64_linux:   "056d090e0c1c5175016cb64ac1d8cebdf86e052895afd90d663e7ee8d65757e4"
   end
 
-  deprecate! date: "2023-02-14", because: :unmaintained
+  disable! date: "2024-02-16", because: :unmaintained
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "atf"
   depends_on "lua"
   depends_on "lutok"

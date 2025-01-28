@@ -1,19 +1,18 @@
 class Freeipmi < Formula
   desc "In-band and out-of-band IPMI (v1.5/2.0) software"
   homepage "https://www.gnu.org/software/freeipmi/"
-  url "https://ftp.gnu.org/gnu/freeipmi/freeipmi-1.6.11.tar.gz"
-  mirror "https://ftpmirror.gnu.org/freeipmi/freeipmi-1.6.11.tar.gz"
-  sha256 "65fbd6910fc010457748695414f27c5755b4e8d75734221221f3858c6230a897"
+  url "https://ftp.gnu.org/gnu/freeipmi/freeipmi-1.6.15.tar.gz"
+  mirror "https://ftpmirror.gnu.org/freeipmi/freeipmi-1.6.15.tar.gz"
+  sha256 "d6929c354639f5ce75b5b1897e8b366eb63625c23e5c4590a7aea034fe2b8caf"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "8583260c6e5706eaf7c94372a1b03d8491fb52669b153ba60bd1a11df5edb61f"
-    sha256 arm64_monterey: "fae01f9999f4cc95527066f13b8c4447a5d6e703bc986fbd512069ef3111ffb6"
-    sha256 arm64_big_sur:  "8308830e5d4c33dc7d403285ec97545878cce100d122d6b4fa20aa7641eb839e"
-    sha256 ventura:        "09f1d39558a5b8e602cab29926918522d88724471892bcd190e57806e92ec377"
-    sha256 monterey:       "4001216e0fe3a051849feddbf0dc1ff908919fa240344794576988bbd0e3ebae"
-    sha256 big_sur:        "eb31c3a6c89b3666c4eeee2e6fde67b9715febef14441fba601319c4b0f30b5f"
-    sha256 x86_64_linux:   "b5764abf88b9dcc6f4a2dd253d49ad46bb74c1065ae41e92b61bde93fa0e79ea"
+    sha256 arm64_sequoia: "600615952288903808095ab8808b45eae7c2adaa7fdc9d6f4187579fbedd687d"
+    sha256 arm64_sonoma:  "e2c6067bcd9b96a9e85b98d14b5e30038a421314c564c953b6c2ae7903434c7c"
+    sha256 arm64_ventura: "9f74bd59960c7352c0d63ac4fd4ecddddec57bca1d8ac33518bcebde80a0a5a9"
+    sha256 sonoma:        "78711420153a4559ce6a61e5084349b056add23ee61edff9c6d5ed5a77f09df7"
+    sha256 ventura:       "2f72ea86838d3b58e9669f04b87e20f494425d863403aecae7cb30d76bf55d00"
+    sha256 x86_64_linux:  "d49402b292786a8ba64707b8985249bbb64c8c5845005dd5efdc2d6c49c4e9e1"
   end
 
   depends_on "texinfo" => :build
@@ -25,21 +24,21 @@ class Freeipmi < Formula
 
   # Fix -flat_namespace being used on Big Sur and later.
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-pre-0.4.2.418-big_sur.diff"
-    sha256 "83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
-    # Workaround for Xcode 14.3.
-    ENV.append_to_cflags "-Wno-implicit-function-declaration"
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
 
     # Hardcode CPP_FOR_BUILD to work around cpp shim issue:
     # https://github.com/Homebrew/brew/issues/5153
     inreplace "man/Makefile.in",
-      "$(CPP_FOR_BUILD) -nostdinc -w -C -P -I$(top_srcdir)/man $@.pre $@",
-      "#{ENV.cxx} -E -nostdinc -w -C -P -I$(top_srcdir)/man $@.pre > $@"
+      "$(CPP_FOR_BUILD) -nostdinc -w -C -P -I. -I$(top_srcdir)/man $@.pre $@",
+      "#{ENV.cxx} -E -nostdinc -w -C -P -I. -I$(top_srcdir)/man $@.pre > $@"
 
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

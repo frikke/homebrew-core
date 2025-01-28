@@ -4,7 +4,7 @@ class Monkeysphere < Formula
   url "https://deb.debian.org/debian/pool/main/m/monkeysphere/monkeysphere_0.44.orig.tar.gz"
   sha256 "6ac6979fa1a4a0332cbea39e408b9f981452d092ff2b14ed3549be94918707aa"
   license "GPL-3.0-or-later"
-  revision 6
+  revision 9
 
   livecheck do
     url "https://deb.debian.org/debian/pool/main/m/monkeysphere/"
@@ -12,17 +12,16 @@ class Monkeysphere < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "728f6625c94c2f1117680043040da86964132758702159e53b28f655032fce4a"
-    sha256 cellar: :any,                 arm64_monterey: "d755663a07608287f1d14512c9a192907a60674456df96368ded7456b71a84c8"
-    sha256 cellar: :any,                 arm64_big_sur:  "b939793eb175a2d4ba85afe54360ae1c1d2e18e65bfbe48da3d3a1c1f7e4f6e9"
-    sha256 cellar: :any,                 ventura:        "0028241b0874b2909d437fca8628a12ecaef0b01582e444468d8c148c0c95434"
-    sha256 cellar: :any,                 monterey:       "34cd3db42f71f5693572fd7033880ce59dc368902fd138fa991c0b9ad2f13282"
-    sha256 cellar: :any,                 big_sur:        "72462262364ea78369735b4fbbbb29c41ac08d103305fcf664aa53af1df7d199"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "36140b1926ed1243e59776aad0dc4b0b065f0e8dc09749c31e7fac8719ae9227"
+    sha256 cellar: :any,                 arm64_sequoia: "40d8c3289f12c710d030f446886eb4e45c396e4b1517dbc722a6e639cd113193"
+    sha256 cellar: :any,                 arm64_sonoma:  "898254e686c3406c0af79584f182a97fd0796a66f755055c3c59745850ee6bde"
+    sha256 cellar: :any,                 arm64_ventura: "e04ebbbfc60f349cebc2a8574367934080b0c52c61e6ed1d988b5965b4a2650e"
+    sha256 cellar: :any,                 sonoma:        "855d71f1d6e31d991fa30df070c136fcaa99457573f16ac6e05defae3e3ac7d3"
+    sha256 cellar: :any,                 ventura:       "ac5c54b17c62e126b1f10c18918fd2a66e8bff38a0a51379e7ddac0890fa9997"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "21398c0664f91eddb4e26a9b1f00cdc17e3462647651c04ada0eaa76a93d0b19"
   end
 
   depends_on "gnu-sed" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gnupg"
   depends_on "libassuan"
   depends_on "libgcrypt"

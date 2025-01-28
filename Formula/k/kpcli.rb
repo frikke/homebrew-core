@@ -1,12 +1,8 @@
-require "language/perl"
-
 class Kpcli < Formula
-  include Language::Perl::Shebang
-
   desc "Command-line interface to KeePass database files"
   homepage "https://kpcli.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/kpcli/kpcli-4.0.pl"
-  sha256 "5189d7dad69ddc9834d24757e561d2b48eaeda9cadb3e4999608ff8efe28fd35"
+  url "https://downloads.sourceforge.net/project/kpcli/kpcli-4.1.3.pl"
+  sha256 "c91363e4e07f3521a867f68db602c95b53dc167e4366ee7ff254252b4176c62f"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
 
   livecheck do
@@ -15,34 +11,34 @@ class Kpcli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1b71e58c56c57b0fa759ea5786bf0ba36c880783a2f5f1baf86cc590d9f0a019"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ebbadc6474dbbd735f548d09e9dba2e3bc211780e56f7fdfb40a32e36a9038e3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "47c696e277df2f3c1396e8cb5694cc5abd596d2a506aa007b2cae9bcc004b08d"
-    sha256 cellar: :any_skip_relocation, ventura:        "ae3ef7aac135d8f8cbe80a37ca5b0093e2ab8b52ebc3617dcb68c3fccce50bc9"
-    sha256 cellar: :any_skip_relocation, monterey:       "34d64f8c1b9bb7242bc8493ecbae8c6e99f7222426c8f5df41aa7c3346a95b35"
-    sha256 cellar: :any_skip_relocation, big_sur:        "44716bf0ce766ef67916dfbb5f15af2711fcddf2b707439a148a04e928db6563"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b3c8ff0cba1768546a1ade52f244bbef35447d911e6d0ae404a1cc1fb20c0d07"
+    sha256 cellar: :any,                 arm64_sequoia: "07acbda85e763997f4f4350cb67ee904413309b57132dd9b528fd73913dc6320"
+    sha256 cellar: :any,                 arm64_sonoma:  "ccc808e72ee497400ca548656f35fa746f00c43acafa9000a2c82608e2d9a23e"
+    sha256 cellar: :any,                 arm64_ventura: "e749db8f89b0c44e1f4bdf8939f17d17588d0ad085b80eec57133550180974d9"
+    sha256 cellar: :any,                 sonoma:        "7e4fbc43db9b559627b88caeaac89eb1c0a7b3bf94830cc47fb52498a9121c71"
+    sha256 cellar: :any,                 ventura:       "5b6f7ccdcd16433c960df66d0219223f9b16879052f3762b632ded2f51ea104d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "194893adad47f2845c789a032750b49f46ce0900a6d72858305f9f820de97a04"
   end
 
   depends_on "readline"
 
+  uses_from_macos "ncurses"
   uses_from_macos "perl"
 
   resource "Mac::Pasteboard" do
     on_macos do
-      url "https://cpan.metacpan.org/authors/id/W/WY/WYANT/Mac-Pasteboard-0.103.tar.gz"
-      sha256 "2f5e8dd2db0d6445558484ca6d42d839c5a97ee8aa1b250e694d67d5b7f6634c"
+      url "https://cpan.metacpan.org/authors/id/W/WY/WYANT/Mac-Pasteboard-0.105.tar.gz"
+      sha256 "2d5592abb1f015273eaa6d832edd922f8695368bc69fea8f413b826bb1e68633"
     end
   end
 
   resource "Clone" do
     on_linux do
-      url "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/Clone-0.45.tar.gz"
-      sha256 "cbb6ee348afa95432e4878893b46752549e70dc68fe6d9e430d1d2e99079a9e6"
+      url "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/Clone-0.47.tar.gz"
+      sha256 "4c2c0cb9a483efbf970cb1a75b2ca75b0e18cb84bcb5c09624f86e26b09c211d"
     end
   end
 
-  resource "TermReadKey" do
+  resource "Term::ReadKey" do
     on_linux do
       url "https://cpan.metacpan.org/authors/id/J/JS/JSTOWE/TermReadKey-2.38.tar.gz"
       sha256 "5a645878dc570ac33661581fbb090ff24ebce17d43ea53fd22e105a856a47290"
@@ -85,13 +81,13 @@ class Kpcli < Formula
   end
 
   resource "Clipboard" do
-    url "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/Clipboard-0.28.tar.gz"
-    sha256 "9e8d79015194263357c25a0f5d094800fff43bdbf9f8601ec3b0ed5eb0966d26"
+    url "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/Clipboard-0.31.tar.gz"
+    sha256 "af6dc25cf8299d3ed612a2182d0c98e7a011f12ac5f6634c1e9180d3204c2cd8"
   end
 
   resource "Capture::Tiny" do
-    url "https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Capture-Tiny-0.48.tar.gz"
-    sha256 "6c23113e87bad393308c90a207013e505f659274736638d8c79bac9c67cc3e19"
+    url "https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Capture-Tiny-0.50.tar.gz"
+    sha256 "ca6e8d7ce7471c2be54e1009f64c367d7ee233a2894cacf52ebe6f53b04e81e5"
   end
 
   def install
@@ -121,8 +117,6 @@ class Kpcli < Formula
                      "--libdir=#{Formula["readline"].opt_lib}"
       system "make", "install"
     end
-
-    rewrite_shebang detected_perl_shebang, "kpcli-#{version}.pl"
 
     libexec.install "kpcli-#{version}.pl" => "kpcli"
     chmod 0755, libexec/"kpcli"

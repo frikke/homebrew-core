@@ -9,18 +9,13 @@ class Csvtomd < Formula
   revision 3
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "340344c8ac5bd1dedb8d922b8c491bb80a6e2b6c9575676b56b7909344acef44"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "340344c8ac5bd1dedb8d922b8c491bb80a6e2b6c9575676b56b7909344acef44"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "340344c8ac5bd1dedb8d922b8c491bb80a6e2b6c9575676b56b7909344acef44"
-    sha256 cellar: :any_skip_relocation, ventura:        "0644156a7787998b6056d120df749095ffbd3d20e330e72074ad75bc90412f4a"
-    sha256 cellar: :any_skip_relocation, monterey:       "0644156a7787998b6056d120df749095ffbd3d20e330e72074ad75bc90412f4a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0644156a7787998b6056d120df749095ffbd3d20e330e72074ad75bc90412f4a"
-    sha256 cellar: :any_skip_relocation, catalina:       "0644156a7787998b6056d120df749095ffbd3d20e330e72074ad75bc90412f4a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d6c324ebdfa22e9e83a7c6603910e86b2787afca3cda9df5284ea98976ac7e95"
+    rebuild 6
+    sha256 cellar: :any_skip_relocation, all: "db9a5f1d08b328f96733905f1b05215a8fe89ff95834ebc873a94d3197e16477"
   end
 
-  depends_on "python@3.11"
+  deprecate! date: "2025-01-10", because: :repo_archived
+
+  depends_on "python@3.13"
 
   # ValueError: invalid mode: 'rU'
   patch :DATA
@@ -30,15 +25,15 @@ class Csvtomd < Formula
   end
 
   test do
-    (testpath/"test.csv").write <<~EOS
+    (testpath/"test.csv").write <<~CSV
       column 1,column 2
       hello,world
-    EOS
-    markdown = <<~EOS.strip
+    CSV
+    markdown = <<~MARKDOWN.strip
       column 1  |  column 2
       ----------|----------
       hello     |  world
-    EOS
+    MARKDOWN
     assert_equal markdown, shell_output("#{bin}/csvtomd test.csv").strip
   end
 end

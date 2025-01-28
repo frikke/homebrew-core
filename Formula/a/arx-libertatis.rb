@@ -11,9 +11,12 @@ class ArxLibertatis < Formula
   end
 
   bottle do
+    sha256 arm64_sequoia:  "e60d7ed4b0a7ff3b132efb97907d8203a0e501f292866d17ab9b2773376b44cd"
+    sha256 arm64_sonoma:   "2c520ea9e3ce0eb1066cd47fd192e73bda08a3e27b39b1efa6b5dcef7614dedf"
     sha256 arm64_ventura:  "1db7612e1dbbe5d1515b7578a2c20a3b62dd4f65c37257237d10bf7e48723448"
     sha256 arm64_monterey: "9fd235faef3f4cac1fa1bc33acace5545839c5bf9a4344793225f734dc0f4b7e"
     sha256 arm64_big_sur:  "5b7dd893fd8ab89d9265dc031d48781b14437ba175265f89a316a0d60686927e"
+    sha256 sonoma:         "57d56bfaf644da9ad8cfda24e22bef0e474bd46d5ad4d5a3ffd6279b7d5777bf"
     sha256 ventura:        "2969e73fdbd0e6d7c8a72891440da7ea868bcdb35776fafb425e81f369d4df6d"
     sha256 monterey:       "d9c218e036852e73dea349e17eaa6e03358f7118bd41acd98a5f4bae7b25bc9d"
     sha256 big_sur:        "e855dfe524dd05d0ebf94acee4cb2e74f2037d0c4c44eb76fd5f49fbbb8477f8"
@@ -40,13 +43,19 @@ class ArxLibertatis < Formula
   uses_from_macos "zlib"
 
   on_linux do
+    depends_on "mesa"
     depends_on "openal-soft"
   end
 
   conflicts_with "rnv", because: "both install `arx` binaries"
 
   def install
-    args = std_cmake_args
+    args = %w[
+      -DBUILD_CRASHREPORTER=OFF
+      -DSTRICT_USE=ON
+      -DWITH_OPENGL=glew
+      -DWITH_SDL=2
+    ]
 
     # Install prebuilt icons to avoid inkscape and imagemagick deps
     if build.head?
@@ -54,14 +63,9 @@ class ArxLibertatis < Formula
       args << "-DDATA_FILES=#{buildpath}/arx-libertatis-data"
     end
 
-    mkdir "build" do
-      system "cmake", "..", *args,
-                            "-DBUILD_CRASHREPORTER=OFF",
-                            "-DSTRICT_USE=ON",
-                            "-DWITH_OPENGL=glew",
-                            "-DWITH_SDL=2"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   def caveats
@@ -75,6 +79,7 @@ class ArxLibertatis < Formula
   end
 
   test do
-    system "#{bin}/arx", "-h"
+    output = shell_output("#{bin}/arx --list-dirs")
+    assert_match "User directories (select first existing)", output
   end
 end

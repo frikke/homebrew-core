@@ -1,48 +1,36 @@
 class Ahoy < Formula
   desc "Creates self documenting CLI programs from commands in YAML files"
-  homepage "https://ahoy-cli.readthedocs.io/"
-  url "https://github.com/ahoy-cli/ahoy/archive/refs/tags/v2.1.1.tar.gz"
-  sha256 "38189a92e39e3ae3a34be491dd2cd010928debe46b112ad82336fafa852556b9"
+  homepage "https://github.com/ahoy-cli/ahoy/"
+  url "https://github.com/ahoy-cli/ahoy/archive/refs/tags/v2.3.0.tar.gz"
+  sha256 "d48b832a475fc9aa5ea42784ac77805afa7bcd477d919a603ec022c240a045df"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "af46c291ed8074770313676100c783c09f3e89f8513cf0772c49e2fa577fb684"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "af46c291ed8074770313676100c783c09f3e89f8513cf0772c49e2fa577fb684"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "af46c291ed8074770313676100c783c09f3e89f8513cf0772c49e2fa577fb684"
-    sha256 cellar: :any_skip_relocation, ventura:        "50400846fb4102aa87185c75b2b962e1fe8c2a2ed4a5ba59dcff3c7a48427feb"
-    sha256 cellar: :any_skip_relocation, monterey:       "50400846fb4102aa87185c75b2b962e1fe8c2a2ed4a5ba59dcff3c7a48427feb"
-    sha256 cellar: :any_skip_relocation, big_sur:        "50400846fb4102aa87185c75b2b962e1fe8c2a2ed4a5ba59dcff3c7a48427feb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "14b0c30a235c3f027727b48728ff36daaf63489df699cd99c04281270b01ae98"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8d0be876590907288aa7687f43dc47ca9b73a7927e85e94efd171e57ae1bd476"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8d0be876590907288aa7687f43dc47ca9b73a7927e85e94efd171e57ae1bd476"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "8d0be876590907288aa7687f43dc47ca9b73a7927e85e94efd171e57ae1bd476"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2be33eca2f4ea292d53fc0a2f177ef7bffb865ba53e52619568dcc261abcda00"
+    sha256 cellar: :any_skip_relocation, ventura:       "2be33eca2f4ea292d53fc0a2f177ef7bffb865ba53e52619568dcc261abcda00"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "739afb6f4249685b464784d2288c5c7d97976a76638096b01d40bd3cb0a14fa6"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}-homebrew")
-  end
-
-  def caveats
-    <<~EOS
-      ===== UPGRADING FROM 1.x TO 2.x =====
-
-      If you are upgrading from ahoy 1.x, note that you'll
-      need to upgrade your ahoyapi settings in your .ahoy.yml
-      files to 'v2' instead of 'v1'.
-
-      See other changes at:
-
-      https://github.com/ahoy-cli/ahoy
-
-    EOS
+    cd "v2" do
+      system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}-homebrew")
+    end
+    ohai "Please check the README in the repo (https://github.com/ahoy-cli/ahoy) for new features."
+    ohai "An updated documentation website is coming soon."
   end
 
   test do
-    (testpath/".ahoy.yml").write <<~EOS
+    (testpath/".ahoy.yml").write <<~YAML
       ahoyapi: v2
       commands:
         hello:
           cmd: echo "Hello Homebrew!"
-    EOS
+    YAML
     assert_equal "Hello Homebrew!\n", `#{bin}/ahoy hello`
 
     assert_equal "#{version}-homebrew", shell_output("#{bin}/ahoy --version").strip

@@ -14,9 +14,12 @@ class DbusGlib < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "5eed90b160bea86016fa557ad060ecf04074b5cee3b102043c5ec0f5822a00a8"
+    sha256 cellar: :any,                 arm64_sonoma:   "2a3f225b37e1ba7f5f8bdaf96e410172458c03ff5d61973962f4fafe12b56cfc"
     sha256 cellar: :any,                 arm64_ventura:  "c88874e0737f46cfc08bcc30c2b2d1feddeb95b19ef1725a1d006bef17999968"
     sha256 cellar: :any,                 arm64_monterey: "24a79926eb518b6de78cacfc8d6893655bdbc6c62ad5b84c89131697fa97a568"
     sha256 cellar: :any,                 arm64_big_sur:  "d87340d630e5e4e08fcaf5c557ad1577736069561e3903f763cb50396b417830"
+    sha256 cellar: :any,                 sonoma:         "4cbc2aa17c117612d9d671b54a9f859e5422ea870c2d7c7f57f1478a65418591"
     sha256 cellar: :any,                 ventura:        "ed1a98a4ab509c8179f348c10c8b7e9d07762388abf988c4c9e0857daf8a642d"
     sha256 cellar: :any,                 monterey:       "22c039588770bd957a8905eccdc7bb460b19ffaf193d3e9ae30332a48d653b7a"
     sha256 cellar: :any,                 big_sur:        "b8b40647f906afbe0c3c35be698d77b02e22fe204cad83e1cda62842aba68ea2"
@@ -25,14 +28,18 @@ class DbusGlib < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "40299090266efbefb057847af56cbccedf7c96ba98107c86fe4c7c0b8254cf0c"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "dbus"
-  depends_on "gettext"
   depends_on "glib"
 
+  uses_from_macos "expat"
+
+  on_macos do
+    depends_on "gettext"
+  end
+
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 

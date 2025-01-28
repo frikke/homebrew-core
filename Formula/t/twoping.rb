@@ -1,4 +1,6 @@
 class Twoping < Formula
+  include Language::Python::Virtualenv
+
   desc "Ping utility to determine directional packet loss"
   homepage "https://www.finnie.org/software/2ping/"
   url "https://www.finnie.org/software/2ping/2ping-4.5.1.tar.gz"
@@ -8,20 +10,17 @@ class Twoping < Formula
   head "https://github.com/rfinnie/2ping.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "4a8be32ba927a46659b03b82082dfe5477e5e84ae24b7a1185330ca5a6ac0b34"
+    rebuild 5
+    sha256 cellar: :any_skip_relocation, all: "5153c17a69826ba8fa3274c858acc3c608cf7b9208fa683043fcda9bed6311c1"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
-    python3 = "python3.11"
-    ENV.prepend_create_path "PYTHONPATH", libexec/Language::Python.site_packages(python3)
-    system python3, *Language::Python.setup_install_args(libexec, python3)
+    virtualenv_install_with_resources
+
     man1.install "doc/2ping.1"
     man1.install_symlink "2ping.1" => "2ping6.1"
-    bin.install Dir["#{libexec}/bin/*"]
-    bin.env_script_all_files(libexec/"bin", PYTHONPATH: ENV["PYTHONPATH"])
     bash_completion.install "2ping.bash_completion" => "2ping"
   end
 
@@ -29,8 +28,8 @@ class Twoping < Formula
     run [opt_bin/"2ping", "--listen", "--quiet"]
     keep_alive true
     require_root true
-    log_path "/dev/null"
-    error_log_path "/dev/null"
+    log_path File::NULL
+    error_log_path File::NULL
   end
 
   test do

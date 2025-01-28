@@ -1,8 +1,8 @@
 class Quickjs < Formula
   desc "Small and embeddable JavaScript engine"
   homepage "https://bellard.org/quickjs/"
-  url "https://bellard.org/quickjs/quickjs-2021-03-27.tar.xz"
-  sha256 "a45bface4c3379538dea8533878d694e289330488ea7028b105f72572fe7fe1a"
+  url "https://bellard.org/quickjs/quickjs-2024-01-13.tar.xz"
+  sha256 "3c4bf8f895bfa54beb486c8d1218112771ecfc5ac3be1036851ef41568212e03"
   license "MIT"
 
   livecheck do
@@ -11,29 +11,27 @@ class Quickjs < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "be1ba0dc988a714a4b33a5d1dbf028b5c0438c6a07854db4b076ca4e54c12c16"
-    sha256 arm64_monterey: "e9f1c2d64092a5b0084e3ad49c9f7936efbc48d54ffbcf423cfa900cf62616eb"
-    sha256 arm64_big_sur:  "c6fe0bfcc35db87914873424e1a7d4386362eeb008ef1fb28e78cd87811bbb14"
-    sha256 ventura:        "170832cb5130c215c1598393faf7ac8ca238034f03e3bf2593415837ffcce76e"
-    sha256 monterey:       "bfbc5d750e690dc1d65a818ba6b5fc3eaa86fcd0110ab1cd6ba51c82bb356a0b"
-    sha256 big_sur:        "fe0f2ea5d5afcdf52bd8fc70277f27b39e00aeda8229bcb2d59d01a8454704ca"
-    sha256 catalina:       "ec26dd8206150e0f19102256a47a77c4373b61ba9a91981050a6fa000f010284"
-    sha256 mojave:         "de7929242e69797033d62921e1605c67890e5dbe13f05cd09e01724962d12624"
-    sha256 x86_64_linux:   "8c6aaa6a5226d20c18da497df09507dc06ce352047e18e7202bc4275cfbeb908"
+    sha256 arm64_sequoia:  "9ac6a1c14a372f8e110aa703ccace27e88126187cb3af83c8182dfdad70dc0df"
+    sha256 arm64_sonoma:   "d8e22767ae91c9911e9c4d2dcac7af64721903c7c90cb90a4ff5218b14c9e403"
+    sha256 arm64_ventura:  "7470c608a6769f8269a9a66644291809ab3f453a974736973487a0e3abbbdee6"
+    sha256 arm64_monterey: "0f7cbd908a98955c57b6ab1cd86614c560c98992107c9a0c4a565bec96e77168"
+    sha256 sonoma:         "4b4183ec2ae090f33781c4ca33446ae5597910c3bbc6ad23dab6197c1396b35c"
+    sha256 ventura:        "5f0d78ed0a0ce5e317996918f860783f4744573ef601b56ae3df0346730b5ab3"
+    sha256 monterey:       "6f93efa66e963ddc9f2eae93713aed75373a7b7d62ceaeba9c57da6c98969cf8"
+    sha256 x86_64_linux:   "34e76af7014843804104d0885e72d6c9adc203cb54bfabff61577230e4498c9e"
   end
 
   def install
-    system "make", "install", "prefix=#{prefix}", "CONFIG_M32="
+    system "make", "install", "PREFIX=#{prefix}", "CONFIG_M32="
   end
 
   test do
     output = shell_output("#{bin}/qjs --eval 'const js=\"JS\"; console.log(`Q${js}${(7 + 35)}`);'").strip
     assert_match(/^QJS42/, output)
 
-    path = testpath/"test.js"
-    path.write "console.log('hello');"
-    system "#{bin}/qjsc", path
-    output = shell_output(testpath/"a.out").strip
-    assert_equal "hello", output
+    test_file = testpath/"test.js"
+    test_file.write "console.log('hello');"
+    system bin/"qjsc", test_file
+    assert_equal "hello", shell_output(testpath/"a.out").strip
   end
 end

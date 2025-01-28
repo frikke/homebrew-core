@@ -1,14 +1,17 @@
 class RbenvCommunalGems < Formula
   desc "Share gems across multiple rbenv Ruby installs"
   homepage "https://github.com/tpope/rbenv-communal-gems"
-  url "https://github.com/tpope/rbenv-communal-gems/archive/v1.0.1.tar.gz"
+  url "https://github.com/tpope/rbenv-communal-gems/archive/refs/tags/v1.0.1.tar.gz"
   sha256 "99f1c0be6721e25037f964015cbd2622d70603ceeeaef58f040410ac3697d766"
   license "MIT"
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4cd057a73659f1fdea3a0d266485367b960378c790eef4c6d7b707a4936c8481"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "a189879cf1fb24dfd135aaf5c9fafe5c4fc1251236da0476be32e7a3a9edb5ce"
   end
+
+  deprecate! date: "2024-03-14", because: :repo_archived
 
   depends_on "rbenv"
 

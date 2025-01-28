@@ -1,36 +1,33 @@
 class Zlint < Formula
   desc "X.509 Certificate Linter focused on Web PKI standards and requirements"
   homepage "https://github.com/zmap/zlint"
-  url "https://github.com/zmap/zlint.git",
-      tag:      "v3.5.0",
-      revision: "45e8dff6fe0d2a6989366a3dbd44713c360afc8f"
+  url "https://github.com/zmap/zlint/archive/refs/tags/v3.6.5.tar.gz"
+  sha256 "ce73c3fb8daaad3b4a41473a970e80425d714477d2ef0a6b91829adc1875197b"
   license "Apache-2.0"
   head "https://github.com/zmap/zlint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "a6e8676ab7323d994d3dfb7ed10811e76b0ee1dbb8356d5faae44e737f2ddbfb"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4c6e2db91078b648c70b65e045f265291a93d1936c35bd5f50de67d6ffed7e67"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "870a9b3d865c07dcee5df61c933bcc06964c7f67e98888472b70faf3880efbbb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "487c8eab86c4ae89f047d6ebcea40f4707fdd0f93bf0b724a51a6d2f1a31a10e"
-    sha256 cellar: :any_skip_relocation, sonoma:         "3e3fe54543c0b1b19253072394314950187ca3744faacb55c05dc835c928a9db"
-    sha256 cellar: :any_skip_relocation, ventura:        "c3e18791e097ac32f17e9bd87ec0d92932ecf9465a1c6be96a38c2fe9a3d1b56"
-    sha256 cellar: :any_skip_relocation, monterey:       "4cce97370e576d5aa6d83d20b1a09281a17b47f6b2f7010d58f69ac7d0d98b4a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "44f78c1721863740ea49fff58a01230f743d2adbe7d6d9afa21acb287c8ad1ba"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ff883e8663c390615278f11e60038a814ee3143cdff144f4789ba47de7257124"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "29f795e5e0dab8f87d1e796c42cd7b6157ae36b00cc6cfe60e8388c3bcd3e870"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "29f795e5e0dab8f87d1e796c42cd7b6157ae36b00cc6cfe60e8388c3bcd3e870"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "29f795e5e0dab8f87d1e796c42cd7b6157ae36b00cc6cfe60e8388c3bcd3e870"
+    sha256 cellar: :any_skip_relocation, sonoma:        "7c9a3891731c3a651f571acb39ae62024ebeeabc702a71c458a8a193c1e33403"
+    sha256 cellar: :any_skip_relocation, ventura:       "7c9a3891731c3a651f571acb39ae62024ebeeabc702a71c458a8a193c1e33403"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8bcb5c7126db76b93333ab19ad73b22cb5acb6ed0dc900dbe406586e801bb755"
   end
 
   depends_on "go" => :build
 
   def install
-    system "make", "--directory=v3", "GIT_VERSION=v#{version}", "zlint"
-    bin.install "v3/zlint"
+    cd "v3" do
+      ldflags = "-s -w -X main.version=#{version}"
+      system "go", "build", *std_go_args(ldflags:), "./cmd/zlint"
+    end
   end
 
   test do
-    assert_match "ZLint version v#{version}",
-      shell_output("#{bin}/zlint -version")
+    assert_match "ZLint version #{version}", shell_output("#{bin}/zlint -version")
 
-    (testpath/"cert.pem").write <<~EOS
+    (testpath/"cert.pem").write <<~PEM
       -----BEGIN CERTIFICATE-----
       MIIB3jCCAWSgAwIBAgIUU3hxzxSDV5V1DeRyZjgzdPKatBEwCgYIKoZIzj0EAwMw
       HjEcMBoGA1UEAwwTaG9tZWJyZXctemxpbnQtdGVzdDAeFw0yMjAxMDEwMDAwMDBa
@@ -44,7 +41,7 @@ class Zlint < Formula
       MQDEMciPyBdrKwnJilT2kVwIMdMmxAjcmV048Ai0CImT5iRERKdBa7QeydMcJo3Z
       7zs=
       -----END CERTIFICATE-----
-    EOS
+    PEM
 
     output = shell_output("#{bin}/zlint -longSummary cert.pem")
     %w[

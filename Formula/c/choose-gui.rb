@@ -1,17 +1,16 @@
 class ChooseGui < Formula
   desc "Fuzzy matcher that uses std{in,out} and a native GUI"
   homepage "https://github.com/chipsenkbeil/choose"
-  url "https://github.com/chipsenkbeil/choose/archive/refs/tags/1.3.1.tar.gz"
-  sha256 "63d69aa24eca3e397ca5d6ca8da57921c1f1ed02c34e6ef351b999bc208861e4"
+  url "https://github.com/chipsenkbeil/choose/archive/refs/tags/1.4.1.tar.gz"
+  sha256 "71cbe036fd60e18522b35b588196acc82ec2f6b9ab49a6da0472dc01e6d1ae54"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ea87b1a590c751e812b4fada4882951b3cda17c489ab4f6a1fd4398acbe262aa"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "630408a8095e21ae5a7f25892d49edd0936e0bc397d85af335f898d3d8c45508"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d742aa98d6c503e953531bcaac5807254e820a2f0c4888faa06a791f292365a3"
-    sha256 cellar: :any_skip_relocation, ventura:        "051c460b229a5650d4acf03b9ab5c5627b50b5dd82285ff6d203ad611f7eaedb"
-    sha256 cellar: :any_skip_relocation, monterey:       "3fb160658f91298dbebbdca13ddd30c01565dd41146d07bc739f27a868a240a2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8bebb256288062b620e845055833832c14a98f835b330e3c1fa866390a880e24"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6fc3426cef66b0713adacb38e27ee348aad346dc3136c382b73af3c1d9de4a6c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "58252dbc3802b396738153c38323f82efb5c193f9f4c411aa2d8d87606cc83d0"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "da0631fa22b646a92b6bde76d3bdda68e91c7c625cb6e16377888ce58d1c3de6"
+    sha256 cellar: :any_skip_relocation, sonoma:        "bedc4ca3cac331edc6b895f30d6140ac83a430d65a03f5a6783b07877f98e7e1"
+    sha256 cellar: :any_skip_relocation, ventura:       "0b13228bbef3d92d71e830c26ec836f730a8d1b4f577211ebed04134cbb69f60"
   end
 
   depends_on xcode: :build
@@ -27,6 +26,6 @@ class ChooseGui < Formula
   end
 
   test do
-    system "#{bin}/choose", "-h"
+    system bin/"choose", "-h"
   end
 end

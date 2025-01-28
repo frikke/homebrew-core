@@ -1,69 +1,52 @@
 class ProtobufC < Formula
   desc "Protocol buffers library"
   homepage "https://github.com/protobuf-c/protobuf-c"
-  url "https://github.com/protobuf-c/protobuf-c/releases/download/v1.4.1/protobuf-c-1.4.1.tar.gz"
-  sha256 "4cc4facd508172f3e0a4d3a8736225d472418aee35b4ad053384b137b220339f"
+  url "https://github.com/protobuf-c/protobuf-c/releases/download/v1.5.0/protobuf-c-1.5.0.tar.gz"
+  sha256 "7b404c63361ed35b3667aec75cc37b54298d56dd2bcf369de3373212cc06fd98"
   license "BSD-2-Clause"
-  revision 7
+  revision 16
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "c22945177efec85a4b167ab364a46d374b22154b3eab165aff689101d6267ce1"
-    sha256 cellar: :any,                 arm64_ventura:  "37a4bccd649b2435c9c6d5d97052bedd166c6c0de7580360d6c10bd19dcbf930"
-    sha256 cellar: :any,                 arm64_monterey: "c45b43b82dc7043bebec4bd0a4bcdb7e6f58b64f5495182d5530fb0571d02d2e"
-    sha256 cellar: :any,                 arm64_big_sur:  "392fb3edc430d2372b401b50fa09c85347f09c393b60c905647aec7214f5f5cd"
-    sha256 cellar: :any,                 sonoma:         "1c194b43acd1c81c2f682ddd0ad537f5bcb9d19b0d2c1b566c7b208637b65faf"
-    sha256 cellar: :any,                 ventura:        "40b6341261f223df456dafb7166367b7c4d007749e4e06dfff186d6537c5e290"
-    sha256 cellar: :any,                 monterey:       "66f3cd044e6b8dd0cd558a3342092657b2d0d96864f08a0f1cacbba0912e06d6"
-    sha256 cellar: :any,                 big_sur:        "d10693cc22348eea4be40236f6113f6ef5b2d217316da61fc762a89aaf7fa400"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2f681a4ef1578ca632766037b520ec9f90eab975351ef00e45f1dd60b1e4afc7"
+    sha256 cellar: :any,                 arm64_sequoia: "e126a9b3a7187dd6d62c635505b284c9bf15375f76f53e8fcb37b4864a9d4606"
+    sha256 cellar: :any,                 arm64_sonoma:  "ebfe8527faeef9424fc49ece715eb37648789eaf39bb6d46b9f57b17fdc88af7"
+    sha256 cellar: :any,                 arm64_ventura: "bb0ad5bef5a788dd56b3472bc3f8c62879c483c786b9a3a3c9ea61be5d5486a5"
+    sha256 cellar: :any,                 sonoma:        "a0db027a6bc9d54bd10f0bfa47ff2fb4ad0fcf4efd4ecf0f1243651dc8d84a49"
+    sha256 cellar: :any,                 ventura:       "ba6edb598c82c195302f320fc934ffc3e640b89744c93ec96fe8c8f64ea5aeca"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d79036e60276199da3118381a3b616b125e1a17d3a8b8f43a9c12d0f905f861a"
   end
 
   head do
     url "https://github.com/protobuf-c/protobuf-c.git", branch: "master"
+
     depends_on "asciidoc" => :build
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
   end
 
-  # TODO: `autoconf`, `automake`, and `libtool` are needed for the patches.
-  #       Remove when they are no longer needed.
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "abseil"
   depends_on "protobuf"
 
-  # The next three patches are for compatibility with the newest protobuf.
-  # https://github.com/protobuf-c/protobuf-c/pull/556
-  # TODO: Uncomment `if build.head?` in `#install` when these are no longer needed.
+  # Apply commits from open PR to support Protobuf 26.
+  # PR ref: https://github.com/protobuf-c/protobuf-c/pull/711
   patch do
-    url "https://github.com/protobuf-c/protobuf-c/commit/66a0b0d205224f63f19dd8f96abf9dcdc2112331.patch?full_index=1"
-    sha256 "a3561ad37f33048c59a1ceece246a515b62cef91126e4041056d10ea26a19230"
+    url "https://github.com/protobuf-c/protobuf-c/commit/e3acc96ca2a00ef715fa2caa659f677cad8a9fa0.patch?full_index=1"
+    sha256 "3b564a971023d127bb7b666e5669f792c94766836ccaed5acfae3e23b8152d43"
   end
-
   patch do
-    url "https://github.com/protobuf-c/protobuf-c/commit/7706c95d4835e75f182ab56d9dad5c8cd8517e0a.patch?full_index=1"
-    sha256 "86364b4da6e077bd9f89a82d6e2ac965776ee1a544e43d1964c2e800424cdb6e"
-  end
-
-  patch do
-    url "https://github.com/protobuf-c/protobuf-c/commit/66574f3fd85a205eb7c90b790477d5415364209e.patch?full_index=1"
-    sha256 "2d1d6edbd615dff4f0a9c4a974d325effefc44466e1855f8c0b88e5977962a9d"
+    url "https://github.com/protobuf-c/protobuf-c/commit/1b4b205d87b1bc6f575db1fd1cbbb334a694abe8.patch?full_index=1"
+    sha256 "6d02812445a229963add1b41c07bebddc3437fecb2a03844708512326fd70914"
   end
 
   def install
-    # https://github.com/protocolbuffers/protobuf/issues/9947
-    ENV.append_to_cflags "-DNDEBUG"
-
-    # TODO: Uncomment `if build.head?` when the patches are no longer needed.
-    system "autoreconf", "--force", "--install", "--verbose" # if build.head?
-    system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    testdata = <<~EOS
+    testdata = <<~PROTO
       syntax = "proto3";
       package test;
       message TestCase {
@@ -72,8 +55,11 @@ class ProtobufC < Formula
       message Test {
         repeated TestCase case = 1;
       }
-    EOS
+    PROTO
     (testpath/"test.proto").write testdata
     system Formula["protobuf"].opt_bin/"protoc", "test.proto", "--c_out=."
+
+    testpath.glob("test.pb-c.*").map(&:unlink)
+    system bin/"protoc-c", "test.proto", "--c_out=."
   end
 end

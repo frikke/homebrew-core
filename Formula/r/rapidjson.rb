@@ -1,24 +1,34 @@
 class Rapidjson < Formula
   desc "JSON parser/generator for C++ with SAX and DOM style APIs"
   homepage "https://rapidjson.org/"
-  url "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz"
-  sha256 "bf7ced29704a1e696fbccf2a2b4ea068e7774fa37f6d7dd4039d0787f8bed98e"
   license "MIT"
   head "https://github.com/Tencent/rapidjson.git", branch: "master"
 
+  stable do
+    url "https://github.com/Tencent/rapidjson/archive/refs/tags/v1.1.0.tar.gz"
+    sha256 "bf7ced29704a1e696fbccf2a2b4ea068e7774fa37f6d7dd4039d0787f8bed98e"
+
+    # Backport fix for usage with recent GCC and Clang
+    patch do
+      url "https://github.com/Tencent/rapidjson/commit/9bd618f545ab647e2c3bcbf2f1d87423d6edf800.patch?full_index=1"
+      sha256 "ce341a69d6c17852fddd5469b6aabe995fd5e3830379c12746a18c3ae858e0e1"
+    end
+  end
+
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "97a2dc11fc6d7359450d3bee8c9b06b4ad1f141ea23b2b1b57eae9f9c9bcb0cf"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, all: "ba505c9a587b3c26539eae5dd732ae36bca53b67daf94579fee177d88094fa52"
   end
 
   depends_on "cmake" => :build
 
   def install
-    system "cmake", "-DRAPIDJSON_BUILD_DOC=OFF",
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DRAPIDJSON_BUILD_DOC=OFF",
                     "-DRAPIDJSON_BUILD_EXAMPLES=OFF",
                     "-DRAPIDJSON_BUILD_TESTS=OFF",
-                    ".", *std_cmake_args
-    system "make", "install"
+                    *std_cmake_args
+    system "cmake", "--install", "build"
   end
 
   test do

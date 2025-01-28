@@ -1,8 +1,8 @@
 class Babl < Formula
   desc "Dynamic, any-to-any, pixel format translation library"
   homepage "https://www.gegl.org/babl/"
-  url "https://download.gimp.org/pub/babl/0.1/babl-0.1.106.tar.xz"
-  sha256 "d325135d3304f088c134cc620013acf035de2e5d125a50a2d91054e7377c415f"
+  url "https://download.gimp.org/pub/babl/0.1/babl-0.1.110.tar.xz"
+  sha256 "bf47be7540d6275389f66431ef03064df5376315e243d0bab448c6aa713f5743"
   license "LGPL-3.0-or-later"
   # Use GitHub instead of GNOME's git. The latter is unreliable.
   head "https://github.com/GNOME/babl.git", branch: "master"
@@ -13,13 +13,12 @@ class Babl < Formula
   end
 
   bottle do
-    sha256                               arm64_ventura:  "d2262c448da0fbd1483282bf7978d537381608d10e98778a6a7e3dfb332b797b"
-    sha256                               arm64_monterey: "1a436ea903c5eeb2cdfa524171c8976ac0047ea0fc48c3daacc8f814f367b723"
-    sha256                               arm64_big_sur:  "fe7ce007039e7d52fb050c0581b179c339f2dbec696d84a584c30a39bc2490e5"
-    sha256                               ventura:        "86ad27203bd7e18d035a1c1f089fdfe336e5ae4fef112615b6961a225cf12e03"
-    sha256                               monterey:       "cc27752609a03322409dea058eb438cd198a785fbbc541e31b08cc671d73bd97"
-    sha256                               big_sur:        "3aae805b1aee8eb7462a31e95db66c0d2e1b2cd9fdbecf06ac947f32ac57e74e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "324b6d7f0de8ab3568a9f3ce0a3197199c2a098ea1abbee970d471de866b30b1"
+    sha256                               arm64_sequoia: "147cea64ffccae5da20c8e6896db601e3c12fe1df5f6f5c2580a746af348be4e"
+    sha256                               arm64_sonoma:  "2c4f97f6ea0da560095f5d93285b47e00c37edadadffd133679662a15232a854"
+    sha256                               arm64_ventura: "6e624a1cfb00d2718c1da20e8f64a40356fa5248d5c343458b58c11c20d4e28b"
+    sha256                               sonoma:        "6cf45b37cb88356d1f68d5047fe351ebee46150ed9003b8f2fc6308e67c9a7c3"
+    sha256                               ventura:       "6b340ce32c9b0095fddf0d5ea61d9c1bdca667e3610f74110eb6491d00ab6aa6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3179d3e7472775e90a8befb85f6d611a68f0860c60e1386ea868686a89b443b2"
   end
 
   depends_on "glib" => :build # to add to PKG_CONFIG_PATH for gobject-introspection
@@ -27,18 +26,18 @@ class Babl < Formula
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pcre2" => :build # to add to PKG_CONFIG_PATH for glib
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "vala" => :build
   depends_on "little-cms2"
 
   def install
-    system "meson", "setup", "build", *std_meson_args, "-Dwith-docs=false"
+    system "meson", "setup", "build", "-Dwith-docs=false", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <babl/babl.h>
       int main() {
         babl_init();
@@ -48,7 +47,7 @@ class Babl < Formula
         babl_exit();
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-I#{include}/babl-0.1", testpath/"test.c", "-L#{lib}", "-lbabl-0.1", "-o", "test"
     system testpath/"test"
 

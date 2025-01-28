@@ -1,56 +1,65 @@
 class Librcsc < Formula
   desc "RoboCup Soccer Simulator library"
-  homepage "https://osdn.net/projects/rctools/"
-  # Canonical: https://osdn.net/dl/rctools/librcsc-4.1.0.tar.gz
-  url "https://dotsrc.dl.osdn.net/osdn/rctools/51941/librcsc-4.1.0.tar.gz"
-  sha256 "1e8f66927b03fb921c5a2a8c763fb7297a4349c81d1411c450b180178b46f481"
-
-  livecheck do
-    url "https://osdn.net/projects/rctools/releases/"
-    regex(%r{value=.*?/rel/rctools/librcsc/v?(\d+(?:\.\d+)+)["']}i)
-  end
+  homepage "https://github.com/helios-base/librcsc"
+  url "https://github.com/helios-base/librcsc/archive/refs/tags/rc2024.tar.gz"
+  sha256 "81a3f86c9727420178dd936deb2994d764c7cd4888a2150627812ab1b813531b"
+  license "LGPL-3.0-or-later"
 
   bottle do
     rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "0b8a58835ad594228751783935808aafdb3117be0a1e4b10754313a02f9d0ff3"
-    sha256 cellar: :any,                 arm64_ventura:  "843e8fa7ea1ce56071294f4a7b833ba4367ae3bb6363af83aeaae7f6d52d7636"
-    sha256 cellar: :any,                 arm64_monterey: "6ed80637e973c59168c069fabeec0634448c8c161120c886f62cc3a498a5784e"
-    sha256 cellar: :any,                 arm64_big_sur:  "833fe11162a367e783177275011d5156933cb33c29c34d423237a253214f5552"
-    sha256 cellar: :any,                 sonoma:         "264a3d386346e2c76b4f4815a30f594a40333ce771cd2839cb1cd1ff4c701f96"
-    sha256 cellar: :any,                 ventura:        "6ac4c039117d05a0abdbcdfc09ac868667491fb670690929fc2597ffeeedf6fc"
-    sha256 cellar: :any,                 monterey:       "5997731a4b6f409b301ea5014d41e53611048a5c8b8e59c78a31fba4f74626c0"
-    sha256 cellar: :any,                 big_sur:        "e1af394e5832c69c864b55aece45a9a3a29664f32d28a20fb18f3e809eb01a31"
-    sha256 cellar: :any,                 catalina:       "621b412c1c5c6623fef7b37e179dc75b47169b4a1007384aa2985daee09d6176"
-    sha256 cellar: :any,                 mojave:         "0eeb0dfb16662da2760d8c753dc23049afdd9a8da0a5ae3eba9c5ac56ed00a41"
-    sha256 cellar: :any,                 high_sierra:    "4bd96acb6e78620e25b3b33e745e7770ea812cde22a3d756ac978c778d3b993c"
-    sha256 cellar: :any,                 sierra:         "c8b9dc2887f771f07b33bb70cec9ab62b4cee067f8b3a2d7ae57296428881031"
-    sha256 cellar: :any,                 el_capitan:     "c2093c232c857c15bea5dd6c1c6df14aa4b00ed0c6eb3ab7e4d0d3f8c72b54c6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6084c66b0de10b5c51e6094bfbf800fc8f7982354c3e64eb27122ae741b8fa9f"
+    sha256 cellar: :any,                 arm64_sequoia: "3d9d528cd8cfa66f49e6a5a371a4f93a2ceac383985a9189627bfd901006b9c7"
+    sha256 cellar: :any,                 arm64_sonoma:  "8fde29d988114c1ad006242a6e5ff6d76da689505116521fd8581c44f3c1f6b1"
+    sha256 cellar: :any,                 arm64_ventura: "2ef3bfaa135d7dcdfa214b56ec141bdac11882fb307a6aaa4415fda4a982aad8"
+    sha256 cellar: :any,                 sonoma:        "d4887f6f0256c8c55347ef86c671a712b3b8b07e52ff691899197a4ecb40ac90"
+    sha256 cellar: :any,                 ventura:       "d91b3e133981705b317d6a74a48f821a13c3e83d1ea53f27a8b087c6087cfe2b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "77dd0bd9e1b3c8971a4eca3430b49648f944824d1a6fc0337696c846372ca9b2"
   end
 
-  depends_on "boost"
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "boost" => :build
+  depends_on "libtool" => :build
 
-  # Fix -flat_namespace being used on Big Sur and later.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-pre-0.4.2.418-big_sur.diff"
-    sha256 "83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
-  end
+  uses_from_macos "zlib"
+
+  # Add missing header to fix build on Monterey
+  # Issue ref: https://github.com/helios-base/librcsc/issues/88
+  patch :DATA
 
   def install
-    system "./configure", "--disable-debug",
-                          "--prefix=#{prefix}"
+    # Strip linkage to `boost`
+    ENV.append "LDFLAGS", "-Wl,-dead_strip_dylibs" if OS.mac?
+
+    system "./bootstrap"
+    system "./configure", "--disable-silent-rules",
+                          "--with-boost=#{Formula["boost"].opt_prefix}",
+                          *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <rcsc/rcg.h>
       int main() {
         rcsc::rcg::PlayerT p;
         return 0;
       }
-    EOS
-    system ENV.cxx, "test.cpp", "-o", "test", "-L#{lib}", "-lrcsc_rcg"
+    CPP
+    system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", "-L#{lib}", "-lrcsc"
     system "./test"
   end
 end
+
+__END__
+diff --git a/rcsc/rcg/parser_simdjson.cpp b/rcsc/rcg/parser_simdjson.cpp
+index 47c9d2c..8218669 100644
+--- a/rcsc/rcg/parser_simdjson.cpp
++++ b/rcsc/rcg/parser_simdjson.cpp
+@@ -43,6 +43,7 @@
+
+ #include <string_view>
+ #include <functional>
++#include <unordered_map>
+
+ namespace rcsc {
+ namespace rcg {

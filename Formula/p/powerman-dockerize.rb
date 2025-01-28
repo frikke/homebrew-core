@@ -1,18 +1,17 @@
 class PowermanDockerize < Formula
   desc "Utility to simplify running applications in docker containers"
   homepage "https://github.com/powerman/dockerize"
-  url "https://github.com/powerman/dockerize/archive/refs/tags/v0.19.0.tar.gz"
-  sha256 "192c142ab25893c7a1e8a135280d8e72f05f12b56c1e2b5d932946707ec68c6b"
+  url "https://github.com/powerman/dockerize/archive/refs/tags/v0.20.2.tar.gz"
+  sha256 "b9c10d73a222379c95c8cb02da882857ce0ff001e084468218ccb33375f1043e"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "22a49e6780e8e00a054aaa35c6749d21095d374eac84c5c773ff549b38adae4a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "22a49e6780e8e00a054aaa35c6749d21095d374eac84c5c773ff549b38adae4a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "22a49e6780e8e00a054aaa35c6749d21095d374eac84c5c773ff549b38adae4a"
-    sha256 cellar: :any_skip_relocation, ventura:        "8ab1eff297eb25f14338b89b7bd198978b3541e619203fa92ef2450b0045e098"
-    sha256 cellar: :any_skip_relocation, monterey:       "8ab1eff297eb25f14338b89b7bd198978b3541e619203fa92ef2450b0045e098"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8ab1eff297eb25f14338b89b7bd198978b3541e619203fa92ef2450b0045e098"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "02c820b472202d7146338d7c94989edf2ce8f8c6223abf57f688224a9f92cc0e"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "77eb12272817fa2070e5ffff79c53db97e822776cee3b599cf1731c47b5bf96c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "77eb12272817fa2070e5ffff79c53db97e822776cee3b599cf1731c47b5bf96c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "77eb12272817fa2070e5ffff79c53db97e822776cee3b599cf1731c47b5bf96c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "0613ab1a6aef4c559a4b566c13323fe02400dbab2698cad61fc6ea099908b0dc"
+    sha256 cellar: :any_skip_relocation, ventura:       "0613ab1a6aef4c559a4b566c13323fe02400dbab2698cad61fc6ea099908b0dc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0f2fc4582b62b2b7bb8c7a947862a82f1e4e46e0a22c620a7d6d920ae5f8ef2a"
   end
 
   depends_on "go" => :build
@@ -24,6 +23,6 @@ class PowermanDockerize < Formula
 
   test do
     assert_match version.to_s, shell_output("#{bin}/dockerize --version")
-    system "#{bin}/dockerize", "-wait", "https://www.google.com/", "-wait-retry-interval=1s", "-timeout", "5s"
+    system bin/"dockerize", "-wait", "https://www.google.com/", "-wait-retry-interval=1s", "-timeout", "5s"
   end
 end

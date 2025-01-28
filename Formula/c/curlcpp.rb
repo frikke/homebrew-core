@@ -6,9 +6,12 @@ class Curlcpp < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "02d6013f6cebe3e32f938baf215bc25a97b6b20b04e7639f59f360f81c0984a1"
+    sha256 cellar: :any,                 arm64_sonoma:   "a7d90c04040339eb2d284bb2c1510806df36bc0fa37ddd8445db1dd63e9e5016"
     sha256 cellar: :any,                 arm64_ventura:  "c3f9991c295224065b7df591bf5f28c1ec9247e16ebfa3318d20d99fcd20aa62"
     sha256 cellar: :any,                 arm64_monterey: "0e9dad877d6c11ed3243c0463f69daaeabe74dcd54ccf80dad016d85c5951546"
     sha256 cellar: :any,                 arm64_big_sur:  "5337cf2331b855265be23c9ad2209977c07ab6acf9ca7c808e14b58494923407"
+    sha256 cellar: :any,                 sonoma:         "786f28cab6cc4ef524212c85d133968158e692572148a1b4f06433c836ecabf6"
     sha256 cellar: :any,                 ventura:        "ff1362a719032031c6dac022c9ccd060533a0b19d8dd5de454d0713461f8d24a"
     sha256 cellar: :any,                 monterey:       "69efcd43355ab8ba5ed151d52462c1b87541f898d0f02046bfcf2d9da6e720cd"
     sha256 cellar: :any,                 big_sur:        "05ea45b1b2fce091147574dab246b00275c2b97a6554c5e4071f66777c018b74"
@@ -26,7 +29,7 @@ class Curlcpp < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <iostream>
       #include <ostream>
 
@@ -66,7 +69,7 @@ class Curlcpp < Formula
           }
           return 0;
       }
-    EOS
+    CPP
 
     system ENV.cxx, "-std=c++11", "test.cpp", "-L#{lib}", "-lcurlcpp", "-lcurl", "-o", "test"
     system "./test"

@@ -1,9 +1,9 @@
 class Dcmtk < Formula
   desc "OFFIS DICOM toolkit command-line utilities"
   homepage "https://dicom.offis.de/dcmtk.php.en"
-  url "https://dicom.offis.de/download/dcmtk/dcmtk367/dcmtk-3.6.7.tar.gz"
-  sha256 "7c58298e3e8d60232ee6fc8408cfadd14463cc11a3c4ca4c59af5988c7e9710a"
-  revision 1
+  url "https://dicom.offis.de/download/dcmtk/dcmtk369/dcmtk-3.6.9.tar.gz"
+  sha256 "b93ff5561244916a6e1e7e3ecccf2e26e6932c4edb5961268401cea7d4ab9c16"
+  license "BSD-3-Clause"
   head "https://git.dcmtk.org/dcmtk.git", branch: "master"
 
   livecheck do
@@ -12,21 +12,23 @@ class Dcmtk < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "56304c047bdb463854f71556209410992b5f252fd0f0f33b1cefead035e27793"
-    sha256 arm64_monterey: "c966591af19a169366159a0627b43bcae6b5c90b8efcffa2259ffd093e8f405e"
-    sha256 arm64_big_sur:  "3f689f24e0cf1573b561e08373941648f65ecc8cffc4606b9a2777c2670e4006"
-    sha256 ventura:        "a0874415414b69e964b2edd63b07b0fad5220b96e2eaff5ad82ef72403989047"
-    sha256 monterey:       "f0cf38165223c381b0d88d273d354ca87d5f834b415ace05e5c9bc7264fe0ab8"
-    sha256 big_sur:        "44385222676a716e78524f80ce61b155d257bee41a8853b2cbdca52f843ba941"
-    sha256 x86_64_linux:   "6ae6be2c9ffcf1a438ace27a6d22e08fe953c82ef830b198eaf6f1c2f39a365c"
+    sha256 arm64_sequoia: "6349ba68f65ba257caa778ea8ab86fbf2b70141baf5a0a8f7bfa3759765c42a8"
+    sha256 arm64_sonoma:  "86d3578d795ba30a2a75a9c3d5fa8c5f692bc54c38ed5c2a901cdd10c8e15023"
+    sha256 arm64_ventura: "fd350d43be22126a196b194747b45df08b58919507fd61bde058c153a97ccf33"
+    sha256 sonoma:        "b5496a75247e5fd852d750a503dc788829bcc3e9532a90fae42d64508bf72ba6"
+    sha256 ventura:       "acaae376685ecc370ccf3f6b363b6c1d8b1ace7f752999103eb01eaf44e4716a"
+    sha256 x86_64_linux:  "bf2a2675135b64915b5c5b427c536289e68a904007d0d0ef0c999845005aae14"
   end
 
   depends_on "cmake" => :build
+
+  depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
   depends_on "openssl@3"
 
   uses_from_macos "libxml2"
+  uses_from_macos "zlib"
 
   def install
     args = std_cmake_args + ["-DDCMTK_WITH_ICU=OFF"]

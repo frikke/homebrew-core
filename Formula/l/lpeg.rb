@@ -1,7 +1,7 @@
 class Lpeg < Formula
   desc "Parsing Expression Grammars For Lua"
   homepage "https://www.inf.puc-rio.br/~roberto/lpeg/"
-  url "http://www.inf.puc-rio.br/~roberto/lpeg/lpeg-1.1.0.tar.gz"
+  url "https://www.inf.puc-rio.br/~roberto/lpeg/lpeg-1.1.0.tar.gz"
   mirror "https://github.com/neovim/deps/raw/master/opt/lpeg-1.1.0.tar.gz"
   sha256 "4b155d67d2246c1ffa7ad7bc466c1ea899bbc40fef0257cc9c03cecbaed4352a"
   license "MIT"
@@ -13,6 +13,7 @@ class Lpeg < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "af50e5ff5ff953cb182ffb7657fdbf5fbfc9958f12be114c6713d7e62190c421"
     sha256 cellar: :any,                 arm64_sonoma:   "d725e7feeb5c96970d64781282c5c4ae56e9e1b2e824280c9ac2d4098acd18cb"
     sha256 cellar: :any,                 arm64_ventura:  "032f19654879a0542eb5836fa19da7ae278fb1709375f4b17e8a24b219e54293"
     sha256 cellar: :any,                 arm64_monterey: "d9b65ef2160677f986634fb433681bab43f7f87d2510884e373dab0d7bbd86a2"

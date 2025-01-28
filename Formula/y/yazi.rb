@@ -1,43 +1,47 @@
 class Yazi < Formula
-  desc "️Blazing fast terminal file manager written in Rust, based on async I/O"
+  desc "Blazing fast terminal file manager written in Rust, based on async I/O"
   homepage "https://github.com/sxyazi/yazi"
-  url "https://github.com/sxyazi/yazi/archive/refs/tags/v0.1.4.tar.gz"
-  sha256 "991f8621cf6f362d0c22cd598a434b6fb42fb7e9fde4c2f678297f9ac4959d36"
+  url "https://github.com/sxyazi/yazi/archive/refs/tags/v0.4.2.tar.gz"
+  sha256 "88995c90954d140f455cf9ca4f87f9ca36390717377be86b0672456e1eb5f65f"
   license "MIT"
   head "https://github.com/sxyazi/yazi.git", branch: "main"
 
+  # There can be a notable gap between when a version is tagged and a
+  # corresponding release is created, so we check the "latest" release instead
+  # of the Git tags.
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "47238030562f56a8b8c8d113c5c266d23d893ff85084a43a2c70f3053de945ae"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "301b1c8fcb96c2b952be3362878dee3ceb534e2d04126027348211e04abee9eb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7057f16963dcb9d11c2a24a99755460bf8e7098bffe16f5a96d58c075958a2c4"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "280d30ce1cc37b618540bd93f60211847e81b3e6274c4083120d95c8be50b25b"
-    sha256 cellar: :any_skip_relocation, sonoma:         "095b051f4f4a57c8c67ac8fcfff1c8c2714a31d33917f9fa99b52bbc6d3c43ed"
-    sha256 cellar: :any_skip_relocation, ventura:        "751a62e7215323685c5b66986da52d68556a6751b7d802cb81237fe9c6cd7b12"
-    sha256 cellar: :any_skip_relocation, monterey:       "fdca4277149409056ab9def139e5d87ddf11c4a6ee167978f4fc61e1f2a7eeca"
-    sha256 cellar: :any_skip_relocation, big_sur:        "07280d1a9341eed2646d316b340880c5965f948b318aaa872404584651e1cb35"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "406dc52a16ce8b2de137c1ab866dcbdb3e55133db21299535941df76384550de"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1ba54da545d0115236664e029b3ae1d419afe51b056e66e29a3e1f5b05c8f05c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cf5865c823c7b3ce10ff1d4736e0f53389f25752cdfa594f1dbf9dae3618d6c8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "3247b4c5ef816299cac1f4136d6315d832b34f4d91c837d3ac508909a2d11639"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b4ab2c77a3f8ec2223d7f23e75881ceceb244345cd2bba2a6138ce5eedf250e9"
+    sha256 cellar: :any_skip_relocation, ventura:       "9b0b58d92279e841ad17061c8be648ff024abebc79c9b5f682a7f3258e2ee71b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6031243911f37d5038d6efd4fa2c2e492aef7e630dd3ab154503593272f84156"
   end
 
   depends_on "rust" => :build
 
   def install
-    system "cargo", "install", *std_cargo_args(path: "app")
+    ENV["VERGEN_GIT_SHA"] = tap.user
+    ENV["YAZI_GEN_COMPLETIONS"] = "1"
+    system "cargo", "install", *std_cargo_args(path: "yazi-fm")
+    system "cargo", "install", *std_cargo_args(path: "yazi-cli")
+
+    bash_completion.install "yazi-boot/completions/yazi.bash" => "yazi"
+    zsh_completion.install "yazi-boot/completions/_yazi"
+    fish_completion.install "yazi-boot/completions/yazi.fish"
+
+    bash_completion.install "yazi-cli/completions/ya.bash" => "ya"
+    zsh_completion.install "yazi-cli/completions/_ya"
+    fish_completion.install "yazi-cli/completions/ya.fish"
   end
 
   test do
-    require "pty"
-
-    PTY.spawn(bin/"yazi") do |r, w, _pid|
-      r.winsize = [80, 60]
-      sleep 1
-      w.write "quit"
-      begin
-        r.read
-      rescue Errno::EIO
-        # GNU/Linux raises EIO when read is done on closed pty
-      end
-    end
-
-    assert_equal "yazi #{version}", shell_output("#{bin}/yazi --version").strip
+    # yazi is a GUI application
+    assert_match "Yazi #{version}", shell_output("#{bin}/yazi --version").strip
   end
 end

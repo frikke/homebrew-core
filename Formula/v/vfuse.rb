@@ -1,14 +1,9 @@
 class Vfuse < Formula
   desc "Convert bootable DMG images for use in VMware Fusion"
   homepage "https://github.com/chilcote/vfuse"
-  url "https://github.com/chilcote/vfuse/archive/2.2.6.tar.gz"
+  url "https://github.com/chilcote/vfuse/archive/refs/tags/2.2.6.tar.gz"
   sha256 "fbf5f8a1c664b03c7513a70aa05c3fc501a7ebdb53f128f1f05c24395871a314"
   license "Apache-2.0"
-
-  livecheck do
-    url :stable
-    strategy :github_latest
-  end
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_monterey: "f8184d1fd9ed9a9053df739ad09fa721686131c8a6c2a13b294aec564016cf19"
@@ -19,7 +14,7 @@ class Vfuse < Formula
     sha256 cellar: :any_skip_relocation, mojave:         "95be83b370683ec27d9052f897028bd939241568d81939a67d3bb985d89a06df"
   end
 
-  deprecate! date: "2023-07-03", because: :deprecated_upstream
+  disable! date: "2024-07-05", because: :deprecated_upstream
 
   depends_on :macos
 

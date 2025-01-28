@@ -5,11 +5,6 @@ class OpenZwave < Formula
   sha256 "c4e4eb643709eb73c30cc25cffc24e9e7b6d7c49bd97ee8986c309d168d9ad2f"
   license "LGPL-3.0-or-later"
 
-  livecheck do
-    url "http://old.openzwave.com/downloads/"
-    regex(/href=.*?openzwave[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
-
   bottle do
     sha256 arm64_ventura:  "8d7c20fa4a5bd2b5691c3f8bf77b2cfe00669e0c7c779418c9c67c73d91ccb0e"
     sha256 arm64_monterey: "46059e0f107fa894491dcca4afbc27487374077ac10d0c9e0466b70a21b98bdf"
@@ -22,10 +17,10 @@ class OpenZwave < Formula
     sha256 x86_64_linux:   "32e72b176dcd28b5876df5dca595f9d9a93c159d475fbbe2affb9e21d6e1c30b"
   end
 
-  deprecate! date: "2023-08-14", because: :unmaintained
+  disable! date: "2024-08-24", because: :unmaintained
 
   depends_on "doxygen" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   def install
     ENV["BUILD"] = "release"
@@ -41,7 +36,7 @@ class OpenZwave < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <iostream>
       #include <functional>
       #include <openzwave/Manager.h>
@@ -49,7 +44,7 @@ class OpenZwave < Formula
       {
         return OpenZWave::Manager::getVersionAsString().empty();
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cpp", "-I#{include}/openzwave",
                     "-L#{lib}", "-lopenzwave", "-lpthread", "-o", "test"
     system "./test"

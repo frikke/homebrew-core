@@ -1,18 +1,18 @@
 class GemCompletion < Formula
   desc "Bash completion for gem"
   homepage "https://github.com/mernen/completion-ruby"
-  url "https://github.com/mernen/completion-ruby.git",
-      revision: "f3e4345042b0cc48317e45b673dfd3d23904b9a7"
-  version "2"
+  url "https://github.com/mernen/completion-ruby/archive/refs/tags/v1.0.2.tar.gz"
+  sha256 "70b9ae9154076b561f0d7b2b74893258dc00168ded3e8686f14e349f4a324914"
   license "MIT"
-  head "https://github.com/mernen/completion-ruby.git", branch: "master"
+  version_scheme 1
+  head "https://github.com/mernen/completion-ruby.git", branch: "main"
 
   livecheck do
     formula "ruby-completion"
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "044d02a4211a0f89e550ff2f5779903cb443528f8f703ea2bd549bc39b9be595"
+    sha256 cellar: :any_skip_relocation, all: "cf301278a53387a05bbe44db4f921629211afb38be7057bcc60ff0088f5ebae1"
   end
 
   def install

@@ -1,34 +1,37 @@
 class Netdata < Formula
   desc "Diagnose infrastructure problems with metrics, visualizations & alarms"
   homepage "https://netdata.cloud/"
-  url "https://github.com/netdata/netdata/releases/download/v1.42.3/netdata-v1.42.3.tar.gz"
-  sha256 "36cd2a1e06001fa77bf30ece74571d730a204cf509d37ffe42f05f7671d9ff31"
+  url "https://github.com/netdata/netdata/releases/download/v1.44.3/netdata-v1.44.3.tar.gz"
+  sha256 "50df30a9aaf60d550eb8e607230d982827e04194f7df3eba0e83ff7919270ad2"
   license "GPL-3.0-or-later"
+  revision 15
 
   livecheck do
     url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   bottle do
-    sha256 arm64_ventura:  "da389c4b1f52a389ae95916a92d57fb0e9c2e0593f769cea317fddeae1b5987c"
-    sha256 arm64_monterey: "f52d4a2eb9b8c4a808533ca9e02c0d27fcd6ef6362babfd0a3cdc04dca529c35"
-    sha256 arm64_big_sur:  "08a73d41c4b9bad1b299772a588459b92443a3f1168e1c195c9e1e7d3dc99a89"
-    sha256 ventura:        "a51bf430fb1eac9f477a58c35f6ae0aa03d3fa80c3a8d94b63806ec2433adfa8"
-    sha256 monterey:       "0556e767ff79b1849294c7db757312e832e645d0f4cc82a5c6114722fbdfb606"
-    sha256 big_sur:        "1958084139df44c6ddf20292390455e669531f707b531e98092e7ae93427d7f7"
-    sha256 x86_64_linux:   "249269b02d428fba3afb8d072f830989d50fbd3a6cd1a28815fe80359b9a9f15"
+    sha256 arm64_sequoia: "86659b5011bb7f7d2caacdbffe8bfb52e570026eefcc28db297c58e13cc55105"
+    sha256 arm64_sonoma:  "7f49dca20ba3a479be97800eb84790be64e3fb8a2d1d658ed6160d266068b081"
+    sha256 arm64_ventura: "f9d215d7780084e9d4d61a76c810ec7e1c45c9dbaf6c0613cb626a89fcc97026"
+    sha256 sonoma:        "e7985f32bb0bcc982a520d01b95d65a8e7e9ac18e81e427dec281bfa7a7413ef"
+    sha256 ventura:       "a7802a15c80aafd9504c875db123906c5d70887578597a51ab9bb26380bc13fc"
+    sha256 x86_64_linux:  "1ea6bc52591b731ffecebc4e3cc134f51b6aeb9c48645bc70e0c0a7dfe9a7f49"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "m4" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "abseil"
   depends_on "json-c"
   depends_on "libuv"
   depends_on "libyaml"
   depends_on "lz4"
   depends_on "openssl@3"
+  depends_on "pcre2"
   depends_on "protobuf"
   depends_on "protobuf-c"
 
@@ -57,8 +60,7 @@ class Netdata < Formula
     judyprefix = "#{buildpath}/resources/judy"
 
     resource("judy").stage do
-      system "./configure", "--disable-debug", "--disable-dependency-tracking",
-          "--disable-shared", "--prefix=#{judyprefix}"
+      system "./configure", "--disable-shared", *std_configure_args(prefix: judyprefix)
 
       # Parallel build is broken
       ENV.deparallelize do
@@ -76,9 +78,7 @@ class Netdata < Formula
 
     system "autoreconf", "--force", "--install", "--verbose"
     args = %W[
-      --disable-dependency-tracking
       --disable-silent-rules
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
       --libexecdir=#{libexec}
@@ -94,7 +94,7 @@ class Netdata < Formula
       args << "UUID_LIBS=-luuid"
       args << "UUID_CFLAGS=-I#{Formula["util-linux"].opt_include}"
     end
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "clean"
     system "make", "install"
 
@@ -115,9 +115,9 @@ class Netdata < Formula
   end
 
   test do
-    system "#{sbin}/netdata", "-W", "set", "registry", "netdata unique id file",
-                              "#{testpath}/netdata.unittest.unique.id",
-                              "-W", "set", "registry", "netdata management api key file",
-                              "#{testpath}/netdata.api.key"
+    system sbin/"netdata", "-W", "set", "registry", "netdata unique id file",
+                           "#{testpath}/netdata.unittest.unique.id",
+                           "-W", "set", "registry", "netdata management api key file",
+                           "#{testpath}/netdata.api.key"
   end
 end

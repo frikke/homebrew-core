@@ -10,28 +10,25 @@ class Mkvtomp4 < Formula
   head "https://github.com/gavinbeatty/mkvtomp4.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "40b20115a22f30e12c87b231eca95ab046e3b83e953b52b72cc854590c1d5b1e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "40b20115a22f30e12c87b231eca95ab046e3b83e953b52b72cc854590c1d5b1e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "40b20115a22f30e12c87b231eca95ab046e3b83e953b52b72cc854590c1d5b1e"
-    sha256 cellar: :any_skip_relocation, ventura:        "b7cd942202d691603d7168598bbed297c48c231bc3ef6425483899d9b7229a4b"
-    sha256 cellar: :any_skip_relocation, monterey:       "b7cd942202d691603d7168598bbed297c48c231bc3ef6425483899d9b7229a4b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b7cd942202d691603d7168598bbed297c48c231bc3ef6425483899d9b7229a4b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9bf4126d40540e60ed5901ae61ed87bdd039abcc21d834165a882a3932bf925a"
+    rebuild 5
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "19c4993069753ad76887c0d42e472ab10e86c1888747713f0368d31130997a9c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "19c4993069753ad76887c0d42e472ab10e86c1888747713f0368d31130997a9c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "19c4993069753ad76887c0d42e472ab10e86c1888747713f0368d31130997a9c"
+    sha256 cellar: :any_skip_relocation, ventura:       "19c4993069753ad76887c0d42e472ab10e86c1888747713f0368d31130997a9c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "47a445773cf25560a4dc6e1413e3a4180d4358419d05466c03616f91e9dbd443"
   end
 
   depends_on "ffmpeg"
   depends_on "gpac"
   depends_on "mkvtoolnix"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     virtualenv_install_with_resources
-    bin.install_symlink bin/"mkvtomp4.py" => "mkvtomp4"
-    prefix.install libexec/"share"
+    bin.install_symlink "mkvtomp4.py" => "mkvtomp4"
   end
 
   test do
-    system "#{bin}/mkvtomp4", "--help"
+    system bin/"mkvtomp4", "--help"
   end
 end

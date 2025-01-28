@@ -5,24 +5,26 @@ class Fontforge < Formula
   sha256 "ca82ec4c060c4dda70ace5478a41b5e7b95eb035fe1c4cf85c48f996d35c60f8"
   license "GPL-3.0-or-later"
   revision 1
+  head "https://github.com/fontforge/fontforge.git", branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "9046c0e8c9b22e734124680b0ada61d6205fffcdcc3e390e730bc7782508d227"
-    sha256 arm64_monterey: "8effca8a77d5c2622ca337c4432e935259b02f72cdb60aaefe00c232dcec728f"
-    sha256 arm64_big_sur:  "76ce570594897169977ae31c6b7365f04168eec804a743c807213e0844c755a2"
-    sha256 ventura:        "bd63ee28f83dec665137eb003994a9e39a159c14e3ae104fb8cb5b7878f3d858"
-    sha256 monterey:       "3861d0866438662ff819393a8a1f2ca896f621417fc5aaf8269f5db45ae309b1"
-    sha256 big_sur:        "4b7f3290b74c518c7e1dfb246a51208d61365ac79762934ce4b7261fa990ccdd"
-    sha256 x86_64_linux:   "68b6ce1b252505ed77ad7cf427c26aa892f68fb46115f7006e638d21c5a9aa26"
+    rebuild 4
+    sha256 arm64_sequoia: "f3efe932a2d7e72caf599601b82ee40144cb2ea3a1bef0afd5698b20ab11ff94"
+    sha256 arm64_sonoma:  "0d843c5837f6634f8f3c2c2c2862f427f651d24670383e1a470a3e933e6065b4"
+    sha256 arm64_ventura: "a6c3b3307443666523cc29b8bec912c6b1f933fe96580f061478b257ad0a992f"
+    sha256 sonoma:        "174995c9c06977e05958d535f7065c443ecbd9b1a64f97c232f83296852866b9"
+    sha256 ventura:       "ca33c447dc43b3f8d73bd42eb933b1fe1882794898cf387e4f22714d20ee6420"
+    sha256 x86_64_linux:  "91cc737d5d5ff50542c7737cfe8f8f693d64a103b07839d7047a21cb9149e1ee"
   end
 
   depends_on "cmake" => :build
+  depends_on "gettext" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "cairo"
   depends_on "fontconfig"
   depends_on "freetype"
-  depends_on "gettext"
   depends_on "giflib"
   depends_on "glib"
   depends_on "jpeg-turbo"
@@ -32,29 +34,45 @@ class Fontforge < Formula
   depends_on "libtool"
   depends_on "libuninameslist"
   depends_on "pango"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "readline"
   depends_on "woff2"
 
   uses_from_macos "libxml2"
+  uses_from_macos "zlib"
 
-  resource "homebrew-testdata" do
-    url "https://raw.githubusercontent.com/fontforge/fontforge/1346ce6e4c004c312589fdb67e31d4b2c32a1656/tests/fonts/Ambrosia.sfd"
-    sha256 "6a22acf6be4ab9e5c5a3373dc878030b4b8dc4652323395388abe43679ceba81"
+  on_macos do
+    depends_on "brotli"
+    depends_on "gettext"
+  end
+
+  # build patch for po translation files
+  # upstream bug report, https://github.com/fontforge/fontforge/issues/5251
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/9403988/fontforge/20230101.patch"
+    sha256 "e784c4c0fcf28e5e6c5b099d7540f53436d1be2969898ebacd25654d315c0072"
+  end
+
+  def python3
+    "python3.13"
   end
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
-                    "-GNinja",
-                    "-DENABLE_GUI=OFF",
-                    "-DENABLE_FONTFORGE_EXTRAS=ON"
+    args = %W[
+      -DENABLE_GUI=OFF
+      -DENABLE_FONTFORGE_EXTRAS=ON
+      -DPython3_EXECUTABLE=#{which(python3)}
+      -DPYHOOK_INSTALL_DIR=#{Language::Python.site_packages(python3)}
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   def caveats
     on_macos do
-      <<~EOS
+      <<~TEXT
         This formula only installs the command line utilities.
 
         FontForge.app can be downloaded directly from the website:
@@ -62,21 +80,25 @@ class Fontforge < Formula
 
         Alternatively, install with Homebrew Cask:
           brew install --cask fontforge
-      EOS
+      TEXT
     end
   end
 
   test do
-    python = Formula["python@3.11"].opt_bin/"python3.11"
+    resource "homebrew-testdata" do
+      url "https://raw.githubusercontent.com/fontforge/fontforge/1346ce6e4c004c312589fdb67e31d4b2c32a1656/tests/fonts/Ambrosia.sfd"
+      sha256 "6a22acf6be4ab9e5c5a3373dc878030b4b8dc4652323395388abe43679ceba81"
+    end
+
     system bin/"fontforge", "-version"
     system bin/"fontforge", "-lang=py", "-c", "import fontforge; fontforge.font()"
-    system python, "-c", "import fontforge; fontforge.font()"
+    system python3, "-c", "import fontforge; fontforge.font()"
 
     resource("homebrew-testdata").stage do
       ffscript = "fontforge.open('Ambrosia.sfd').generate('#{testpath}/Ambrosia.woff2')"
       system bin/"fontforge", "-c", ffscript
     end
-    assert_predicate testpath/"Ambrosia.woff2", :exist?
+    assert_path_exists testpath/"Ambrosia.woff2"
 
     fileres = shell_output("/usr/bin/file #{testpath}/Ambrosia.woff2")
     assert_match "Web Open Font Format (Version 2)", fileres

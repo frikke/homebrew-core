@@ -1,16 +1,12 @@
 class LibbitcoinSystem < Formula
   desc "Bitcoin Cross-Platform C++ Development Toolkit"
   homepage "https://github.com/libbitcoin/libbitcoin-system"
-  url "https://github.com/libbitcoin/libbitcoin-system/archive/v3.8.0.tar.gz"
+  url "https://github.com/libbitcoin/libbitcoin-system/archive/refs/tags/v3.8.0.tar.gz"
   sha256 "b5dd2a97289370fbb93672dd3114383f30d877061de1d1683fa8bdda5309bfa2"
   license "AGPL-3.0-or-later"
 
-  livecheck do
-    url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
-  end
-
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "cb0bbe2d1b5692e930dcb817ed09fa8b1fa392ede7eab0dc856c2d6fa7017c65"
     sha256 cellar: :any,                 arm64_sonoma:   "3324919582f6ab687cbf681f056347985f63c06c7f525e0aa283dc592197a000"
     sha256                               arm64_ventura:  "aed49e03846e0be62e5e605ca01179ba431dfb35d3f1b844ff8fce859549862f"
     sha256                               arm64_monterey: "0a300abdc05543b90b2b5db0e0d6117ca3d8c97cce089349350435d169321525"
@@ -22,15 +18,19 @@ class LibbitcoinSystem < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "e9f1a6063cdcb6c35a069eb546968520935ad2addcc25e4d76229dcc8b61806a"
   end
 
+  # About 2 years since request for release with support for recent `boost`.
+  # Ref: https://github.com/libbitcoin/libbitcoin-system/issues/1234
+  disable! date: "2024-12-14", because: "uses deprecated `boost@1.76`"
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   # https://github.com/libbitcoin/libbitcoin-system/issues/1234
   depends_on "boost@1.76"
 
   resource "secp256k1" do
-    url "https://github.com/libbitcoin/secp256k1/archive/v0.1.0.20.tar.gz"
+    url "https://github.com/libbitcoin/secp256k1/archive/refs/tags/v0.1.0.20.tar.gz"
     sha256 "61583939f1f25b92e6401e5b819e399da02562de663873df3056993b40148701"
   end
 
@@ -58,7 +58,7 @@ class LibbitcoinSystem < Formula
 
   test do
     boost = Formula["boost@1.76"]
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <bitcoin/system.hpp>
       int main() {
         const auto block = bc::chain::block::genesis_mainnet();
@@ -69,7 +69,7 @@ class LibbitcoinSystem < Formula
         std::cout << message << std::endl;
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cpp",
                     "-I#{boost.include}",
                     "-L#{lib}", "-lbitcoin-system",

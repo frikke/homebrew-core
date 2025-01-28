@@ -1,38 +1,31 @@
 class Bubblewrap < Formula
   desc "Unprivileged sandboxing tool for Linux"
   homepage "https://github.com/containers/bubblewrap"
-  url "https://github.com/containers/bubblewrap/releases/download/v0.8.0/bubblewrap-0.8.0.tar.xz"
-  sha256 "957ad1149db9033db88e988b12bcebe349a445e1efc8a9b59ad2939a113d333a"
+  url "https://github.com/containers/bubblewrap/releases/download/v0.11.0/bubblewrap-0.11.0.tar.xz"
+  sha256 "988fd6b232dafa04b8b8198723efeaccdb3c6aa9c1c7936219d5791a8b7a8646"
   license "LGPL-2.0-or-later"
+  head "https://github.com/containers/bubblewrap.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "8647ce8a184f5a3071dc0dd4ba31c17423540d5bd11bd1b2513771d9fab36a66"
-  end
-
-  head do
-    url "https://github.com/containers/bubblewrap.git", branch: "master"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "c6694f22b5343dc2dbb81adf6ff9fcd5a37ee6fe1757e96b4966367e766dcfe4"
   end
 
   depends_on "docbook-xsl" => :build
-  depends_on "libxslt"     => :build
+  depends_on "libxslt" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => :build
   depends_on "strace" => :test
   depends_on "libcap"
   depends_on :linux
 
   def install
-    system "autoreconf", "-fvi" if build.head?
-    system "./configure", *std_configure_args, "--disable-silent-rules",
-           "--with-bash-completion-dir=#{bash_completion}"
-
-    # Use docbook-xsl's docbook style for generating the man pages:
-    inreplace "Makefile" do |s|
-      s.gsub! "http://docbook.sourceforge.net/release/xsl/current",
-              "#{Formula["docbook-xsl"].opt_prefix}/docbook-xsl"
-    end
-
-    system "make", "install"
+    args = %w[
+      -Dselinux=disabled
+    ]
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do

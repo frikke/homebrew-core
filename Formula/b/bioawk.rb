@@ -1,13 +1,17 @@
 class Bioawk < Formula
   desc "AWK modified for biological data"
   homepage "https://github.com/lh3/bioawk"
-  url "https://github.com/lh3/bioawk/archive/v1.0.tar.gz"
+  url "https://github.com/lh3/bioawk/archive/refs/tags/v1.0.tar.gz"
   sha256 "5cbef3f39b085daba45510ff450afcf943cfdfdd483a546c8a509d3075ff51b5"
+  license "HPND"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "581ec8168890f6010df9a49953f2d52a3a86020fc350cb7cdb64fae38e23b0c8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "781164882120d8b28e1cdac8b8db1f5c9a8bdedea381aedad9b35b6d185f2897"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "a80d9d6887393ec604646dd2e79090bda1034f5947488995c383d29b8fbb2f47"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "a568547e0fb85d1d0678d157c93aee71710f58d3bc4591186365ae28e4502b24"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "de4d41adcf20cf87de3d2310d98c1dbfbff95eb3432e6d0888be964889f024c6"
+    sha256 cellar: :any_skip_relocation, sonoma:         "41b9e0d69738711ac5f1a2269ba11cd6de67303224621e9f52bb5564e76f0098"
     sha256 cellar: :any_skip_relocation, ventura:        "d10e6430821b1876cf8ad863dce1978f7aa4564bc3508e48f7cfa9d8e4d89306"
     sha256 cellar: :any_skip_relocation, monterey:       "844d8041e128ebcf46d1a5dec20dfc22f0a3fc1ff48388310cf810685acd9890"
     sha256 cellar: :any_skip_relocation, big_sur:        "f0e6d3b143b32066da8f41266d1edf2855ab0d780982c8eb09b78194c1e2484e"

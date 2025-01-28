@@ -1,10 +1,9 @@
 class Coturn < Formula
   desc "Free open source implementation of TURN and STUN Server"
   homepage "https://github.com/coturn/coturn"
-  url "https://github.com/coturn/coturn/archive/refs/tags/4.6.2.tar.gz"
-  sha256 "13f2a38b66cffb73d86b5ed24acba4e1371d738d758a6039e3a18f0c84c176ad"
+  url "https://github.com/coturn/coturn/archive/refs/tags/4.6.3.tar.gz"
+  sha256 "dc3a529fd9956dc8771752a7169c5ad4c18b9deef3ec96049de30fabf1637704"
   license "BSD-3-Clause"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,16 +11,15 @@ class Coturn < Formula
   end
 
   bottle do
-    sha256                               arm64_ventura:  "29aca0c706485a911b2a21de41235d9b592919508585d626425709518e30a9ea"
-    sha256                               arm64_monterey: "618cbd141e1e439b749b24147e26c49d1d75da27009f565ce03040c73d24d559"
-    sha256                               arm64_big_sur:  "aab53a999e6e1b0ad15a3b9db8f3b34d8cb0d1ae66c7d9f2977f5b898468d42e"
-    sha256                               ventura:        "64b12f1d41901b80b75fb1d36f443864b51df41a31dc71eafb007dbdfd8cab20"
-    sha256                               monterey:       "5a032a4fa80f86dc196db3363c7d2afcd0a622c2adbb6d3fc0eb294b04d56554"
-    sha256                               big_sur:        "96ef0109d26469de93155a60f49a2fca01c64b02267f45d89a7102aff069392f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1c91fbd01d98f9d930e27333818de9f7ae357b1d0ca2313a8a6fcf1f4eee8837"
+    sha256                               arm64_sequoia: "cc1e87b2bd8ea182e22a581153ddc693dd38ac1f15fc0e463fcd154bd3eee57c"
+    sha256                               arm64_sonoma:  "341e8ef28b555221b0511e20e7265d41d2dbefb1f0e8c289d914aa8e4725ef8b"
+    sha256                               arm64_ventura: "ce340904c0e8031987effce0e9806806d633929d718f1be50bc535e7815549cc"
+    sha256                               sonoma:        "46fcb4c3078988a2182c214ff9a3d1789f65003a877729ba8371cbc464ad495f"
+    sha256                               ventura:       "14664b015f3e3d9842b5ee261a5d56a9685edd37be0712c59ee82a5df950f5be"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "14cb601252934f11e56bf2be311806d9031745ad2b6cb22c2d4daf9244daa1d7"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "hiredis"
   depends_on "libevent"
   depends_on "libpq"
@@ -30,15 +28,12 @@ class Coturn < Formula
   def install
     ENV["SSL_CFLAGS"] = "-I#{Formula["openssl@3"].opt_include}"
     ENV["SSL_LIBS"] = "-L#{Formula["openssl@3"].opt_lib} -lssl -lcrypto"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
+    system "./configure", "--disable-silent-rules",
                           "--mandir=#{man}",
                           "--localstatedir=#{var}",
                           "--includedir=#{include}",
-                          "--libdir=#{lib}",
                           "--docdir=#{doc}",
-                          "--prefix=#{prefix}"
+                          *std_configure_args
 
     system "make", "install"
 
@@ -55,6 +50,6 @@ class Coturn < Formula
   end
 
   test do
-    system "#{bin}/turnadmin", "-l"
+    system bin/"turnadmin", "-l"
   end
 end

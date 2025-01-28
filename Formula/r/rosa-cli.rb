@@ -1,8 +1,8 @@
 class RosaCli < Formula
   desc "RedHat OpenShift Service on AWS (ROSA) command-line interface"
   homepage "https://www.openshift.com/products/amazon-openshift"
-  url "https://github.com/openshift/rosa/archive/refs/tags/v1.2.26.tar.gz"
-  sha256 "ab1f1de6979f7f896ef4a65212b60651f79e50ff10317c29d91072ba1c4b8c34"
+  url "https://github.com/openshift/rosa/archive/refs/tags/v1.2.49.tar.gz"
+  sha256 "aeeffad860775314da8f65f8a02c256c4d063b6ba27ad902d924af6ae97d29a1"
   license "Apache-2.0"
   head "https://github.com/openshift/rosa.git", branch: "master"
 
@@ -12,26 +12,27 @@ class RosaCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "19e03de44dc86ff8fc35186aba3d465ebcd1b8edd8055a5de035dd800590cdb4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "605dd6551b0bb35245fe263b3117af8828141f9f222e7cd17eaa65eb6120b588"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "59b8b6cbb0c0a300f39905c0cb0040a4b5a44beda03b921f79b8c1f61d2e636c"
-    sha256 cellar: :any_skip_relocation, ventura:        "3d3b15442574cdd263ebbbfa0727c754c06ea4eb84c92ac6d603b706ef2c97f7"
-    sha256 cellar: :any_skip_relocation, monterey:       "1ed1a6230b2356c802597790dd168bbd1ba8c59042281e207f24d5f9229f7c2b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a2f507a837c37bd4476c29be0bf5976aa3669b809b37a03bd0719a19a6809c98"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dd214c81ad896989ecd0ac69b26db9eddb3602534cb775183e00c03fc9b6d835"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "69374f8a29b1bd28cd9e51709b1b9813c3d2ecad38de1cf2ccdf682b902d5ab9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "24631cffb77b3bbe77a29b7cb2b1e4bd48116c7f6dbf29d2942531c3868ec2ff"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "ae20e5c71d8bfa96e6b5b8d907b4aaa55648bd0fc8755fa6d028b033f558ac7c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "69c3ffb90e27a91dc2139397a1c906de3937180693a546b75c229fa1e5d1ed61"
+    sha256 cellar: :any_skip_relocation, ventura:       "01448cd7b6691e8e1266888de022856c16c7f24e9eae391eea06d000e5e921c5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ae433cde47f95078db5e97294f95ced4ed9a6e74d2346fd7d79550ac5c7b3036"
   end
 
   depends_on "go" => :build
   depends_on "awscli"
 
   def install
-    system "go", "build", *std_go_args(output: bin/"rosa"), "./cmd/rosa"
-    generate_completions_from_executable(bin/"rosa", "completion", base_name: "rosa")
+    system "go", "build", *std_go_args(ldflags: "-s -w", output: bin/"rosa"), "./cmd/rosa"
+
+    generate_completions_from_executable(bin/"rosa", "completion")
   end
 
   test do
+    output = shell_output("#{bin}/rosa create cluster 2<&1", 1)
+    assert_match "Failed to create OCM connection: Not logged in", output
+
     assert_match version.to_s, shell_output("#{bin}/rosa version")
-    assert_match "Failed to create AWS client: Failed to find credentials.",
-                 shell_output("#{bin}/rosa create cluster 2<&1", 1)
   end
 end

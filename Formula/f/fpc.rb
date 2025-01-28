@@ -15,9 +15,12 @@ class Fpc < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "075f0b14b19da5236d2bb421450d1b86fb816bc62a9bb0adaf97404662f9ab02"
+    sha256 cellar: :any,                 arm64_sonoma:   "e480e9fed8fc823d817fd3178b9eea9c3ca5da5b1d6c6c55d69622cf5ecca411"
     sha256 cellar: :any,                 arm64_ventura:  "4b97cd1a7cb634a76fdf735018cb18304fb185628a99dfd58ea72b137df7b14e"
     sha256 cellar: :any,                 arm64_monterey: "86f02cead2ca01e961c47442b79a5b9d4703194d3f436b91fefc56fefe859081"
     sha256 cellar: :any,                 arm64_big_sur:  "b4efbb9f568afadfb27aab8ca80895b7f306f58c7ff8a0623f2bd8418338b745"
+    sha256 cellar: :any,                 sonoma:         "c5fb604a561ff84c67c6a93f2be94adf6f74b7ddbeb9cdfc1def6929ed2a8e59"
     sha256 cellar: :any,                 ventura:        "fbc1ab1898d436b128697c853bdd6807b05fdbcff4636a61733a711ceef56039"
     sha256 cellar: :any,                 monterey:       "42f981be67bc5f3a433117e3ae4b014001aa786acb4a24d09579fc154beedb4d"
     sha256 cellar: :any,                 big_sur:        "4c3a012398b6136776358206b0cac52ec1096484c27a08c142e7f51afc713956"
@@ -30,6 +33,8 @@ class Fpc < Formula
   on_linux do
     depends_on "mesa" => :test
   end
+
+  conflicts_with "px", because: "both install `ptop` binaries"
 
   resource "bootstrap" do
     on_macos do
@@ -66,8 +71,11 @@ class Fpc < Formula
     end
 
     # Help fpc find the startup files (crt1.o and friends)
-    sdk = MacOS.sdk_path_if_needed
-    args = sdk ? %W[OPT="-XR#{sdk}"] : []
+    args = if OS.mac? && (sdk = MacOS.sdk_path_if_needed)
+      %W[OPT="-XR#{sdk}"]
+    else
+      []
+    end
 
     system "make", "build", "PP=#{fpc_compiler}", *args
     system "make", "install", "PP=#{fpc_compiler}", "PREFIX=#{prefix}"
@@ -75,10 +83,10 @@ class Fpc < Formula
     bin.install_symlink lib/name/version/compiler_name
 
     # Prevent non-executable audit warning
-    rm_f Dir[bin/"*.rsj"]
+    rm(Dir[bin/"*.rsj"])
 
     # Generate a default fpc.cfg to set up unit search paths
-    system "#{bin}/fpcmkcfg", "-p", "-d", "basepath=#{lib}/fpc/#{version}", "-o", "#{prefix}/etc/fpc.cfg"
+    system bin/"fpcmkcfg", "-p", "-d", "basepath=#{lib}/fpc/#{version}", "-o", prefix/"etc/fpc.cfg"
 
     if OS.linux?
       # On Linux, non-executable IDE support files get built and end up in bin.
@@ -93,15 +101,15 @@ class Fpc < Formula
   end
 
   test do
-    hello = <<~EOS
+    (testpath/"hello.pas").write <<~PASCAL
       program Hello;
       uses GL;
       begin
         writeln('Hello Homebrew')
       end.
-    EOS
-    (testpath/"hello.pas").write(hello)
-    system "#{bin}/fpc", "hello.pas"
+    PASCAL
+
+    system bin/"fpc", "hello.pas"
     assert_equal "Hello Homebrew", shell_output("./hello").strip
   end
 end

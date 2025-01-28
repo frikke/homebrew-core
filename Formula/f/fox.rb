@@ -1,25 +1,27 @@
 class Fox < Formula
   desc "Toolkit for developing Graphical User Interfaces easily"
   homepage "http://fox-toolkit.org/"
-  url "http://fox-toolkit.org/ftp/fox-1.6.56.tar.gz"
-  sha256 "c517e5fcac0e6b78ca003cc167db4f79d89e230e5085334253e1d3f544586cb2"
+  url "http://fox-toolkit.org/ftp/fox-1.6.59.tar.gz"
+  sha256 "48f33d2dd5371c2d48f6518297f0ef5bbf3fcd37719e99f815dc6fc6e0f928ae"
   license "LGPL-2.1-or-later"
-  revision 4
 
-  bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "e3a425ba8dc21f31f67bbf515030956f044f42af7e06a12ed5eea4c00b10feb0"
-    sha256 cellar: :any,                 arm64_monterey: "825cfc53620606c3366928e1e7da404bc11e31283b7de29497ba504652abe149"
-    sha256 cellar: :any,                 arm64_big_sur:  "8328ac03359070c9f20537a6277d15d8a815e35387bba1c5cdcd11af51d4baa6"
-    sha256 cellar: :any,                 ventura:        "74567e8739db08f0369e2d6177c0b6e38d5dc862342042b164682b0cddf7d64b"
-    sha256 cellar: :any,                 monterey:       "2396ca931860ca6523b7507a084ec9c5518493be593c5cf6a0a56735619e16c5"
-    sha256 cellar: :any,                 big_sur:        "bb8bdbecbd7b8c4c8f9c3caa90f17063579e1ecbdd9beea3276330fb8116d907"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e8721a37c018aedef917055183eede83c8a1cab283371e2be629d85c9e006a0b"
+  # We restrict matching to versions with an even-numbered minor version
+  # number, as an odd-numbered minor indicates a development version:
+  # http://www.fox-toolkit.org/faq.html#VERSION
+  livecheck do
+    url "http://fox-toolkit.org/download.html"
+    regex(%r{href=.*?fox[._-]v?(\d+(?:\.\d+)+)\.t[^"' >]+?["']?[^>]*?>[^<]+?</[^>]+?>\s*\(STABLE\)}im)
+    regex(/href=.*?fox[._-]v?(\d+\.\d*[02468](?:\.\d+)*)\.t/i)
   end
 
-  # There have been numerous attempts to update this to 1.6.57 (latest stable)
-  # with no success. If you are reading this and can fix the build, please open
-  # a PR and we can undeprecate this formula
-  deprecate! date: "2023-09-03", because: :does_not_build
+  bottle do
+    sha256 cellar: :any,                 arm64_sequoia: "9c2013438ee383a44ff0b074698e0525e723eaea322745da017f9a18e254c55d"
+    sha256 cellar: :any,                 arm64_sonoma:  "680d4ca9e11e09ae8022d3e66d38df4ca5c7aa3c9178d9768d7968e89c8afa8b"
+    sha256 cellar: :any,                 arm64_ventura: "913fd94fc1d4051b12d88df4659942892cf9c3e05fd4ad582c2a2fc38efe0def"
+    sha256 cellar: :any,                 sonoma:        "6e12aa948749cb6bb0618a376ced17b39a3c6d043b97598b91e31ac1c2d09306"
+    sha256 cellar: :any,                 ventura:       "365ecefc5bf0fa8070f7b13604b4706cdf13e0510ede27f0531d905664d1672e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "192f9a030ddd8f3613d2bc213b843f9ca0b667f08a67e3a5dbd43e84ff3b8ea5"
+  end
 
   depends_on "fontconfig"
   depends_on "freetype"
@@ -29,13 +31,19 @@ class Fox < Formula
   depends_on "libx11"
   depends_on "libxcursor"
   depends_on "libxext"
-  depends_on "libxfixes"
   depends_on "libxft"
-  depends_on "libxi"
   depends_on "libxrandr"
-  depends_on "libxrender"
   depends_on "mesa"
   depends_on "mesa-glu"
+
+  uses_from_macos "bzip2"
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "libxfixes"
+    depends_on "libxi"
+    depends_on "libxrender"
+  end
 
   # Fix -flat_namespace being used on Big Sur and later.
   patch do
@@ -46,10 +54,12 @@ class Fox < Formula
   def install
     # Needed for libxft to find ftbuild2.h provided by freetype
     ENV.append "CPPFLAGS", "-I#{Formula["freetype"].opt_include}/freetype2"
-    system "./configure", *std_configure_args,
-                          "--enable-release",
+
+    system "./configure", "--enable-release",
                           "--with-x",
-                          "--with-opengl"
+                          "--with-opengl",
+                          *std_configure_args
+
     # Unset LDFLAGS, "-s" causes the linker to crash
     system "make", "install", "LDFLAGS="
     (bin/"Adie.stx").unlink

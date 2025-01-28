@@ -1,33 +1,32 @@
 class FdkAacEncoder < Formula
   desc "Command-line encoder frontend for libfdk-aac"
   homepage "https://github.com/nu774/fdkaac"
-  url "https://github.com/nu774/fdkaac/archive/v1.0.5.tar.gz"
-  sha256 "87b2d2cc913a1f90bd19315061ede81c1c3364e160802c70117a7ea81e80bd33"
+  url "https://github.com/nu774/fdkaac/archive/refs/tags/v1.0.6.tar.gz"
+  sha256 "ed34c8dcae3d49d385e1ceaa380c5871cda744402358c61bcb49950a25bfae58"
   license "Zlib"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "53ead014ba7ed33292482be014d74bc631fc64a9027f7ae6a5858b66e51cef24"
-    sha256 cellar: :any,                 arm64_monterey: "df8bf96255c43057c312a4062aa386d1dc136c0dd86094c7d9cd067120b57ee4"
-    sha256 cellar: :any,                 arm64_big_sur:  "66c2be632e6ba93f7fd30d43ff968edfed911d104e14d8a43b86b52cf8d78719"
-    sha256 cellar: :any,                 ventura:        "cfaf04fdeffda1f429b28ee0dd84914768f4339007a14999415aae8eea232051"
-    sha256 cellar: :any,                 monterey:       "02f940f3b2a982e8f727cb9a449623777e33de70d41ad43423462aafe6db0ad0"
-    sha256 cellar: :any,                 big_sur:        "aab1624f88d3b7b0b0c3ae2e772ee86efd4b6707468a78d43459a598920eb053"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8fd87f32244ba80edb9825fa589570d8591f6ce337aa994025ad04f221f545f7"
+    sha256 cellar: :any,                 arm64_sequoia:  "7984a593915d70746aa5802b6f4232ad56c5c5329192197fa10a45a7c4f09266"
+    sha256 cellar: :any,                 arm64_sonoma:   "e9e4f37acb4d76dc6139145cacc2c1d9799104c60ee43d650f63f1ff6bf96b94"
+    sha256 cellar: :any,                 arm64_ventura:  "fece94f860394daafbacfb656ea28592bd0f482b12227335952f84852b011094"
+    sha256 cellar: :any,                 arm64_monterey: "09cd0ffbcfe2e83c3526a2ea97ae7fac02085c4682938f2714291ce09a1d0dd9"
+    sha256 cellar: :any,                 sonoma:         "99f243a63d88d1350bc798ca8f90ed703485462aa7a99b92588aafecd2867874"
+    sha256 cellar: :any,                 ventura:        "4cc459e64c6b70274d477f223911b3f4cef20646920cd6f365d0992faae184c3"
+    sha256 cellar: :any,                 monterey:       "93b808efe4acbd0d60c1990acd03b8eebd5308c8c59350f8bd13394423a7baa6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5d3bcffd33552747f8c107a46e42f3cff7b500647fd2f268d688bee77ef711aa"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "fdk-aac"
 
   def install
-    system "autoreconf", "-i"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--mandir=#{man}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-silent-rules",
+                          "--mandir=#{man}",
+                          *std_configure_args
     system "make", "install"
   end
 
@@ -57,11 +56,11 @@ class FdkAacEncoder < Formula
       (sample * 32767.0).round
     end
 
-    File.open("#{testpath}/tone.pcm", "wb") do |f|
+    (testpath/"tone.pcm").open("wb") do |f|
       f.syswrite(samples.flatten.pack("s*"))
     end
 
-    system "#{bin}/fdkaac", "-R", "--raw-channels", "1", "-m",
+    system bin/"fdkaac", "-R", "--raw-channels", "1", "-m",
            "1", "#{testpath}/tone.pcm", "--title", "Test Tone"
   end
 end

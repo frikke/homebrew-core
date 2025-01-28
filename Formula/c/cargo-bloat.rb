@@ -1,25 +1,24 @@
 class CargoBloat < Formula
   desc "Find out what takes most of the space in your executable"
   homepage "https://github.com/RazrFalcon/cargo-bloat"
-  url "https://github.com/RazrFalcon/cargo-bloat/archive/v0.11.1.tar.gz"
-  sha256 "4f338c1a7f7ee6bcac150f7856ed1f32cf8d9009cfd513ca6c1aac1e6685c35f"
+  url "https://github.com/RazrFalcon/cargo-bloat/archive/refs/tags/v0.12.1.tar.gz"
+  sha256 "8195cebb94a740cd3b89611ae79d7d3e2d8fd8ec297f5a0f07efa7069ef05be7"
   license "MIT"
   head "https://github.com/RazrFalcon/cargo-bloat.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2c53b8b2d79a6849c1d205fb83756a26d05c9474dd1224c60b2514be91c88de4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5f62f85a081b59f0bd758eef9d2bab666fa6454b0aacd2cdfd37ddf0739f7de8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b6ab2d9245352f227b5f223510a0f5808f12f6c7c646cd97762bffc3a9ba1314"
-    sha256 cellar: :any_skip_relocation, ventura:        "bc46e671082df2cbd1efe4c960fda46fbd9d8367cf6dc5dc3609f23d8acd688c"
-    sha256 cellar: :any_skip_relocation, monterey:       "3805e2d627484ee6d60f6f5e3b67d1e89f9b4813207f406f462a3a3f582d92f2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bef4a80020141209f357649f2574808a043c5d8134f7986dd3574cd61d11672f"
-    sha256 cellar: :any_skip_relocation, catalina:       "89b74b010c7fa1ecf1593d3f0134e19d29c95d4457f19103cb1d726f76253f1c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5bf7b9ad04fb48b20b2c5e000b812bd6910d65d3dd6cc567436f5e9b156a6ca8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "330a8ee78cfb647dd2d262e2a9e61bf5147e1329082864f71ab2162ad7a54c88"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "b9caa51f467a8ff4272b885a45091bd018e2defd629aa70d1a58686553ea9545"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9e785499e4d1ca0ea95076b21ec4f73098c5a2e7af38f9cd804465786f1745a1"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d6cb18085aca63f0c6730d86532d74276a598d5587f7bd4cf64f6352593bb16b"
+    sha256 cellar: :any_skip_relocation, sonoma:         "f643448f04a72a456a13efb160fe1470144128d55c7e3d7f44fe8c6a1027ec2b"
+    sha256 cellar: :any_skip_relocation, ventura:        "d0de5a94dec7e213075d86b9bb4ac9c206c7308fcf34b75388477ca58825e189"
+    sha256 cellar: :any_skip_relocation, monterey:       "a374eabb4b4da3740c97abcf9e2f4a030a21d3ac6c3ff503269d4a153086a00a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9c271533c6e4ff7415d51ccb2fcbee8e514e0ec2142a48543a5c8dd705ac9e4a"
   end
 
   depends_on "rust" => :build
-  depends_on "rustup-init" => :test
+  depends_on "rustup" => :test
 
   def install
     system "cargo", "install", *std_cargo_args
@@ -28,10 +27,9 @@ class CargoBloat < Formula
   test do
     # Show that we can use a different toolchain than the one provided by the `rust` formula.
     # https://github.com/Homebrew/homebrew-core/pull/134074#pullrequestreview-1484979359
-    ENV["RUSTUP_INIT_SKIP_PATH_CHECK"] = "yes"
-    rustup_init = Formula["rustup-init"].bin/"rustup-init"
-    system rustup_init, "-y", "--profile", "minimal", "--default-toolchain", "beta", "--no-modify-path"
-    ENV.prepend_path "PATH", HOMEBREW_CACHE/"cargo_cache/bin"
+    ENV.prepend_path "PATH", Formula["rustup"].bin
+    system "rustup", "default", "beta"
+    system "rustup", "set", "profile", "minimal"
 
     system "cargo", "new", "hello_world", "--bin"
     cd "hello_world" do

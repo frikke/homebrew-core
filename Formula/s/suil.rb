@@ -1,8 +1,8 @@
 class Suil < Formula
   desc "Lightweight C library for loading and wrapping LV2 plugin UIs"
   homepage "https://drobilla.net/software/suil.html"
-  url "https://download.drobilla.net/suil-0.10.18.tar.xz"
-  sha256 "84ada094fbe17ad3e765379002f3a0c7149b43b020235e4d7fa41432f206f85f"
+  url "https://download.drobilla.net/suil-0.10.22.tar.xz"
+  sha256 "d720969e0f44a99d5fba35c733a43ed63a16b0dab867970777efca4b25387eb7"
   license "ISC"
   head "https://gitlab.com/lv2/suil.git", branch: "master"
 
@@ -12,38 +12,41 @@ class Suil < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "c16352b240c86569da188787f15046383e4a19e1c29c43af837fcef3920e5e8b"
-    sha256 arm64_monterey: "0c4d8b7e8560e0943ddec670ff4d3a67ee0875b5d277df4c3000c9944e6dca1f"
-    sha256 arm64_big_sur:  "2182b7000767586fb9e95a79f56e8099eebdad2592a3a8d2aefe2c857a941415"
-    sha256 ventura:        "9b1422b8a975aa305885b35234a38774a764b9a19163a62ce970b43af29f3a89"
-    sha256 monterey:       "934191e852bb9a873c72de4049009d1572e1258e8984deb69a7270e2a4ebba5e"
-    sha256 big_sur:        "e4e4e33c56f403d0d8947c9955c44e38f488a44aee173c6776c5450b360fdb69"
-    sha256 catalina:       "479de98313d7f3f58e78bc1667b1169b3a92157f5f64d2a2eb54d567dde1be33"
-    sha256 x86_64_linux:   "57ddadd96885c8ba621b7f8e8538392defbf0048bd332e9ca62075a379d5872b"
+    sha256 arm64_sequoia: "b27db9a3ce79f632d05b548af8aa895cc763f16b501a9c9bdc8034e4859dea86"
+    sha256 arm64_sonoma:  "529c47a29c76d87980ea9834dd2a01e2590d0adb8dc9a2a47fb82eb5a705d984"
+    sha256 arm64_ventura: "bd054ff192b6136795fc419d57c5424d32e10ff8549d63429999e6fc6e85ecb4"
+    sha256 sonoma:        "f22ed2c24dfd9fdd0e046c4373717a5bcd9b5934d816357814b461cc3eba1e72"
+    sha256 ventura:       "28cba60e06927ded4633dedf3b1c9541e5ff8fe692df7e9d6ad0d52055f2abd4"
+    sha256 x86_64_linux:  "c82fc9ca3e304f4ddab55a00cddc288ba608f5114103e22a1afb7e85d413d87c"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "python@3.11" => :build
-  depends_on "gtk+3"
+  depends_on "pkgconf" => :build
+  depends_on "libx11"
   depends_on "lv2"
   depends_on "qt@5"
 
+  on_linux do
+    depends_on "glib"
+    depends_on "gtk+3"
+  end
+
   def install
-    system "meson", "build", *std_meson_args
-    system "meson", "compile", "-C", "build"
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <suil/suil.h>
 
       int main()
       {
         return suil_ui_supported("my-host", "my-ui");
       }
-    EOS
+    C
     lv2 = Formula["lv2"].opt_include
     system ENV.cc, "test.c", "-I#{lv2}", "-I#{include}/suil-0", "-L#{lib}", "-lsuil-0", "-o", "test"
     system "./test"

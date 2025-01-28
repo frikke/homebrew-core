@@ -1,8 +1,8 @@
 class Sonarqube < Formula
   desc "Manage code quality"
-  homepage "https://www.sonarqube.org/"
-  url "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.2.0.77647.zip"
-  sha256 "873e20590ea30fb38f58efbc4423b5a4897fced37600752654a41ead8d5efd1b"
+  homepage "https://www.sonarsource.com/products/sonarqube/"
+  url "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-24.12.0.100206.zip"
+  sha256 "ac1d7b7e0348bd272b34d9ac037fa4e0835d6fb795f594339e5d698857840ea7"
   license "LGPL-3.0-or-later"
 
   livecheck do
@@ -11,13 +11,12 @@ class Sonarqube < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cef6ca443e6bf81ad4f3d9da7aaf5534cabf8f7e2f83849a91c334d9c07466d3"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "cef6ca443e6bf81ad4f3d9da7aaf5534cabf8f7e2f83849a91c334d9c07466d3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cef6ca443e6bf81ad4f3d9da7aaf5534cabf8f7e2f83849a91c334d9c07466d3"
-    sha256 cellar: :any_skip_relocation, ventura:        "cef6ca443e6bf81ad4f3d9da7aaf5534cabf8f7e2f83849a91c334d9c07466d3"
-    sha256 cellar: :any_skip_relocation, monterey:       "cef6ca443e6bf81ad4f3d9da7aaf5534cabf8f7e2f83849a91c334d9c07466d3"
-    sha256 cellar: :any_skip_relocation, big_sur:        "cef6ca443e6bf81ad4f3d9da7aaf5534cabf8f7e2f83849a91c334d9c07466d3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "38e9121c11a103410727ee41ddfa39b36b3a28cf33f141d270dc202a169309cb"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0a5c1031c6ae98abaa73e4d12ed78f6bba68bd97da9897fd1e183bbeb5294cc1"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0a5c1031c6ae98abaa73e4d12ed78f6bba68bd97da9897fd1e183bbeb5294cc1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "0a5c1031c6ae98abaa73e4d12ed78f6bba68bd97da9897fd1e183bbeb5294cc1"
+    sha256 cellar: :any_skip_relocation, sonoma:        "0a5c1031c6ae98abaa73e4d12ed78f6bba68bd97da9897fd1e183bbeb5294cc1"
+    sha256 cellar: :any_skip_relocation, ventura:       "0a5c1031c6ae98abaa73e4d12ed78f6bba68bd97da9897fd1e183bbeb5294cc1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d771f9341c3dbf7fedba57778402ff75a8afd965f00629f12fd316923b104e2f"
   end
 
   depends_on "openjdk@17"

@@ -1,11 +1,8 @@
-require "language/node"
-
 class Copilot < Formula
   desc "CLI tool for Amazon ECS and AWS Fargate"
   homepage "https://aws.github.io/copilot-cli/"
-  url "https://github.com/aws/copilot-cli.git",
-      tag:      "v1.30.1",
-      revision: "e61b1aa12998ccd70c7dc7db5bbdbf63eb853eb5"
+  url "https://github.com/aws/copilot-cli/archive/refs/tags/v1.34.0.tar.gz"
+  sha256 "accc579f16a4a3ce59376d98bffdde206c849004834ad5f953b0bef1c4a4ed11"
   license "Apache-2.0"
   head "https://github.com/aws/copilot-cli.git", branch: "mainline"
 
@@ -15,41 +12,37 @@ class Copilot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2295270a8d9e627381bce24ea6cb24d06cd56e24105b33e50dd670cda0e67865"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c5c735993c9396f9b40f5798a7d8651137f041b6c3bc08ccc6c69e6144d0e0a9"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a43ca3687f4b298d1cd0bafc6653f1310ac1deb81cfbf533df55fdb914658d87"
-    sha256 cellar: :any_skip_relocation, ventura:        "b0cf67a0a3585d65140f6e57bb93cee7d9b9503a1eea097841fec6b7526ae408"
-    sha256 cellar: :any_skip_relocation, monterey:       "6c46855bee6645a374c199e0352e3b01aa87c3028be834f598728c427efc8181"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f8bdce97b0adac51ca5afe386120da2c5b0310c921fbd2dec1e6a81cf35af230"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "acf4ccce4a014461bcb34c97693970fa0cee8f4c5ea8beed5f18a82cb97ec39f"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "39fb8244acdd1b8140247ef573ddc650b5511b62d3faa87d644a8e215593b53c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "8fc475e69d0ded4336e64ef5a2fd1ed4e529395855e6a9793396fdcd63490419"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "03c0787759692dac390026739780ce95bb7d620506e40c3cc97b6a16aefb62b1"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "fbe01c17821a9a69ef225f3f1d8ecd6be8603899e0faea082296a75448567c6f"
+    sha256 cellar: :any_skip_relocation, sonoma:         "bc263d1431a6f039c7598c58a4bc8108d5fed4ea36b5711614d35cf98c805389"
+    sha256 cellar: :any_skip_relocation, ventura:        "b9e512e1f5e911b80712ac57ab2ea88aafa618802d56e12a841edebfb0c1399f"
+    sha256 cellar: :any_skip_relocation, monterey:       "a469bb0b4f8faaa68cd01f530a6875e6128075c00810a5f8431034a530dd8e36"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fa605d9516c08d36db9a01a42bc304f5e6a81a51af2edd77ac90228a1e87d28c"
   end
 
   depends_on "go" => :build
   depends_on "node" => :build
 
   def install
-    Language::Node.setup_npm_environment
-
-    system "make", "tools"
-    system "make", "package-custom-resources"
-    system "make", "build"
-
+    ENV.deparallelize
+    system "make", "VERSION=#{version}"
     bin.install "bin/local/copilot"
-
     generate_completions_from_executable(bin/"copilot", "completion")
   end
 
   test do
-    ENV["AWS_ACCESS_KEY_ID"] = "test"
-    ENV["AWS_SECRET_ACCESS_KEY"] = "test"
+    ENV["AWS_REGION"] = ENV["AWS_SECRET_ACCESS_KEY"] = "test"
+    ENV["AWS_ACCESS_KEY_ID"] = "eu-west-1"
     begin
-      _, stdout, wait_thr = Open3.popen2("AWS_REGION=eu-west-1 #{bin}/copilot init 2>&1")
+      _, stdout, wait_thr = Open3.popen2("#{bin}/copilot init 2>&1")
       assert_match "Note: It's best to run this command in the root of your Git repository", stdout.gets("\n")
     ensure
       Process.kill 9, wait_thr.pid
     end
 
-    assert_match "Run `copilot app init` to create an application",
-      shell_output("AWS_REGION=eu-west-1 #{bin}/copilot pipeline init 2>&1", 1)
+    output = shell_output("#{bin}/copilot pipeline init 2>&1", 1)
+    assert_match "Run `copilot app init` to create an application", output
   end
 end

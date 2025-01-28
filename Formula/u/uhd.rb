@@ -1,12 +1,26 @@
 class Uhd < Formula
+  include Language::Python::Virtualenv
+
   desc "Hardware driver for all USRP devices"
   homepage "https://files.ettus.com/manual/"
-  # The build system uses git to recover version information
-  url "https://github.com/EttusResearch/uhd.git",
-      tag:      "v4.5.0.0",
-      revision: "471af98f6b595f5fd52d62303287d968ed2a8d0b"
   license all_of: ["GPL-3.0-or-later", "LGPL-3.0-or-later", "MIT", "BSD-3-Clause", "Apache-2.0"]
+  revision 3
   head "https://github.com/EttusResearch/uhd.git", branch: "master"
+
+  stable do
+    url "https://github.com/EttusResearch/uhd/archive/refs/tags/v4.7.0.0.tar.gz"
+    sha256 "afe56842587ce72d6a57535a2b15c061905f0a039abcc9d79f0106f072a00d10"
+
+    # Backport support for Boost 1.87.0
+    patch do
+      url "https://github.com/EttusResearch/uhd/commit/2dc7b3e572830c71d49ee0648eef445e7f3abfd6.patch?full_index=1"
+      sha256 "337b55e9323aef61274f52ff6c9d557fcae56b568dda029c3a70b33cccaaf636"
+    end
+    patch do
+      url "https://github.com/EttusResearch/uhd/commit/adfe953d965e58b5931c1b1968899492c8087cf6.patch?full_index=1"
+      sha256 "a9cc7e247a20157e2cbbf241315ef8fe53bdcf7db320a483b2466abcbd4efffe"
+    end
+  end
 
   livecheck do
     url :stable
@@ -14,47 +28,53 @@ class Uhd < Formula
   end
 
   bottle do
-    sha256                               arm64_ventura:  "9dc6ed062449ec39e8c882c3332169c512e156f175919bae3ce4a2702c668cfe"
-    sha256                               arm64_monterey: "81f0e5e1b3d9f4251466897ecc3c5ddc12cf0dbdcb25cf13cbac51cbb5256a96"
-    sha256                               arm64_big_sur:  "ec241eed9ad2249695a364bb796741ace35f2259f3ce2c3cda0607d5918c7eec"
-    sha256                               ventura:        "1190bd80ef912e96adf96bdf67bbbfb7e74bf310cb4c5b2986e0f24c484e30d2"
-    sha256                               monterey:       "019f803d3c7826cf510217b97c35765fe16f1ddae043f44478cddb2926c0b01f"
-    sha256                               big_sur:        "e596da5bb83ecb3449e8aba4c04026caa16592ccbf4e330c9a4d74d0ba7a83bd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1cf89006de8952c7347e8dd9d1adbebf4b379465bce3eca853d419d9e85a9a4e"
+    sha256                               arm64_sequoia: "a67a5ccc7de15b223549c804b5226cd3890019db8223c34854772b0ede131014"
+    sha256                               arm64_sonoma:  "890c98eea52abb6d20bf83caf5b93b63e4608099e112292ef607da7f7119d8bb"
+    sha256                               arm64_ventura: "bbdbb5a0fce80b3ccab90959bfc39f773e53d6a9a7cbe85d3f52325e2ca5ff14"
+    sha256                               sonoma:        "842ca33e3b8e46bf18ce25bdf4f121cce5162cd5954ad26252256274ab7f206d"
+    sha256                               ventura:       "5595861c3ed59199ef1ec599a0b8ff1c39027a7099c77a6ce22a700af8995916"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e6a6782f339a0d82ec7bebbe7bb7f21be37d0fbb6eea7623402c9c0786cf077b"
   end
 
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "boost"
   depends_on "libusb"
-  depends_on "python-markupsafe"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
-  fails_with gcc: "5"
+  on_linux do
+    depends_on "ncurses"
+  end
 
   resource "mako" do
-    url "https://files.pythonhosted.org/packages/05/5f/2ba6e026d33a0e6ddc1dddf9958677f76f5f80c236bd65309d280b166d3e/Mako-1.2.4.tar.gz"
-    sha256 "d60a3903dc3bb01a18ad6a89cdbe2e4eadc69c0bc8ef1e3773ba53d44c3f7a34"
+    url "https://files.pythonhosted.org/packages/67/03/fb5ba97ff65ce64f6d35b582aacffc26b693a98053fa831ab43a437cbddb/Mako-1.3.5.tar.gz"
+    sha256 "48dbc20568c1d276a2698b36d968fa76161bf127194907ea6fc594fa81f943bc"
+  end
+
+  resource "markupsafe" do
+    url "https://files.pythonhosted.org/packages/b4/d2/38ff920762f2247c3af5cbbbbc40756f575d9692d381d7c520f45deb9b8f/markupsafe-3.0.1.tar.gz"
+    sha256 "3e683ee4f5d0fa2dde4db77ed8dd8a876686e3fc417655c2ece9a90576905344"
   end
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
-    ENV.prepend_create_path "PYTHONPATH", libexec/"vendor"/Language::Python.site_packages(python3)
+    venv = virtualenv_create(buildpath/"venv", python3)
+    venv.pip_install resources
+    ENV.prepend_path "PYTHONPATH", venv.site_packages
 
-    resource("mako").stage do
-      system python3, *Language::Python.setup_install_args(libexec/"vendor", python3)
-    end
-
-    system "cmake", "-S", "host", "-B", "host/build", "-DENABLE_TESTS=OFF", *std_cmake_args
-    system "cmake", "--build", "host/build"
-    system "cmake", "--install", "host/build"
+    system "cmake", "-S", "host", "-B", "build",
+                    "-DENABLE_TESTS=OFF",
+                    "-DUHD_VERSION=#{version}",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    assert_match version.major_minor_patch.to_s, shell_output("#{bin}/uhd_config_info --version")
+    assert_match version.to_s, shell_output("#{bin}/uhd_config_info --version")
   end
 end

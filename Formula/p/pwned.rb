@@ -1,20 +1,20 @@
-require "language/node"
-
 class Pwned < Formula
   desc "CLI for the 'Have I been pwned?' service"
   homepage "https://github.com/wKovacs64/pwned"
-  url "https://registry.npmjs.org/pwned/-/pwned-11.0.0.tgz"
-  sha256 "35ea2c1ac3b2c44a11b5460d89b59df9509ecc5a94fce1306dd2f786d1e7b89d"
+  url "https://registry.npmjs.org/pwned/-/pwned-12.1.2.tgz"
+  sha256 "cec3ba5e1f552aa46170b70facb5b0c527b08a5810e0db63770bc8360f071fe5"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "3920a5c684a3f16e8596a419884b7152f0ff59ea179c784e69871683adf43081"
+    sha256 cellar: :any_skip_relocation, all: "9ebd3ad239fc48a2eed418cd390de0919eb63ffc9731ce5317a26cdf046d8845"
   end
 
   depends_on "node"
 
+  conflicts_with "bash-snippets", because: "both install `pwned` binaries"
+
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 

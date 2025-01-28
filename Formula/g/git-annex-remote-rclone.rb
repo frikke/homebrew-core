@@ -1,12 +1,13 @@
 class GitAnnexRemoteRclone < Formula
   desc "Use rclone supported cloud storage with git-annex"
-  homepage "https://github.com/DanielDent/git-annex-remote-rclone"
-  url "https://github.com/DanielDent/git-annex-remote-rclone/archive/v0.7.tar.gz"
-  sha256 "a119e3a4c194ff24a07aa1620714d60e0dc2a3148f5479cb07faf31e0e31889c"
-  license "GPL-3.0"
+  homepage "https://github.com/git-annex-remote-rclone/git-annex-remote-rclone"
+  url "https://github.com/git-annex-remote-rclone/git-annex-remote-rclone/archive/refs/tags/v0.8.tar.gz"
+  sha256 "6da12f46d46613cc5a539057052be7d8aa5259bd973ddff2d6ee460d34cd096c"
+  license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "d9853f2712e4e5c03a8b5e7a3c8295ab4c7b8720583ff75276f62a476a701f99"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "60ec135de845b97d8eafb3de716f93fda72c9c69a99c58e6b9669eec71006cfc"
   end
 
   depends_on "git-annex"
@@ -22,8 +23,6 @@ class GitAnnexRemoteRclone < Formula
 
     # make sure git can find git-annex
     ENV.prepend_path "PATH", bin
-    # We don't want this here or it gets "caught" by git-annex.
-    rm_r "Library/Python/2.7/lib/python/site-packages/homebrew.pth"
 
     system "git", "init"
     system "git", "annex", "init"

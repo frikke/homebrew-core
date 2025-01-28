@@ -1,35 +1,42 @@
 class Spr < Formula
   desc "Submit pull requests for individual, amendable, rebaseable commits to GitHub"
-  homepage "https://github.com/getcord/spr"
-  url "https://github.com/getcord/spr/archive/refs/tags/v1.3.4.tar.gz"
-  sha256 "eada48e089a7edef98a45cfa7ba8b4f31102e72c9b9fba519712b3cfb8663229"
+  homepage "https://github.com/spacedentist/spr"
+  url "https://github.com/spacedentist/spr/archive/refs/tags/v1.3.5.tar.gz"
+  sha256 "d1f53f4222fd9916c9edc0457bfe04bac66d9ff60a7c0e7a0c4519317c3f3fb8"
   license "MIT"
+  head "https://github.com/spacedentist/spr.git", branch: "master"
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c9930a1a635480ecbb6c6dc6a05f79058a96e46b3892c1518a86238b263bc7d2"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "53115bf257ae552982f512f008bb7f7f88d13249111d7ed58b3b42dce447c060"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "59cca6a0a52c53c8c758ba8722e24b52239c668273cdeb89884b9f9964bab36e"
-    sha256 cellar: :any_skip_relocation, ventura:        "b80056f73d8861eaa031f4b73e2492e87e409247827f6605ad91c6b0c38abc4c"
-    sha256 cellar: :any_skip_relocation, monterey:       "e4fc2f7bab9f2b2d2688e8a92517b07004dec292d8e000b988d01e976d5f516c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d92cfc824a5c4bd30ac14c88fd1147b5dc5c84d560ab8ddb8cbc93694d668894"
-    sha256 cellar: :any_skip_relocation, catalina:       "34791a0fc2f0421bc7334137c5a538d4b77311430fbe5167e937ee2c36774a35"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "021b7008382f3b08eb08933c099c347203dd751684b27ff22cd6ac3e9eede534"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "0eac58b3ff05872197f7abac423d42d87e439ccaab7f6579edec222f2de2710b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "b69a549a251230cd5561cb9df78d7dec8393f923ffbe1379e42312f79ba7afac"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c5991317f779e5cc3ac6287f08414a51566d08ad837d87fc0fee579c7bf2eed0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2cf35baf53290180b7f1b0a7b453e060eefd982008c8750d1cde5f5e4a07fb04"
+    sha256 cellar: :any_skip_relocation, sonoma:         "817a28b41cdab633e17b0ab7ba58be93f1866c15b47a64dc7bd9bff36d1c33b7"
+    sha256 cellar: :any_skip_relocation, ventura:        "a68d4e83af3fa0a54f23a27edf699d27b7b2514e6a4b2a631b772728fe8fb4c1"
+    sha256 cellar: :any_skip_relocation, monterey:       "6f56e9ebcef926ce71fe573640660366d923d1ff407c26c52dab11891786dd40"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "86d1aa332e5b30c08f8d1eaa2aa49a5371ead75d9e5061c6fd822d5a0c70f972"
   end
 
   depends_on "rust" => :build
   uses_from_macos "zlib"
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
+  end
+
+  # rust 1.80 build patch, upstream pr ref, https://github.com/spacedentist/spr/pull/202
+  patch do
+    url "https://github.com/spacedentist/spr/commit/ed450a3ec9c2b79e585ff162f0f3bd2fb2be4b00.patch?full_index=1"
+    sha256 "e1b7dab848c828a704ceeff2e46511e17a16198f26b184f75afd8bf0f695d22e"
   end
 
   def install
-    system "cargo", "install", *std_cargo_args
+    system "cargo", "install", *std_cargo_args(path: "spr")
   end
 
   test do
-    spr = "#{bin}/spr"
+    spr = bin/"spr"
     assert_match "spr #{version}", shell_output("#{spr} --version")
 
     system "git", "config", "--global", "user.email", "nobody@example.com"

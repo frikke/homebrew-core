@@ -1,13 +1,14 @@
 class TranslateShell < Formula
   desc "Command-line translator using Google Translate and more"
   homepage "https://www.soimort.org/translate-shell"
-  url "https://github.com/soimort/translate-shell/archive/v0.9.7.1.tar.gz"
+  url "https://github.com/soimort/translate-shell/archive/refs/tags/v0.9.7.1.tar.gz"
   sha256 "f949f379779b9e746bccb20fcd180d041fb90da95816615575b49886032bcefa"
   license "Unlicense"
   head "https://github.com/soimort/translate-shell.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e4e1003f63ebe71cf50e49f32093a3af1e777c5e24b2c7b4b996c753be83e5f7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "58078d2c0655645aa195c91dc972beb161c90a4085a58bced9d2a9d9830c7b92"
   end
 
   depends_on "fribidi"

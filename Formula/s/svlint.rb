@@ -1,25 +1,31 @@
 class Svlint < Formula
   desc "SystemVerilog linter"
   homepage "https://github.com/dalance/svlint"
-  url "https://github.com/dalance/svlint/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "716accda481e1da015af5059348e3a5c6487d82e1e85cbcd5f6457f002cdbe37"
+  url "https://github.com/dalance/svlint/archive/refs/tags/v0.9.3.tar.gz"
+  sha256 "ed07d77dd72fe49c086df407ed74e321d210eb19dc0dc353ebcf23414116ccfd"
   license "MIT"
   head "https://github.com/dalance/svlint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f8c0b4f390801c48cfd5f6004581fa5da07886f74a922612d1d975048e4c2f1b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2ff52d80372bb928e3470885fdd62c3a686dbb6dab726d8564b068a9aac8844c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1286dcbe8892fdbe5d3ce9ccdd11beb6451b8adc6e8a979801592d868c83681e"
-    sha256 cellar: :any_skip_relocation, ventura:        "1dad384d05891c91a289b3c0bba23d4db45a8a6c8c69809a01f67937ef849b83"
-    sha256 cellar: :any_skip_relocation, monterey:       "e2c0f4853b5104200d12eb7d2c24a9f08abda62441adbd0ec6d79c291ed008af"
-    sha256 cellar: :any_skip_relocation, big_sur:        "2016168fcf958c0963d21f33294fcf858691a9b1a880fe14e147fc3067cd2ca3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "155e57a9faa08b576f4199c43934059db0cac0ac04fbcb97cf1c9330d5e92265"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9c82113e0273481d396f4d0b09bcb50abe5034c9397c9b4779e235df99dba9cb"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2d4983f8a4e157a8cddd6e4e3aef2ad28dc6b1a0048134e1e8894f6a8259ceae"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e92e737e77aa193fa30e67f5c443fec1329ec01ced2ec0cf74ded12c8037f614"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a54509a5ccbaa642caf7f72f8d24aa93191b4ee8d7eb5eb42f5c9c5c302a552e"
+    sha256 cellar: :any_skip_relocation, ventura:       "fcc94fcfab52c8b6fca8bc7473bc59f14748ee9a97679b344a9d2d724456d063"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fbe93914caa4cc7c788375ba72a0dc2d1a1bccde48f0100a1f39b2fc70ae8827"
   end
 
   depends_on "rust" => :build
 
   def install
     system "cargo", "install", *std_cargo_args
+
+    # installation produces two binaries, `mdgen` and `svlint`, however, `mdgen` is for dev pipeline
+    # see https://github.com/dalance/svlint/blob/729159751f330c4c3f7adaa25b826f809f0e5f44/README.md?plain=1#L26
+    rm bin/"mdgen"
+
+    generate_completions_from_executable(bin/"svlint", "--shell-completion")
   end
 
   test do

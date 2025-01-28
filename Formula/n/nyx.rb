@@ -9,18 +9,16 @@ class Nyx < Formula
   revision 3
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2b3fe494a6c9224fd13b936dcb327ecc4be321ea2a77c613698f68c0c6c052d8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2b3fe494a6c9224fd13b936dcb327ecc4be321ea2a77c613698f68c0c6c052d8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2b3fe494a6c9224fd13b936dcb327ecc4be321ea2a77c613698f68c0c6c052d8"
-    sha256 cellar: :any_skip_relocation, ventura:        "e79c9f3ee6611c779246f2fedb938be974781451c4a4b8a9472f2be27a9d6c76"
-    sha256 cellar: :any_skip_relocation, monterey:       "e79c9f3ee6611c779246f2fedb938be974781451c4a4b8a9472f2be27a9d6c76"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e79c9f3ee6611c779246f2fedb938be974781451c4a4b8a9472f2be27a9d6c76"
-    sha256 cellar: :any_skip_relocation, catalina:       "e79c9f3ee6611c779246f2fedb938be974781451c4a4b8a9472f2be27a9d6c76"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "38098429261a50eaa8e1256002a97b4940172d36b7676e3aee11fb26002f5c94"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5d7b2a2b86698a16d079eaa5f30e5f21fa0dcef3f356f2532fc3eae3bc8353ef"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5d7b2a2b86698a16d079eaa5f30e5f21fa0dcef3f356f2532fc3eae3bc8353ef"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "5d7b2a2b86698a16d079eaa5f30e5f21fa0dcef3f356f2532fc3eae3bc8353ef"
+    sha256 cellar: :any_skip_relocation, sonoma:        "c01145218094ee9fe66681f2fef001e7f5f12f15f83506626da97b03de4b7d96"
+    sha256 cellar: :any_skip_relocation, ventura:       "c01145218094ee9fe66681f2fef001e7f5f12f15f83506626da97b03de4b7d96"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5d7b2a2b86698a16d079eaa5f30e5f21fa0dcef3f356f2532fc3eae3bc8353ef"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   resource "stem" do
     url "https://files.pythonhosted.org/packages/b2/66/c5515de764bffae1347e671819711268da5c02bfab8406223526822fe5f6/stem-1.8.1.tar.gz"

@@ -1,9 +1,10 @@
 class GccAT12 < Formula
   desc "GNU compiler collection"
   homepage "https://gcc.gnu.org/"
-  url "https://ftp.gnu.org/gnu/gcc/gcc-12.3.0/gcc-12.3.0.tar.xz"
-  mirror "https://ftpmirror.gnu.org/gcc/gcc-12.3.0/gcc-12.3.0.tar.xz"
-  sha256 "949a5d4f99e786421a93b532b22ffab5578de7321369975b91aec97adfda8c3b"
+  # TODO: Remove maximum_macos if Xcode 16 support is added to https://github.com/iains/gcc-12-branch
+  url "https://ftp.gnu.org/gnu/gcc/gcc-12.4.0/gcc-12.4.0.tar.xz"
+  mirror "https://ftpmirror.gnu.org/gcc/gcc-12.4.0/gcc-12.4.0.tar.xz"
+  sha256 "704f652604ccbccb14bdabf3478c9511c89788b12cb3bbffded37341916a9175"
   license "GPL-3.0-or-later" => { with: "GCC-exception-3.1" }
 
   livecheck do
@@ -12,19 +13,22 @@ class GccAT12 < Formula
   end
 
   bottle do
-    sha256                               arm64_ventura:  "3cd7b4d3ca96aafd0bb1b40734ea7418c6e4917f4a218ce98c896dc92e631961"
-    sha256                               arm64_monterey: "9802dd72f1bb6f4bf4d8cb93b9f123301a442eb976cecf1a2f3d67734eb32499"
-    sha256                               arm64_big_sur:  "f7acf87eb58753c009b0dc7b596edda21d94ff18f2c2c466e073ac81e0d10e3e"
-    sha256                               ventura:        "666dd278818941b709f7cfe863e949e5586759d870e38e1ab1e74478fb7e29a7"
-    sha256                               monterey:       "5a21c9cdf8794592972379fff064a5db8616e2b8f7c229ed10ae33d3d5c14e09"
-    sha256                               big_sur:        "65398664f3617323aa0b75d786420070a823c1189dc8612172451461d227985d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f259d60c17bd8b896e8a6beaf6f86ebda297a4bf5dc413dc12c3f8b71d45b436"
+    sha256                               arm64_sonoma:   "55614581a8985550c5cc84cd29f7122d4aca5d11f60c5ff119e7432419c2b9d8"
+    sha256                               arm64_ventura:  "1466d203d2b62e3771a0d1935314747e6a098793622f6a007c23acaf8185731b"
+    sha256                               arm64_monterey: "94bc560bcbfc98966d891656b3a0705958bdac330dfab3a9913c4c412e2f5885"
+    sha256                               sonoma:         "de57cdd8fc489a7fb88f7af19a730af87a14418c7181e5ba03e20c40e4d65738"
+    sha256                               ventura:        "cbaf8ac753711e7c39e90cc3abf3dee9847dea8908e5e575bd4065ffeef0c9b0"
+    sha256                               monterey:       "436e51d082e7cfaa612458fdd2703f530abcd49730e7634ce659700fedb033e1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "50b8eb4f9125e36b9daad5dcd7cf470d6780d1ab2a1bad652793299fc6036770"
   end
 
   # The bottles are built on systems with the CLT installed, and do not work
   # out of the box on Xcode-only systems due to an incorrect sysroot.
   pour_bottle? only_if: :clt_installed
 
+  # https://github.com/iains/gcc-12-branch/issues/24
+  # https://github.com/iains/gcc-12-branch/issues/25
+  depends_on maximum_macos: [:ventura, :build] # Xcode < 16
   depends_on "gmp"
   depends_on "isl"
   depends_on "libmpc"
@@ -43,8 +47,8 @@ class GccAT12 < Formula
   # Branch from the Darwin maintainer of GCC, with a few generic fixes and
   # Apple Silicon support, located at https://github.com/iains/gcc-12-branch
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/f1188b90d610e2ed170b22512ff7435ba5c891e2/gcc/gcc-12.3.0.diff"
-    sha256 "9da2f964d8aeaea7c30623d253c3d36d398baa3db907ebe38e2a9ce1f005818b"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/ca7047dad38f16fb02eb63bd4447e17d0b68b3bb/gcc/gcc-12.4.0.diff"
+    sha256 "c0e8e94fbf65a6ce13286e7f13beb5a1d84b182a610489026ce3e2420fc3d45c"
   end
 
   def install
@@ -84,6 +88,14 @@ class GccAT12 < Formula
       # System headers may not be in /usr/include
       sdk = MacOS.sdk_path_if_needed
       args << "--with-sysroot=#{sdk}" if sdk
+
+      # Work around a bug in Xcode 15's new linker (FB13038083)
+      if DevelopmentTools.clang_build_version >= 1500
+        toolchain_path = "/Library/Developer/CommandLineTools"
+        args << "--with-ld=#{toolchain_path}/usr/bin/ld-classic"
+      end
+
+      make_args = []
     else
       # Fix cc1: error while loading shared libraries: libisl.so.15
       args << "--with-boot-ldflags=-static-libstdc++ -static-libgcc #{ENV.ldflags}"
@@ -97,11 +109,17 @@ class GccAT12 < Formula
       # Change the default directory name for 64-bit libraries to `lib`
       # https://stackoverflow.com/a/54038769
       inreplace "gcc/config/i386/t-linux64", "m64=../lib64", "m64="
+      inreplace "gcc/config/aarch64/t-aarch64-linux", "lp64=../lib64", "lp64="
+
+      make_args = %W[
+        BOOT_CFLAGS=-I#{Formula["zlib"].opt_include}
+        BOOT_LDFLAGS=-L#{Formula["zlib"].opt_lib}
+      ]
     end
 
     mkdir "build" do
       system "../configure", *args
-      system "make"
+      system "make", *make_args
 
       # Do not strip the binaries on macOS, it makes them unsuitable
       # for loading plugins
@@ -119,11 +137,11 @@ class GccAT12 < Formula
     # Rename man7.
     man7.glob("*.7") { |file| add_suffix file, version.major }
     # Even when we disable building info pages some are still installed.
-    info.rmtree
+    rm_r(info)
 
     # Work around GCC install bug
     # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105664
-    rm_rf bin.glob("*-gcc-tmp")
+    rm_r(bin.glob("*-gcc-tmp"))
   end
 
   def add_suffix(file, suffix)
@@ -157,7 +175,7 @@ class GccAT12 < Formula
       specs = libgcc/"specs"
       ohai "Creating the GCC specs file: #{specs}"
       specs_orig = Pathname.new("#{specs}.orig")
-      rm_f [specs_orig, specs]
+      rm([specs_orig, specs].select(&:exist?))
 
       system_header_dirs = ["#{HOMEBREW_PREFIX}/include"]
 
@@ -214,18 +232,18 @@ class GccAT12 < Formula
   end
 
   test do
-    (testpath/"hello-c.c").write <<~EOS
+    (testpath/"hello-c.c").write <<~C
       #include <stdio.h>
       int main()
       {
         puts("Hello, world!");
         return 0;
       }
-    EOS
-    system "#{bin}/gcc-#{version.major}", "-o", "hello-c", "hello-c.c"
+    C
+    system bin/"gcc-#{version.major}", "-o", "hello-c", "hello-c.c"
     assert_equal "Hello, world!\n", shell_output("./hello-c")
 
-    (testpath/"hello-cc.cc").write <<~EOS
+    (testpath/"hello-cc.cc").write <<~CPP
       #include <iostream>
       struct exception { };
       int main()
@@ -236,11 +254,11 @@ class GccAT12 < Formula
           catch (...) { }
         return 0;
       }
-    EOS
-    system "#{bin}/g++-#{version.major}", "-o", "hello-cc", "hello-cc.cc"
+    CPP
+    system bin/"g++-#{version.major}", "-o", "hello-cc", "hello-cc.cc"
     assert_equal "Hello, world!\n", shell_output("./hello-cc")
 
-    (testpath/"test.f90").write <<~EOS
+    (testpath/"test.f90").write <<~FORTRAN
       integer,parameter::m=10000
       real::a(m), b(m)
       real::fact=0.5
@@ -250,8 +268,8 @@ class GccAT12 < Formula
       end do
       write(*,"(A)") "Done"
       end
-    EOS
-    system "#{bin}/gfortran-#{version.major}", "-o", "test", "test.f90"
+    FORTRAN
+    system bin/"gfortran-#{version.major}", "-o", "test", "test.f90"
     assert_equal "Done\n", shell_output("./test")
   end
 end

@@ -3,18 +3,18 @@ class SpeedtestCli < Formula
 
   desc "Command-line interface for https://speedtest.net bandwidth tests"
   homepage "https://github.com/sivel/speedtest-cli"
-  url "https://github.com/sivel/speedtest-cli/archive/v2.1.3.tar.gz"
+  url "https://github.com/sivel/speedtest-cli/archive/refs/tags/v2.1.3.tar.gz"
   sha256 "45e3ca21c3ce3c339646100de18db8a26a27d240c29f1c9e07b6c13995a969be"
   license "Apache-2.0"
   revision 1
   head "https://github.com/sivel/speedtest-cli.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "dbe544f6837c7157450533ffc8a0e40166790b7b8c79f24e9aa759fd66888c23"
+    rebuild 4
+    sha256 cellar: :any_skip_relocation, all: "6add96ed8b9a4a517bbbe21659fb0068c4d6b11da84d858524d221eee60d8448"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   # Support Python 3.10, remove on next release
   patch do

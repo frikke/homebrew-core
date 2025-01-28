@@ -1,29 +1,32 @@
 class ImapUw < Formula
   # imap-uw is unmaintained software; the author has passed away and there is
   # no active successor project.
+  # The previous homepage is
+  # https://web.archive.org/web/20191028114408/https://www.washington.edu/imap/
   desc "University of Washington IMAP toolkit"
-  homepage "https://web.archive.org/web/20191028114408/https://www.washington.edu/imap/"
+  homepage "https://salsa.debian.org/holmgren/uw-imap"
   url "https://mirrorservice.org/sites/ftp.cac.washington.edu/imap/imap-2007f.tar.gz"
   mirror "https://fossies.org/linux/misc/old/imap-2007f.tar.gz"
   sha256 "53e15a2b5c1bc80161d42e9f69792a3fa18332b7b771910131004eb520004a28"
   license "Apache-2.0"
   revision 1
 
-  livecheck do
-    skip "Not maintained"
-  end
-
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "1c6588d448256165bc075365c4261d53de52575e394b9661c7837e6cce5450f8"
+    sha256 cellar: :any,                 arm64_sonoma:   "0c3e132c651b5e9b2a8deed4b0c512144c118d72df933fdc87046e2b631793c9"
     sha256 cellar: :any,                 arm64_ventura:  "853cb9eabed350f511e68b7198005a276b86efecf79846ed68858d226df546de"
     sha256 cellar: :any,                 arm64_monterey: "52ef7c6c326e06a85524eab3a22f29ff095877b1a640979958b72cede3dc8758"
     sha256 cellar: :any,                 arm64_big_sur:  "3598566905f97346d6691c708ae0c6673d28924265f5e10d33bdb2f8d40aa90b"
+    sha256 cellar: :any,                 sonoma:         "765a17f2dd45fe663b5c33591f9178e72801afa7ff61e5f5d3c94166801057aa"
     sha256 cellar: :any,                 ventura:        "3752df02ec24ffaed9fb630721492c24647a5426a0b53678fb4d574b1c99babb"
     sha256 cellar: :any,                 monterey:       "b103e67bafbc727288fe497dc634d65489b9c9272ed23971a35348988e0fd21d"
     sha256 cellar: :any,                 big_sur:        "03c5fc6a4e888a756809749d359b45141b95fbb8b3cfa662ebd9687e55ba958a"
     sha256 cellar: :any,                 catalina:       "f98ac44c956015b954474247210e3b19dbcf629280b69ab2c33386ad6f298c31"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "5b87416d2dcf7b2384df72ef50f309556b3e4e267eedf11f05ae54b53f67c8a1"
   end
+
+  deprecate! date: "2024-07-03", because: :unmaintained
 
   depends_on "openssl@3"
 
@@ -32,6 +35,8 @@ class ImapUw < Formula
   on_linux do
     depends_on "linux-pam"
   end
+
+  conflicts_with "alpine", because: "both install `mailutil` binaries"
 
   # Two patches below are from Debian, to fix OpenSSL 3 compatibility
   # https://salsa.debian.org/holmgren/uw-imap/tree/master/debian/patches
@@ -60,16 +65,18 @@ class ImapUw < Formula
     # Skip IPv6 warning on Linux as libc should be IPv6 safe.
     touch "ip6"
 
-    args = []
-    # Workaround for Xcode 14.3.
-    args << "EXTRACFLAGS=-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+    extra_cflags = []
+    # Workaround for Xcode 14.3
+    extra_cflags << "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+    # Workaround for Xcode 15
+    extra_cflags << "-Wno-incompatible-function-pointer-types" if DevelopmentTools.clang_build_version >= 1500
 
     target = if OS.mac?
       "oxp"
     else
       "ldb"
     end
-    system "make", target, *args
+    system "make", target, "EXTRACFLAGS=#{extra_cflags.join(" ")}"
 
     # email servers:
     sbin.install "imapd/imapd", "ipopd/ipop2d", "ipopd/ipop3d"

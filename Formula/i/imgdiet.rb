@@ -1,24 +1,29 @@
 class Imgdiet < Formula
   desc "Optimize and resize images"
   homepage "https://git.sr.ht/~jamesponddotco/imgdiet-go"
-  url "https://git.sr.ht/~jamesponddotco/imgdiet-go/archive/v0.1.1.tar.gz"
-  sha256 "c503e03bb2b2bce9fce4bd71244af3ddec2ee920e31cfd7f1ca10da8ddf66784"
+  url "https://git.sr.ht/~jamesponddotco/imgdiet-go/archive/v0.2.0.tar.gz"
+  sha256 "25fcdc40ad63ce2739fad6543c592d757dc59d5c7a409af87cb20884600984ce"
   license "MIT"
   head "https://git.sr.ht/~jamesponddotco/imgdiet-go", branch: "trunk"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "de81fbb6f723124ee2339e1a5f52613bf0ae342164416e2418dfdda4541116b5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d26edf95f2a68ba491d063e688030638984107da0d33c77b7a008d4b740a408b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "70bd6552daa7f655a15723ec912abfd3e92cc206f2d1ebdc9d6bb32f4ed0e606"
-    sha256 cellar: :any_skip_relocation, ventura:        "91e230a91073416afeec262e7a1f3db6d2db70d103dc7e67bec5d3677bc4e52a"
-    sha256 cellar: :any_skip_relocation, monterey:       "29729d6900cf925b7abcdf373b367314a3bec84fe7b7132e51706ee948c94692"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d7b37ab1f4ac867aa399cae59d41f0622d89ffb0869a08fb6298f5895e2ad3f8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2d5c60ff9ac8702d7a3e89e147a7674a764ef24ccc17bd2399101b170a7ac880"
+    sha256 cellar: :any,                 arm64_sequoia: "3f2124dea87682bc905fb403d3cfb36b16193959e56e267de9c31c73c8a5c708"
+    sha256 cellar: :any,                 arm64_sonoma:  "f105f52dbd1a99c8a8326845841da7f2236060e11ca3cec2c4b96f9f8375f876"
+    sha256 cellar: :any,                 arm64_ventura: "fc829c032e756ecb5b56c0998c24147db43f76ef1498961a2b59ebb04bb1b6d5"
+    sha256 cellar: :any,                 sonoma:        "ae731c0d8dca0947f6015f1024ce4b41206c00c9e497a62f0f834965a4c67852"
+    sha256 cellar: :any,                 ventura:       "947efce27e3c0ef5a9be6fba6fa4fe3c7f6d926ed27bb1e3f62d04cf4c2eb65d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a7c06e10203f59029e144945345f81e9efbbe4b758442441f35a9e6d85b603e7"
   end
 
   depends_on "go" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
+  depends_on "glib"
   depends_on "vips"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/imgdiet"
@@ -26,6 +31,6 @@ class Imgdiet < Formula
 
   test do
     system bin/"imgdiet", "--compression", "9", test_fixtures("test.png"), testpath/"out.jpg"
-    assert_predicate testpath/"out.jpg", :exist?
+    assert_path_exists testpath/"out.jpg"
   end
 end

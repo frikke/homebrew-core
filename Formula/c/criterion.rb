@@ -1,45 +1,46 @@
 class Criterion < Formula
   desc "Cross-platform C and C++ unit testing framework for the 21st century"
   homepage "https://github.com/Snaipe/Criterion"
-  url "https://github.com/Snaipe/Criterion/releases/download/v2.4.1/criterion-2.4.1.tar.xz"
-  sha256 "d0f86a8fc868e2c7b83894ad058313023176d406501a4ee8863e5357e31a80e7"
+  url "https://github.com/Snaipe/Criterion/releases/download/v2.4.2/criterion-2.4.2.tar.xz"
+  sha256 "e3c52fae0e90887aeefa1d45066b1fde64b82517d7750db7a0af9226ca6571c0"
   license "MIT"
-  revision 3
+  revision 2
   head "https://github.com/Snaipe/Criterion.git", branch: "bleeding"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "e2fa6b6131c59f39a3153bc8f5a90bcaf5c5ee4b7cf5375572c0e79edb559d81"
-    sha256 cellar: :any, arm64_monterey: "6342d313467fc469437fedeff6dafcf6db55eb4e9afa56a4b3d39ed30ee3462c"
-    sha256 cellar: :any, arm64_big_sur:  "a72de1d6b5e7dee339ff55d9e5322e31338997e0f750d1e90ba3879f1bd13ff9"
-    sha256 cellar: :any, ventura:        "698a580f22b167eddca65ee4a296436ab78f414281cb6816bef1ba1112cb5ff2"
-    sha256 cellar: :any, monterey:       "d047a288db8efb7335928601b3f33604a6784c6f0f134400bba0584e1d222e4d"
-    sha256 cellar: :any, big_sur:        "b5552777b6e4a64ea00444da777d40d5c62078a77a1828e8610161143f36d5f4"
-    sha256               x86_64_linux:   "b58276340d35a0ab8ed97152a6ed76d33547df5cac1bf69b8eaca673dc5fc6d6"
+    sha256 cellar: :any, arm64_sequoia: "87e4b6050b97f8c93ffa634a013392a08dd9ca6ccde834ab0b38ef960bdbbb3c"
+    sha256 cellar: :any, arm64_sonoma:  "cd2f6e03ef7b2bf9e3ba7e6620fc3f7971a98bba90ada27302ac84e1e0019ac4"
+    sha256 cellar: :any, arm64_ventura: "c6f8a68eba64dd89f2a9748e37b7739919ef51f24c065495c1804b682bf507b5"
+    sha256 cellar: :any, sonoma:        "85c669acf3f38a5a905425ece8bc92f8a845c9af1dcf569a4d9c18da99a4e507"
+    sha256 cellar: :any, ventura:       "b43ee024021a2a0ae8ad6c1a246790b0990544cbe288d16bd6a21af517afab97"
+    sha256               x86_64_linux:  "c0801143d8501a7af0e73b559b3af2d4877edf4cf2a9f5adb1f622915738f9e4"
   end
 
   depends_on "cmake" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libgit2"
   depends_on "nanomsg"
+  depends_on "nanopb"
+
   uses_from_macos "libffi"
 
   def install
-    system "meson", "setup", *std_meson_args, "--force-fallback-for=boxfort", "build"
+    system "meson", "setup", "build", "--force-fallback-for=boxfort,debugbreak,klib", *std_meson_args
     system "meson", "compile", "-C", "build"
     system "meson", "install", "--skip-subprojects", "-C", "build"
   end
 
   test do
-    (testpath/"test-criterion.c").write <<~EOS
+    (testpath/"test-criterion.c").write <<~C
       #include <criterion/criterion.h>
 
       Test(suite_name, test_name)
       {
         cr_assert(1);
       }
-    EOS
+    C
 
     system ENV.cc, "test-criterion.c", "-I#{include}", "-L#{lib}", "-lcriterion", "-o", "test-criterion"
     system "./test-criterion"

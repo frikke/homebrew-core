@@ -1,32 +1,29 @@
 class WasmMicroRuntime < Formula
   desc "WebAssembly Micro Runtime (WAMR)"
   homepage "https://github.com/bytecodealliance/wasm-micro-runtime"
-  url "https://github.com/bytecodealliance/wasm-micro-runtime/archive/refs/tags/WAMR-1.2.3.tar.gz"
-  sha256 "5c1b8a72bbc1943aa6bda7cfbabb909a89bf3a4a2115ef8f8821315a5594d2e2"
+  url "https://github.com/bytecodealliance/wasm-micro-runtime/archive/refs/tags/WAMR-2.2.0.tar.gz"
+  sha256 "93b6ba03f681e061967106046b1908631ee705312b9a6410f3baee7af7c6aac9"
   license "Apache-2.0" => { with: "LLVM-exception" }
   head "https://github.com/bytecodealliance/wasm-micro-runtime.git", branch: "main"
 
+  # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
+  # labeled as "pre-release" on GitHub before the version is released, so it's
+  # necessary to use the `GithubLatest` strategy.
   livecheck do
     url :stable
-    regex(/^WAMR[._-]v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "4587fad7622d938be7daf2981bc1122f2bbc58712805e715869c2ef0c6f6af90"
-    sha256 cellar: :any,                 arm64_monterey: "ea4a7e600529e8b9eff9ae75d63cb6173a7367d7edc2dcabae988d1939cae3c5"
-    sha256 cellar: :any,                 arm64_big_sur:  "c2f0931318437df0f323b11e849e1f7c5068927c1a19980abaf7fa732c836612"
-    sha256 cellar: :any,                 ventura:        "b3459a58b87fda1d8f3443252d1d643f794d4dee7e36be678f04669e03135327"
-    sha256 cellar: :any,                 monterey:       "4d2be4bdc605ac92a629e5f1a01af4c6f1169297d30a5f7eae6c8204d23a02a7"
-    sha256 cellar: :any,                 big_sur:        "3670878e30af5a164743dcc4b9397a6a36b0b53654e0000ae3933af3753cc9b4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a9adfdede849d11cdd909c9dd5793345550362af778c4831e2233e8e99a80638"
+    sha256 cellar: :any,                 arm64_sequoia: "8c09d15112bc9ac42ab86ccc8baf1881ec3653a0d589dfad8a7aa41ae5f4d411"
+    sha256 cellar: :any,                 arm64_sonoma:  "9b5b5ea15d69f031cd2d314a8bcf70d804c210280b330be3fb0034726cf36f75"
+    sha256 cellar: :any,                 arm64_ventura: "2e6ac37ea867c542514480907f9b0710e477c67dd286c1208930444da16582f4"
+    sha256 cellar: :any,                 sonoma:        "92ed7cdc11f95b3d4be42b9b2878e9c66aae6f0c537be17fcb0731ded92a7dd2"
+    sha256 cellar: :any,                 ventura:       "f4ba8cddef3b9e781ead80432292f6996a9f259c68b3696d8d1b3589f7f4250e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f1c67ba32fefde0efd67412efe9853e03b47fb0a8cfd845d03a795d231e130a6"
   end
 
   depends_on "cmake" => :build
-
-  resource "homebrew-fib_wasm" do
-    url "https://github.com/wasm3/wasm3/raw/main/test/lang/fib.c.wasm"
-    sha256 "e6fafc5913921693101307569fc1159d4355998249ca8d42d540015433d25664"
-  end
 
   def install
     # Prevent CMake from downloading and building things on its own.
@@ -53,6 +50,11 @@ class WasmMicroRuntime < Formula
   end
 
   test do
+    resource "homebrew-fib_wasm" do
+      url "https://github.com/wasm3/wasm3/raw/main/test/lang/fib.c.wasm"
+      sha256 "e6fafc5913921693101307569fc1159d4355998249ca8d42d540015433d25664"
+    end
+
     resource("homebrew-fib_wasm").stage testpath
 
     output = shell_output("#{bin}/iwasm -f fib #{testpath}/fib.c.wasm 2>&1", 1)

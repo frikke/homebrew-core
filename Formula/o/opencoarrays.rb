@@ -1,21 +1,19 @@
 class Opencoarrays < Formula
   desc "Open-source coarray Fortran ABI, API, and compiler wrapper"
   homepage "http://www.opencoarrays.org"
-  url "https://github.com/sourceryinstitute/OpenCoarrays/releases/download/2.10.1/OpenCoarrays-2.10.1.tar.gz"
-  sha256 "b04b8fa724e7e4e5addbab68d81d701414e713ab915bafdf1597ec5dd9590cd4"
+  url "https://github.com/sourceryinstitute/OpenCoarrays/releases/download/2.10.2/OpenCoarrays-2.10.2.tar.gz"
+  sha256 "e13f0dc54b966b0113deed7f407514d131990982ad0fe4dea6b986911d26890c"
   license "BSD-3-Clause"
-  revision 1
+  revision 5
   head "https://github.com/sourceryinstitute/opencoarrays.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "34ac30208c143808ef8ba9c70f0e8a4e025fa2772878a3d7ee294378bd98eae9"
-    sha256 cellar: :any,                 arm64_monterey: "c949b97866c6b19884a3547575306bf3d288e1cad006a8e987e2d29fa4f13708"
-    sha256 cellar: :any,                 arm64_big_sur:  "e07007d8dc742feaab1455322b5b9d39375c30712e354fab23ee8f8db5df596d"
-    sha256 cellar: :any,                 ventura:        "5424c08546ff3c93f549fddee86f76d1923e6b3ec8710e8d13d88e508a31e355"
-    sha256 cellar: :any,                 monterey:       "f7997c9dde7fd5e028a013e9f1d68a2cf5e12cdc59f44f7abd8012f0d1abeca1"
-    sha256 cellar: :any,                 big_sur:        "8e7707061f7929fbe390b77a64e1ec4f86b1c192dd7cb356a5694bb7f262a893"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a08a0be9d6bab631c11027a255d67e9855249c3fd779f66476213573541aa4d6"
+    sha256 cellar: :any,                 arm64_sequoia: "e263b0b0243719cdaf1ef02de84c8d70c52b1ba4b75254e75eec540daba88fde"
+    sha256 cellar: :any,                 arm64_sonoma:  "8c6e809fff5e543d60f2ee038ca04aa99e398a69b3aec9db067249c84b2beef0"
+    sha256 cellar: :any,                 arm64_ventura: "343c2414094be734db3423e6c2fab208320996971c0475f27e9b4328e20307a3"
+    sha256 cellar: :any,                 sonoma:        "bf66d20a900e5b7880971a9d5c0801cc9b18f3f4fded8be925bf482fb9b86d00"
+    sha256 cellar: :any,                 ventura:       "6918670d6f5c0b401d2aaea00dc994ac8a5879ec7430c0212c058c7a8654f90e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3be56cc15f1203f55853c88f265444b90868d9228e88fc3c405b5219e401eab5"
   end
 
   depends_on "cmake" => :build
@@ -23,15 +21,19 @@ class Opencoarrays < Formula
   depends_on "open-mpi"
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
+    # Replace `open-mpi` Cellar path that breaks on `open-mpi` version/revision bumps.
+    # CMake FindMPI uses REALPATH so there isn't a clean way to handle during generation.
+    openmpi = Formula["open-mpi"]
+    inreplace_files = [bin/"caf", lib/"cmake/opencoarrays/OpenCoarraysTargets.cmake"]
+    inreplace inreplace_files, openmpi.prefix.realpath, openmpi.opt_prefix
   end
 
   test do
-    (testpath/"tally.f90").write <<~EOS
+    (testpath/"tally.f90").write <<~FORTRAN
       program main
         use iso_c_binding, only : c_int
         use iso_fortran_env, only : error_unit
@@ -50,9 +52,9 @@ class Opencoarrays < Formula
         sync all
         if (this_image()==1) write(*,*) "Test passed"
       end program
-    EOS
-    system "#{bin}/caf", "tally.f90", "-o", "tally"
-    system "#{bin}/cafrun", "-np", "3", "--oversubscribe", "./tally"
-    assert_match Formula["open-mpi"].lib.realpath.to_s, shell_output("#{bin}/caf --show")
+    FORTRAN
+    system bin/"caf", "tally.f90", "-o", "tally"
+    system bin/"cafrun", "-np", "3", "--oversubscribe", "./tally"
+    assert_match Formula["open-mpi"].opt_lib.to_s, shell_output("#{bin}/caf --show")
   end
 end

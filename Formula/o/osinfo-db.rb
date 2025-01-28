@@ -1,8 +1,8 @@
 class OsinfoDb < Formula
   desc "Osinfo database of operating systems for virtualization provisioning tools"
   homepage "https://libosinfo.org/"
-  url "https://releases.pagure.org/libosinfo/osinfo-db-20230719.tar.xz"
-  sha256 "13d1c97fc7d67137935dcc97778c08bb079a4f0fe312d479786cea1411e4845a"
+  url "https://releases.pagure.org/libosinfo/osinfo-db-20250124.tar.xz", using: :nounzip
+  sha256 "7ca717f0975a798135a2b39eefdd1436a0b0682e29685c7fd01ef7f83a257250"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,19 +11,13 @@ class OsinfoDb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6efec181fc8f83e24cc6cc3ed5a014e5c4f0093644515314435dd5fd65530296"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6efec181fc8f83e24cc6cc3ed5a014e5c4f0093644515314435dd5fd65530296"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6efec181fc8f83e24cc6cc3ed5a014e5c4f0093644515314435dd5fd65530296"
-    sha256 cellar: :any_skip_relocation, ventura:        "6efec181fc8f83e24cc6cc3ed5a014e5c4f0093644515314435dd5fd65530296"
-    sha256 cellar: :any_skip_relocation, monterey:       "6efec181fc8f83e24cc6cc3ed5a014e5c4f0093644515314435dd5fd65530296"
-    sha256 cellar: :any_skip_relocation, big_sur:        "6efec181fc8f83e24cc6cc3ed5a014e5c4f0093644515314435dd5fd65530296"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9d9b938741b0351313612482b4831f4057dce7f0af778d50d5fa1af67c9c60c9"
+    sha256 cellar: :any_skip_relocation, all: "0f63a7d54ad267ae4178a13f7a465bd0c2a9875bca1c3e23c9d1c2e4f795630a"
   end
 
   depends_on "osinfo-db-tools" => [:build, :test]
 
   def install
-    system "osinfo-db-import", "--dir=#{share}/osinfo", cached_download
+    system "osinfo-db-import", "--dir=#{share}/osinfo", "osinfo-db-#{version}.tar.xz"
   end
 
   test do

@@ -1,27 +1,27 @@
 class MagicEnum < Formula
   desc "Static reflection for enums (to string, from string, iteration) for modern C++"
   homepage "https://github.com/Neargye/magic_enum"
-  url "https://github.com/Neargye/magic_enum/archive/v0.9.3.tar.gz"
-  sha256 "3cadd6a05f1bffc5141e5e731c46b2b73c2dbff025e723c8abaa659e0a24f072"
+  url "https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.7.tar.gz"
+  sha256 "b403d3dad4ef542fdc3024fa37d3a6cedb4ad33c72e31b6d9bab89dcaf69edf7"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "d106a548298cae974bd65aded36cc2812bfefaa4d5bd111a50cbb3235dc49336"
+    sha256 cellar: :any_skip_relocation, all: "4522b89be3d394cfd87829cc5ed355bb25ac0a66c38eb2ad4106b8338719e276"
   end
 
   depends_on "cmake" => :build
 
-  fails_with gcc: "5" # C++17
-
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
-    system "./test/test-cpp17"
-    system "./test/test-cpp17"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
+    system "./build/test/test-cpp17"
+    system "./build/test/test-cpp20"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <iostream>
       #include <magic_enum.hpp>
 
@@ -33,9 +33,9 @@ class MagicEnum < Formula
         std::cout << c1_name << std::endl;
         return 0;
       }
-    EOS
+    CPP
 
-    system ENV.cxx, "test.cpp", "-I#{include}", "-std=c++17", "-o", "test"
+    system ENV.cxx, "test.cpp", "-I#{include}/magic_enum", "-std=c++17", "-o", "test"
     assert_equal "RED\n", shell_output(testpath/"test")
   end
 end

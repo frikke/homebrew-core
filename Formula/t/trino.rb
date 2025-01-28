@@ -3,8 +3,8 @@ class Trino < Formula
 
   desc "Distributed SQL query engine for big data"
   homepage "https://trino.io"
-  url "https://search.maven.org/remotecontent?filepath=io/trino/trino-server/412/trino-server-412.tar.gz", using: :nounzip
-  sha256 "9e02a8be2034664eaa97dc3d83e11b41df9c9d573c1b20f564e2fc3d1cd4a95f"
+  url "https://search.maven.org/remotecontent?filepath=io/trino/trino-server/469/trino-server-469.tar.gz", using: :nounzip
+  sha256 "111933d897a7312c2b20eef1184203c180a28833add3c84367c2ca4fdb9b0e02"
   license "Apache-2.0"
 
   livecheck do
@@ -13,30 +13,41 @@ class Trino < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f6ebb41d27a16d3fe44ae2517c134ddccf7b596d81019eb81e5bf4568caa343a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f6ebb41d27a16d3fe44ae2517c134ddccf7b596d81019eb81e5bf4568caa343a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f6ebb41d27a16d3fe44ae2517c134ddccf7b596d81019eb81e5bf4568caa343a"
-    sha256 cellar: :any_skip_relocation, ventura:        "f6ebb41d27a16d3fe44ae2517c134ddccf7b596d81019eb81e5bf4568caa343a"
-    sha256 cellar: :any_skip_relocation, monterey:       "f6ebb41d27a16d3fe44ae2517c134ddccf7b596d81019eb81e5bf4568caa343a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f6ebb41d27a16d3fe44ae2517c134ddccf7b596d81019eb81e5bf4568caa343a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "080e1b7d67d173370fe5823937d264b6b4731ea7d4e76ee9eb414c84016718a1"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "791be307105c5a6731790e676d8e681ab569a6b29b3e06dfc09074b125dffedc"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "791be307105c5a6731790e676d8e681ab569a6b29b3e06dfc09074b125dffedc"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "791be307105c5a6731790e676d8e681ab569a6b29b3e06dfc09074b125dffedc"
+    sha256 cellar: :any_skip_relocation, sonoma:        "03069aa7ba823097f4cee85c417464964882fdd10750399e47f418ae8ec21c2f"
+    sha256 cellar: :any_skip_relocation, ventura:       "03069aa7ba823097f4cee85c417464964882fdd10750399e47f418ae8ec21c2f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "490156059e830eab8739db6440ee197050c62a1dd7c26369fe05ee691234ac51"
   end
 
   depends_on "gnu-tar" => :build
   depends_on "openjdk"
-  depends_on "python@3.11"
+
+  uses_from_macos "python"
 
   resource "trino-src" do
-    url "https://github.com/trinodb/trino/archive/refs/tags/412.tar.gz", using: :nounzip
-    sha256 "20474865f2426048019c981d5bbefe18583549de4bc9b6cfbc2d6403283bc3b5"
+    url "https://github.com/trinodb/trino/archive/refs/tags/469.tar.gz", using: :nounzip
+    sha256 "17e1413f3a110b8d33724ce47ac52900e03d8ae723e322b1500a2985cd1bc398"
+
+    livecheck do
+      formula :parent
+    end
   end
 
   resource "trino-cli" do
-    url "https://search.maven.org/remotecontent?filepath=io/trino/trino-cli/412/trino-cli-412-executable.jar"
-    sha256 "8d5cf8563942573b8a3926bdf6f8668aef2fd08488a0253d56ff6d450e6f717e"
+    url "https://search.maven.org/remotecontent?filepath=io/trino/trino-cli/469/trino-cli-469-executable.jar"
+    sha256 "1df0abceb1369e6034dd43e447ad31b0f12897731066ad06e4328b44871f3cc3"
+
+    livecheck do
+      formula :parent
+    end
   end
 
   def install
+    odie "trino-src resource needs to be updated" if version != resource("trino-src").version
+    odie "trino-cli resource needs to be updated" if version != resource("trino-cli").version
+
     # Manually extract tarball to avoid losing hardlinks which increases bottle
     # size from MBs to GBs. Remove once Homebrew is able to preserve hardlinks.
     # Ref: https://github.com/Homebrew/brew/pull/13154
@@ -55,7 +66,7 @@ class Trino < Formula
       inreplace libexec/"etc/jvm.config", %r{^-agentpath:/usr/lib/trino/bin/libjvmkill.so$\n}, ""
     end
 
-    rewrite_shebang detected_python_shebang, libexec/"bin/launcher.py"
+    rewrite_shebang detected_python_shebang(use_python_from_path: true), libexec/"bin/launcher.py"
     (bin/"trino-server").write_env_script libexec/"bin/launcher", Language::Java.overridable_java_home_env
 
     resource("trino-cli").stage do
@@ -64,11 +75,13 @@ class Trino < Formula
     end
 
     # Remove incompatible pre-built binaries
-    libprocname_dirs = libexec.glob("bin/procname/*")
-    # Keep the Linux-x86_64 directory to make bottles identical
-    libprocname_dirs.reject! { |dir| dir.basename.to_s == "Linux-x86_64" } if build.bottle?
-    libprocname_dirs.reject! { |dir| dir.basename.to_s == "#{OS.kernel_name}-#{Hardware::CPU.arch}" }
-    libprocname_dirs.map(&:rmtree)
+    launcher_dirs = libexec.glob("bin/{darwin,linux}-*")
+    # Keep the linux-amd64 directory to make bottles identical
+    launcher_dirs.reject! { |dir| dir.basename.to_s == "linux-amd64" } if build.bottle?
+    launcher_dirs.reject! do |dir|
+      dir.basename.to_s == "#{OS.kernel_name.downcase}-#{Hardware::CPU.intel? ? "amd64" : "arm64"}"
+    end
+    rm_r launcher_dirs
   end
 
   def post_install
@@ -81,25 +94,11 @@ class Trino < Formula
   end
 
   test do
-    port = free_port
-    cp libexec/"etc/config.properties", testpath/"config.properties"
-    inreplace testpath/"config.properties", "8080", port.to_s
-    server = fork do
-      exec bin/"trino-server", "run", "--verbose",
-                                      "--data-dir", testpath,
-                                      "--config", testpath/"config.properties"
-    end
-    sleep 30
-
-    query = "SELECT state FROM system.runtime.nodes"
-    output = shell_output(bin/"trino --debug --server localhost:#{port} --execute '#{query}'")
-    assert_match "\"active\"", output
-  ensure
-    Process.kill("TERM", server)
-    begin
-      Process.wait(server)
-    rescue Errno::ECHILD
-      quiet_system "pkill", "-9", "-P", server.to_s
-    end
+    assert_match version.to_s, shell_output("#{bin}/trino --version")
+    # A more complete test existed before but we removed it because it crashes macOS
+    # https://github.com/Homebrew/homebrew-core/pull/153348
+    # You can add it back when the following issue is fixed:
+    # https://github.com/trinodb/trino/issues/18983#issuecomment-1794206475
+    # https://bugs.openjdk.org/browse/CODETOOLS-7903448
   end
 end

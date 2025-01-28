@@ -1,12 +1,13 @@
 class LibbitcoinDatabase < Formula
   desc "Bitcoin High Performance Blockchain Database"
   homepage "https://github.com/libbitcoin/libbitcoin-database"
-  url "https://github.com/libbitcoin/libbitcoin-database/archive/v3.8.0.tar.gz"
+  url "https://github.com/libbitcoin/libbitcoin-database/archive/refs/tags/v3.8.0.tar.gz"
   sha256 "37dba4c01515fba82be125d604bbe55dbdcc69e41d41f8cf6fbaddaaab68c038"
-  license "AGPL-3.0"
+  license "AGPL-3.0-or-later"
   revision 1
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "891d6ba155b3dec6d7760d1147cbe3fa3448ba722c33a8363913ac7e3fe337f6"
     sha256 cellar: :any,                 arm64_sonoma:   "7d1a6883674ad006e2233445adc8c47ef8505acdb097ce666bb91e83b4e38e1c"
     sha256                               arm64_ventura:  "d5aaf977086d6ae540c4726ce77eed25538d1bcba722d34d69dfefa42a531600"
     sha256                               arm64_monterey: "f238610033ae744928597b0719dd7eb2347e5470ebd23c81638cac3d9368799a"
@@ -18,10 +19,14 @@ class LibbitcoinDatabase < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "2f2ceee2a4bc6ac4b0b67af2b97916eb79e0ed1aeee66a4a8695beee59e44a50"
   end
 
+  # About 2 years since request for release with support for recent `boost`.
+  # Ref: https://github.com/libbitcoin/libbitcoin-system/issues/1234
+  disable! date: "2024-12-14", because: "uses deprecated `boost@1.76`"
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   # https://github.com/libbitcoin/libbitcoin-system/issues/1234
   depends_on "boost@1.76"
   depends_on "libbitcoin-system"
@@ -39,7 +44,7 @@ class LibbitcoinDatabase < Formula
 
   test do
     boost = Formula["boost@1.76"]
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <bitcoin/database.hpp>
       using namespace libbitcoin::database;
       using namespace libbitcoin::chain;
@@ -50,7 +55,7 @@ class LibbitcoinDatabase < Formula
         assert(cache.size() == 1u);
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test",
                     "-I#{boost.include}",
                     "-L#{Formula["libbitcoin"].opt_lib}", "-lbitcoin-system",

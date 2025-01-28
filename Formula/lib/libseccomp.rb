@@ -1,8 +1,8 @@
 class Libseccomp < Formula
   desc "Interface to the Linux Kernel's syscall filtering mechanism"
   homepage "https://github.com/seccomp/libseccomp"
-  url "https://github.com/seccomp/libseccomp/releases/download/v2.5.4/libseccomp-2.5.4.tar.gz"
-  sha256 "d82902400405cf0068574ef3dc1fe5f5926207543ba1ae6f8e7a1576351dcbdb"
+  url "https://github.com/seccomp/libseccomp/releases/download/v2.6.0/libseccomp-2.6.0.tar.gz"
+  sha256 "83b6085232d1588c379dc9b9cae47bb37407cf262e6e74993c61ba72d2a784dc"
   license "LGPL-2.1-only"
 
   livecheck do
@@ -11,7 +11,7 @@ class Libseccomp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "49db89117b474de352eabc99840644ff081d9120d54d1eaf5cda150798852075"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "827764369e33cc2ca6ef5961ab87b4005dc023942fe407f1427d775aec63e4d0"
   end
 
   head do
@@ -34,7 +34,7 @@ class Libseccomp < Formula
   test do
     ver_major, ver_minor, = version.to_s.split(".")
 
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <seccomp.h>
       int main(int argc, char *argv[])
       {
@@ -43,7 +43,7 @@ class Libseccomp < Formula
         if(SCMP_VER_MINOR != #{ver_minor})
           return 1;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lseccomp", "-o", "test"
     system "./test"

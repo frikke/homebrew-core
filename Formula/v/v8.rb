@@ -1,9 +1,9 @@
 class V8 < Formula
   desc "Google's JavaScript engine"
-  homepage "https://github.com/v8/v8/wiki"
+  homepage "https://v8.dev/docs"
   # Track V8 version from Chrome stable: https://chromiumdash.appspot.com/releases?platform=Mac
-  url "https://github.com/v8/v8/archive/11.7.439.16.tar.gz"
-  sha256 "df073b032cafab5124a166771b5d66f6afaa8412c4d5863d2ba8d52c253ced33"
+  url "https://github.com/v8/v8/archive/refs/tags/12.7.224.16.tar.gz"
+  sha256 "00425fe7fd851f11839537256922addbfee0f5d27c6bf5ab375b9d0347d8ed94"
   license "BSD-3-Clause"
 
   livecheck do
@@ -23,83 +23,84 @@ class V8 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "923dcb56245d63d810769af204979ce8ec79b8c5948129018ec3ca1c24a9b3b1"
-    sha256 cellar: :any,                 arm64_monterey: "ed26e75302ce842f8d1db3f8deca7edc47da2bdbd86593fa8adc26e9e4efe9ab"
-    sha256 cellar: :any,                 arm64_big_sur:  "bf3964edddd790884e2e230a7df0732e11e6a991f27dbdefb4cafdb759718e8d"
-    sha256 cellar: :any,                 ventura:        "df68e49baa4c80fd8a0ac350d610b0b273960843b42c4276947ddd826a0b6bdf"
-    sha256 cellar: :any,                 monterey:       "ac0f7843d7a98dd6ff7df3bb7d475999b124bb1d84ac8f0ae50eba85599330a4"
-    sha256 cellar: :any,                 big_sur:        "e347443e3a34f8b43abd15e72ec214b4d277b65e7420bc8ff8f270556ff88e41"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1b1e4ffb2d4b2c2e150bf969ec6e373130ca94a33ffeac66d301ac9111978e1e"
+    sha256 cellar: :any,                 arm64_sequoia:  "c970a5657a165144470702ac586a5b17349397446a421f35e9323a0f01dcd385"
+    sha256 cellar: :any,                 arm64_sonoma:   "15a1692bba6d316446d00640d6f0975a221cb519031b76e9fc8a7036c93a2550"
+    sha256 cellar: :any,                 arm64_ventura:  "b40b3f0daae622cc1d258b8834c9f5f6b942652deb785c22350e9b8ce08ac7c5"
+    sha256 cellar: :any,                 arm64_monterey: "d4236596413abd930b07c749b5b87c7551cc68ff744ee9878bacafe668a8b055"
+    sha256 cellar: :any,                 sonoma:         "dc5ac107d6237165e8735bd3ba8b9ed4e45ccb1b5b9a9b6b97d35c7dfb4ba045"
+    sha256 cellar: :any,                 ventura:        "087168f4e81ef0d7c0b343c99e5e382acc08201b499c49c55990a137397c38dd"
+    sha256 cellar: :any,                 monterey:       "8340f34e94f455aa9250ba6915271606b08f14e31261c9584f098bcfa62ba532"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9106a7390ca79160d728d43c22e38ced8b861c1c98e38552325efa33584f526e"
   end
 
   depends_on "ninja" => :build
-  depends_on "python@3.11" => :build
+  depends_on xcode: ["10.0", :build] # for xcodebuild, min version required by v8
+
+  uses_from_macos "python" => :build
 
   on_macos do
     depends_on "llvm" => :build
-    depends_on xcode: ["10.0", :build] # required by v8
+    depends_on "llvm" if DevelopmentTools.clang_build_version <= 1400
   end
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "glib"
   end
 
-  fails_with gcc: "5"
-
   # Look up the correct resource revisions in the DEP file of the specific releases tag
-  # e.g. for CIPD dependency gn: https://chromium.googlesource.com/v8/v8.git/+/refs/tags/<version>/DEPS#64
+  # e.g. for CIPD dependency gn: https://chromium.googlesource.com/v8/v8.git/+/refs/tags/<version>/DEPS#74
   resource "gn" do
     url "https://gn.googlesource.com/gn.git",
-        revision: "811d332bd90551342c5cbd39e133aa276022d7f8"
-  end
-
-  resource "v8/base/trace_event/common" do
-    url "https://chromium.googlesource.com/chromium/src/base/trace_event/common.git",
-        revision: "147f65333c38ddd1ebf554e89965c243c8ce50b3"
+        revision: "b3a0bff47dd81073bfe67a402971bad92e4f2423"
   end
 
   resource "v8/build" do
     url "https://chromium.googlesource.com/chromium/src/build.git",
-        revision: "afe0125ef9e10b400d9ec145aa18fca932369346"
+        revision: "faf20f32f1d19bd492f8f16ac4a7ecfabdbb60c1"
+  end
+
+  resource "v8/third_party/fp16/src" do
+    url "https://chromium.googlesource.com/external/github.com/Maratyszcza/FP16.git",
+        revision: "0a92994d729ff76a58f692d3028ca1b64b145d91"
   end
 
   resource "v8/third_party/googletest/src" do
     url "https://chromium.googlesource.com/external/github.com/google/googletest.git",
-        revision: "af29db7ec28d6df1c7f0f745186884091e602e07"
+        revision: "a7f443b80b105f940225332ed3c31f2790092f47"
   end
 
   resource "v8/third_party/icu" do
     url "https://chromium.googlesource.com/chromium/deps/icu.git",
-        revision: "de4ce0071eb47ed54cbda54869001210cf3a8ae5"
+        revision: "98f2494518c2dbb9c488e83e507b070ea5910e95"
   end
 
   resource "v8/third_party/jinja2" do
     url "https://chromium.googlesource.com/chromium/src/third_party/jinja2.git",
-        revision: "515dd10de9bf63040045902a4a310d2ba25213a0"
+        revision: "2f6f2ff5e4c1d727377f5e1b9e1903d871f41e74"
   end
 
   resource "v8/third_party/markupsafe" do
     url "https://chromium.googlesource.com/chromium/src/third_party/markupsafe.git",
-        revision: "006709ba3ed87660a17bd4548c45663628f5ed85"
+        revision: "e582d7f0edb9d67499b0f5abd6ae5550e91da7f2"
   end
 
   resource "v8/third_party/zlib" do
     url "https://chromium.googlesource.com/chromium/src/third_party/zlib.git",
-        revision: "526382e41c9c5275dc329db4328b54e4f344a204"
+        revision: "209717dd69cd62f24cbacc4758261ae2dd78cfac"
   end
 
   resource "v8/third_party/abseil-cpp" do
     url "https://chromium.googlesource.com/chromium/src/third_party/abseil-cpp.git",
-        revision: "583dc6d1b3a0dd44579718699e37cad2f0c41a26"
+        revision: "bfe59c2726fda7494a800f7d0ee461f0564653b3"
   end
 
   def install
     (buildpath/"build").install resource("v8/build")
     (buildpath/"third_party/jinja2").install resource("v8/third_party/jinja2")
     (buildpath/"third_party/markupsafe").install resource("v8/third_party/markupsafe")
+    (buildpath/"third_party/fp16/src").install resource("v8/third_party/fp16/src")
     (buildpath/"third_party/googletest/src").install resource("v8/third_party/googletest/src")
-    (buildpath/"base/trace_event/common").install resource("v8/base/trace_event/common")
     (buildpath/"third_party/icu").install resource("v8/third_party/icu")
     (buildpath/"third_party/zlib").install resource("v8/third_party/zlib")
     (buildpath/"third_party/abseil-cpp").install resource("v8/third_party/abseil-cpp")
@@ -107,25 +108,25 @@ class V8 < Formula
     # Build gn from source and add it to the PATH
     (buildpath/"gn").install resource("gn")
     cd "gn" do
-      system "python3.11", "build/gen.py"
+      system "python3", "build/gen.py"
       system "ninja", "-C", "out/", "gn"
     end
     ENV.prepend_path "PATH", buildpath/"gn/out"
 
     # create gclient_args.gni
-    (buildpath/"build/config/gclient_args.gni").write <<~EOS
+    (buildpath/"build/config/gclient_args.gni").write <<~GN
       declare_args() {
         checkout_google_benchmark = false
       }
-    EOS
+    GN
 
     # setup gn args
     gn_args = {
       is_debug:                     false,
       is_component_build:           true,
       v8_use_external_startup_data: false,
-      v8_enable_i18n_support:       true, # enables i18n support with icu
-      clang_base_path:              "\"#{Formula["llvm"].opt_prefix}\"", # uses Homebrew clang instead of Google clang
+      v8_enable_fuzztest:           false,
+      v8_enable_i18n_support:       true,  # enables i18n support with icu
       clang_use_chrome_plugins:     false, # disable the usage of Google's custom clang plugins
       use_custom_libcxx:            false, # uses system libc++ instead of Google's custom one
       treat_warnings_as_errors:     false, # ignore not yet supported clang argument warnings
@@ -140,6 +141,18 @@ class V8 < Formula
       ENV["AR"] = DevelopmentTools.locate("ar")
       ENV["NM"] = DevelopmentTools.locate("nm")
       gn_args[:use_rbe] = false
+    else
+      ENV["DEVELOPER_DIR"] = ENV["HOMEBREW_DEVELOPER_DIR"] # help run xcodebuild when xcode-select is set to CLT
+      gn_args[:clang_base_path] = "\"#{Formula["llvm"].opt_prefix}\"" # uses Homebrew clang instead of Google clang
+      # Work around failure mixing newer `llvm` headers with older Xcode's libc++:
+      # Undefined symbols for architecture x86_64:
+      #   "std::__1::__libcpp_verbose_abort(char const*, ...)", referenced from:
+      #       std::__1::__throw_length_error[abi:nn180100](char const*) in stack_trace.o
+      if DevelopmentTools.clang_build_version <= 1400
+        gn_args[:fatal_linker_warnings] = false
+        inreplace "build/config/mac/BUILD.gn", "[ \"-Wl,-ObjC\" ]",
+                                               "[ \"-Wl,-ObjC\", \"-L#{Formula["llvm"].opt_lib}/c++\" ]"
+      end
     end
 
     # Make sure private libraries can be found from lib
@@ -175,7 +188,7 @@ class V8 < Formula
     t = "#{bin}/d8 -e 'print(new Intl.DateTimeFormat(\"en-US\").format(new Date(\"2012-12-20T03:00:00\")));'"
     assert_match %r{12/\d{2}/2012}, shell_output(t).chomp
 
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <libplatform/libplatform.h>
       #include <v8.h>
       int main(){
@@ -184,10 +197,10 @@ class V8 < Formula
         v8::V8::Initialize();
         return 0;
       }
-    EOS
+    CPP
 
     # link against installed libc++
-    system ENV.cxx, "-std=c++17", "test.cpp",
+    system ENV.cxx, "-std=c++20", "test.cpp",
                     "-I#{include}", "-L#{lib}",
                     "-Wl,-rpath,#{libexec}",
                     "-lv8", "-lv8_libplatform"

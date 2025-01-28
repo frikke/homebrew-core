@@ -1,8 +1,8 @@
 class CfnFormat < Formula
   desc "Command-line tool for formatting AWS CloudFormation templates"
   homepage "https://github.com/aws-cloudformation/rain"
-  url "https://github.com/aws-cloudformation/rain/archive/v1.5.0.tar.gz"
-  sha256 "fdb2548cd9247370c2cd792903b8f7be03772636b037b583155fb8b3e069106c"
+  url "https://github.com/aws-cloudformation/rain/archive/refs/tags/v1.21.0.tar.gz"
+  sha256 "1bf031347ff0e3f51b16575639c6e6fc64fd2e7979a4f7678bfeb313fb5a2c7a"
   license "Apache-2.0"
 
   livecheck do
@@ -10,27 +10,26 @@ class CfnFormat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d086752906498cd64832cdaac1be25860de469958a69b9485d40ddbb55fe7f78"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2b0bdac579b6d9379b31c97b814fd93bce2b00f513c511907504e86275624dcd"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ccb80e73feefc3e0056bf3cac8bf3b171a2a673863f52973b16dd959c90d3fa3"
-    sha256 cellar: :any_skip_relocation, ventura:        "3eb5fa6c0627ffd8adbce639352cd230b3c1f5daeb38dcbcfdb1af3025e7feb6"
-    sha256 cellar: :any_skip_relocation, monterey:       "525cc2687728a0ee65d4acbd9942fc6fea59752946a2655ac56d9e84262cd2cd"
-    sha256 cellar: :any_skip_relocation, big_sur:        "2f9f0fdabfc82610bc7c3130759cab3d96429e3897631451f6f5d336191d2163"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "037e93802c0076eb833e7318d2567df1385447395758a67f25dfdeccb85a6e82"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c1943f596de0243ccedaa86623f07a9e71d140b75128f7cfd7e3105ca5ec0aef"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c1943f596de0243ccedaa86623f07a9e71d140b75128f7cfd7e3105ca5ec0aef"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c1943f596de0243ccedaa86623f07a9e71d140b75128f7cfd7e3105ca5ec0aef"
+    sha256 cellar: :any_skip_relocation, sonoma:        "fe5051fb94a5a51ba7d893cc727f2a3693ad13a9d8ab5532b03cff051b2cd690"
+    sha256 cellar: :any_skip_relocation, ventura:       "fe5051fb94a5a51ba7d893cc727f2a3693ad13a9d8ab5532b03cff051b2cd690"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "03f359e039edbf0a71a22798d309f2bc1f288d58bd0175df266fcffd6a18732e"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "cmd/cfn-format/main.go"
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/cfn-format"
   end
 
   test do
-    (testpath/"test.template").write <<~EOS
+    (testpath/"test.template").write <<~YAML
       Resources:
         Bucket:
           Type: AWS::S3::Bucket
-    EOS
+    YAML
     assert_equal "test.template: formatted OK", shell_output("#{bin}/cfn-format -v test.template").strip
   end
 end

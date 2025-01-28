@@ -1,8 +1,8 @@
 class Libwpe < Formula
   desc "General-purpose library for WPE WebKit"
   homepage "https://wpewebkit.org/"
-  url "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.14.1/libwpe-1.14.1.tar.xz"
-  sha256 "b1d0cdcf0f8dbb494e65b0f7913e357106da9a0d57f4fbb7b9d1238a6dbe9ade"
+  url "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.16.1/libwpe-1.16.1.tar.xz"
+  sha256 "9cca60f2c4393ea0de53c675ebc3cdbe9c5aa249259dd1d6d81a49b052d37481"
   license "BSD-2-Clause"
   head "https://github.com/WebPlatformForEmbedded/libwpe.git", branch: "master"
 
@@ -12,12 +12,12 @@ class Libwpe < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "7f69a6299280b9afffd0a13f2bbe1eeab9fb654d867ae33733adefe3a0e381f9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "e01b8a42552149efe9906c1b281ae2ed01a4a2aab6f5017c7a0357f9b7251d58"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libxkbcommon"
   depends_on :linux
   depends_on "mesa"
@@ -29,13 +29,13 @@ class Libwpe < Formula
   end
 
   test do
-    (testpath/"wpe-test.c").write <<~EOS
+    (testpath/"wpe-test.c").write <<~C
       #include "wpe/wpe.h"
       #include <stdio.h>
       int main() {
         printf("%u.%u.%u", wpe_get_major_version(), wpe_get_minor_version(), wpe_get_micro_version());
       }
-    EOS
+    C
     ENV.append_to_cflags "-I#{include}/wpe-1.0"
     ENV.append "LDFLAGS", "-L#{lib}"
     ENV.append "LDLIBS", "-lwpe-1.0"

@@ -1,8 +1,8 @@
 class Modules < Formula
   desc "Dynamic modification of a user's environment via modulefiles"
   homepage "https://modules.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/modules/Modules/modules-5.3.1/modules-5.3.1.tar.bz2"
-  sha256 "171f7faebc1363c8738a6905b31074636dd81d303098002b1c25801ee5483d86"
+  url "https://downloads.sourceforge.net/project/modules/Modules/modules-5.5.0/modules-5.5.0.tar.bz2"
+  sha256 "cb6355b0c81566a4d3ecd06fb4ae6afc9665a087b1e9039c5b5ffbc46fa282e2"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,13 +11,13 @@ class Modules < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "539114dd953441f82633f0f5ce201719c7d5ffda9613ec94702997a08e774e84"
-    sha256 cellar: :any,                 arm64_monterey: "82afee11869c89ee190f3fc6980f2c3acb543f4020ef49389f444948f8ae3146"
-    sha256 cellar: :any,                 arm64_big_sur:  "1943734262bd565d5a170208a3aa3a14945342a440043e63051ddf66e1597a91"
-    sha256 cellar: :any,                 ventura:        "343d1394d56a919042afad951b2e43c18687d6b0132844e2d5ac07269211b3e0"
-    sha256 cellar: :any,                 monterey:       "fe91df353c52b0456323d366f55fb9d6eda624b868439bcf28407453412b1b6f"
-    sha256 cellar: :any,                 big_sur:        "cfc7cf47d087751ed1fe11735ad56ae11d0cf61f64bea4d39ba12c3fca74046a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d96274b4f7ea6077d0d72bfee2c769ef0cc455cda316c321b522825936d57da5"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "5ee8c71190aeced9c34d24f7b6390cfa0bf50b956a5a2290ee551b01c9aa1086"
+    sha256 cellar: :any,                 arm64_sonoma:  "86119337a0e011b3caf42509870164f5066f0c75089998113da9c0f06125e8c4"
+    sha256 cellar: :any,                 arm64_ventura: "9de919dfb835f533aed25bf0c0b0136c910e7d630b932b38254c27570315b578"
+    sha256 cellar: :any,                 sonoma:        "aebb442a0032596c907ffc37e7a18c277ca3573d1cca286672082fb6854e49f5"
+    sha256 cellar: :any,                 ventura:       "384d55d505817dec102466f81f646fdb554d9736a0259f806a29743b88f0c332"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "da598032599f2d8333a49d29652dadad9aaa674ea502eeeccfd33bb822414cc8"
   end
 
   depends_on "tcl-tk"
@@ -25,17 +25,15 @@ class Modules < Formula
   uses_from_macos "less"
 
   def install
+    tcltk = Formula["tcl-tk"]
     args = %W[
       --prefix=#{prefix}
       --datarootdir=#{share}
-      --with-tcl=#{Formula["tcl-tk"].opt_lib}
+      --with-tcl=#{tcltk.opt_lib}
+      --with-tclsh=#{tcltk.opt_bin}/tclsh
       --without-x
     ]
-
-    if OS.linux?
-      args << "--with-pager=#{Formula["less"].opt_bin}/less"
-      args << "--with-tclsh=#{Formula["tcl-tk"].opt_bin}/tclsh"
-    end
+    args << "--with-pager=#{Formula["less"].opt_bin}/less" if OS.linux?
 
     system "./configure", *args
     system "make", "install"

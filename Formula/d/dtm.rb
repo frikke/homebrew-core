@@ -1,18 +1,19 @@
 class Dtm < Formula
   desc "Cross-language distributed transaction manager"
   homepage "https://en.dtm.pub/"
-  url "https://github.com/dtm-labs/dtm/archive/refs/tags/v1.17.3.tar.gz"
-  sha256 "07e5aba2b90e94d280700f1257cfcfc9850c15e69f3632c951d83b190147700a"
+  url "https://github.com/dtm-labs/dtm/archive/refs/tags/v1.18.0.tar.gz"
+  sha256 "97499e49afb8c433282844b13865b2d66eae36fb346795d1afb838d53753e06e"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0833a7087d8c13f59ef3a5e766b3a0f85d30ce6f87fbbbea86a7c094656a1c99"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0833a7087d8c13f59ef3a5e766b3a0f85d30ce6f87fbbbea86a7c094656a1c99"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0833a7087d8c13f59ef3a5e766b3a0f85d30ce6f87fbbbea86a7c094656a1c99"
-    sha256 cellar: :any_skip_relocation, ventura:        "261798c44d73d1afd07ef77332ac69cf27a1ac614635b0e6d3ad345a0af4a7e3"
-    sha256 cellar: :any_skip_relocation, monterey:       "261798c44d73d1afd07ef77332ac69cf27a1ac614635b0e6d3ad345a0af4a7e3"
-    sha256 cellar: :any_skip_relocation, big_sur:        "261798c44d73d1afd07ef77332ac69cf27a1ac614635b0e6d3ad345a0af4a7e3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4326d257de2ddc8dedbedb3b7413c3c2586c1709dd4e527b9392e3b46ad92a2f"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "7a7f087990e26662c07a007b1be3449b149893714c6d2313d97fd3692f655ea2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "63c45a54c45da8f99b35a6fcb77fe61c7ffb569f91ab0b9512b5402f99c3736d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "72464eb0df2c29f9e37cfc324e70c54539e8cad7cadc905d5ad11c1fd6fc8178"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6b600ee1db91a2fcbf1dc223e4c943bc2010af24ba546c9a6f58b36702cf8346"
+    sha256 cellar: :any_skip_relocation, sonoma:         "9d0c38e3ced18c92c54b39e8c275c6e0a460fc0127cd1e9e7745eeaf5b58e831"
+    sha256 cellar: :any_skip_relocation, ventura:        "d11da745c086298e7dfa1876440bf3ca8af99b44e0123a6dcef83d2c19619549"
+    sha256 cellar: :any_skip_relocation, monterey:       "6a795a583080ac09c9866a8ccc742e2985d11c834ea4164501b33269d70b1dee"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b8c34cf469f8007319bfbf08f98f5d1649e00ede21536a7be68ef26447e4475d"
   end
 
   depends_on "go" => :build

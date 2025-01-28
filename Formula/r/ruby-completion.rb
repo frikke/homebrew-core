@@ -1,18 +1,14 @@
 class RubyCompletion < Formula
   desc "Bash completion for Ruby"
   homepage "https://github.com/mernen/completion-ruby"
-  url "https://github.com/mernen/completion-ruby.git",
-      revision: "f3e4345042b0cc48317e45b673dfd3d23904b9a7"
-  version "2"
+  url "https://github.com/mernen/completion-ruby/archive/refs/tags/v1.0.2.tar.gz"
+  sha256 "70b9ae9154076b561f0d7b2b74893258dc00168ded3e8686f14e349f4a324914"
   license "MIT"
+  version_scheme 1
   head "https://github.com/mernen/completion-ruby.git", branch: "main"
 
-  livecheck do
-    skip "No version information available to check"
-  end
-
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "534da18dd29bafad68930a70b41d94de09a99d0c4cf01e62bdb1a3c3f49fd3f3"
+    sha256 cellar: :any_skip_relocation, all: "8d1ac3a77d0543fca3d43fc9dcf1574d4bc8e68e964769a49c8f09c4677e964f"
   end
 
   def install

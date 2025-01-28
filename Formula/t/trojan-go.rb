@@ -8,9 +8,12 @@ class TrojanGo < Formula
   head "https://github.com/p4gefau1t/trojan-go.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "f58e47fab9a183c8212343c7e2e7fb4096af8ccc3a3d6db82bcace4e2a0feaf0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "f9872077ff3a1ef7d427cac872b6b1ff7d3cff029c241e35a884e4b4a090e163"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "76f3e955eee77490f3104b14685a116a56697e78a77cd681a2161ae1889fc251"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "ec98c6b4c3d8848c7f4f509b2dc0597ced55ca1345e6cb7df3db3cc61e8806ca"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9762f85a824ff74c47da792549bee3b227c3abdc0cdb0e240cbedd353aefdfc1"
+    sha256 cellar: :any_skip_relocation, sonoma:         "6ad928d61bed0387e16832906b26d2f33cbb38bdc432f2fd9926c8dfb0803265"
     sha256 cellar: :any_skip_relocation, ventura:        "88774cb71364936de995b60f0814352b844a0803b6da516def65ad0a5faef2b4"
     sha256 cellar: :any_skip_relocation, monterey:       "0e62938f7a9e79f03a657c4fdaa0399bd7b619043bc479bdb593d27d52bd37c2"
     sha256 cellar: :any_skip_relocation, big_sur:        "dbd2c6728ed016b1edec17347f6afb7b2c963838785e9579c597a84c84760782"
@@ -44,7 +47,7 @@ class TrojanGo < Formula
       -X github.com/p4gefau1t/trojan-go/constant.Commit=#{Utils.git_head}
     ].join(" ")
 
-    system "go", "build", *std_go_args(ldflags: ldflags), "-o", execpath, "-tags=full"
+    system "go", "build", *std_go_args(ldflags:), "-o", execpath, "-tags=full"
     (bin/"trojan-go").write_env_script execpath,
       TROJAN_GO_LOCATION_ASSET: "${TROJAN_GO_LOCATION_ASSET:-#{pkgshare}}"
 
@@ -76,8 +79,6 @@ class TrojanGo < Formula
   end
 
   test do
-    require "webrick"
-
     (testpath/"test.crt").write <<~EOS
       -----BEGIN CERTIFICATE-----
       MIIBuzCCASQCCQDC8CtpZ04+pTANBgkqhkiG9w0BAQsFADAhMQswCQYDVQQGEwJV
@@ -112,11 +113,20 @@ class TrojanGo < Formula
     EOS
 
     http_server_port = free_port
-    http_server = WEBrick::HTTPServer.new Port: http_server_port
-    Thread.new { http_server.start }
+    fork do
+      server = TCPServer.new(http_server_port)
+      loop do
+        socket = server.accept
+        socket.write "HTTP/1.1 200 OK\r\n" \
+                     "Content-Type: text/plain; charset=utf-8\r\n" \
+                     "Content-Length: 0\r\n" \
+                     "\r\n"
+        socket.close
+      end
+    end
 
     trojan_go_server_port = free_port
-    (testpath/"server.yaml").write <<~EOS
+    (testpath/"server.yaml").write <<~YAML
       run-type:     server
       local-addr:   127.0.0.1
       local-port:   #{trojan_go_server_port}
@@ -127,11 +137,11 @@ class TrojanGo < Formula
       ssl:
         cert:       #{testpath}/test.crt
         key:        #{testpath}/test.key
-    EOS
-    server = fork { exec "#{bin}/trojan-go", "-config", testpath/"server.yaml" }
+    YAML
+    server = fork { exec bin/"trojan-go", "-config", testpath/"server.yaml" }
 
     trojan_go_client_port = free_port
-    (testpath/"client.yaml").write <<~EOS
+    (testpath/"client.yaml").write <<~YAML
       run-type:     client
       local-addr:   127.0.0.1
       local-port:   #{trojan_go_client_port}
@@ -142,18 +152,18 @@ class TrojanGo < Formula
       ssl:
         verify:     false
         sni:        localhost
-    EOS
-    client = fork { exec "#{bin}/trojan-go", "-config", testpath/"client.yaml" }
+    YAML
+    client = fork { exec bin/"trojan-go", "-config", testpath/"client.yaml" }
 
     sleep 3
     begin
-      system "curl", "--socks5", "127.0.0.1:#{trojan_go_client_port}", "github.com"
+      output = shell_output("curl --socks5 127.0.0.1:#{trojan_go_client_port} example.com")
+      assert_match "<title>Example Domain</title>", output
     ensure
       Process.kill 9, server
       Process.wait server
       Process.kill 9, client
       Process.wait client
-      http_server.shutdown
     end
   end
 end

@@ -1,7 +1,7 @@
 class Opencbm < Formula
   desc "Provides access to various floppy drive formats"
   homepage "https://spiro.trikaliotis.net/opencbm"
-  url "https://github.com/OpenCBM/OpenCBM/archive/v0.4.99.104.tar.gz"
+  url "https://github.com/OpenCBM/OpenCBM/archive/refs/tags/v0.4.99.104.tar.gz"
   sha256 "5499cd1143b4a246d6d7e93b94efbdf31fda0269d939d227ee5bcc0406b5056a"
   license "GPL-2.0-only"
   head "https://git.code.sf.net/p/opencbm/code.git", branch: "master"
@@ -12,21 +12,22 @@ class Opencbm < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "735513b4928af4c14803fc656d7c6d7db607e41e0eef128f0bbd3ae94ab1cb0f"
-    sha256 arm64_monterey: "7a9045bbeb039a0780d82105d34db267b90bc25149a3a5ef6f09fbe9d5668c3f"
-    sha256 arm64_big_sur:  "5ccc1506a1b20e7b17fcea1eac1a6af5cc4cc55f7be4c91e99d36f2daf6c4ea8"
-    sha256 ventura:        "01fd967c187d6386e2d162174599eb1ddf3f5de8250d213d8fcf6e8b19bca83b"
-    sha256 monterey:       "d650f6b29d9bb6e28834ae32065a1589ec06ca738ebf615ea3a62109442abde6"
-    sha256 big_sur:        "f1843a75ae047aa93f9e6614462fabc2f87691fb977487c2e5db92f3b78a0aa5"
-    sha256 catalina:       "455a3ac134295766c1752bd861ab6109262e3dd780751d5227219c9970226640"
-    sha256 x86_64_linux:   "4526b2743b3a0ff4cf54f874099bb2f8c1779f709f7b97ba156796e7db504449"
+    rebuild 1
+    sha256 arm64_sequoia: "529ae3225eaf83d45e82682ed1e4a209f92e6998c1c646e24532f9e711a8eea1"
+    sha256 arm64_sonoma:  "fe90bccc22f2363fad79f49fa1cc5e844d2bc3c83627a9b7460bc5a07b64877d"
+    sha256 arm64_ventura: "d278718401caa82cefb764cad68a547d8e09a2a28622ff012472a0dbaeebbb21"
+    sha256 sonoma:        "c3c96a4d11cf6d06933aca2bf0ad4cdbc5d4cd7af512fdc7552bba26ec8e4bdd"
+    sha256 ventura:       "90c901874fffef22c717c75d8958109f5b82849c6c1ae5ceac0d2c31bd5595a2"
+    sha256 x86_64_linux:  "d7258949de49e4b268d2d236217f42982663a39430d534f32fc1dc7b60d2d043"
   end
 
   # cc65 is only used to build binary blobs included with the programs; it's
   # not necessary in its own right.
   depends_on "cc65" => :build
-  depends_on "pkg-config" => :build
-  depends_on "libusb-compat"
+  depends_on "pkgconf" => :build
+  depends_on "libusb"
+
+  uses_from_macos "ncurses"
 
   def install
     # This one definitely breaks with parallel build.
@@ -34,7 +35,6 @@ class Opencbm < Formula
 
     args = %W[
       -fLINUX/Makefile
-      LIBUSB_CONFIG=#{Formula["libusb-compat"].bin}/libusb-config
       PREFIX=#{prefix}
       MANDIR=#{man1}
       ETCDIR=#{etc}
@@ -47,6 +47,6 @@ class Opencbm < Formula
   end
 
   test do
-    system "#{bin}/cbmctrl", "--help"
+    system bin/"cbmctrl", "--help"
   end
 end

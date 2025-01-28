@@ -6,6 +6,7 @@ class Libmwaw < Formula
   license any_of: ["LGPL-2.1-or-later", "MPL-2.0"]
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "e1a2a5f288071c5a5c899ed113f87a841ec434bce245a98750a1ee1b0b2c0b64"
     sha256 cellar: :any,                 arm64_sonoma:   "952e2d7978c0a53b42c6c3bcef9faf03e878069664710baed01bbf696527f329"
     sha256 cellar: :any,                 arm64_ventura:  "14c3ef9b89eabb6d8f579cd6b4fc6b10aff80157395e25f5f4032c365e35814c"
     sha256 cellar: :any,                 arm64_monterey: "22010af06baf85faaa647b36eab334caa1f097cbe8f66d60c77bb745ce70bcd9"
@@ -17,10 +18,10 @@ class Libmwaw < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "2f6f70031a248697ceaaaf2b4626511400904de27cac8f6c441196a6bf05ef1c"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "librevenge"
 
-  fails_with gcc: "5"
+  uses_from_macos "zlib"
 
   resource "homebrew-test_document" do
     url "https://github.com/openpreserve/format-corpus/raw/825c8a5af012a93cf7aac408b0396e03a4575850/office-examples/Old%20Word%20file/NEWSSLID.DOC"
@@ -28,20 +29,16 @@ class Libmwaw < Formula
   end
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
     testpath.install resource("homebrew-test_document")
     # Test ID on an actual office document
-    assert_equal shell_output("#{bin}/mwawFile #{testpath}/NEWSSLID.DOC").chomp,
-                 "#{testpath}/NEWSSLID.DOC:Microsoft Word 2.0[pc]"
+    assert_equal "#{testpath}/NEWSSLID.DOC:Microsoft Word 2.0[pc]",
+                 shell_output("#{bin}/mwawFile #{testpath}/NEWSSLID.DOC").chomp
     # Control case; non-document format should return an empty string
-    assert_equal shell_output("#{bin}/mwawFile #{test_fixtures("test.mp3")}").chomp,
-                 ""
+    assert_empty shell_output("#{bin}/mwawFile #{test_fixtures("test.mp3")}").chomp
   end
 end

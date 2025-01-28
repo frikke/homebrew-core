@@ -1,27 +1,27 @@
 class Gnupg < Formula
   desc "GNU Pretty Good Privacy (PGP) package"
   homepage "https://gnupg.org/"
-  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.3.tar.bz2"
-  sha256 "a271ae6d732f6f4d80c258ad9ee88dd9c94c8fdc33c3e45328c4d7c126bd219d"
+  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.7.tar.bz2"
+  sha256 "7b24706e4da7e0e3b06ca068231027401f238102c41c909631349dcc3b85eb46"
   license "GPL-3.0-or-later"
 
+  # GnuPG appears to indicate stable releases with an even-numbered minor
+  # (https://gnupg.org/download/#end-of-life).
   livecheck do
     url "https://gnupg.org/ftp/gcrypt/gnupg/"
-    regex(/href=.*?gnupg[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    regex(/href=.*?gnupg[._-]v?(\d+\.\d*[02468](?:\.\d+)*)\.t/i)
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura:  "b36cece245a9b2f401fb25f5a8889e03458b76aca9f7bdaf95bac90fa067fb50"
-    sha256 arm64_monterey: "8951a873559c55131f5cf620528039653b1656fb8f428f9df4755230b7b8737c"
-    sha256 arm64_big_sur:  "51178a0ebf5071ff97acfca894ff19d2563757b06db45cc639cf565dcfa28540"
-    sha256 ventura:        "92c5de78a69010ffa7c30578f08b7443bde2906d553e6e225be131e34d983ad0"
-    sha256 monterey:       "d9a628e366f7373ef3aa576f03b6cbba0671c77e3a2606796d3e6b05d6c7f447"
-    sha256 big_sur:        "0f7278b21edfbcbc9d7350f8231eead52164283de936433ff85aea4eeff26831"
-    sha256 x86_64_linux:   "806bf7a22e94d2c83bd19278a23cf7988074e86b5fd4cd0e6d1e031b9fc96fc0"
+    sha256 arm64_sequoia: "47b40c87309680baa445bb8b9bb71c94f7c9020789a6ae5f45980febeb6d1e42"
+    sha256 arm64_sonoma:  "f2778e812043b14964316eaaa17bc8fde02331fea2746af82bd5694d93456710"
+    sha256 arm64_ventura: "7f2f1d42257dc87ee46240ae4ea8eff46455245fdf832b905d52d8364e08da2c"
+    sha256 sonoma:        "989a2348d01b160110ab4ba3bedda4e194bf02122d31e6029fc536baba261a37"
+    sha256 ventura:       "1b8bfec784f857856a2471ed8702259987fab15b101f9d948c81467b0fd5bc91"
+    sha256 x86_64_linux:  "a091d36b710f7fdd8db5cb20dc4af2f20254b04f3d17fd2df2155701e0da9d27"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gnutls"
   depends_on "libassuan"
   depends_on "libgcrypt"
@@ -29,11 +29,11 @@ class Gnupg < Formula
   depends_on "libksba"
   depends_on "libusb"
   depends_on "npth"
-  depends_on "openldap"
   depends_on "pinentry"
   depends_on "readline"
 
   uses_from_macos "bzip2"
+  uses_from_macos "openldap"
   uses_from_macos "sqlite", since: :catalina
   uses_from_macos "zlib"
 
@@ -46,11 +46,12 @@ class Gnupg < Formula
     ENV.append "CPPFLAGS", "-I#{libusb.opt_include}/libusb-#{libusb.version.major_minor}"
 
     mkdir "build" do
-      system "../configure", *std_configure_args,
-                             "--disable-silent-rules",
-                             "--sysconfdir=#{etc}",
+      system "../configure", "--disable-silent-rules",
                              "--enable-all-tests",
-                             "--with-pinentry-pgm=#{Formula["pinentry"].opt_bin}/pinentry"
+                             "--sysconfdir=#{etc}",
+                             "--with-pinentry-pgm=#{Formula["pinentry"].opt_bin}/pinentry",
+                             "--with-readline=#{Formula["readline"].opt_prefix}",
+                             *std_configure_args
       system "make"
       system "make", "check"
       system "make", "install"
@@ -60,9 +61,9 @@ class Gnupg < Formula
     # https://dev.gnupg.org/T5415#145864
     if OS.mac?
       # write to buildpath then install to ensure existing files are not clobbered
-      (buildpath/"scdaemon.conf").write <<~EOS
+      (buildpath/"scdaemon.conf").write <<~CONF
         disable-ccid
-      EOS
+      CONF
       pkgetc.install "scdaemon.conf"
     end
   end
@@ -73,7 +74,7 @@ class Gnupg < Formula
   end
 
   test do
-    (testpath/"batch.gpg").write <<~EOS
+    (testpath/"batch.gpg").write <<~GPG
       Key-Type: RSA
       Key-Length: 2048
       Subkey-Type: RSA
@@ -83,7 +84,8 @@ class Gnupg < Formula
       Expire-Date: 1d
       %no-protection
       %commit
-    EOS
+    GPG
+
     begin
       system bin/"gpg", "--batch", "--gen-key", "batch.gpg"
       (testpath/"test.txt").write "Hello World!"

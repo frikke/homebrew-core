@@ -1,10 +1,19 @@
 class Envoy < Formula
   desc "Cloud-native high-performance edge/middle/service proxy"
   homepage "https://www.envoyproxy.io/index.html"
-  url "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.27.0.tar.gz"
-  sha256 "143a433817b38dee5474a500816e26f38e7f4d1375162ad2d889918273be146b"
   license "Apache-2.0"
   head "https://github.com/envoyproxy/envoy.git", branch: "main"
+
+  stable do
+    url "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.33.0.tar.gz"
+    sha256 "fd726135761ea163f0312d49960c602c9b4fcb78ca3c36600975fed16e0787c4"
+
+    # Backport disabling libcurl docs to fix build. Remove in the next release.
+    patch do
+      url "https://github.com/envoyproxy/envoy/commit/ae6cb3254cbf98999993d0120d289a207a57f825.patch?full_index=1"
+      sha256 "a5c25bad6884f382909036ac9e8c812c5d3ba3104f2f1d24f5035acf705b0d74"
+    end
+  end
 
   livecheck do
     url :stable
@@ -12,13 +21,12 @@ class Envoy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d99adc9097b64deaeb383c0f2925d6a2cfea8c705b05d799a6c090f13b4e560c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0d8dccd9daba63ccaca2dd16873777bcb261d5e146c06651958413d5efc30932"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2b85d11708bb1c8d76deeb066efe78f3231f4d4226d35411d89811e559087aa7"
-    sha256 cellar: :any_skip_relocation, ventura:        "af28a5d930551fb2a61edecc935df75b9f158abd25456e3d7eeeeebd390afca8"
-    sha256 cellar: :any_skip_relocation, monterey:       "e2ec638544b36b3ebb2ac99fb70f900fdb1dd87ba861d5414e820bf8ee2bfd1e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bfadf63208fff3d32908254573433b4df2efddf165de5fe43f6ba0fbe87b8524"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "796d35a7589e5ec7e6957cb85e70d0f518e6b9d0ff20abafadfad5bcc15d7ea3"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "691cd0a607d8d87f7dfa64976aedcd779d2061d94d0b88b2253f98cfdc898f33"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "494f6f9f2e19abfef167a8c16d6e37a2365046f3a11d798f35dcdc8d4f449760"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "ae500a19266c143b27ab88c463a923919692b2767d235bfad61c1f51a37e6a51"
+    sha256 cellar: :any_skip_relocation, sonoma:        "9fc6ababc39170ab0e175cf542955f95e5f927bdcfc53098c1048467847bf388"
+    sha256 cellar: :any_skip_relocation, ventura:       "6e134fd52fad3fdec6293dac2135003ba3e458f0b2737ad16d4a6e544d43eeef"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b56276639ae42c6de00e30caf68e8c29d79565b0cee17a477b1f03ee680ec23d"
   end
 
   depends_on "automake" => :build
@@ -31,23 +39,22 @@ class Envoy < Formula
   depends_on xcode: :build
   depends_on macos: :catalina
 
+  uses_from_macos "llvm" => :build
   uses_from_macos "python" => :build
 
   on_macos do
     depends_on "coreutils" => :build
   end
 
-  # https://github.com/envoyproxy/envoy/tree/main/bazel#supported-compiler-versions
-  fails_with :gcc do
-    version "8"
-    cause "C++17 support and tcmalloc requirement"
+  on_linux do
+    depends_on "lld" => :build
   end
 
-  def install
-    # Per https://luajit.org/install.html: If MACOSX_DEPLOYMENT_TARGET
-    # is not set then it's forced to 10.4, which breaks compile on Mojave.
-    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s
+  # https://github.com/envoyproxy/envoy/tree/main/bazel#supported-compiler-versions
+  # GCC/ld.gold had some issues while building envoy 1.29 so use clang/lld instead
+  fails_with :gcc
 
+  def install
     env_path = "#{HOMEBREW_PREFIX}/bin:/usr/bin:/bin"
     args = %W[
       --compilation_mode=opt
@@ -55,28 +62,24 @@ class Envoy < Formula
       --verbose_failures
       --action_env=PATH=#{env_path}
       --host_action_env=PATH=#{env_path}
+      --define=wasm=disabled
     ]
 
     if OS.linux?
-      # Build fails with GCC 10+ at external/com_google_absl/absl/container/internal/inlined_vector.h:448:5:
-      # error: '<anonymous>.absl::inlined_vector_internal::Storage<char, 128, std::allocator<char> >::data_'
-      # is used uninitialized in this function [-Werror=uninitialized]
-      # Try to remove in a release that uses a newer abseil
-      args << "--cxxopt=-Wno-uninitialized"
-      args << "--host_cxxopt=-Wno-uninitialized"
-    else
-      # The clang available on macOS catalina has a warning that isn't clean on v8 code.
-      # The warning doesn't show up with more recent clangs, so disable it for now.
-      args << "--cxxopt=-Wno-range-loop-analysis"
-      args << "--host_cxxopt=-Wno-range-loop-analysis"
+      # GCC/ld.gold had some issues while building envoy so use clang/lld instead
+      args << "--config=clang"
 
-      # To suppress warning on deprecated declaration on v8 code. For example:
-      # external/v8/src/base/platform/platform-darwin.cc:56:22: 'getsectdatafromheader_64'
-      # is deprecated: first deprecated in macOS 13.0.
-      # https://bugs.chromium.org/p/v8/issues/detail?id=13428.
-      # Reference: https://github.com/envoyproxy/envoy/pull/23707.
-      args << "--cxxopt=-Wno-deprecated-declarations"
-      args << "--host_cxxopt=-Wno-deprecated-declarations"
+      # clang 18 introduced stricter thread safety analysis. Remove once release that supports clang 18
+      # https://github.com/envoyproxy/envoy/issues/37911
+      args << "--copt=-Wno-thread-safety-reference-return"
+
+      # Workaround to build with Clang 19 until envoy uses newer tcmalloc
+      # https://github.com/google/tcmalloc/commit/a37da0243b83bd2a7b1b53c187efd4fbf46e6e38
+      args << "--copt=-Wno-unused-but-set-variable"
+
+      # Workaround to build with Clang 19 until envoy uses newer grpc
+      # https://github.com/grpc/grpc/commit/e55f69cedd0ef7344e0bcb64b5ec9205e6aa4f04
+      args << "--copt=-Wno-missing-template-arg-list-after-template-kw"
     end
 
     # Write the current version SOURCE_VERSION.
@@ -84,7 +87,7 @@ class Envoy < Formula
 
     system Formula["bazelisk"].opt_bin/"bazelisk", "build", *args, "//source/exe:envoy-static.stripped"
     bin.install "bazel-bin/source/exe/envoy-static.stripped" => "envoy"
-    pkgshare.install "configs", "examples"
+    pkgshare.install "configs"
   end
 
   test do

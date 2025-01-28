@@ -1,10 +1,9 @@
 class Boost < Formula
   desc "Collection of portable C++ source libraries"
   homepage "https://www.boost.org/"
-  url "https://github.com/boostorg/boost/releases/download/boost-1.82.0/boost-1.82.0.tar.xz"
-  sha256 "fd60da30be908eff945735ac7d4d9addc7f7725b1ff6fcdcaede5262d511d21e"
+  url "https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-b2-nodocs.tar.xz"
+  sha256 "3abd7a51118a5dd74673b25e0a3f0a4ab1752d8d618f4b8cea84a603aeecc680"
   license "BSL-1.0"
-  revision 1
   head "https://github.com/boostorg/boost.git", branch: "master"
 
   livecheck do
@@ -16,18 +15,15 @@ class Boost < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "42422b7765221f757c71294b9a083edb13d9d9af092ea5d566f34245898ec2b3"
-    sha256 cellar: :any,                 arm64_ventura:  "acb65f0a6f8a12472eaa2aa223353ceac4134617bc9f99e936df65cfd5240507"
-    sha256 cellar: :any,                 arm64_monterey: "5657bdadfac084745828ccc82589de8b510ffdeca71caf42421a5c4c6b0ece27"
-    sha256 cellar: :any,                 arm64_big_sur:  "a5fa15020b6283ed965017f0abe3ee4df8f3c32c0ed38773b9eecd6411054ec7"
-    sha256 cellar: :any,                 sonoma:         "a51e2e43e98ba290cc33f856e52c04571229e491612f603eedb497986dca48ca"
-    sha256 cellar: :any,                 ventura:        "8ab0045fe83cf0542ea94d81869483ef5d131f5503ef5f9483921316279c1b77"
-    sha256 cellar: :any,                 monterey:       "ba45e6493a71c16e673a2d0ed68596c6538ddbdd218a0bbd5090f4ebe95d00e4"
-    sha256 cellar: :any,                 big_sur:        "268562e726a442438012396aee7a56f558036fceed672c4f703d32f58388e186"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "35b4d88117e6f549d87e237494f6b3c0a725fb7a1a073387bcc100cc8e53cd81"
+    sha256 cellar: :any,                 arm64_sequoia: "00a8471e4eca0c3f486e94cfe0609fc467d0805270dd18e5e8bad0a237aadeba"
+    sha256 cellar: :any,                 arm64_sonoma:  "e343b4cb9530c8685040b7f33be212f8da78756060b3400f37242446a6b4c452"
+    sha256 cellar: :any,                 arm64_ventura: "e68b84eed4a2fe54c3de30ae35852c8fbe217bfdc28b8f063059cc1491d5f7b1"
+    sha256 cellar: :any,                 sonoma:        "4365d15232d6c4980c51f0c3b729b1adfe80ee6088d1276cf7d56a609a8025f5"
+    sha256 cellar: :any,                 ventura:       "125c0502cdfedda094229358e3173375cb8f020cd129a43ecfa43ffc251eb57a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ed501937c2b5e96c65f5b44c852f7fb8e8692fcd009459980b3751d10e762164"
   end
 
-  depends_on "icu4c"
+  depends_on "icu4c@76"
   depends_on "xz"
   depends_on "zstd"
 
@@ -45,11 +41,11 @@ class Boost < Formula
     end
 
     # libdir should be set by --prefix but isn't
-    icu4c_prefix = Formula["icu4c"].opt_prefix
+    icu4c = deps.map(&:to_formula).find { |f| f.name.match?(/^icu4c@\d+$/) }
     bootstrap_args = %W[
       --prefix=#{prefix}
       --libdir=#{lib}
-      --with-icu=#{icu4c_prefix}
+      --with-icu=#{icu4c.opt_prefix}
     ]
 
     # Handle libraries that will not be built.
@@ -67,16 +63,17 @@ class Boost < Formula
       --libdir=#{lib}
       -d2
       -j#{ENV.make_jobs}
-      --layout=tagged-1.66
+      --layout=system
       --user-config=user-config.jam
       install
-      threading=multi,single
+      threading=multi
       link=shared,static
     ]
 
-    # Boost is using "clang++ -x c" to select C compiler which breaks C++14
-    # handling using ENV.cxx14. Using "cxxflags" and "linkflags" still works.
-    args << "cxxflags=-std=c++14"
+    # Boost is using "clang++ -x c" to select C compiler which breaks C++
+    # handling in superenv. Using "cxxflags" and "linkflags" still works.
+    # C++17 is due to `icu4c`.
+    args << "cxxflags=-std=c++17"
     args << "cxxflags=-stdlib=libc++" << "linkflags=-stdlib=libc++" if ENV.compiler == :clang
 
     system "./bootstrap.sh", *bootstrap_args
@@ -85,7 +82,7 @@ class Boost < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <boost/algorithm/string.hpp>
       #include <boost/iostreams/device/array.hpp>
       #include <boost/iostreams/device/back_inserter.hpp>
@@ -131,7 +128,7 @@ class Boost < Formula
 
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-std=c++14", "-o", "test", "-L#{lib}", "-lboost_iostreams",
                     "-L#{Formula["zstd"].opt_lib}", "-lzstd"
     system "./test"

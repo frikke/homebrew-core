@@ -1,8 +1,8 @@
 class Asciidoctorj < Formula
   desc "Java wrapper and bindings for Asciidoctor"
   homepage "https://github.com/asciidoctor/asciidoctorj"
-  url "https://search.maven.org/remotecontent?filepath=org/asciidoctor/asciidoctorj/2.5.10/asciidoctorj-2.5.10-bin.zip"
-  sha256 "292db5e831192982ce485d1a1ffa37590b17d5e3757f11052145f07b6d1161bd"
+  url "https://search.maven.org/remotecontent?filepath=org/asciidoctor/asciidoctorj/3.0.0/asciidoctorj-3.0.0-bin.zip"
+  sha256 "6d6fed763aa441746f57e98aeaa302678b62c8420ffced00e2cfd979a9377c17"
   license "Apache-2.0"
 
   livecheck do
@@ -11,13 +11,13 @@ class Asciidoctorj < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "902df3c34d2131f33bf18a26999e4e05b4700a8bb0224921ef06f9f583503774"
+    sha256 cellar: :any_skip_relocation, all: "e6545330f49cad533a5caedbc9fa651fc7d2c5dff6ce42310de2563331ee160c"
   end
 
   depends_on "openjdk"
 
   def install
-    rm_rf Dir["bin/*.bat"] # Remove Windows files.
+    rm_r(Dir["bin/*.bat"]) # Remove Windows files.
     libexec.install Dir["*"]
     (bin/"asciidoctorj").write_env_script libexec/"bin/asciidoctorj", JAVA_HOME: Formula["openjdk"].opt_prefix
   end

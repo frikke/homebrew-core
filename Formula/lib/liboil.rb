@@ -3,6 +3,9 @@ class Liboil < Formula
   homepage "https://wiki.freedesktop.org/liboil/"
   url "https://liboil.freedesktop.org/download/liboil-0.3.17.tar.gz"
   sha256 "105f02079b0b50034c759db34b473ecb5704ffa20a5486b60a8b7698128bfc69"
+  # Only liboil/ref/mt19937ar.c is BSD-3-Clause while rest is BSD-2-Clause.
+  # The license for liboil/motovec/* is excluded as it is only used on PowerPC.
+  license all_of: ["BSD-2-Clause", "BSD-3-Clause"]
 
   livecheck do
     url "https://liboil.freedesktop.org/download/"
@@ -11,6 +14,7 @@ class Liboil < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "884af7577129d0a2cf1418f838a9d8057e4f158911797fc6e7ba4e2217ce0182"
     sha256 cellar: :any,                 arm64_sonoma:   "793980d104cfea7e8ee60dc08de451f1d6c208c90ba8faa57d026d6bb36af87b"
     sha256 cellar: :any,                 arm64_ventura:  "d9163cdae71515f1281691a77d77cd635f9f5d0e001eece4ac204f0156ecc393"
     sha256 cellar: :any,                 arm64_monterey: "1301c11b0befc6f72c27cdf4c659caa989c472a4a04d5fda6d1815baff7c381e"
@@ -31,27 +35,25 @@ class Liboil < Formula
   depends_on "automake" => :build
   depends_on "gtk-doc" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   def install
     ENV.append "CFLAGS", "-fheinous-gnu-extensions" if ENV.compiler == :clang
 
-    system "autoreconf", "-fvi"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <liboil/liboil.h>
       int main(int argc, char** argv) {
         oil_init();
         return 0;
       }
-    EOS
+    C
 
     flags = ["-I#{include}/liboil-0.3", "-L#{lib}", "-loil-0.3"] + ENV.cflags.to_s.split
     system ENV.cc, "test.c", "-o", "test", *flags

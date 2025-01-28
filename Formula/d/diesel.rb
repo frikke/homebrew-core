@@ -1,24 +1,23 @@
 class Diesel < Formula
   desc "Command-line tool for Rust ORM Diesel"
   homepage "https://diesel.rs"
-  url "https://github.com/diesel-rs/diesel/archive/refs/tags/v2.1.1.tar.gz"
-  sha256 "eaed2b94bac9d93b5138cabcce45dab3bfbdfe9d2b911653c6c4571b45d8c9fa"
+  url "https://github.com/diesel-rs/diesel/archive/refs/tags/v2.2.6.tar.gz"
+  sha256 "55244c993f4fee5e2c6af4810744d0e604cf781efd71953e98baba4fd5a28a31"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/diesel-rs/diesel.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "acbf79a7e8f09fd2ee2165d210fcbd243c8d9c257fab071dbc6ea53766054fc2"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "fccc247b92f9991d1e24d8b6fbc1a1fd6d19970c60229c6a326e75a7d8e80f3d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "558b3918ca0dfb19729286bc2939b093498dd0cedc13edf7d8c9badfe75e053f"
-    sha256 cellar: :any_skip_relocation, ventura:        "fdd895a8cbf5afc39ba5d07e180706f95deb4204087eff55f675f1770e72a644"
-    sha256 cellar: :any_skip_relocation, monterey:       "b2f02564df1c223d5f5acad65cfaf88bc4417c8ff714a541ae9209b849375da5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b98e2280d3c980181df23c7608acfb03533b2fdac2ecd7b9c9c6e98f4a3b3a42"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0d268da02aebb441c2934e880cd57eea1cd826c45822231096338efc6cf5f4a2"
+    sha256 cellar: :any,                 arm64_sequoia: "fc4a4e3b249d9cd9479772462ab78c3737e361099b6d64c117cec125e0a70799"
+    sha256 cellar: :any,                 arm64_sonoma:  "2d44c4324e2e185d85ca5f710a94b16638b7431e721ca3608a83727eb7d6a53a"
+    sha256 cellar: :any,                 arm64_ventura: "6cafa4900ee1a4b4dfb809bab026d6614576d1458714980ec852383f78104d9d"
+    sha256 cellar: :any,                 sonoma:        "4ce0b93ce2b18888008cc095e6fe76362f26b1ae96632d44133ec9ddfdb8a9f8"
+    sha256 cellar: :any,                 ventura:       "1f4e88ad6dfaa15a83e92f3bdc75d4e9b8c4ad5f83ac75141ffc902a212578d5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "43e19ae62eab9b6525d4562d02c85f10dff9a5aa6df74ed0b9e11efa1e4284a4"
   end
 
   depends_on "rust" => [:build, :test]
   depends_on "libpq"
-  depends_on "mysql-client"
+  depends_on "mariadb-connector-c"
 
   uses_from_macos "sqlite"
 

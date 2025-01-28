@@ -1,8 +1,8 @@
 class Eprover < Formula
   desc "Theorem prover for full first-order logic with equality"
   homepage "https://eprover.org/"
-  url "https://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.6/E.tgz"
-  sha256 "aa1f3deaa229151e60d607560301a46cd24b06a51009e0a9ba86071e40d73edd"
+  url "https://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_3.1/E.tgz"
+  sha256 "f84db3ec902488d5e166b5915c56e12397fd3660744387a2c5a6f81a5005a986"
   license any_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
 
   livecheck do
@@ -11,15 +11,14 @@ class Eprover < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "933c3244099f0d7631bc4b5fff2ff790686d3fd8519448118d80a57664133984"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f2df4ffe6c58bfdbd59c96e662f1ca66a91f5f26b21b8de2cbf6e36368443f4c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6c5b3ef3fe7c4d8a83d6bc36414cc31a75ee9ec0444e8bc3a53ad9c0e398d388"
-    sha256 cellar: :any_skip_relocation, ventura:        "fa5c8ccf21c2651c3e5ce3ee03cd4b02bfd17e2f6d4a4cd7d84f27a0eb86fa8b"
-    sha256 cellar: :any_skip_relocation, monterey:       "d43e11494bbb94729f103b7680e258d98397954b26ec1ee876c7600f6433ea37"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5ca253b65f824844b7238c6a48870d62aa7c59759b30caaaf297019dddb1546f"
-    sha256 cellar: :any_skip_relocation, catalina:       "fdad068ad22a703c18f58502d91a24fa16ba2fce017b0f39b9145583930b19c2"
-    sha256 cellar: :any_skip_relocation, mojave:         "2d9b6284695c33af156b99e32026eb934a889ffa0d8891cb1f7f49a8a1b72942"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c5038a0c14455835be07e268a78233512aed9ecc0cfcb22bb0041c533d58cdbe"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "65ad63b92572ae8df5e194af0220e5c53bbcfe0f2b2bbad3c56a8986957c005a"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "6174d343789b0dc0c306310375663846d88dcdc00fc537640cbff2a132b26fdb"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f511d4a64d7ba346c3606a6a73401fcebecaaf77982f2087864eab271b10b9d7"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "28b0ddd1441db834182b376f3ec50b9874c3161c2899a94a8e448b730ab6dad1"
+    sha256 cellar: :any_skip_relocation, sonoma:         "d7dc29a61463dad9697692df024feb7a0637cfa185389a8e1ac450d338ec82e0"
+    sha256 cellar: :any_skip_relocation, ventura:        "2cd2a423d127773dc95f66ff87ab40d44b69b8f7bf6973ae9b0e484347cd788d"
+    sha256 cellar: :any_skip_relocation, monterey:       "9953da977fd0841e944d76ab7b9b84c9e75c028d446a94d8f63e96f938aa26ac"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0b87312e68d9ba0a2ea25d407ee3449bfbbf3cf9fad12dd690a4243d90427a83"
   end
 
   def install
@@ -30,6 +29,6 @@ class Eprover < Formula
   end
 
   test do
-    system "#{bin}/eprover", "--help"
+    system bin/"eprover", "--help"
   end
 end

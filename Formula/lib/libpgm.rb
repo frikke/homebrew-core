@@ -5,7 +5,7 @@ class Libpgm < Formula
   head "https://github.com/steve-o/openpgm.git", branch: "master"
 
   stable do
-    url "https://github.com/steve-o/openpgm/archive/release-5-3-128.tar.gz"
+    url "https://github.com/steve-o/openpgm/archive/refs/tags/release-5-3-128.tar.gz"
     version "5.3.128"
     sha256 "8d707ef8dda45f4a7bc91016d7f2fed6a418637185d76c7ab30b306499c6d393"
 
@@ -17,6 +17,7 @@ class Libpgm < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "0f2266ecabc1128e3a70ff8e31864e6cd556bd20b66cc2c74fd32011b2646dc4"
     sha256 cellar: :any,                 arm64_sonoma:   "6764decaa99670740309808e8be1ac3d75dbb9b8b8f8037d10c6dbe2932e0290"
     sha256 cellar: :any,                 arm64_ventura:  "27bb9366ecfabb4dafc81a54a1b7c39259cfcad13337a63c18a55ea0de26f2d5"
     sha256 cellar: :any,                 arm64_monterey: "8461b86788d5f5d6b6240ca78169bc120dd05fc753dcf052403537f5bd173382"
@@ -45,7 +46,7 @@ class Libpgm < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <pgm/pgm.h>
 
       int main(void) {
@@ -55,7 +56,7 @@ class Libpgm < Formula
         }
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}/pgm-5.3", "-L#{lib}", "-lpgm", "-o", "test"
     system "./test"
   end

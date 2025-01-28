@@ -1,10 +1,10 @@
 class Bottom < Formula
   desc "Yet another cross-platform graphical process/system monitor"
   homepage "https://clementtsang.github.io/bottom/"
-  url "https://github.com/ClementTsang/bottom/archive/refs/tags/0.9.6.tar.gz"
-  sha256 "202130e0d7c362d0d0cf211f6a13e31be3a02f13f998f88571e59a7735d60667"
+  url "https://github.com/ClementTsang/bottom/archive/refs/tags/0.10.2.tar.gz"
+  sha256 "1db45fe9bc1fabb62d67bf8a1ea50c96e78ff4d2a5e25bf8ae8880e3ad5af80a"
   license "MIT"
-  head "https://github.com/ClementTsang/bottom.git", branch: "master"
+  head "https://github.com/ClementTsang/bottom.git", branch: "main"
 
   # There can be a notable gap between when a version is tagged and a
   # corresponding release is created, so we check the "latest" release instead
@@ -15,13 +15,13 @@ class Bottom < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "230f9e676ba5fc701d5c0d12fc34f52502a702979b4eb98875c83463bc3d3112"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7b155becba57f4f76d8009b4686756a5c05b914995d4fc2277f1a79dbea5728a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "32282051bf83138932c9ffb44e2cfcd3a09683bc25520949ccd21cf3273f83e8"
-    sha256 cellar: :any_skip_relocation, ventura:        "62d753583c35328b6d5c0360bc58b0b2e148a4d09f123acf5f68754227d93712"
-    sha256 cellar: :any_skip_relocation, monterey:       "7a2edf54adea53d8210fc39a6a82103b125fc801a24111c4ca4ba6b8262c8046"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f4b7fcbb96e6a1adfe8f5e0afc177ac04f4c9114be1c16b270c240e77d30ce5c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cce0e8c30968637538771345087ad22e91704f314f585cc8589ff7b727a39125"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "293b085af54d7e69f159e9b6a1a317ea380d52cc2996bbf74203971cb2fa6347"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2c90acf12752aa008cb245f0f5e6982ba391b4129b0f1372d2f651b367768f90"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "fc76f47d4eaef7e6eac3cda67cbb06805b049ed83b0c7d7f3121a0ef3f9486dc"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a50cf59e7195ba6cc6c24778047b1681e1932625222c4a3d19f386e315366737"
+    sha256 cellar: :any_skip_relocation, ventura:       "eb73f6318589bc6be3e01d7eefd8a1cb4e19726be7f2f14cd8e574d2d86333d8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5f438b63dce811a4d60b306a712385942acec74e726101dc8ab78b910ced3a2e"
   end
 
   depends_on "rust" => :build
@@ -35,7 +35,7 @@ class Bottom < Formula
     # Completion scripts are generated in the crate's build
     # directory, which includes a fingerprint hash. Try to locate it first
     out_dir = "target/tmp/bottom"
-    bash_completion.install "#{out_dir}/completion/btm.bash"
+    bash_completion.install "#{out_dir}/completion/btm.bash" => "btm"
     fish_completion.install "#{out_dir}/completion/btm.fish"
     zsh_completion.install "#{out_dir}/completion/_btm"
     man1.install "#{out_dir}/manpage/btm.1"

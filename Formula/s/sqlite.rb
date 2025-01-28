@@ -1,30 +1,26 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
   homepage "https://sqlite.org/index.html"
-  url "https://www.sqlite.org/2023/sqlite-autoconf-3430100.tar.gz"
-  version "3.43.1"
-  sha256 "39116c94e76630f22d54cd82c3cea308565f1715f716d1b2527f1c9c969ba4d9"
+  url "https://www.sqlite.org/2025/sqlite-autoconf-3480000.tar.gz"
+  version "3.48.0"
+  sha256 "ac992f7fca3989de7ed1fe99c16363f848794c8c32a158dafd4eb927a2e02fd5"
   license "blessing"
 
   livecheck do
     url :homepage
     regex(%r{href=.*?releaselog/v?(\d+(?:[._]\d+)+)\.html}i)
     strategy :page_match do |page, regex|
-      page.scan(regex).map { |match| match&.first&.gsub("_", ".") }
+      page.scan(regex).map { |match| match&.first&.tr("_", ".") }
     end
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "204074e0aea3d5046e7520ebc9c9f926d0495c99ab2f836f5b6f438dc35023a3"
-    sha256 cellar: :any,                 arm64_ventura:  "81259fc63f4628081719fff9be2a710890743b397c3efcc127963e4e7f881d5e"
-    sha256 cellar: :any,                 arm64_monterey: "d45a06ea7fd9215bfaa84ac5666ca3457e22f55061ed068bb4c2a047f3bbbdcb"
-    sha256 cellar: :any,                 arm64_big_sur:  "657349fb05058b07f1167c63736d090461a4a23cc846e2d002f9cbba7c14c81b"
-    sha256 cellar: :any,                 sonoma:         "011e0229ba52b236336865293b4145345e63df8f099c38b35389454a7f2f3786"
-    sha256 cellar: :any,                 ventura:        "21a077eb227087d2e65580e34d306eef9086d17845d54df13db051a73d1e8e71"
-    sha256 cellar: :any,                 monterey:       "15ef687cca6b7bb5f1653c5abc66524806cda68d3435f86a84685ac915e7daa2"
-    sha256 cellar: :any,                 big_sur:        "f5bc709e4fdec42f08af5773f6524e07b8705cfc2fbea1acb797f81dcbfb5931"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "619b4108b279cc97be34e246a70a0a57c74b1db30d10c050da15a6695cfe8427"
+    sha256 cellar: :any,                 arm64_sequoia: "56459499fcb30c412b34069af462affba6150a684684b747a7696fb96bd6afe5"
+    sha256 cellar: :any,                 arm64_sonoma:  "88f8ceb923134e0f733355ddd5d8aeca284a6749b47bf42dab86de23854b8255"
+    sha256 cellar: :any,                 arm64_ventura: "b7aa1674e769996a9fff7a79b81eae73dfcb7c91dd2b746bd2f0c8c9f05ddb4e"
+    sha256 cellar: :any,                 sonoma:        "7ca5392892461703f4aaad060a0c33849d95a523e16e7b9e86ec97b94ccd1082"
+    sha256 cellar: :any,                 ventura:       "3046ba527c7add5e0406dfb8cdce75a76fa6ba273a3bf0a64041adc2753ef8dc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e8bc3f02f117c74ccf0f315354ccc1ecf10a013c7b2cbc6b7137617f1422a30e"
   end
 
   keg_only :provided_by_macos
@@ -70,13 +66,13 @@ class Sqlite < Formula
 
   test do
     path = testpath/"school.sql"
-    path.write <<~EOS
+    path.write <<~SQL
       create table students (name text, age integer);
       insert into students (name, age) values ('Bob', 14);
       insert into students (name, age) values ('Sue', 12);
       insert into students (name, age) values ('Tim', 13);
       select name from students order by age asc;
-    EOS
+    SQL
 
     names = shell_output("#{bin}/sqlite3 < #{path}").strip.split("\n")
     assert_equal %w[Sue Tim Bob], names

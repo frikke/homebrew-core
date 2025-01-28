@@ -1,61 +1,67 @@
 class Himalaya < Formula
   desc "CLI email client written in Rust"
-  homepage "https://pimalaya.org/himalaya/"
-  url "https://github.com/soywod/himalaya/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "9a5593a3a92dcce8227cea45870a88432d8df3a012636eb5461165cf599dbcbb"
+  homepage "https://github.com/pimalaya/himalaya"
+  url "https://github.com/pimalaya/himalaya/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "bc5ee10ebdb23ea205215650070373dc591f083a96b1d6d038aa23a105256f94"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "738f75aedd57528d9db730056b4f0113a040769a166f3867abf9280b3d61c870"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "669e214ec347274c3c3307c70707018878dc5badfb225a2474bdb1222480c1a5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c2fae94407f6ed9a3219ad2b48c7ed988298447ada49c59a4afa758fc727eecf"
-    sha256 cellar: :any_skip_relocation, ventura:        "83bb99ef9a793f8bd75e124e002d9e5f0fbda01292b69efee8b50169a57b5a7d"
-    sha256 cellar: :any_skip_relocation, monterey:       "f79d8bc1dcce9339d6629f14b7f3fe83bb2ad83981e39307e25876d68ef5e72a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "058bf1827a10ac97c86c9760da9943ca7e282328c81605568334d4c1a13053ec"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9d7452aa05f8a359c8c0f4accba2a48a9625b98a368dd48f9c5845c066d5c112"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c4faaa05c76bc7dd4d2423479e34af0cff58aba3f95bcd5a96ee6b154326460d"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9194d490d1c2356183427ebe2762a813661535944d34daa63e2d75d976ef6bbd"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "0ef6045f2bf47e807661cf800ff036e9df0c2e99fcea5e7d00ba0bed15a0160e"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a2782ddbd515580d4ce47d939155d31b3bf744500ef566c771d839bc32b05f5f"
+    sha256 cellar: :any_skip_relocation, ventura:       "159ef73b0f7b1fbca6cd8a509a993b7d18df156eddce6b04ad5e22360343d35f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b564756c788cadcae7e27532be8008896bf3cf742c7b5f9c861f966576364df4"
   end
 
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
 
   on_linux do
-    depends_on "pkg-config" => :build
     depends_on "openssl@3"
+  end
+
+  # revert `cc` crate to 1.2.7, upstream pr ref, https://github.com/pimalaya/himalaya/pull/542
+  patch do
+    url "https://github.com/pimalaya/himalaya/commit/ea70e7c123fd8b30e5b36ab62bfcfafa63779797.patch?full_index=1"
+    sha256 "44e8c415819272971787761f285be397ddc384a4230890bf1c8494c786b45373"
   end
 
   def install
     system "cargo", "install", *std_cargo_args
+
+    system bin/"himalaya", "man", buildpath
+    man1.install Dir["*.1"]
     generate_completions_from_executable(bin/"himalaya", "completion")
   end
 
   test do
-    # See https://github.com/soywod/himalaya#configuration
-    (testpath/".config/himalaya/config.toml").write <<~EOS
-      name = "Your full name"
-      downloads-dir = "/abs/path/to/downloads"
-      signature = """
-      --
-      Regards,
-      """
-
-      [gmail]
+    # See https://github.com/pimalaya/himalaya#configuration
+    (testpath/".config/himalaya/config.toml").write <<~TOML
+      [accounts.gmail]
       default = true
-      email = "your.email@gmail.com"
+      email = "example@gmail.com"
 
-      backend = "imap"
-      imap-host = "imap.gmail.com"
-      imap-port = 993
-      imap-login = "your.email@gmail.com"
-      imap-auth  = "passwd"
-      imap-passwd = { cmd = "echo password" }
+      folder.alias.inbox = "INBOX"
+      folder.alias.sent = "[Gmail]/Sent Mail"
+      folder.alias.drafts = "[Gmail]/Drafts"
+      folder.alias.trash = "[Gmail]/Trash"
 
-      sender = "smtp"
-      smtp-host = "smtp.gmail.com"
-      smtp-port = 465
-      smtp-login = "your.email@gmail.com"
-      smtp-auth  = "passwd"
-      smtp-passwd = { cmd = "echo password" }
-    EOS
+      backend.type = "imap"
+      backend.host = "imap.gmail.com"
+      backend.port = 993
+      backend.login = "example@gmail.com"
+      backend.auth.type = "password"
+      backend.auth.raw = "*****"
 
-    assert_match "Error: cannot login to imap server", shell_output(bin/"himalaya 2>&1", 1)
+      message.send.backend.type = "smtp"
+      message.send.backend.host = "smtp.gmail.com"
+      message.send.backend.port = 465
+      message.send.backend.login = "example@gmail.com"
+      message.send.backend.auth.type = "password"
+      message.send.backend.auth.cmd = "*****"
+    TOML
+
+    assert_match "cannot authenticate to IMAP server", shell_output(bin/"himalaya 2>&1", 1)
   end
 end

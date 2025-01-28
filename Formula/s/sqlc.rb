@@ -1,19 +1,18 @@
 class Sqlc < Formula
   desc "Generate type safe Go from SQL"
   homepage "https://sqlc.dev/"
-  url "https://github.com/sqlc-dev/sqlc/archive/v1.21.0.tar.gz"
-  sha256 "7857578856045e96ecf326c8733a21656025744411f3d151e39c4d3025ed194c"
+  url "https://github.com/sqlc-dev/sqlc/archive/refs/tags/v1.28.0.tar.gz"
+  sha256 "0f7f6992855c487871d331443a7091e1a62a345968483b581b20a7259f557af3"
   license "MIT"
   head "https://github.com/sqlc-dev/sqlc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "be41393b33f1f41929921cee8c1bdd69880973a56ee0ac9caa7bb38e6701f532"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c6fc78597ffa8287ecc379676eabbd3f8d9674b7a6765e3b7097140556a552ac"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2e86baa1b6049a9904222d66389b992d249a6ed36e93962e588ed719f4cb7c80"
-    sha256 cellar: :any_skip_relocation, ventura:        "b3e392a3a016d3c220079cb8d81c14c9f1efb0052ed37bcbea4c7f25844d7b06"
-    sha256 cellar: :any_skip_relocation, monterey:       "403beb9cc598ffcf7ef5bf16362d655bfe7f7c9400e6cf38871bb5da7ac0cdaa"
-    sha256 cellar: :any_skip_relocation, big_sur:        "35562212b84a0e45e1054b514193bf33e4000846fd001851e14f5eb2657aa50c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c0b62062fc17ecf577dfc76669a920e1197d72394c6e0855c8e1c41e90d8094e"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "caa8d51308aa6abf0dbd6acb6f353d1dd6648a9bcef289144a5bfcc68aae5051"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a6b39222f01fd18759f9eb377107e171b58f65cbef47c1cf15b23870f0b9db38"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "8b777e107d47a905be13b907ac37b3a8bce4ee4e3454147f58b6bf8fd7d3a066"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1bfe4bbbbb0aaa33911858cfe85b7eebf23f55e7768aa10fc2ad9218c711aa88"
+    sha256 cellar: :any_skip_relocation, ventura:       "d3b2510595ff558f5c8433abb4728436e6e7263b0a78a703008f7c350e66351b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "eab99091241a87f58cbcc558e3dc820b60e916337cc7a78212e517841268f367"
   end
 
   depends_on "go" => :build
@@ -25,7 +24,7 @@ class Sqlc < Formula
   end
 
   test do
-    (testpath/"sqlc.json").write <<~SQLC
+    (testpath/"sqlc.json").write <<~JSON
       {
         "version": "1",
         "packages": [
@@ -38,14 +37,14 @@ class Sqlc < Formula
           }
         ]
       }
-    SQLC
+    JSON
 
-    (testpath/"query.sql").write <<~EOS
+    (testpath/"query.sql").write <<~SQL
       CREATE TABLE foo (bar text);
 
       -- name: SelectFoo :many
       SELECT * FROM foo;
-    EOS
+    SQL
 
     system bin/"sqlc", "generate"
     assert_predicate testpath/"db.go", :exist?

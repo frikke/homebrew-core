@@ -1,9 +1,8 @@
 class Dex2jar < Formula
   desc "Tools to work with Android .dex and Java .class files"
   homepage "https://github.com/pxb1988/dex2jar"
-  url "https://github.com/pxb1988/dex2jar/releases/download/v2.3/dex2jar-v2.zip"
-  version "2.3"
-  sha256 "d0507b6277193476ae29351905b5fa9b20d1a9a5ce119b46d87e5b188edf859e"
+  url "https://github.com/pxb1988/dex2jar/releases/download/v2.4/dex-tools-v2.4.zip"
+  sha256 "ee7c45eb3c1d2474a6145d8d447e651a736a22d9664b6d3d3be5a5a817dda23a"
   license "Apache-2.0"
 
   livecheck do
@@ -12,17 +11,17 @@ class Dex2jar < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4ff845a14eb6055275b1144eb77d19334d57b2074bc7347136e23da4a180396f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "ded18e9ed01974a255fca1641dfa790cf06c09ad819578f9e351d06f71a5ad83"
   end
 
   depends_on "openjdk"
 
   def install
     # Remove Windows scripts
-    rm_rf Dir["*.bat"]
+    rm_r(Dir["*.bat"])
 
     # Install files
-    prefix.install_metafiles
     chmod 0755, Dir["*"]
     libexec.install Dir["*"]
 

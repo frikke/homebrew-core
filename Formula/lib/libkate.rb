@@ -9,6 +9,7 @@ class Libkate < Formula
 
   bottle do
     rebuild 3
+    sha256 cellar: :any,                 arm64_sequoia:  "04dd85a72a879204ea1f0f70685354e14e85a082a048d7745bc78c2c8da3361a"
     sha256 cellar: :any,                 arm64_sonoma:   "86df815c607bf3885aad8db7f1d235cdd3b01ed0ebd1435e2c12abbfb9eb4e86"
     sha256 cellar: :any,                 arm64_ventura:  "f026c1dedc82362063313529155c028a9073cd85a4df725f5eecd01e79e8beb8"
     sha256 cellar: :any,                 arm64_monterey: "3b2b393791903423df63ad4da2e8b15d164096347ad62ffc21b0bb075ebca8e4"
@@ -25,7 +26,7 @@ class Libkate < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "159b8a3fb3e5ed3f1fe68bd29dbe791f5a4e967fe7b94af24a4148d09f7c6e03"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libogg"
   depends_on "libpng"
 
@@ -34,13 +35,13 @@ class Libkate < Formula
     # however, this breaks install as it needs python2 to compile the KateDJ tool.
     ENV["PYTHON"] = ":"
 
-    system "./configure", *std_configure_args,
-                          "--enable-shared",
-                          "--enable-static"
+    system "./configure", "--enable-shared",
+                          "--enable-static",
+                          *std_configure_args
     system "make", "check"
     system "make", "install"
 
-    (man1/"KateDJ.1").unlink
+    rm(man1/"KateDJ.1")
   end
 
   test do

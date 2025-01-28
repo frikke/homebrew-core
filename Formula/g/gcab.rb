@@ -13,9 +13,12 @@ class Gcab < Formula
   end
 
   bottle do
+    sha256 arm64_sequoia:  "e6e1d52d928e85cb2fbbea1220fb224c61dae65fe1525959ae6fb61f7f77b013"
+    sha256 arm64_sonoma:   "7191f605413c808ef98d36eb37021fc8b038692ace3b8429b2d1b7e1c49b941e"
     sha256 arm64_ventura:  "1bba0eb507e8f2d7b64ad8c1a28c12dc74a785747a4683baa60437c2a4b015a6"
     sha256 arm64_monterey: "6bb87009bd9a5f53529273af07389d8cf4a3aae0c55a9dd51c617b598d5f7fc6"
     sha256 arm64_big_sur:  "abeac675d359f49d72372bb3e829a4abae65dddb5e2e92087cf0db14596b8040"
+    sha256 sonoma:         "ecdb571082d959ac47d5eb8cdebec587e0fb564dda216e2431c8f5730b229d69"
     sha256 ventura:        "d8cdcdfd05260f7ea32808b2b58f6711b2d1288bdd57b003dae112c99bc67a7d"
     sha256 monterey:       "3ccbb8269e8171382a3e9a3de7805a96f7c64e402eed4a0a277eb57978485c22"
     sha256 big_sur:        "2f7491f5f92549e9f9d23e42091f4dc24e36a921284a540a79665c6073e663f4"
@@ -26,9 +29,15 @@ class Gcab < Formula
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "vala" => :build
   depends_on "glib"
+
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     system "meson", "setup", "build", "-Ddocs=false", "-Dtests=false", *std_meson_args
@@ -37,6 +46,6 @@ class Gcab < Formula
   end
 
   test do
-    system "#{bin}/gcab", "--version"
+    system bin/"gcab", "--version"
   end
 end

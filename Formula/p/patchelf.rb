@@ -11,6 +11,7 @@ class Patchelf < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "00f60cc5a6eda135bd0184aa3e4980da9017132553c2ab685b03842f4c196ea2"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "25689776796afacaf452e8e74dd3805bf9ff129c00f3cc886c0857db9802c9db"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "37888c994e481e2b6a3a212c689195e2ca6dbeb681779845bbeda5a52262c1b5"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "bd75a287bcecfb33a2ca07c92225435571804a8e73f30ecc4769a6a7443dc2d0"
@@ -28,8 +29,6 @@ class Patchelf < Formula
     depends_on "autoconf" => :build
     depends_on "automake" => :build
   end
-
-  fails_with gcc: "5" # Needs std::optional
 
   resource "homebrew-helloworld" do
     url "http://timelessname.com/elfbin/helloworld.tar.gz"
@@ -56,7 +55,7 @@ class Patchelf < Formula
       assert_equal "/lib/ld-linux.so.2\n", shell_output("#{bin}/patchelf --print-interpreter chello")
       assert_equal "libc.so.6\n", shell_output("#{bin}/patchelf --print-needed chello")
       assert_equal "\n", shell_output("#{bin}/patchelf --print-rpath chello")
-      assert_equal "", shell_output("#{bin}/patchelf --set-rpath /usr/local/lib chello")
+      assert_empty shell_output("#{bin}/patchelf --set-rpath /usr/local/lib chello")
       assert_equal "/usr/local/lib\n", shell_output("#{bin}/patchelf --print-rpath chello")
     end
   end

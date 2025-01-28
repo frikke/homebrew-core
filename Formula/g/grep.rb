@@ -7,15 +7,15 @@ class Grep < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "0c5a74551504781dec17477fd6a7ec21680c3b30be3f421d02e4f57593181ad2"
-    sha256 cellar: :any,                 arm64_ventura:  "9c67868f89e03cc3ad77d4bf39c0593cf7c59d453ad8224e9c7007b800642f53"
-    sha256 cellar: :any,                 arm64_monterey: "8d1835e0b36b0c644660af9515c1973d650dfffaea08ba0c42914c99c3724d1c"
-    sha256 cellar: :any,                 arm64_big_sur:  "fb7628adb948252d44148389af10a0fb8d5b4c43b60cee093ebd821f678bfada"
-    sha256 cellar: :any,                 sonoma:         "8a2920cc2deb14480b0195d267443839941e0e301f6fe44adc31d79a6214708b"
-    sha256 cellar: :any,                 ventura:        "199c241e41de52e21ca6c28735cbbbe3e9e0595082e6742db76726f41baab11f"
-    sha256 cellar: :any,                 monterey:       "e66f574af6ce36a8bcac7fd7b3d1beb9962e9af570ccb04c7ed916cd04e9017b"
-    sha256 cellar: :any,                 big_sur:        "bbcc7e67bfdf6f9d89dfed9895e52620c88717d3e917e5c8fed35790a611069e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "caca59a561720fc8d5c57c39d1272c236e147e33ca8d66b2defb1e46466a29ff"
+    rebuild 2
+    sha256 cellar: :any,                 arm64_sequoia:  "b2b59b800b2017f64aa518d30dd83bb009486b67bab2b9fd2f5b96383741ccf3"
+    sha256 cellar: :any,                 arm64_sonoma:   "bad191c3178de90cfea096ef75c4ae8c97a3fed1aa36a9fd0eb88e02e0300ecd"
+    sha256 cellar: :any,                 arm64_ventura:  "3b671635a7a98ec6a5fd2f1ed1f7b61274fe68aa5ba2e23c448241777e5c23e0"
+    sha256 cellar: :any,                 arm64_monterey: "f4b2ed835aac8ced4b617609f502c657ea1f20a97282e1c19aa75b08316bd952"
+    sha256 cellar: :any,                 sonoma:         "ce3337c484b58a52ffc841fae13f3f530fbe8132a53f7f8a3fae8e17a994fa6c"
+    sha256 cellar: :any,                 ventura:        "0499226ca301f19321f44d9e0229f5dffceea6af6509835af86c073ac3a3e329"
+    sha256 cellar: :any,                 monterey:       "85f180f4b3c3563befd80d4d91389a9a7e4e69eb956c74251a3d3ed83fa26cf8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f8a180d77300df9dfad5d2e12b7f2061207fef15b63a6a4ed6d4082daa00345d"
   end
 
   head do
@@ -30,34 +30,34 @@ class Grep < Formula
     uses_from_macos "gperf" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "pcre2"
 
   def install
     system "./bootstrap" if build.head?
 
     args = %W[
-      --disable-dependency-tracking
       --disable-nls
-      --prefix=#{prefix}
       --infodir=#{info}
       --mandir=#{man}
       --with-packager=Homebrew
     ]
 
     args << "--program-prefix=g" if OS.mac?
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
 
     if OS.mac?
-      %w[grep egrep fgrep].each do |prog|
-        (libexec/"gnubin").install_symlink bin/"g#{prog}" => prog
-        (libexec/"gnuman/man1").install_symlink man1/"g#{prog}.1" => "#{prog}.1"
+      bin.children.each do |file|
+        (libexec/"gnubin").install_symlink file => file.basename.to_s.delete_prefix("g")
+      end
+      man1.children.each do |file|
+        (libexec/"gnuman/man1").install_symlink file => file.basename.to_s.delete_prefix("g")
       end
     end
 
-    libexec.install_symlink "gnuman" => "man"
+    (libexec/"gnubin").install_symlink "../gnuman" => "man"
   end
 
   def caveats

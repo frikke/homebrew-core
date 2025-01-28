@@ -1,22 +1,18 @@
 class Awk < Formula
   desc "Text processing scripting language"
   homepage "https://www.cs.princeton.edu/~bwk/btl.mirror/"
-  url "https://github.com/onetrueawk/awk/archive/20230909.tar.gz"
-  sha256 "24e554feb609fa2f5eb911fb8fe006c68d9042e34b2caafaad1f2200ce967c50"
-  # https://fedoraproject.org/wiki/Licensing:MIT?rd=Licensing/MIT#Standard_ML_of_New_Jersey_Variant
-  license "MIT"
+  url "https://github.com/onetrueawk/awk/archive/refs/tags/20250116.tar.gz"
+  sha256 "e031b1e1d2b230f276f975bffb923f0ea15f798c839d15a3f26a1a39448e32d7"
+  license "SMLNJ"
   head "https://github.com/onetrueawk/awk.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "3741938ae9a555470dcfe75975f7f98b6d838bce024b561b1e380b8112ee6981"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "71dcc0d85c8d256e4ade6241eae82a18de3fc1fe20ca242961b9ed6b1e4206ea"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "90467b080cdf1b139af338000c31586fd9b3ee387a214597b333d036354d6d63"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3e5e4df91f2628fdd27e655e1198cdf4f19e80aaf5235f4d987fa095638ad0ed"
-    sha256 cellar: :any_skip_relocation, sonoma:         "5e3669a1e2820cc1fd720c0af37ace49f1fea3da567983c61b3daccdefb05e9f"
-    sha256 cellar: :any_skip_relocation, ventura:        "9ee6a4d8b1dcfb3808ef2dc51214017865924b0631b2107d381be48c8e93ae0a"
-    sha256 cellar: :any_skip_relocation, monterey:       "14e36a488a1b66e579663545494c55bb9eeec31b71d72f23f810f69e04963333"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5943f92ced18437d64dbfc8653ea95f589517757316dd0dab9fac3ee1d39dbca"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7675e8286eaea8e940da59bf608da314f34033606c9f0a0c71c98f1f698cf8a4"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5856a1cbeffd667a6c5b806882dd171e1e07e4fc360c517879670d473e2c53d6"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "120228d2017aa47ba4b3bfc5f19a036c9faae95df04d0868c2b2deb114b8a914"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1e7d70c9939caca5633d63b76cf7335e09acc043ead6161030d6509f17627c52"
+    sha256 cellar: :any_skip_relocation, sonoma:        "8968128a1d73c936afcf91001b14acff3b61434c29da46dcc6633a0db110bafe"
+    sha256 cellar: :any_skip_relocation, ventura:       "bcd5849c88f363e61d7b5a64ad66523b179bb0640c6ccb2d20bc73a5f16ff97e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "58c95f701bae773a84aac466636229ae363c15b1943ae627d2065bcb16c2bc78"
   end
 
   uses_from_macos "bison" => :build
@@ -32,6 +28,6 @@ class Awk < Formula
   end
 
   test do
-    assert_match "test", pipe_output("#{bin}/awk '{print $1}'", "test")
+    assert_match "test", pipe_output("#{bin}/awk '{print $1}'", "test", 0)
   end
 end

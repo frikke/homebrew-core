@@ -1,8 +1,8 @@
 class Astro < Formula
   desc "To build and run Airflow DAGs locally and interact with the Astronomer API"
   homepage "https://www.astronomer.io/"
-  url "https://github.com/astronomer/astro-cli/archive/refs/tags/v1.19.2.tar.gz"
-  sha256 "cb024d1e787102572964a8c3a391e9cffd152f8c0ec43da92ec45d6b15064863"
+  url "https://github.com/astronomer/astro-cli/archive/refs/tags/v1.33.0.tar.gz"
+  sha256 "57f4e207c63ff45f06cac7597796452c3e8a26786aa6735e55a60007a1e42dd3"
   license "Apache-2.0"
 
   livecheck do
@@ -11,19 +11,21 @@ class Astro < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "033eba3ab4c048c7e9cc6b4de928cc44389d2d110b15e956c73f5203c212b9fb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "033eba3ab4c048c7e9cc6b4de928cc44389d2d110b15e956c73f5203c212b9fb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "033eba3ab4c048c7e9cc6b4de928cc44389d2d110b15e956c73f5203c212b9fb"
-    sha256 cellar: :any_skip_relocation, ventura:        "359bd3ebdd46cb2e1905616b0605c57019dba951c965892b1e0ebb805551bb0e"
-    sha256 cellar: :any_skip_relocation, monterey:       "359bd3ebdd46cb2e1905616b0605c57019dba951c965892b1e0ebb805551bb0e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "359bd3ebdd46cb2e1905616b0605c57019dba951c965892b1e0ebb805551bb0e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "afd70318653b7d0df1b4fa2246b910095177d92db4bb60c1e57a3fd1a6c95b9c"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2134df077c078b9e66b6f7bbb8b4683f5a88e470d1a076ed3fc08126ca07230b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b88afe208f91ab2892f8376ea5eb2de760ac9d344d0be2d3714590422b0cfa8f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "ea581a0064bab7efc144f6342d0c0e2245ad7596d09bfd7319dbf0c4cc990f76"
+    sha256 cellar: :any_skip_relocation, sonoma:        "da399443be3b70b7cb62e05cdaa2c2e59b479dd1d48ba8c1ec402572f0072cc5"
+    sha256 cellar: :any_skip_relocation, ventura:       "153bfac081418956e42f8143d19e322477dec99f8f58ca9fd8c9c966bcc9ff0e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "441ad7fed13afd54c6150f62edd0cb2f63552fc4a9f263fa838ca1a272449fe1"
   end
 
   depends_on "go" => :build
 
+  on_macos do
+    depends_on "podman"
+  end
+
   def install
-    ENV["CGO_ENABLED"] = "0"
     system "go", "build", *std_go_args(ldflags: "-s -w -X github.com/astronomer/astro-cli/version.CurrVersion=#{version}")
 
     generate_completions_from_executable(bin/"astro", "completion")
@@ -33,9 +35,12 @@ class Astro < Formula
     version_output = shell_output("#{bin}/astro version")
     assert_match("Astro CLI Version: #{version}", version_output)
 
-    run_output = shell_output("echo 'y' | #{bin}/astro dev init")
-    assert_match(/^Initializing Astro project*/, run_output)
-    assert_predicate testpath/".astro/config.yaml", :exist?
+    mkdir testpath/"astro-project"
+    cd testpath/"astro-project" do
+      run_output = shell_output("#{bin}/astro dev init")
+      assert_match "Initialized empty Astro project", run_output
+      assert_path_exists testpath/".astro/config.yaml"
+    end
 
     run_output = shell_output("echo 'test@invalid.io' | #{bin}/astro login astronomer.io --token-login=test", 1)
     assert_match(/^Welcome to the Astro CLI*/, run_output)

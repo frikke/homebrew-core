@@ -1,8 +1,8 @@
 class Epinio < Formula
   desc "CLI for Epinio, the Application Development Engine for Kubernetes"
   homepage "https://epinio.io/"
-  url "https://github.com/epinio/epinio/archive/refs/tags/v1.9.0.tar.gz"
-  sha256 "f4e8bd1daf855be98a389920a2d3ea504b7a33e01f0aa8b14a9e536e2232696e"
+  url "https://github.com/epinio/epinio/archive/refs/tags/v1.11.0.tar.gz"
+  sha256 "c90d551f4c7e142d0edf33ce39d3760ffb852ab22a88ad04165e159d44455076"
   license "Apache-2.0"
 
   # Upstream creates a stable version tag ahead of release but a version isn't
@@ -13,13 +13,14 @@ class Epinio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "16cd2d8c17f264eb6212137534b47931dd67ffd30a2da04ab85cc36a7ac05a69"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "401e58b70b09d46c901bfd3b72f401660d8e28bd542e71d114175c065f35f1d0"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c7c5b2965f92d18231ddde73ea7317dc4edccada95e82b967b5b365717187d05"
-    sha256 cellar: :any_skip_relocation, ventura:        "ebf1e33d33053a105300a709cee642f838c0b465bf15f659f538ba4201f3902f"
-    sha256 cellar: :any_skip_relocation, monterey:       "3d458af201c865412339eca336d4c6e419a420f331ef65d553af9fc376ebf640"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5f75df9fe09bc8ef49532df50cf6bc721b33bf8ed1f70855734ad80cd30cb258"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8bf4ea5222e2db10adc44cc698150589824d708071e26f03bd5103ab61713dbc"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "918cc4970f4144f7a3486167e19835edaf3e757e21a0c38753e05d07c908baf0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "36f7c49a38a4db43af6cb055a05ac5926b70f4e02be0b78bf3e105542b5b8deb"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1e6b187a3c9bcc242f33ef94d1e4b0c66405037e7703db7fc7c1581c8c9d9dae"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "39fc412fbb38d64fda1653f4e0268dc22f6616902ccdc16d26a925e9e3cf8b79"
+    sha256 cellar: :any_skip_relocation, sonoma:         "97f65c59a709ef78f944b05414271a2038562291ffcd7c3a62d1690b35383e99"
+    sha256 cellar: :any_skip_relocation, ventura:        "622444239281063b9ea2fc3f7cb24d10179cc042fc5d169f69c2103c29d194c7"
+    sha256 cellar: :any_skip_relocation, monterey:       "a23ff8736f9b2503b8f16102df34759eccc3b0c0104ab214fb5ecc2123be455f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1796bc25f20a13613f626417dae775c8410aa5c257be48065f3e645a4b6829ed"
   end
 
   depends_on "go" => :build
@@ -34,8 +35,7 @@ class Epinio < Formula
     output = shell_output("#{bin}/epinio version 2>&1")
     assert_match "Epinio Version: v#{version}", output
 
-    output = shell_output("#{bin}/epinio settings update-ca 2>&1")
-    assert_match "failed to get kube config", output
-    assert_match "no configuration has been provided", output
+    output = shell_output("#{bin}/epinio settings show 2>&1")
+    assert_match "Show Settings", output
   end
 end

@@ -1,9 +1,10 @@
 class Zeromq < Formula
   desc "High-performance, asynchronous messaging library"
   homepage "https://zeromq.org/"
-  url "https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz"
-  sha256 "c593001a89f5a85dd2ddf564805deb860e02471171b3f204944857336295c3e5"
-  license "LGPL-3.0-or-later" => { with: "LGPL-3.0-linking-exception" }
+  url "https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz"
+  sha256 "6653ef5910f17954861fe72332e68b03ca6e4d9c7160eb3a8de5a5a913bfab43"
+  license "MPL-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,17 +12,14 @@ class Zeromq < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "5dd98b530183bcafee0b791a59bf8e9442c9e774a3fdaf9d316917c45da0c616"
-    sha256 cellar: :any,                 arm64_ventura:  "6bc660ae09b329a376dc1784d2fa5d7f97ebfffdbbd8548fc664668d5b7d9406"
-    sha256 cellar: :any,                 arm64_monterey: "3776994a62536dd689bfa39321f8d0eb92cb9e71ae6fb8c7c3041be344af52c9"
-    sha256 cellar: :any,                 arm64_big_sur:  "eb0ee61f9c1e894c9ad5e55a5a8bc0b3859d56fab57179f82e3e41df6ca4b9f5"
-    sha256 cellar: :any,                 sonoma:         "057626027e9055157ac87b9d185ce36cb5accdb01574d51bd1e67813d71db718"
-    sha256 cellar: :any,                 ventura:        "c4e25da540f8d95e6d5048e6c7caf2e5f367b6e6b0858cfb6bdcc00f39223525"
-    sha256 cellar: :any,                 monterey:       "5806c8a77daa291e27c94ea0c905fd5b57484bc2546a11936daee72944615401"
-    sha256 cellar: :any,                 big_sur:        "579862174f4ce6883fe9871e52d0d4306c8daa67ecc7b5ab94c6174e29bb54bb"
-    sha256 cellar: :any,                 catalina:       "64bdc5d8d6cc656f1a086157bdbe565f658996f93e8d65af2ad222d80b23aa08"
-    sha256 cellar: :any,                 mojave:         "ee58ce5abf154406908cbc5104126d543ff47d62ae90319b4b7227726adb885b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8f5ec18a6ea91285231ab20957ca570b5affa0a6f2bfa10e3c608580c2416293"
+    sha256 cellar: :any,                 arm64_sequoia:  "8898ce6776591ad282627fd7215f02ade8f5c5ec3d4dd457ce25aba12c3c1c18"
+    sha256 cellar: :any,                 arm64_sonoma:   "3bf8942ece99f0457125006cf729f24823e09a3f6bd2257e8be9873e5783a0a1"
+    sha256 cellar: :any,                 arm64_ventura:  "0f670cd22b752c640a01f1f3353f8cdf7a6bf31beefad511c17baf315ad848f4"
+    sha256 cellar: :any,                 arm64_monterey: "3a8bc264cb466f765f65f73b0db3c202899656efa11b2df37bd961a224589e20"
+    sha256 cellar: :any,                 sonoma:         "986910eab9519ca92f167b545cde5992124a963b56d1346f2f917368e9a7eb43"
+    sha256 cellar: :any,                 ventura:        "25344444cf8c0583f65b1f36fdf11edc40ce2fe637fa04e34fe28c730573dadc"
+    sha256 cellar: :any,                 monterey:       "c8c1cafdffdc020cf504bc59888d61a016df6cdfc12650d89a43a846edb77ef2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "904b3146ea9aab3b4fdb584c74be1fa762145d3435eef653becc38ce0600c1bc"
   end
 
   head do
@@ -33,14 +31,14 @@ class Zeromq < Formula
   end
 
   depends_on "asciidoc" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "xmlto" => :build
 
   depends_on "libsodium"
 
   def install
     # Work around "error: no member named 'signbit' in the global namespace"
-    if MacOS.version == :high_sierra
+    if OS.mac? && MacOS.version == :high_sierra
       ENV.delete("HOMEBREW_SDKROOT")
       ENV.delete("SDKROOT")
     end
@@ -51,13 +49,13 @@ class Zeromq < Formula
     # https://github.com/Homebrew/homebrew-core/pull/35940#issuecomment-454177261
 
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}", "--with-libsodium"
+    system "./configure", "--with-libsodium", *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <zmq.h>
 
@@ -67,7 +65,7 @@ class Zeromq < Formula
         assert(0 == zmq_msg_init_size(&query, 1));
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lzmq", "-o", "test"
     system "./test"
     system "pkg-config", "libzmq", "--cflags"

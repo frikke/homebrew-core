@@ -3,12 +3,15 @@ class ChinadnsC < Formula
   homepage "https://github.com/shadowsocks/ChinaDNS"
   url "https://github.com/shadowsocks/ChinaDNS/releases/download/1.3.2/chinadns-1.3.2.tar.gz"
   sha256 "abfd433e98ac0f31b8a4bd725d369795181b0b6e8d1b29142f1bb3b73bbc7230"
-  license "GPL-3.0"
+  license "GPL-3.0-or-later"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d7f5135d04a85b3d2eb3db7d807d091f45b6c7047613d73538fe8e3fd92d2fcd"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "b959cce820a04d88db10395e6823303d9dba2a789215626b8eea0777f88dada1"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "962e197fda53c506ca1a8a11ab883c4e7b154a12ea747219b4add76e8fc2cc0d"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "b400b323f97ff6d0570ed5b2ccffc2325516dea3c12d6ee18c5903ee2d607f3e"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8a5921a1eb32cce03417035e20ed9fc3c52569bbe3cc963f4a5d8dacd8a61bd4"
+    sha256 cellar: :any_skip_relocation, sonoma:         "46f3927a44604a56d4263e14756379a34d06e4a5037f8e98c7cb73f2cba42f80"
     sha256 cellar: :any_skip_relocation, ventura:        "25c8e721baf2e9622339fd932f96af2e331aceafe6188f196536455cf4e77f20"
     sha256 cellar: :any_skip_relocation, monterey:       "3269038188274afa37cfbc4155f9aac9d63c5e47ac0e1cae9b10eb3e6eab63b5"
     sha256 cellar: :any_skip_relocation, big_sur:        "d15cde6788156aa67dffd280752d52f5aac1ef1e8f56c8e5864ce05b9c81647a"
@@ -33,6 +36,6 @@ class ChinadnsC < Formula
   end
 
   test do
-    system "#{bin}/chinadns", "-h"
+    system bin/"chinadns", "-h"
   end
 end

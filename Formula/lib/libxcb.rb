@@ -1,30 +1,28 @@
 class Libxcb < Formula
   desc "X.Org: Interface to the X Window System protocol"
   homepage "https://www.x.org/"
-  url "https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.16.tar.xz"
-  sha256 "4348566aa0fbf196db5e0a576321c65966189210cb51328ea2bb2be39c711d71"
+  url "https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.17.0.tar.xz"
+  sha256 "599ebf9996710fea71622e6e184f3a8ad5b43d0e5fa8c4e407123c88a59a6d55"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "36a383a0da6652d303796914f373ef3d974e7a8b4fb91de6a790dc3b1b37c719"
-    sha256 cellar: :any,                 arm64_ventura:  "9d83f7db1397e0afdd378af99d7da6bce33932df317d069452d9290ee621c895"
-    sha256 cellar: :any,                 arm64_monterey: "218d18008b39f761e9a77f8ff3f12162a6c8a86967cd55a71484fbc150c4053a"
-    sha256 cellar: :any,                 arm64_big_sur:  "8640d6a1d1631651f91df5c2ddf3e683e8d95eec58f5da34838076fa5aa93ca2"
-    sha256 cellar: :any,                 sonoma:         "51cab02db56d162ea34e7ac278a1adf846aaf8b5b219c6160c4ad7173636be56"
-    sha256 cellar: :any,                 ventura:        "a647b59bc0edc97b407fb24ae0b407c15192253ff974a1215edbe472c2bb638c"
-    sha256 cellar: :any,                 monterey:       "a8a235d90ceb77fe7cde801a86cab42c4b2566da1dc3ec9976ca65d45a4eaeb3"
-    sha256 cellar: :any,                 big_sur:        "f0f3b01121bf2779d73b04d2b9c1f2bb851083f1d2ae191d5670cdd72335ccf2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3b9097b6fb09f58424307e917bd212568c009f9ff0ac8264433f94f6bc2392b5"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "cce8d9e12c3f0b2fdbffbb3f7ba02f7e25cf3fa495b3e759d34a6264599543b3"
+    sha256 cellar: :any,                 arm64_sonoma:  "103f2b2f44b6dfd22bc936c9eb7f325b598374c549a9f56465b8cce80a2ea829"
+    sha256 cellar: :any,                 arm64_ventura: "3de506a3b5fd61bdd3f1cd5a244b82ea34b696894c8c3124e844a37ff6afd8c7"
+    sha256 cellar: :any,                 sonoma:        "d7cbef805f6d1aab547a65a931972df59a768bb48ff845ecdcbf7b404f64cfa6"
+    sha256 cellar: :any,                 ventura:       "b0bd40b6aba450db00c38a98d4a1e3b8cf3335f4df18e4044e60e1b0ad7fb481"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1ccb2f6e9f4feb73b3dbc56248554bc8ce30cb34771ed987eec1bd956f8563e2"
   end
 
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build # match version in `xcb-proto`
+  depends_on "pkgconf" => :build
+  depends_on "python@3.13" => :build # match version in `xcb-proto`
   depends_on "xcb-proto" => :build
   depends_on "libxau"
   depends_on "libxdmcp"
 
   def install
-    python3 = "python3.11"
+    python3 = "python3.13"
 
     args = %W[
       --sysconfdir=#{etc}
@@ -40,13 +38,13 @@ class Libxcb < Formula
       PYTHON=#{python3}
     ]
 
-    system "./configure", *std_configure_args, *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdlib.h>
       #include <string.h>
@@ -91,7 +89,7 @@ class Libxcb < Formula
         xcb_disconnect(connection);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-o", "test", "-I#{include}", "-L#{lib}", "-lxcb"
     system "./test"
     assert_equal 0, $CHILD_STATUS.exitstatus

@@ -6,6 +6,7 @@ class Libxinerama < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "16a20793dd7f5af12c877b836d798ae0b22e8cd392a7d29b7f35ecf3d9cea19d"
     sha256 cellar: :any,                 arm64_sonoma:   "62f42418dfb296c2e21748bd9902aec2e59acde89316b6340a0fdebe01a934b8"
     sha256 cellar: :any,                 arm64_ventura:  "69863001935cc52cff4322674c03ab0e0f429ca424cf619135459571a9712677"
     sha256 cellar: :any,                 arm64_monterey: "dc7b122a398f22ad751700145dc9d3b82f2fb60fc85a64daf3a71e0761c3e140"
@@ -18,34 +19,32 @@ class Libxinerama < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "d8bcf697bd80954325c6994d562554f890ab0fd6e35ae671f0886a05bcacc29b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libx11"
   depends_on "libxext"
   depends_on "xorgproto"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/extensions/Xinerama.h"
 
       int main(int argc, char* argv[]) {
         XineramaScreenInfo info;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

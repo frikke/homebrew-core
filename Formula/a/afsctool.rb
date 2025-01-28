@@ -7,34 +7,48 @@ class Afsctool < Formula
   head "https://github.com/RJVB/afsctool.git"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f21804d2beead64d635cd72b2b9e5b76d1911dc2de9c15236e41689ddc46dc74"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4cee829a15d8fb035095298b056e8925c2ce5bf730c6ed7ac2e76df4f8432595"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "05e5e2d51ff1fec526024bd93ba39d39afe230badd7e5bbe686df6e7ebf0fbab"
-    sha256 cellar: :any_skip_relocation, ventura:        "9c972678aa3e291a0224c6e14cc90df0e29ccadd5cfafc895bb354b39b8a9e47"
-    sha256 cellar: :any_skip_relocation, monterey:       "e13983fdbff0c188b976e8a0bdb49fcfadf83385bb65e96eb01381884cb40d60"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a225ce419105bddbb9fbd33d7ce67c500b2e571464a6b7f5f8792b73ce5aca59"
-    sha256 cellar: :any_skip_relocation, catalina:       "588533fd0b1916a8b980983c87e603a8681a420c887c14fec5fcf7b90fbd6d9b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "9eab0e700160a5bf2d1f62f8e67a017280e10315030cb09134933ee782974a95"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "a1596705cff076205b68f6fa301394e2feb6bdfc071543679db46aa38eec7aae"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6528c95eb0a3b0b57a72eeb847ceab4e4887cbcbaf46a019f9e47d875b6deb9b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "54700cfb61f7a32df0346997ccb3a181e1b7bef7613ad8bee751b75aaab9500d"
+    sha256 cellar: :any_skip_relocation, sonoma:         "74f60adb27bfbec7b4add84a60f73ae3d7c804632dd99a39b61c270bf8125e92"
+    sha256 cellar: :any_skip_relocation, ventura:        "3f8835bb2dac636100454adb2262b8e86dbb394519dcd60f83ecbd39e21e6f17"
+    sha256 cellar: :any_skip_relocation, monterey:       "17a9351748475089c170985080188c640209eab140e959808979260d752c254e"
   end
 
   depends_on "cmake" => :build
   depends_on "google-sparsehash" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on :macos
 
+  resource "lzfse" do
+    url "https://github.com/lzfse/lzfse.git",
+        revision: "e634ca58b4821d9f3d560cdc6df5dec02ffc93fd"
+  end
+
   def install
-    system "cmake", ".", *std_cmake_args
-    system "cmake", "--build", "."
-    bin.install "afsctool"
-    bin.install "zfsctool"
+    (buildpath/"src/private/lzfse").install resource("lzfse")
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    bin.install "build/afsctool", "build/zfsctool"
   end
 
   test do
     path = testpath/"foo"
-    path.write "some text here."
-    system "#{bin}/afsctool", "-c", path
-    system "#{bin}/afsctool", "-v", path
+    sample = "A"*1024*1024
+    path.write sample
+    original_size = File.stat(path).blocks
 
-    system "#{bin}/zfsctool", "-c", path
-    system "#{bin}/zfsctool", "-v", path
+    test_options = [[], ["-T", "LZFSE"]]
+    test_options.each do |x|
+      system bin/"afsctool", "-c", *x, path
+      system bin/"afsctool", "-v", path
+      raise "Did not compress" unless File.stat(path).blocks.between?(1, 10)
+
+      system bin/"afsctool", "-d", path
+      raise "Did not decompress" if File.stat(path).blocks != original_size
+      raise "Data corruption" if path.read != sample
+    end
   end
 end

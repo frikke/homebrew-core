@@ -1,19 +1,17 @@
 class EnpassCli < Formula
   desc "Enpass command-line client"
   homepage "https://github.com/hazcod/enpass-cli"
-  url "https://github.com/hazcod/enpass-cli/archive/refs/tags/v1.6.0.tar.gz"
-  sha256 "25668bb30747dc566695ff7f30e65fa2e29b04f5896155a4ab03185d8f5b4111"
+  url "https://github.com/hazcod/enpass-cli/archive/refs/tags/v1.6.3.tar.gz"
+  sha256 "59f1bb98017f3e5ea13d7b82fbf7f975e9da038b97f65375e0a44164ad66be7e"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "67158376301a2f3e721a54503975bd0e7c80cd41d19cd6f6ed4e958a4d5519e2"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3886bf0f30fd5016e681694bf4bb97b3574faeae9bf9ac7739897a33719b2420"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c8c56d9ddabab190cfaecdc750ed9012995cea8031e4a03388048b99b6e62ab1"
-    sha256 cellar: :any_skip_relocation, ventura:        "595299a62c2019cc33106f208551d214e0e8021e796110bed6fb53c9c3c18136"
-    sha256 cellar: :any_skip_relocation, monterey:       "4cacf3c72f633df99482e9735717dd6328526ff7b6f3f87f818bc90c7698ac8b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a9f4ae75f92797bb83b3e7d3ddb8d4d7716fee9ea43d688edcb7099d7d176c70"
-    sha256 cellar: :any_skip_relocation, catalina:       "30e28c45feee0e71a307cd84934d093b5b6279b0a5b963d75046b7cd8914048e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "11e1d47d23da2b08f44c9d991004b3d8ebee28c00bd84ed3f29d0a9a50a65857"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "880a2e628a2ed9f9647e85584c5d4acdf8065514989622830cced35316df2c2b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "099e34647f3ef84b53e9b4854e6d71f8490fff3d52d435f196b89deba5c0f945"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "9d9709ca6f4b7eea51f811278af7844a9dd7b1153c48e5c137f1c96d439b3145"
+    sha256 cellar: :any_skip_relocation, sonoma:        "c8e71c2c817dae86f109d86f36e22995302c5306578058f8f5ee5ac5aaaeabb0"
+    sha256 cellar: :any_skip_relocation, ventura:       "cc4b8e65919630811c6e6ae26e433d9a77cea6323e481153fac72b93ea9fd9c3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "50f075ca060a7ab81a6d247b3a392ce91ffbcbf436145ee38e5fe5cc07781d89"
   end
 
   depends_on "go" => :build

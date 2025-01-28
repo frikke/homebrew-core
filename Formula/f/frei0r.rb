@@ -1,20 +1,19 @@
 class Frei0r < Formula
   desc "Minimalistic plugin API for video effects"
   homepage "https://frei0r.dyne.org/"
-  url "https://github.com/dyne/frei0r/archive/refs/tags/v2.3.1.tar.gz"
-  sha256 "dd6dbe49ba743421d8ced07781ca09c2ac62522beec16abf1750ef6fe859ddc9"
+  url "https://github.com/dyne/frei0r/archive/refs/tags/v2.3.3.tar.gz"
+  sha256 "aeeefe3a9b44761b2cf110017d2b1dfa2ceeb873da96d283ba5157380c5d0ce5"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "716f802dd29e576e6269d338dd490980fd91fa841808d76073cbb20fe3a8ab24"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4ed74b974e7139389d18023f046b110f6130077fdf439ebc5160a74c49d201a3"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "8d7583afd26b8fe3ca325c3be7094cee4b11d0971540fa08c24b5f18bd6d5e11"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "544eca4e64b8b5b9ea9f1e3f8a5ff965e05550c5c817cfdba22bd4cafdccce20"
-    sha256 cellar: :any_skip_relocation, sonoma:         "100ca7787f20ceef6135019f020c4409af77feab2cca4b2ecb002b2e3803eed2"
-    sha256 cellar: :any_skip_relocation, ventura:        "b758ba1802d90593b19018699ff86eda41c097e26901d3416f6c5ac72eaf39d5"
-    sha256 cellar: :any_skip_relocation, monterey:       "6a8da3d13c69817c2ff5cf411211209d78d57be5b9677cfff10bd640059272ea"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9361dbf613fa22e7098b66c5b305971a68311304eb7d46e93622f7c04d655b6d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "74bba79532192e29fe85c8c125d73a7b022c84b3bd36fb655a4fc1c4ec333325"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "064f58d291191e9d7264db2992ee79213b3b88927fb953d3cb70dc09eb458d6b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "59d88950f340427381e84fd644fbc6672a1255812f6c1bc4bb82aaed76640190"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e1432fd9d7d702c1c27f0cf574b337e4191ee454ba439ad0e71be1fecb82f707"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b080ed40975a908e12c9c94829f2b7664382f9fbd5b6083cfe7a289d5841e792"
+    sha256 cellar: :any_skip_relocation, sonoma:         "7499dc7a7e179e486b641d68d31ee0b7c6f9a16949f58da91e4702ddb970eb32"
+    sha256 cellar: :any_skip_relocation, ventura:        "80dd7d731c9bc516931aa77f313eb9a2016e9f0e50adec2e5e8966c0c860584b"
+    sha256 cellar: :any_skip_relocation, monterey:       "3d74d9a45e232e70927cdc16f9bb90b839efb979297bf887da998c8b1b479747"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f85bc09b930b41d316d408e81c26f99f275a578bad4eeb3a24aa8796ca19835d"
   end
 
   depends_on "cmake" => :build
@@ -34,7 +33,7 @@ class Frei0r < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <frei0r.h>
 
       int main()
@@ -46,7 +45,7 @@ class Frei0r < Formula
           return 1;
         }
       }
-    EOS
+    C
     system ENV.cc, "-L#{lib}", "test.c", "-o", "test"
     system "./test"
   end

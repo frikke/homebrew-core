@@ -12,6 +12,7 @@ class Speex < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "885ccb79dee4ad080d2c5ee20ab55569b0dfee064535a537568dd78adff88dcb"
     sha256 cellar: :any,                 arm64_sonoma:   "8dcf1981467ac7b19763ef294c2ef1cbb5fdbe98100043c95f4617a89a930a22"
     sha256 cellar: :any,                 arm64_ventura:  "e8e8cbefa65f7819b2feb27b9067248d97f2e5607253c0a5c8a49a495d7fc824"
     sha256 cellar: :any,                 arm64_monterey: "b0cba69db1b66944a019f312fa128d6c6460f971fdd5cfddc0725051b76a4dd0"
@@ -24,7 +25,7 @@ class Speex < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "3ea2ee48a402525421cb3ef8b83173d4bc57741c10e84fe6fae66691905293ec"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libogg"
 
   def install
@@ -34,7 +35,7 @@ class Speex < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <speex/speex.h>
 
       int main()
@@ -50,7 +51,7 @@ class Speex < Formula
 
           return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lspeex", "-o", "test"
     system "./test"
   end

@@ -11,9 +11,12 @@ class SigrokCli < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "fd787456a3085648cbf83f56294acc9c37579a5dba2338d8d56c74710c03ee90"
+    sha256 cellar: :any,                 arm64_sonoma:   "a5e82221775d890da9132fdc4326606838e1622c0e692248e2e2efd54839893e"
     sha256 cellar: :any,                 arm64_ventura:  "c829705552edd7e001c393e73954a4f95a3b50319994943897c05858e3734998"
     sha256 cellar: :any,                 arm64_monterey: "f097768e26c50de6aafacfb8e1e1db78837620683d42dd1cca848c0797794bd0"
     sha256 cellar: :any,                 arm64_big_sur:  "176086043c5408747b737bf7f8984b966cc23f409977ebd4d01b4f127d7fb580"
+    sha256 cellar: :any,                 sonoma:         "e0ab196bf123ced48ba23364127c709e7cd3dde29842600e29983b9ecc5a7d14"
     sha256 cellar: :any,                 ventura:        "57ec56b4589b3801668bb98fd0c83298ec5958e111bec41a5294f48257db7769"
     sha256 cellar: :any,                 monterey:       "c66c8195acaf4a1865d2df389b0295f9ccf6cca5f4cf6db78b3ad686c35bc3fd"
     sha256 cellar: :any,                 big_sur:        "5a02c04e5b3148c70995ca652850eb8146ab436d102c19f5c96b39a578c5b31e"
@@ -29,10 +32,14 @@ class SigrokCli < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "glib"
   depends_on "libsigrok"
   depends_on "libsigrokdecode"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     system "./autogen.sh" if build.head?
@@ -44,6 +51,6 @@ class SigrokCli < Formula
 
   test do
     # Make sure that we can capture samples from the demo device
-    system "#{bin}/sigrok-cli", "-d", "demo", "--samples", "1"
+    system bin/"sigrok-cli", "-d", "demo", "--samples", "1"
   end
 end

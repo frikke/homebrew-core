@@ -1,10 +1,9 @@
 class Pianobar < Formula
   desc "Command-line player for https://pandora.com"
   homepage "https://6xq.net/pianobar/"
-  url "https://6xq.net/pianobar/pianobar-2022.04.01.tar.bz2"
-  sha256 "1670b28865a8b82a57bb6dfea7f16e2fa4145d2f354910bb17380b32c9b94763"
+  url "https://6xq.net/pianobar/pianobar-2024.12.21.tar.bz2"
+  sha256 "16f4dd2d64da38690946a9670e59bc72a789cf6a323f792e159bb3a39cf4a7f5"
   license "MIT"
-  revision 2
   head "https://github.com/PromyLOPh/pianobar.git", branch: "master"
 
   livecheck do
@@ -13,24 +12,21 @@ class Pianobar < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "fbc2fd420f260620ef30d57b13d850df8da77b2dccecb53a5fb9d698089cba76"
-    sha256 cellar: :any,                 arm64_monterey: "4e6349ecff466a1e973fa0975e992ae0db11a4f919a535839117fda07b402158"
-    sha256 cellar: :any,                 arm64_big_sur:  "0c642308962498b47dae7eec94f52245daf878b180ad5157c107d5d3bb200f75"
-    sha256 cellar: :any,                 ventura:        "abb8bf92074313509c45f27760b1f7c48b7cac98b6cefb82a8eee3c413f1ff1e"
-    sha256 cellar: :any,                 monterey:       "9b479699fb6c58fec10367f6062613ace2697cbb4d9fd5e64257c83fb182d0c4"
-    sha256 cellar: :any,                 big_sur:        "5ea04fcbbc9d9f411a08f6929fb3c9f12d0e09f1b5e4c7c1d695f3a6151126c2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "44018c075406e5c40822a95155d287dcd13541f27048c566bb5c2fd8edc43b29"
+    sha256 cellar: :any,                 arm64_sequoia: "40becb06f83fe8900cc315c4e17a6f9d2aa0e6c0f64ebfa92c9d4375f0f37822"
+    sha256 cellar: :any,                 arm64_sonoma:  "60fbc938432af84fcbd2d65af5a8c7f84a73971953026904e40a72f36ca9916d"
+    sha256 cellar: :any,                 arm64_ventura: "b10ac8d07a77bb918559f52fd2b940e1fbb67114821bcc0787f00998343ef32a"
+    sha256 cellar: :any,                 sonoma:        "54ece37889c899e13f6a450eaed826b55a02212677e6335f30733bb11dc3ba84"
+    sha256 cellar: :any,                 ventura:       "075e6a4aa76b0c0652c66017f8fddb9642b6d4ed5e04686594ff02ea0e2f2426"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "adcd810b2c11957d38dd073181a1742e0d579a60b61c78228ac21fb2fc9f101b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "ffmpeg"
   depends_on "json-c"
   depends_on "libao"
   depends_on "libgcrypt"
 
   uses_from_macos "curl"
-
-  fails_with gcc: "5" # ffmpeg is compiled with GCC
 
   def install
     # Discard Homebrew's CFLAGS as Pianobar reportedly doesn't like them

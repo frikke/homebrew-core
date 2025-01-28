@@ -1,18 +1,12 @@
 class CassandraReaper < Formula
   desc "Management interface for Cassandra"
   homepage "https://cassandra-reaper.io/"
-  url "https://github.com/thelastpickle/cassandra-reaper/releases/download/3.3.3/cassandra-reaper-3.3.3-release.tar.gz"
-  sha256 "001293154fa81f2d360f0c4dfcf71ce71500433a3279e77450c407b4677597be"
+  url "https://github.com/thelastpickle/cassandra-reaper/releases/download/3.7.1/cassandra-reaper-3.7.1-release.tar.gz"
+  sha256 "c35192901f112ae95411e7695de95551323dac2ff20f662be96c8f86b71943e6"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3ca65d24a4519c6542176b0e2b2f994cc74dfc779ea4886ed40ae1cfcd2e629a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3ca65d24a4519c6542176b0e2b2f994cc74dfc779ea4886ed40ae1cfcd2e629a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3ca65d24a4519c6542176b0e2b2f994cc74dfc779ea4886ed40ae1cfcd2e629a"
-    sha256 cellar: :any_skip_relocation, ventura:        "3ca65d24a4519c6542176b0e2b2f994cc74dfc779ea4886ed40ae1cfcd2e629a"
-    sha256 cellar: :any_skip_relocation, monterey:       "3ca65d24a4519c6542176b0e2b2f994cc74dfc779ea4886ed40ae1cfcd2e629a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3ca65d24a4519c6542176b0e2b2f994cc74dfc779ea4886ed40ae1cfcd2e629a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "48efe146d440177527b7b2ae8649a2a6c146bfb724702477449b672af851eb39"
+    sha256 cellar: :any_skip_relocation, all: "c3b2162a4bf6d80c3f1dfeddac8af70d9ed189dcf5517b2dda7a58fc3dccd616"
   end
 
   depends_on "openjdk@11"
@@ -44,11 +38,13 @@ class CassandraReaper < Formula
     inreplace "cassandra-reaper.yaml" do |s|
       s.gsub! "port: 8080", "port: #{port}"
       s.gsub! "port: 8081", "port: #{free_port}"
+      s.gsub! "storageType: memory", "storageType: memory\npersistenceStoragePath: #{testpath}/persistence"
     end
+
     fork do
-      exec "#{bin}/cassandra-reaper", "#{testpath}/cassandra-reaper.yaml"
+      exec bin/"cassandra-reaper", testpath/"cassandra-reaper.yaml"
     end
-    sleep 30
+    sleep 40
     assert_match "200 OK", shell_output("curl -Im3 -o- http://localhost:#{port}/webui/login.html")
   end
 end

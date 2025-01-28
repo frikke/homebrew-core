@@ -1,18 +1,19 @@
 class Goffice < Formula
   desc "Gnumeric spreadsheet program"
   homepage "https://gitlab.gnome.org/GNOME/goffice"
-  url "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.55.tar.xz"
-  sha256 "16a221191855a6a6c0d06b1ef8e481cf3f52041a654ec96d35817045ba1a99af"
+  url "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.57.tar.xz"
+  sha256 "66bfd7e31d2f6756d5a62c3670383cbba02b3cb4c1042950192a801b72a3c9ab"
   license any_of: ["GPL-3.0-only", "GPL-2.0-only"]
 
   bottle do
-    sha256 arm64_ventura:  "b4fba5dd3adb45ec2bbd704602870bebdb56498f8e32a0d9cc73695e56d70539"
-    sha256 arm64_monterey: "d65b7f9ed3f4f20f40db33f6a5e0524a7bb4eefbf7aa64cf2bd6d16ee36a10fe"
-    sha256 arm64_big_sur:  "0aa63ad148cb4aae4c65266661a83918c908e20215370f370a83539b76013925"
-    sha256 ventura:        "64237ea971207b9ed98c30df3fd174e43655c961e3fda8f477c694046906d6eb"
-    sha256 monterey:       "e504938af2973d98cfed4e9a402ba7abafbfa9a1d93cb5deebda0af512bc70db"
-    sha256 big_sur:        "b4b6abb961eb7cc3485f517d1ea196104b0bddfdaa6dee3f258f906584f6e434"
-    sha256 x86_64_linux:   "8cde966d15d0204ea00adf282e606d026988617d25d5e2f139a623a8ce8f1b66"
+    sha256 arm64_sequoia:  "d4ca91bb298e7dc0444609b9a09ceb404b81743329d462f1eb62a2a2046d525d"
+    sha256 arm64_sonoma:   "a946184d2ad6fc95b59fb4c68a598aefebd8df3633d49a9b53decebea9eee6c9"
+    sha256 arm64_ventura:  "c50b18823cc2a8efc038b7487dc1f229425709be9398e29b558d5747b2454006"
+    sha256 arm64_monterey: "d28569db16793e715714a51758ab7429f8be117d964d8035e7062550c03b3a4d"
+    sha256 sonoma:         "32b61c93a65c288cad554a876550c1793e41a3465e792557bc6810c339b8bf8b"
+    sha256 ventura:        "88b7b7f99dae20d363f196ec55427158efd1ea0b0da3f2985b14fc0e637e6a63"
+    sha256 monterey:       "dea1e444318e1364a1a9c96ec0a2b76b74df27b0576d820a354dfc378d4ef519"
+    sha256 x86_64_linux:   "6d3ceb9fbd03a344ad62974ed5cd4365242c42397d323b89c3421416191ecb20"
   end
 
   head do
@@ -25,8 +26,9 @@ class Goffice < Formula
 
   depends_on "gettext" => :build
   depends_on "intltool" => :build
-  depends_on "pkg-config" => :build
-  depends_on "atk"
+  depends_on "pkgconf" => [:build, :test]
+
+  depends_on "at-spi2-core"
   depends_on "cairo"
   depends_on "gdk-pixbuf"
   depends_on "glib"
@@ -35,54 +37,38 @@ class Goffice < Formula
   depends_on "librsvg"
   depends_on "pango"
 
+  uses_from_macos "perl" => :build
+  uses_from_macos "python" => :build
   uses_from_macos "libxml2"
   uses_from_macos "libxslt"
 
   on_macos do
     depends_on "gettext"
+    depends_on "harfbuzz"
+  end
+
+  on_linux do
+    depends_on "perl-xml-parser" => :build
   end
 
   def install
-    if OS.linux?
-      # Needed to find intltool (xml::parser)
-      ENV.prepend_path "PERL5LIB", Formula["intltool"].libexec/"lib/perl5"
-      ENV["INTLTOOL_PERL"] = Formula["perl"].bin/"perl"
-    end
-
     configure = build.head? ? "./autogen.sh" : "./configure"
-    system configure, *std_configure_args, "--disable-silent-rules"
+    system configure, "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <goffice/goffice.h>
-      int main()
-      {
-          void
-          libgoffice_init (void);
-          void
-          libgoffice_shutdown (void);
-          return 0;
+      int main() {
+        libgoffice_init();
+        libgoffice_shutdown();
+        return 0;
       }
-    EOS
-    libxml2 = if OS.mac?
-      "#{MacOS.sdk_path}/usr/include/libxml2"
-    else
-      Formula["libxml2"].opt_include/"libxml2"
-    end
-    system ENV.cc, "-I#{include}/libgoffice-0.10",
-           "-I#{Formula["glib"].opt_include}/glib-2.0",
-           "-I#{Formula["glib"].opt_lib}/glib-2.0/include",
-           "-I#{Formula["harfbuzz"].opt_include}/harfbuzz",
-           "-I#{Formula["libgsf"].opt_include}/libgsf-1",
-           "-I#{libxml2}",
-           "-I#{Formula["gtk+3"].opt_include}/gtk-3.0",
-           "-I#{Formula["pango"].opt_include}/pango-1.0",
-           "-I#{Formula["cairo"].opt_include}/cairo",
-           "-I#{Formula["gdk-pixbuf"].opt_include}/gdk-pixbuf-2.0",
-           "-I#{Formula["atk"].opt_include}/atk-1.0",
-           testpath/"test.c", "-o", testpath/"test"
+    C
+
+    flags = shell_output("pkgconf --cflags --libs libgoffice-#{version.major_minor}").strip.split
+    system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end
 end

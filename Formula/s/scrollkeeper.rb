@@ -7,9 +7,11 @@ class Scrollkeeper < Formula
   revision 2
 
   bottle do
+    sha256 arm64_sonoma:   "393abbc7a63c6f53e924dddf91fc58abd331cdbc74fbbf8118daed76f03a16a8"
     sha256 arm64_ventura:  "a834db07ff6faaa052fcae2830820837d37902cdfc46427df8e98addc82ba600"
     sha256 arm64_monterey: "6de06691bc02972907fa268ce8501559f794454734b2d94894bd41f19cd33c4c"
     sha256 arm64_big_sur:  "88e96878a9f7cef658edaf418c55f7c9e6904aead82bd3102384cbdfb342a400"
+    sha256 sonoma:         "d0b990b427662ec71ef2b7a0009ed1ceaef6f049c6de22a8ed3448928deab19d"
     sha256 ventura:        "03fb943a492839b62516584ae22c9ea7909ff60265e25c1bde2b864778b28ab7"
     sha256 monterey:       "a9b9a811e7d62586377152f75794cb92b57782611622815816f779a823427cb4"
     sha256 big_sur:        "0cdfc1e87fe8d2281867eb923dfce700906894f6593a763fe79f4afc936f2ad2"
@@ -20,7 +22,7 @@ class Scrollkeeper < Formula
   end
 
   # Last release on 2003-12-06 and no upstream activity.
-  deprecate! date: "2023-02-16", because: :unmaintained
+  disable! date: "2024-02-12", because: :unmaintained
 
   depends_on "docbook"
   depends_on "gettext"
@@ -61,10 +63,10 @@ class Scrollkeeper < Formula
 
     # Run autoreconf on macOS to rebuild configure script so that it doesn't try
     # to build with a flat namespace.
-    system "autoreconf", "--force", "--verbose", "--install" if OS.mac?
-    system "./configure", "--prefix=#{prefix}",
-                          "--mandir=#{man}",
-                          "--with-xml-catalog=#{etc}/xml/catalog"
+    system "autoreconf", "--force", "--install", "--verbose" if OS.mac?
+    system "./configure", "--mandir=#{man}",
+                          "--with-xml-catalog=#{etc}/xml/catalog",
+                          *std_configure_args
     system "make"
     system "make", "install"
   end

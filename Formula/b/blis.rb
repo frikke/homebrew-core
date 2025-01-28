@@ -1,26 +1,21 @@
 class Blis < Formula
   desc "BLAS-like Library Instantiation Software Framework"
   homepage "https://github.com/flame/blis"
-  url "https://github.com/flame/blis/archive/0.9.0.tar.gz"
-  sha256 "1135f664be7355427b91025075562805cdc6cc730d3173f83533b2c5dcc2f308"
+  url "https://github.com/flame/blis/archive/refs/tags/1.1.tar.gz"
+  sha256 "847c035809b8994c077ade737a4813601db96c4cf0d903d08ba6a9b8ee0fe03e"
   license "BSD-3-Clause"
   head "https://github.com/flame/blis.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "103cdd90012dd567134b27ed704d763a04d3b1d628e3cea3c17106f5efabc640"
-    sha256 cellar: :any,                 arm64_monterey: "b00ba6ef35a226e90b0bfdf30d7a89ba81d00305fa8d960ccb6fd0aac63d3925"
-    sha256 cellar: :any,                 arm64_big_sur:  "b7bf20b1149ef17db68e5e5626f258e8369f00dbbb22be6c752c298138177aef"
-    sha256 cellar: :any,                 ventura:        "dcec254cbee261d15eebc4d3bd8d698f8af275886c9aca7bb4ce3dc0da961437"
-    sha256 cellar: :any,                 monterey:       "08dc73c2cbce4359b51c2a4c4f78df6350aa24df087b0c1613bb9995717edd68"
-    sha256 cellar: :any,                 big_sur:        "0c21276af8ad03e16deaed43bc146f57aec908e6e4bc95f748cedf2af8c1d3c0"
-    sha256 cellar: :any,                 catalina:       "1feac3394dab398ede9e1540b84c4782ee6e7b916e93327ec68324d1d451db17"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "caf7db98c4ec255521ef31d28156bac9f2149ff02be40ad978b6be0c32ac2ba8"
+    sha256 cellar: :any,                 arm64_sequoia: "7b54027b039fa551a50e4fb6e99c79f732a5b34aff78092d733e22c823450ad9"
+    sha256 cellar: :any,                 arm64_sonoma:  "0709aa01695e7ce672d9d8a0780d28fa3465f2cba5b49f976bd3c96f498c1448"
+    sha256 cellar: :any,                 arm64_ventura: "9630f05d848259bc7ffc9df96102b9655a0cd3284057dd77a5e59256b81a32ec"
+    sha256 cellar: :any,                 sonoma:        "eb365f3d3d6fc8eb1df33f83f72b88ee33984438392b78bdc58e4657f7cec66b"
+    sha256 cellar: :any,                 ventura:       "996841f0627e6a5f43d4f272bb0698e7fecb9f958fe05915c85b0814a6be34ac"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "db5d4aed1ccf53d93eb65d37dd22cda09f5049e7c5fe4bd2f7db556ccaa57ad3"
   end
 
   uses_from_macos "python" => :build
-
-  fails_with gcc: "5"
 
   def install
     # https://github.com/flame/blis/blob/master/docs/ConfigurationHowTo.md
@@ -42,7 +37,7 @@ class Blis < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdlib.h>
       #include <math.h>
@@ -62,7 +57,7 @@ class Blis < Formula
         if (fabs(C[4]-21) > 1.e-5) abort();
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c", "-I#{include}", "-L#{lib}", "-lblis", "-lm"
     system "./test"
   end

@@ -1,22 +1,21 @@
 class Htmldoc < Formula
   desc "Convert HTML to PDF or PostScript"
   homepage "https://www.msweet.org/htmldoc/"
-  url "https://github.com/michaelrsweet/htmldoc/archive/v1.9.17.tar.gz"
-  sha256 "438cbd4c6673a9e156ef9a4793540762e8438298063cac019a45f55ac577872e"
+  url "https://github.com/michaelrsweet/htmldoc/archive/refs/tags/v1.9.20.tar.gz"
+  sha256 "a155c86c69f90a426ff7244bd046bad026cc5ba9ac2be89dcb1d7973c52d5d82"
   license "GPL-2.0-only"
   head "https://github.com/michaelrsweet/htmldoc.git", branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "9f1bcfe7faec9233c76de1a61181dc65860517a30f44a73613132722c99e91d0"
-    sha256 arm64_monterey: "b57f8f12b1cac450538e777edb612638d8e30ea0a0fc364fd4f6444687bae5d0"
-    sha256 arm64_big_sur:  "d6c5799db7ad777b686f27c853b5122f351e3e38fda05be0b491fd34ae0f308c"
-    sha256 ventura:        "66a0a8386caff8134b7bae76beec4525ac4c5529b708c24718887e09bf15fbcb"
-    sha256 monterey:       "062c063380fc216608dac9f3b83bdd9c51ad7e2766d3e87ea32c6993ffaee3e9"
-    sha256 big_sur:        "5ad79f3c3a94e815b938604dedb32356181490963037d4165230c927bb5989bf"
-    sha256 x86_64_linux:   "d164474207477be359c00de33397dd7f6b609409f93d54b984885b4fee045000"
+    sha256 arm64_sequoia: "5183e094ab3128b038025333172df99251d2a4f1db6c409d892eba9ff9967270"
+    sha256 arm64_sonoma:  "3957858cee344323b79f139e3659f40112509a8a63305422c18a523f3a4ebd78"
+    sha256 arm64_ventura: "fc6b29637b2e230ee3f969118df765352cc4c55c496ba0aa28b3ccd8db3fa762"
+    sha256 sonoma:        "7bb2bc2ad093d1d9ab36698bb927dd6ace11ca733f300c18bf8f7299588cf1a4"
+    sha256 ventura:       "905cc97f81a0215aa7b1c90b8679ed67e5446b1b533173f2a2d288b4db4fbc96"
+    sha256 x86_64_linux:  "cff32d4cdcf1043c08056a4a3bcacb77de58c679c878bbe983f8de9fc75d438c"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "jpeg-turbo"
   depends_on "libpng"
 
@@ -28,14 +27,14 @@ class Htmldoc < Formula
   end
 
   def install
-    system "./configure", *std_configure_args,
-                          "--mandir=#{man}",
-                          "--without-gui"
+    system "./configure", "--mandir=#{man}",
+                          "--without-gui",
+                          *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    system "#{bin}/htmldoc", "--version"
+    system bin/"htmldoc", "--version"
   end
 end

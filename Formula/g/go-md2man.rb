@@ -2,21 +2,17 @@ class GoMd2man < Formula
   desc "Converts markdown into roff (man pages)"
   homepage "https://github.com/cpuguy83/go-md2man"
   url "https://github.com/cpuguy83/go-md2man.git",
-      tag:      "v2.0.2",
-      revision: "d97078115282836e16d0dca10b4b42ce60fc70e6"
+      tag:      "v2.0.6",
+      revision: "441631534462b74c098953dbd8d5f6210994b0bf"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "4601a6e6f23215a6598d6c607a3ca0fd4cb8d6355b83a9b936b7ecb3d8e78de9"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "501d739e8eee89129cf4723552580065dcfe087a71d2674b5df8a643394a6ed4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5c90b9a66b208691bd21aac4d739b2a55abdb2b328a858fbcbc161b7e9fe6257"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5c90b9a66b208691bd21aac4d739b2a55abdb2b328a858fbcbc161b7e9fe6257"
-    sha256 cellar: :any_skip_relocation, sonoma:         "c37eaa07a3c67a0980b890ee57ed5fa649f3a85492a255655afff0d9f50fe18a"
-    sha256 cellar: :any_skip_relocation, ventura:        "b8870d7145f1b804f1aa7426053a1d8230e669e929468044aea807e99a908a9d"
-    sha256 cellar: :any_skip_relocation, monterey:       "bf229a23b6bfe77c80872668ccaa52da73fba7b3dcce34085661dbecb5bb9f75"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bf229a23b6bfe77c80872668ccaa52da73fba7b3dcce34085661dbecb5bb9f75"
-    sha256 cellar: :any_skip_relocation, catalina:       "bf229a23b6bfe77c80872668ccaa52da73fba7b3dcce34085661dbecb5bb9f75"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1b64c10c08f4f0d6c663beedba7a143c448950c5bab845a8b1099d3f20bc38d4"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "386385f734e6980cd796ef8c730ce0a24cda6258d62583f63adbb4770b5a246c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "386385f734e6980cd796ef8c730ce0a24cda6258d62583f63adbb4770b5a246c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "386385f734e6980cd796ef8c730ce0a24cda6258d62583f63adbb4770b5a246c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3f403e810b84edebc51c4f8e23f6a9f944e7259df273976f8bce39c0f2bf704f"
+    sha256 cellar: :any_skip_relocation, ventura:       "3f403e810b84edebc51c4f8e23f6a9f944e7259df273976f8bce39c0f2bf704f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b560a2b606a1bb4065ec10a33dad917042b3cbd182e5bd900434d9555135b5cf"
   end
 
   depends_on "go" => :build
@@ -29,6 +25,6 @@ class GoMd2man < Formula
 
   test do
     assert_includes pipe_output(bin/"go-md2man", "# manpage\nand a half\n"),
-                    ".TH manpage\n.PP\nand a half\n"
+                    ".TH manpage\nand a half\n"
   end
 end

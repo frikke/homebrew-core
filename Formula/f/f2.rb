@@ -1,25 +1,29 @@
 class F2 < Formula
   desc "Command-line batch renaming tool"
   homepage "https://github.com/ayoisaiah/f2"
-  url "https://github.com/ayoisaiah/f2/archive/v1.9.1.tar.gz"
-  sha256 "fbeb4540c4afe4aa25565685ee7ef7498449da7fc5f5b70a0e303b15c6e35f71"
+  url "https://github.com/ayoisaiah/f2/archive/refs/tags/v2.0.3.tar.gz"
+  sha256 "164e1282ae1f2ea6a8af93c785d7bb214b09919ad8537b8fbab5b5bc8ee1a396"
   license "MIT"
   head "https://github.com/ayoisaiah/f2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "05a3ff917d9aaab41874915d0270151d14b03d2b45b30346338ba0bc6bbe7aa8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "05a3ff917d9aaab41874915d0270151d14b03d2b45b30346338ba0bc6bbe7aa8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "05a3ff917d9aaab41874915d0270151d14b03d2b45b30346338ba0bc6bbe7aa8"
-    sha256 cellar: :any_skip_relocation, ventura:        "640ad76f6012ed3c7d4dcc4f054e6edfa44621f3594303d32c3cd3c8763351ed"
-    sha256 cellar: :any_skip_relocation, monterey:       "640ad76f6012ed3c7d4dcc4f054e6edfa44621f3594303d32c3cd3c8763351ed"
-    sha256 cellar: :any_skip_relocation, big_sur:        "640ad76f6012ed3c7d4dcc4f054e6edfa44621f3594303d32c3cd3c8763351ed"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "00ebec8aaa2a5d08b8516bc009e658923f3a55eb9df0d92ee8effd98207fabed"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8302833ac2fb9359a9219c8157f0f2b89cfc0a1c77878d333def7a43386aa33b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8302833ac2fb9359a9219c8157f0f2b89cfc0a1c77878d333def7a43386aa33b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "8302833ac2fb9359a9219c8157f0f2b89cfc0a1c77878d333def7a43386aa33b"
+    sha256 cellar: :any_skip_relocation, sonoma:        "8bd506a72e01572496aec534f019ba39752b8f8c9974cdae26c0aad3c2f9b247"
+    sha256 cellar: :any_skip_relocation, ventura:       "8bd506a72e01572496aec534f019ba39752b8f8c9974cdae26c0aad3c2f9b247"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "42b70125dde40f56f721d1f02904018d5ce9bfaf048a5c0cd4d22465a2a25851"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "./cmd..."
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/f2"
+
+    bash_completion.install "scripts/completions/f2.bash" => "f2"
+    fish_completion.install "scripts/completions/f2.fish"
+    zsh_completion.install "scripts/completions/f2.zsh" => "_f2"
   end
 
   test do

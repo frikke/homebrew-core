@@ -1,10 +1,16 @@
 class Libassuan < Formula
   desc "Assuan IPC Library"
   homepage "https://www.gnupg.org/related_software/libassuan/"
-  url "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.6.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libassuan/libassuan-2.5.6.tar.bz2"
-  sha256 "e9fd27218d5394904e4e39788f9b1742711c3e6b41689a31aa3380bd5aa4f426"
-  license "GPL-3.0-only"
+  # TODO: On next release, check if `-std=gnu89` workaround can be removed.
+  # Ref: https://dev.gnupg.org/T7246
+  url "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.1.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libassuan/libassuan-3.0.1.tar.bz2"
+  sha256 "c8f0f42e6103dea4b1a6a483cb556654e97302c7465308f58363778f95f194b1"
+  license all_of: [
+    "LGPL-2.1-or-later",
+    "GPL-3.0-or-later", # assuan.info
+    "FSFULLR", # libassuan-config, libassuan.m4
+  ]
 
   livecheck do
     url "https://gnupg.org/ftp/gcrypt/libassuan/"
@@ -12,24 +18,25 @@ class Libassuan < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "f6b2f1d6181e0a12955a60e6ee2f2d6bcdf489f898986ba0ab35b583f0f3e1d1"
-    sha256 cellar: :any,                 arm64_ventura:  "46b1c3401d74b1712ae9858ec44d9018862238e11ac0b956d5705a82c0591e12"
-    sha256 cellar: :any,                 arm64_monterey: "8913222f8bce3392df60072c27313af9dca61cb5678cec0f23e8bd8d28168bfd"
-    sha256 cellar: :any,                 arm64_big_sur:  "54abc438b9b44aec5933b14393e4ef139f61feca860bbc71f43c355a2754c1db"
-    sha256 cellar: :any,                 sonoma:         "7e7849c151251ada88d638136dfe0013f63334682ea8ddc7ff19322d86e009d2"
-    sha256 cellar: :any,                 ventura:        "bfd5c6760f0da3d77fbca66fe1a44b94ec029919376a5ad1904b88c27bdf607b"
-    sha256 cellar: :any,                 monterey:       "de2d641bac4bc28d4d41cb29284ad24ecf8c1cc2e609056ae5478a81ef17785d"
-    sha256 cellar: :any,                 big_sur:        "25750195f585a93c86ff5b150161cd09cbaea3f9a036ec5aad0dafa7c93417d4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dc27800b95d9c358d6e7d9ef5f6efe56535d08c98bde7c5b028b5d155103f179"
+    sha256 cellar: :any,                 arm64_sequoia:  "d53cede9f63eafcea91f251c981b77d8fd3a1c154f18fbdef96e723bd4735af8"
+    sha256 cellar: :any,                 arm64_sonoma:   "a8ee8c0ab1f375a63461302a4cd02d0d637ffcb1dea275fedcadd809760d782e"
+    sha256 cellar: :any,                 arm64_ventura:  "8184558f48ab9800dc30a504eb75280cf5045e4d7b88ba47b5413d37f70c72c2"
+    sha256 cellar: :any,                 arm64_monterey: "2ffaccce9f611cf5393cbe11dfc1b5ae06b17facc470e0c2bc0412ab99ba3a05"
+    sha256 cellar: :any,                 sonoma:         "163ccdbb162a2ff51d976ea875d5d5ff27e743967199991ffa9932a090b12287"
+    sha256 cellar: :any,                 ventura:        "432ad61d2bb3d4d37085af8a3195e291c587be9d8f500c196ac8b77e30b0123a"
+    sha256 cellar: :any,                 monterey:       "9028c16a9be579ffa059f778586b841319e8c05537177684737d01f552b190f6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "72bb9308d12fb7ff5f41b91805da04e1246521d6f33b9ef4b712ca6d70385b7f"
   end
 
   depends_on "libgpg-error"
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--enable-static"
+    # Fixes duplicate symbols errors - https://lists.gnupg.org/pipermail/gnupg-devel/2024-July/035614.html
+    ENV.append_to_cflags "-std=gnu89"
+
+    system "./configure", "--disable-silent-rules",
+                          "--enable-static",
+                          *std_configure_args
     system "make", "install"
 
     # avoid triggering mandatory rebuilds of software that hard-codes this path

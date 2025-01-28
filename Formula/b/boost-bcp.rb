@@ -1,8 +1,8 @@
 class BoostBcp < Formula
   desc "Utility for extracting subsets of the Boost library"
   homepage "https://www.boost.org/doc/tools/bcp/"
-  url "https://github.com/boostorg/boost/releases/download/boost-1.82.0/boost-1.82.0.tar.xz"
-  sha256 "fd60da30be908eff945735ac7d4d9addc7f7725b1ff6fcdcaede5262d511d21e"
+  url "https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-b2-nodocs.tar.xz"
+  sha256 "3abd7a51118a5dd74673b25e0a3f0a4ab1752d8d618f4b8cea84a603aeecc680"
   license "BSL-1.0"
   head "https://github.com/boostorg/boost.git", branch: "master"
 
@@ -11,21 +11,18 @@ class BoostBcp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "546e2e4b992b227502893bb99802046bd148eac46dc70d351ac15e3a1c741fb0"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "19f66c853e71c38810c7ea1f931c0c739ab21a5f05f7eaef122f469ce676051e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "292512be6a33b38e7b5a02adb43590b8166d6c35a3a0f9f999c41949dc6fe6e0"
-    sha256 cellar: :any_skip_relocation, ventura:        "de25d6bbb70a8c3601dcf42ea912a37532271684b7d7b6620a8a8125b9709c0d"
-    sha256 cellar: :any_skip_relocation, monterey:       "6c284bfdabf3553242dcf2b80fc79ed6c80d61e85a5b4b6239464f003da62feb"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8fe0266537ddf50a031ab743e22ab672adcd64889cdd2944cbafabb45a585005"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "71a4ddd60a9968795a0fc0c961b56bbb5d97a4dfffe2daf4b1be92e7e9647cdf"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "171968ec74f288dbeafafbd6b9499260c9419949e744448f95b4cebcfff46190"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "67ac1798a2a94eed7036d444894605317a8913124de7ce95b8c10df2a723e1d4"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b5c7ae2f79c8ebc6f9e6132cddb866a03c97e04b5f0b671550d113d4602799db"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1171bb8e3d580f0338e57a3d352a9bcb088937550f3d0d9f7a0bc11211d33860"
+    sha256 cellar: :any_skip_relocation, ventura:       "da4bd6cc7653a68f3568e673b5b6470d48e224b817d5b700f4ba480b6042ff02"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9e4050db4c0364d62a8476fb8f4294eaf577cfbd5445061cfdbc69eb1aed449e"
   end
 
   depends_on "boost-build" => :build
   depends_on "boost" => :test
 
   def install
-    # remove internal reference to use brewed boost-build
-    rm "boost-build.jam"
     cd "tools/bcp" do
       system "b2"
       prefix.install "../../dist/bin"

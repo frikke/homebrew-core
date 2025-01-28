@@ -1,9 +1,10 @@
 class BoostPython3 < Formula
   desc "C++ library for C++/Python3 interoperability"
   homepage "https://www.boost.org/"
-  url "https://github.com/boostorg/boost/releases/download/boost-1.82.0/boost-1.82.0.tar.xz"
-  sha256 "fd60da30be908eff945735ac7d4d9addc7f7725b1ff6fcdcaede5262d511d21e"
+  url "https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-b2-nodocs.tar.xz"
+  sha256 "3abd7a51118a5dd74673b25e0a3f0a4ab1752d8d618f4b8cea84a603aeecc680"
   license "BSL-1.0"
+  revision 1
   head "https://github.com/boostorg/boost.git", branch: "master"
 
   livecheck do
@@ -11,21 +12,20 @@ class BoostPython3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "54a07f5f3d5babda43d7adb2af3cb46b3f756ec3e2b67fe50f6da2aff81c7b41"
-    sha256 cellar: :any,                 arm64_monterey: "518fa733ea9fd88e320a9bdd12c259e76c29f2dd1dae0368ca7016830c0c7b1e"
-    sha256 cellar: :any,                 arm64_big_sur:  "a1a6fe4845cc1fb97e50c408a11a84d1a09fe0163e973d15a6320db83b19a156"
-    sha256 cellar: :any,                 ventura:        "c5222b373a4b2f5b5c7e1f9b9012bd34f70a28b56bf9a691426650a8825a0659"
-    sha256 cellar: :any,                 monterey:       "b097a520137dcc5360df7998b7468b12cb33147cdae3c10ab1270f1e36749aaa"
-    sha256 cellar: :any,                 big_sur:        "65864416a8314dc2669890da5bc0246aa4ea5c73985773ed1cea3082b03d1711"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5129320e1bb52a1c69204df65c31f283c9a0caf8a2b6515833c9d689bd4594cd"
+    sha256 cellar: :any,                 arm64_sequoia: "1bfc8d16e673420c90d440351214aa003dddce5dd1e5d997750ebfe3f10406af"
+    sha256 cellar: :any,                 arm64_sonoma:  "10316d5c37144f3ee869da4350a160b518570b60334e768ddbe9eacf1fcb7be8"
+    sha256 cellar: :any,                 arm64_ventura: "f5a6b1a59f5d1bd5092b6256a2fcbfd7fb4816205de5cc94f95fce3ffe708ac5"
+    sha256 cellar: :any,                 sonoma:        "c269dac8219d15e78659b3b5f48819d3695a5e9f646111bd30187d24d6e11525"
+    sha256 cellar: :any,                 ventura:       "7232f6b6da751626f3f7a9bc22ecd19e26804dde406de41b683615805bcead1a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c4dde9942cf842fe1a19c561da2f18880467730858f59ce0feaa6895e8517bbb"
   end
 
   depends_on "numpy" => :build
   depends_on "boost"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
@@ -33,10 +33,10 @@ class BoostPython3 < Formula
     args = %W[
       -d2
       -j#{ENV.make_jobs}
-      --layout=tagged-1.66
+      --layout=system
       --user-config=user-config.jam
       install
-      threading=multi,single
+      threading=multi
       link=shared,static
     ]
 
@@ -44,6 +44,10 @@ class BoostPython3 < Formula
     # handling using ENV.cxx14. Using "cxxflags" and "linkflags" still works.
     args << "cxxflags=-std=c++14"
     args << "cxxflags=-stdlib=libc++" << "linkflags=-stdlib=libc++" if ENV.compiler == :clang
+
+    # Avoid linkage to boost container and graph modules
+    # Issue ref: https://github.com/boostorg/boost/issues/985
+    args << "linkflags=-Wl,-dead_strip_dylibs" if OS.mac?
 
     # disable python detection in bootstrap.sh; it guesses the wrong include
     # directory for Python 3 headers, so we configure python manually in
@@ -79,14 +83,12 @@ class BoostPython3 < Formula
                    "python=#{pyver}",
                    *args
 
-    lib.install buildpath.glob("install-python3/lib/*.*")
-    (lib/"cmake").install buildpath.glob("install-python3/lib/cmake/boost_python*")
-    (lib/"cmake").install buildpath.glob("install-python3/lib/cmake/boost_numpy*")
-    doc.install (buildpath/"libs/python/doc").children
+    lib.install buildpath.glob("install-python3/lib/*{python,numpy}*")
+    (lib/"cmake").install buildpath.glob("install-python3/lib/cmake/*{python,numpy}*")
   end
 
   test do
-    (testpath/"hello.cpp").write <<~EOS
+    (testpath/"hello.cpp").write <<~CPP
       #include <boost/python.hpp>
       char const* greet() {
         return "Hello, world!";
@@ -95,19 +97,19 @@ class BoostPython3 < Formula
       {
         boost::python::def("greet", greet);
       }
-    EOS
+    CPP
 
     pyincludes = shell_output("#{python3}-config --includes").chomp.split
     pylib = shell_output("#{python3}-config --ldflags --embed").chomp.split
     pyver = Language::Python.major_minor_version(python3).to_s.delete(".")
 
-    system ENV.cxx, "-shared", "-fPIC", "hello.cpp", "-L#{lib}", "-lboost_python#{pyver}",
+    system ENV.cxx, "-shared", "-fPIC", "-std=c++14", "hello.cpp", "-L#{lib}", "-lboost_python#{pyver}",
                     "-o", "hello.so", *pyincludes, *pylib
 
-    output = <<~EOS
+    output = <<~PYTHON
       import hello
       print(hello.greet())
-    EOS
+    PYTHON
     assert_match "Hello, world!", pipe_output(python3, output, 0)
   end
 end

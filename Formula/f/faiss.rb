@@ -1,8 +1,8 @@
 class Faiss < Formula
   desc "Efficient similarity search and clustering of dense vectors"
   homepage "https://github.com/facebookresearch/faiss"
-  url "https://github.com/facebookresearch/faiss/archive/v1.7.4.tar.gz"
-  sha256 "d9a7b31bf7fd6eb32c10b7ea7ff918160eed5be04fe63bb7b4b4b5f2bbde01ad"
+  url "https://github.com/facebookresearch/faiss/archive/refs/tags/v1.9.0.tar.gz"
+  sha256 "a6c3c60811aeec2dd8943a41f3df244bfed12371453d9b10eaf6ba55fafad1d2"
   license "MIT"
 
   livecheck do
@@ -11,14 +11,12 @@ class Faiss < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "fce50696b90d0357b420807c89f13b20851a187759c01a20cec3cd281c34fbd6"
-    sha256 cellar: :any,                 arm64_monterey: "d8e5da0af54d584559f730e823abfe76334638e86a6f58ffa8416efae1b58f8b"
-    sha256 cellar: :any,                 arm64_big_sur:  "3bad3d3ecc1fa8fd4d8e6421f4bd2d031143490785ac3f276a432df9dfbd0ac1"
-    sha256 cellar: :any,                 ventura:        "b6d728b6141c74eae30ae89c2ed3faa44a198afd890da6482b407209c79325c5"
-    sha256 cellar: :any,                 monterey:       "8b88769ab126f91fd0269306e3bcc5102baaab9e61730095a24d71c5b3b79546"
-    sha256 cellar: :any,                 big_sur:        "efc062d04573dd6d5b1911cc7cb333f125ae67aae11a8964490852297d8cf941"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7fa475e6a354bfa4456b3f53537a649c68e3b672f4abf87e879d9a25a4215452"
+    sha256 cellar: :any,                 arm64_sequoia: "26ea150f8723f7ebacf858a6d470e1a5fd8145efc4d1080b41e9be6ed7e5e993"
+    sha256 cellar: :any,                 arm64_sonoma:  "dd7330aa740c100fd29ecee133a84a548171317625ebabc0d8892ac753ac7691"
+    sha256 cellar: :any,                 arm64_ventura: "4a6e113023669f5365fd8dc6d3b28992e62d11146e0eb214669ea164cd629ffd"
+    sha256 cellar: :any,                 sonoma:        "a582b7928a12b018566d99d86dd631eac1be0e52ab67fe6a1ac1049559ac726a"
+    sha256 cellar: :any,                 ventura:       "1b52e795c1aff5f0aad25ef87a614129d01a9e35a6f611ea193af29f4307b1b6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "99b2f1ec81e5889a31d5196b95b5a412cfa8806033c67351cb638105381161f2"
   end
 
   depends_on "cmake" => :build

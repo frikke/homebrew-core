@@ -1,27 +1,25 @@
 class Gkrellm < Formula
   desc "Extensible GTK system monitoring application"
   homepage "https://billw2.github.io/gkrellm/gkrellm.html"
-  url "http://gkrellm.srcbox.net/releases/gkrellm-2.3.11.tar.bz2"
-  sha256 "1ee0643ed9ed99f88c1504c89d9ccb20780cf29319c904b68e80a8e7c8678c06"
-  revision 3
+  url "https://gkrellm.srcbox.net/releases/gkrellm-2.4.0.tar.bz2"
+  sha256 "6f83665760b936ad4b55f9182b1ec7601faf38a0f25ea1e4bddc9965088f032d"
+  license "GPL-3.0-or-later"
 
   livecheck do
-    url "http://gkrellm.srcbox.net/releases/"
+    url "https://gkrellm.srcbox.net/releases/"
     regex(/href=.*?gkrellm[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_ventura:  "dd870efc661b45e29ad69fc2413a3d78069763d01e0b1b7c5234df19bf3c102f"
-    sha256 arm64_monterey: "3983e2437e1930f66c19ba5dfffe300ec7624aad43a3e0b4d4b49ead2ec70167"
-    sha256 arm64_big_sur:  "e2722e8eef55bf785c42548a507355bd44df8c6df7dcc40a8c2f5b40f8c2c290"
-    sha256 ventura:        "a2ce7b7c4e41372864b7de15a19d649dbbdb6bcd6c8de4bf1b96264358d834fb"
-    sha256 monterey:       "5871cd121aa7aa4b0bfc6af75e8e718a1e49d560f23efb2a98ad1255167143d9"
-    sha256 big_sur:        "7a4eaed03a5da148716b65e02cdddb03b13c3c1bdf6f43c65cd4833be4d09166"
-    sha256 x86_64_linux:   "5ce7b72ca02d9657b676754d3bcf936e8fba6c4f0aa4fa2e76520bd31f5975eb"
+    sha256 arm64_sonoma:  "291a90717a25bb95ef0c496bdec82d885587559c31009bd552eedaa3a25f583d"
+    sha256 arm64_ventura: "f7de52218b179c4604afe3453fd8d23e2f43cb974b73db9ac8ddd638317fc185"
+    sha256 sonoma:        "40c0010f6bb061498f99a49574e95f69e48d3208a4a45d4958ebbf8b40e55100"
+    sha256 ventura:       "b8ccfe42efe43ed8059fb2cb003af40f5c1cfe707022a01034a775240334eb7a"
+    sha256 x86_64_linux:  "866d5ec29d28c584d77357100e4f8909cf2524cefb6859670578695c4dcb6cfb"
   end
 
-  depends_on "pkg-config" => :build
-  depends_on "atk"
+  depends_on "pkgconf" => :build
+  depends_on "at-spi2-core"
   depends_on "cairo"
   depends_on "fontconfig"
   depends_on "freetype"
@@ -32,8 +30,20 @@ class Gkrellm < Formula
   depends_on "openssl@3"
   depends_on "pango"
 
+  on_macos do
+    depends_on "harfbuzz"
+  end
+
   on_linux do
+    depends_on "libice"
     depends_on "libsm"
+    depends_on "libx11"
+  end
+
+  # disable systemd service handling on macos, upstream pr ref: https://git.srcbox.net/gkrellm/gkrellm/pulls/44
+  patch do
+    url "https://git.srcbox.net/gkrellm/gkrellm/commit/bb444190052b3d4096bbaaeaef15a57df4212b3c.patch?full_index=1"
+    sha256 "20e7d9ed74977450c4417b558a2bd3bbb2cbaf6c0e8cd4df12ea07cf574fb703"
   end
 
   def install
@@ -44,13 +54,11 @@ class Gkrellm < Formula
   end
 
   test do
-    pid = fork do
-      exec "#{bin}/gkrellmd --pidfile #{testpath}/test.pid"
-    end
+    pid = spawn "#{bin}/gkrellmd --pidfile #{testpath}/test.pid"
     sleep 2
 
     begin
-      assert_predicate testpath/"test.pid", :exist?
+      assert_path_exists testpath/"test.pid"
     ensure
       Process.kill "SIGINT", pid
       Process.wait pid

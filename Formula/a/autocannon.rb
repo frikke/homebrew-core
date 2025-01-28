@@ -1,20 +1,18 @@
-require "language/node"
-
 class Autocannon < Formula
   desc "Fast HTTP/1.1 benchmarking tool written in Node.js"
   homepage "https://github.com/mcollina/autocannon"
-  url "https://registry.npmjs.org/autocannon/-/autocannon-7.12.0.tgz"
-  sha256 "ba33a4b876b5d07e6d430481d2331170942f744a2f608c7a7c21eafe6c83f888"
+  url "https://registry.npmjs.org/autocannon/-/autocannon-8.0.0.tgz"
+  sha256 "470ac762b261d8eca3d8069be8776b25fc111e4caa962bc144a85e9631fd07fa"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "aa99297ea39b7efe578a7373dd57585a55a225347632e8dbb2cb4e10f452bb35"
+    sha256 cellar: :any_skip_relocation, all: "802f0328259fdee67f34d0f613897abf2d1a665654a7b26fcd5dca49b053c103"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir[libexec/"bin/*"]
   end
 

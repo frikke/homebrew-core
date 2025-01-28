@@ -1,30 +1,20 @@
 class GnuApl < Formula
   desc "GNU implementation of the programming language APL"
   homepage "https://www.gnu.org/software/apl/"
-  license "GPL-3.0"
-
-  stable do
-    url "https://ftp.gnu.org/gnu/apl/apl-1.8.tar.gz"
-    mirror "https://ftpmirror.gnu.org/apl/apl-1.8.tar.gz"
-    sha256 "144f4c858a0d430ce8f28be90a35920dd8e0951e56976cb80b55053fa0d8bbcb"
-
-    # Fix -flat_namespace being used on Big Sur and later.
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-pre-0.4.2.418-big_sur.diff"
-      sha256 "83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
-    end
-  end
+  url "https://ftp.gnu.org/gnu/apl/apl-1.9.tar.gz"
+  mirror "https://ftpmirror.gnu.org/apl/apl-1.9.tar.gz"
+  sha256 "291867f1b1937693abb57be7d9a37618b0376e3e2709574854a7bbe52bb28eb8"
+  license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura:  "77a4cb83c7800623533fd94943f01c0e5bd2b8eeaf52255f8839227db9e47ecb"
-    sha256 arm64_monterey: "620de4f5d76edf28962b64cca150e9607a4fa663cc0f9fcf0b9ebaa43eb1c8b1"
-    sha256 arm64_big_sur:  "70eb998b36d113e576e114caf29b8b3ed46da86b05d34979f03adb6f2daca772"
-    sha256 ventura:        "64675318c4788ea65d43c4309da414879fc55142b1bfb8bf01e04f423b87dc8f"
-    sha256 monterey:       "3a606c0983eed237b401953d9e871fb69a76aee5b4d26d07a859b51b6451c6de"
-    sha256 big_sur:        "995c4010d02d4af05d2d7772a5957028e6f9860864370807588e306dd3b0dc27"
-    sha256 catalina:       "76ef781d65c2704150aa2435dee2346badb666fe5dfebcc35cd646673246d1b2"
-    sha256 x86_64_linux:   "d586350548ba42b1d7b56d131d9d21cc23313ad4eaa396af8f027ca37beb8db4"
+    sha256 arm64_sequoia:  "82e953cfa3843cb14c56353318d3396ec45c4c000a875a43b01a31d913d626c0"
+    sha256 arm64_sonoma:   "f35c1f051bc4aad5808d2197eecf046d6b3a679eadd68e1039b55d7cfc8f9037"
+    sha256 arm64_ventura:  "81b929cd47b448e036e52f937498d757daf450b909f201a1d1ea4ed32b643e3d"
+    sha256 arm64_monterey: "9658a3ffa6939a5eda6847693000212c3771efe8531d32b54ac04fada499ed26"
+    sha256 sonoma:         "f846d1e2a5d45180aab7b9d70b09b682ee305ece2f115beaddadd9d197f872f9"
+    sha256 ventura:        "35fb69870f69ed42993e2917d539e80d4bc34013b767f486921d28bff333e3a4"
+    sha256 monterey:       "3c142ba8082510e217dba2c772bcc2f19cf3c2f07fb13e93dd3672adea6e229e"
+    sha256 x86_64_linux:   "6e061bdb88a56797f123cdf50083e1065ba79fa1d3542b30ab1225bd4fd37b10"
   end
 
   head do
@@ -35,14 +25,28 @@ class GnuApl < Formula
     depends_on "libtool" => :build
   end
 
+  depends_on "pkgconf" => :build
+  depends_on "cairo"
+  depends_on "glib"
+  depends_on "gtk+3"
+  depends_on "libpng"
+  depends_on "libx11"
+  depends_on "libxcb"
+  depends_on "pcre2"
   depends_on "readline" # GNU Readline is required, libedit won't work
+  depends_on "sqlite"
+
+  on_macos do
+    depends_on "at-spi2-core"
+    depends_on "gdk-pixbuf"
+    depends_on "gettext"
+    depends_on "harfbuzz"
+    depends_on "pango"
+  end
 
   def install
-    system "autoreconf", "-fiv" if build.head?
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
@@ -52,12 +56,9 @@ class GnuApl < Formula
       )OFF
     EOS
 
-    pid = fork do
-      exec "#{bin}/APserver"
-    end
-    sleep 4
-
+    pid = spawn bin/"APserver"
     begin
+      sleep 4
       assert_match "Hello world", shell_output("#{bin}/apl -s -f hello.apl")
     ensure
       Process.kill("SIGINT", pid)

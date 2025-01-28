@@ -1,30 +1,18 @@
 class MariadbAT104 < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://archive.mariadb.org/mariadb-10.4.31/source/mariadb-10.4.31.tar.gz"
-  sha256 "52abf5434c6a42e0a048a63ab99a3898fb7fca1580fadd7a61bd0e9ce9b85054"
+  url "https://archive.mariadb.org/mariadb-10.4.34/source/mariadb-10.4.34.tar.gz"
+  sha256 "c657bdbca790c3106dc781a207f4b67d467571945164725d37cc7e42cc2a590a"
   license "GPL-2.0-only"
 
-  livecheck do
-    url "https://downloads.mariadb.org/rest-api/mariadb/all-releases/?olderReleases=false"
-    strategy :json do |json|
-      json["releases"]&.map do |release|
-        next unless release["release_number"]&.start_with?(version.major_minor)
-        next if release["status"] != "stable"
-
-        release["release_number"]
-      end
-    end
-  end
-
   bottle do
-    sha256 arm64_ventura:  "4cb69145f914fba667eae624da0fab190b2a3c7b5ae7db91bcdf2a6c5dcc9ba2"
-    sha256 arm64_monterey: "57211b29b47aa0b84a1e9824f5b95c7b494340d2986fe2bfb930845fb6d81664"
-    sha256 arm64_big_sur:  "c1a8fcaeec6d7daf4f9261fc1e651bc882fe4f9e6003ae9e28b99e033dd52bcb"
-    sha256 ventura:        "0592d079a891b933d676a09d99b53fcd4a97140dbbd4163bdc51d928841f016f"
-    sha256 monterey:       "1cfc3a74dd31059288ac3096f610b6f25d44764744ed08f13d8e595a9ecdfd7a"
-    sha256 big_sur:        "977359cb61398189809e3497bc9c19a849cad2c440ef7624443c34ecf313cd2a"
-    sha256 x86_64_linux:   "d8c2a5ae627a3e1e7cefe1d0c577779160f2ce6454e6ac42159bcf41023136c4"
+    sha256 arm64_sonoma:   "3a5bb21c7310991538c31c4851db1c0fdc93698ff5dca5d19326d8f1196a2424"
+    sha256 arm64_ventura:  "6d16a9889a56479bf5795e9d031f5c983de4c0655b7de37ac57e330b99db50f5"
+    sha256 arm64_monterey: "5c82ee18f3a09d2a354ecdd54cae80ffc4d2edf2c7b12e94307ab2db27a80bea"
+    sha256 sonoma:         "2de52f8d7109c23e04cf81a1691ef34cfce5d03802b20828bcf2e00b057d5a56"
+    sha256 ventura:        "18fbd5965a4060a7345efe359dc7f38399eb51fd52fc0b905c71d25878e2bb41"
+    sha256 monterey:       "0878ebf0913e0766441d60758105e804cacae4cdebbbfddf64bcae9bc61662a2"
+    sha256 x86_64_linux:   "560cdb9cc44b8eb6a2663b616ca44cd5f5948ccdec61c162fb7b6be499d5dc5d"
   end
 
   keg_only :versioned_formula
@@ -32,26 +20,26 @@ class MariadbAT104 < Formula
   # See: https://mariadb.com/kb/en/changes-improvements-in-mariadb-104/
   # End-of-life on 2024-06-18: https://mariadb.org/about/#maintenance-policy
   # Cannot use `openssl@3`, so we match the deprecation date of `openssl@1.1`
-  deprecate! date: "2023-09-11", because: :unsupported
+  disable! date: "2024-08-01", because: :unsupported
 
   depends_on "bison" => :build
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "groonga"
   depends_on "openssl@1.1"
   depends_on "pcre2"
 
   uses_from_macos "bzip2"
+  uses_from_macos "krb5"
   uses_from_macos "libxcrypt"
   uses_from_macos "libxml2"
   uses_from_macos "ncurses"
+  uses_from_macos "xz"
   uses_from_macos "zlib"
 
   on_linux do
     depends_on "linux-pam"
   end
-
-  fails_with gcc: "5"
 
   def install
     # Set basedir and ldata so that mysql_install_db can find the server
@@ -107,11 +95,11 @@ class MariadbAT104 < Formula
 
     # Don't create databases inside of the prefix!
     # See: https://github.com/Homebrew/homebrew/issues/4975
-    rm_rf prefix/"data"
+    rm_r(prefix/"data")
 
     # Save space
-    (prefix/"mysql-test").rmtree
-    (prefix/"sql-bench").rmtree
+    rm_r(prefix/"mysql-test")
+    rm_r(prefix/"sql-bench")
 
     # Link the setup script into bin
     bin.install_symlink prefix/"scripts/mysql_install_db"
@@ -134,12 +122,12 @@ class MariadbAT104 < Formula
     end
 
     # Install my.cnf that binds to 127.0.0.1 by default
-    (buildpath/"my.cnf").write <<~EOS
+    (buildpath/"my.cnf").write <<~INI
       # Default Homebrew MySQL server config
       [mysqld]
       # Only allow connections from localhost
       bind-address = 127.0.0.1
-    EOS
+    INI
     etc.install "my.cnf"
   end
 
@@ -152,7 +140,7 @@ class MariadbAT104 < Formula
 
     unless File.exist? "#{var}/mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
-      system "#{bin}/mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
+      system bin/"mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
         "--basedir=#{prefix}", "--datadir=#{var}/mysql", "--tmpdir=/tmp"
     end
   end
@@ -180,12 +168,12 @@ class MariadbAT104 < Formula
       "--auth-root-authentication-method=normal"
     port = free_port
     fork do
-      system "#{bin}/mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
+      system bin/"mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
         "--datadir=#{testpath}/mysql", "--port=#{port}", "--tmpdir=#{testpath}/tmp"
     end
     sleep 5
     assert_match "information_schema",
       shell_output("#{bin}/mysql --port=#{port} --user=root --password= --execute='show databases;'")
-    system "#{bin}/mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
+    system bin/"mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
   end
 end

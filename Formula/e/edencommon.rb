@@ -1,77 +1,76 @@
 class Edencommon < Formula
   desc "Shared library for Watchman and Eden projects"
   homepage "https://github.com/facebookexperimental/edencommon"
-  url "https://github.com/facebookexperimental/edencommon/archive/refs/tags/v2023.09.04.00.tar.gz"
-  sha256 "d42f71d2e3f334d1a0797922abe04b16a1bd0b2c7914bf5c8c801d8a7538f9e5"
+  url "https://github.com/facebookexperimental/edencommon/archive/refs/tags/v2024.12.02.00.tar.gz"
+  sha256 "1f52af7c2abca0afb9842f7c698449bd9eb7118d8be1e90255db6f2f2c46a272"
   license "MIT"
+  revision 1
   head "https://github.com/facebookexperimental/edencommon.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "215a427a702f39f990bac1f8113c6df45231498a987b7f2594dea5cec5dc07a4"
-    sha256 cellar: :any,                 arm64_ventura:  "929497e7f932878f26faca065ec1a643106ce94b27af61cd74c503c7c04a087b"
-    sha256 cellar: :any,                 arm64_monterey: "c0ff5be350922c9d6769f6864dc3dc8b626a4bb0c89e15e13b3390b3ce2f597a"
-    sha256 cellar: :any,                 arm64_big_sur:  "9e4005f74df987ababecb953d2c5c9aa2d1cc2884d1aa69bc9253f3270e4439f"
-    sha256 cellar: :any,                 sonoma:         "7c1b7277f43f0a1019421816d49c3e0f332cd698eae693ac89433286141ae82a"
-    sha256 cellar: :any,                 ventura:        "b1e5887ef2d752abc97adcb43f29400b0f6b7c8e872d7de668ee5bb9ae1b87c6"
-    sha256 cellar: :any,                 monterey:       "9cdc228b3b2c6969d90287a5919d9a48770b958da3e429b4f7a20a4230b8ab5c"
-    sha256 cellar: :any,                 big_sur:        "3b50778f30e5782b0b52b21cf415fb12d5e5c69092efa1a2cf86c21ffc1632d7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "93a6f7462557652a9c4467b28cd83e907eb1c9d2427db039e7dd043aebd356a0"
+    sha256 cellar: :any,                 arm64_sequoia: "83eaeaef21caa7562dfed61555ec89b57aa6fbaf08866d8cbece627a1855bf94"
+    sha256 cellar: :any,                 arm64_sonoma:  "6194bc2ab0c56d1383f44dfebfb635d1cce1214a12315b717a10fbfccf90a2e6"
+    sha256 cellar: :any,                 arm64_ventura: "24c45508d9e9b55ccef63a68a2e004f4084392cc27c0c2e240eb2cb296765275"
+    sha256 cellar: :any,                 sonoma:        "cb693e65b565152716e934c64cf018eb042c4a17a42f6bc8383b90e2cce5b928"
+    sha256 cellar: :any,                 ventura:       "e02790a055c067143ca55eff004ca05c40f12e47adde3447f5bed44337d3cf41"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "030338f313bdd546c6058c956b459a642c67e5840dac1497b8a1ea440e19a4f7"
   end
 
   depends_on "cmake" => :build
   depends_on "googletest" => :build
+  depends_on "mvfst" => :build
+  depends_on "wangle" => :build
+  depends_on "boost"
+  depends_on "fb303"
+  depends_on "fbthrift"
+  depends_on "fmt"
   depends_on "folly"
   depends_on "gflags"
   depends_on "glog"
   depends_on "openssl@3"
 
-  # Fix linkage against folly
-  # https://github.com/facebookexperimental/edencommon/pull/10
-  patch do
-    url "https://github.com/facebookexperimental/edencommon/commit/b162c1b8d94b4ed49835da6d03b4d0a550082b47.patch?full_index=1"
-    sha256 "99c299fa6df887d1e72aed3d60a8ca32eb2eda1897715482af8ddfa4702fe24c"
-  end
-
   def install
     # Fix "Process terminated due to timeout" by allowing a longer timeout.
+    inreplace buildpath.glob("eden/common/{os,utils}/test/CMakeLists.txt"),
+              /gtest_discover_tests\((.*)\)/,
+              "gtest_discover_tests(\\1 DISCOVERY_TIMEOUT 60)"
     inreplace "eden/common/utils/test/CMakeLists.txt",
               /gtest_discover_tests\((.*)\)/,
               "gtest_discover_tests(\\1 DISCOVERY_TIMEOUT 60)"
 
-    system "cmake", "-S", ".", "-B", "_build", "-DBUILD_SHARED_LIBS=ON", *std_cmake_args
+    # Avoid having to build FBThrift py library
+    inreplace "CMakeLists.txt", "COMPONENTS cpp2 py)", "COMPONENTS cpp2)"
+
+    shared_args = ["-DBUILD_SHARED_LIBS=ON", "-DCMAKE_INSTALL_RPATH=#{rpath}"]
+    linker_flags = %w[-undefined dynamic_lookup -dead_strip_dylibs]
+    linker_flags << "-ld_classic" if OS.mac? && MacOS.version == :ventura
+    shared_args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,#{linker_flags.join(",")}" if OS.mac?
+
+    system "cmake", "-S", ".", "-B", "_build", *shared_args, *std_cmake_args
     system "cmake", "--build", "_build"
     system "cmake", "--install", "_build"
   end
 
   test do
-    (testpath/"test.cc").write <<~EOS
-      #include <eden/common/utils/ProcessNameCache.h>
+    (testpath/"test.cc").write <<~CPP
+      #include <eden/common/utils/ProcessInfo.h>
       #include <cstdlib>
       #include <iostream>
 
       using namespace facebook::eden;
 
-      ProcessNameCache& getProcessNameCache() {
-        static auto* pnc = new ProcessNameCache;
-        return *pnc;
-      }
-
-      ProcessNameHandle lookupProcessName(pid_t pid) {
-        return getProcessNameCache().lookup(pid);
-      }
-
       int main(int argc, char **argv) {
         if (argc <= 1) return 1;
         int pid = std::atoi(argv[1]);
-        std::cout << lookupProcessName(pid).get() << std::endl;
+        std::cout << readProcessName(pid) << std::endl;
         return 0;
       }
-    EOS
+    CPP
 
     system ENV.cxx, "-std=c++17", "-I#{include}", "test.cc",
                     "-L#{lib}", "-L#{Formula["folly"].opt_lib}",
-                    "-L#{Formula["boost"].opt_lib}", "-L#{Formula["glog"].opt_lib}",
-                    "-ledencommon_utils", "-lfolly", "-lboost_context-mt", "-lglog", "-o", "test"
+                    "-L#{Formula["boost"].opt_lib}", "-L#{Formula["glog"].opt_lib}", "-L#{Formula["fmt"].opt_lib}",
+                    "-ledencommon_utils", "-lfolly", "-lfmt", "-lboost_context", "-lglog", "-o", "test"
     assert_match "ruby", shell_output("./test #{Process.pid}")
   end
 end

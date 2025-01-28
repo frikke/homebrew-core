@@ -1,23 +1,18 @@
 class XercesC < Formula
   desc "Validating XML parser"
   homepage "https://xerces.apache.org/xerces-c/"
-  url "https://www.apache.org/dyn/closer.lua?path=xerces/c/3/sources/xerces-c-3.2.4.tar.gz"
-  mirror "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.gz"
-  sha256 "3d8ec1c7f94e38fee0e4ca5ad1e1d9db23cbf3a10bba626f6b4afa2dedafe5ab"
+  url "https://www.apache.org/dyn/closer.lua?path=xerces/c/3/sources/xerces-c-3.3.0.tar.gz"
+  mirror "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.3.0.tar.gz"
+  sha256 "9555f1d06f82987fbb4658862705515740414fd34b4db6ad2ed76a2dc08d3bde"
   license "Apache-2.0"
-  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "39dcc385d045838db203911a7d016b533505b97ef51ac706f0393b3aa6e1dcf0"
-    sha256 cellar: :any,                 arm64_ventura:  "99006e9ad984212dc5016d5aa9f6ae8021d50f56fec9e13947d9779d9decc1de"
-    sha256 cellar: :any,                 arm64_monterey: "55c380d3cda733199a22d294208fb6b552ae53373ebba6d1ca91737c99ea52eb"
-    sha256 cellar: :any,                 arm64_big_sur:  "a932e185d8ddde919516e0c7cc24f6a98ed760369df9a1edf96db3969d929934"
-    sha256 cellar: :any,                 sonoma:         "2979787f02b1796f3204357d4592657a37f15f3a6cc6743f5442d4983c889911"
-    sha256 cellar: :any,                 ventura:        "529a48ca044cff1006c56e0ba471591d625c4f0efd7a117f98e0d928c3c2cbfc"
-    sha256 cellar: :any,                 monterey:       "17f2a1e797058706fe947034ab4c912f196bf12195736e719c6953d3c418f0c3"
-    sha256 cellar: :any,                 big_sur:        "c61f70bacc917fb00e378878265bc575d427d879148b320cabc14dc71bdca56c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b7f4e544f614d90c303c47caa8630c6b8ac1a6e2f7f30cdd41137710a0a27f36"
+    sha256 cellar: :any,                 arm64_sequoia: "8b648a8f8375fa85bf3bbdcbe82ac8b9f362fbc53303e9832f24f8afbe683eec"
+    sha256 cellar: :any,                 arm64_sonoma:  "3be22ab76376131bdc5534556eb209ad1a63a9e67d0feeb5adde1746e3af455c"
+    sha256 cellar: :any,                 arm64_ventura: "925ebabdd24526e5e9e91ced09983deb480189eae3e1fce43aef08204fcc21c3"
+    sha256 cellar: :any,                 sonoma:        "eed44cffc9b1ab90c33025a5c3c6b30905bf1d97c290ffa18d4bdfe1233a718e"
+    sha256 cellar: :any,                 ventura:       "9ed96c4d74c313eb545ea3d04c6f1973fc81cbf5001bf8707c89a48dcbfb93d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "992f70652b3a78f54ed931bdb482c88a2fb32422cc13aacc0e09975ca8cd6e38"
   end
 
   depends_on "cmake" => :build
@@ -46,7 +41,7 @@ class XercesC < Formula
   end
 
   test do
-    (testpath/"ducks.xml").write <<~EOS
+    (testpath/"ducks.xml").write <<~XML
       <?xml version="1.0" encoding="iso-8859-1"?>
 
       <ducks>
@@ -55,7 +50,7 @@ class XercesC < Formula
           <email>duck@foo.com</email>
         </person>
       </ducks>
-    EOS
+    XML
 
     output = shell_output("#{bin}/SAXCount #{testpath}/ducks.xml")
     assert_match "(6 elems, 1 attrs, 0 spaces, 37 chars)", output

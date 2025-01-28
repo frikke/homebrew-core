@@ -1,8 +1,8 @@
 class MkConfigure < Formula
   desc "Lightweight replacement for GNU autotools"
   homepage "https://github.com/cheusov/mk-configure"
-  url "https://downloads.sourceforge.net/project/mk-configure/mk-configure/mk-configure-0.38.2/mk-configure-0.38.2.tar.gz"
-  sha256 "1e705e11047515aea67327ba67010affcbb77f2f0736eb84a5080249f4ab483e"
+  url "https://downloads.sourceforge.net/project/mk-configure/mk-configure/mk-configure-0.40.0/mk-configure-0.40.0.tar.gz"
+  sha256 "2a422f78752d25f37800cdfe5e96f1d081066837feefb8c8109db4e1daf51d4d"
   license all_of: ["BSD-2-Clause", "BSD-3-Clause", "MIT", "MIT-CMU"]
 
   livecheck do
@@ -11,14 +11,12 @@ class MkConfigure < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "03ff8ccca0eb63cc9f2ab9245887caabe11a9ef50f47133a4c726a39d6ceb88c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "03ff8ccca0eb63cc9f2ab9245887caabe11a9ef50f47133a4c726a39d6ceb88c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9d45e9deae52d90c2fc31e44ead23819539b7f9837e3ad6958758978de8ee252"
-    sha256 cellar: :any_skip_relocation, ventura:        "ec1844ffc84ab220c5eeed4faf0deed8a1d7af581c300e07cc46afff88de6a8d"
-    sha256 cellar: :any_skip_relocation, monterey:       "ec1844ffc84ab220c5eeed4faf0deed8a1d7af581c300e07cc46afff88de6a8d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bc3013691ee8d1abba074ceee462089b99a3c6dbf149801595cf00f6d6c43983"
-    sha256 cellar: :any_skip_relocation, catalina:       "e6d967eb5e56d1aeebe357d1bdba6872bb6eeed45e182c5a1ac0aa0e40248d5c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "344d246a3812813f1738f186a4b988c46c8e0f2a74430f68e4040cbd99b48c08"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "991206600e83a6063a6518b312d991f8bf8390defd941c41af274354e5fe24f5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8a6000f58e84b8f47257cbaed106b59f9a908a5cc0897a88eeaf81e779b6e176"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "5e4df5fafb64a8b2b6c58d5f10f97316016731381ba859ec61fe79222e3404ac"
+    sha256 cellar: :any_skip_relocation, sonoma:        "38eff0dd90436b640ff6ddc3cc0f2f208d5a1a5f0f609c873c8a093fe90cc2be"
+    sha256 cellar: :any_skip_relocation, ventura:       "6981ba14741216c3651d168e0f29810904547ad38df976ca0cd6305c7f3a29a4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "434d05bf1acf22ab6f0f9f3fda53b07228fdadac453d2c6fbf7ba38e5a32d637"
   end
 
   depends_on "bmake"
@@ -34,6 +32,6 @@ class MkConfigure < Formula
   end
 
   test do
-    system "#{bin}/mkcmake", "-V", "MAKE_VERSION", "-f", "/dev/null"
+    system bin/"mkcmake", "-V", "MAKE_VERSION", "-f", File::NULL
   end
 end

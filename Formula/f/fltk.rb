@@ -1,10 +1,9 @@
 class Fltk < Formula
   desc "Cross-platform C++ GUI toolkit"
   homepage "https://www.fltk.org/"
-  url "https://www.fltk.org/pub/fltk/1.3.8/fltk-1.3.8-source.tar.gz"
-  sha256 "f3c1102b07eb0e7a50538f9fc9037c18387165bc70d4b626e94ab725b9d4d1bf"
+  url "https://github.com/fltk/fltk/releases/download/release-1.4.1/fltk-1.4.1-source.tar.bz2"
+  sha256 "bff25d1c79fa0620e37ee17871f13fc2b35aa56d17e7576aa9a8d2ce5ed0e57e"
   license "LGPL-2.0-only" => { with: "FLTK-exception" }
-  revision 1
 
   livecheck do
     url "https://www.fltk.org/software.php"
@@ -12,16 +11,12 @@ class Fltk < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "18647efbd061f3b6d60fdd5cf815c95530b518cb8022ea0e468f5595935b4c18"
-    sha256 arm64_ventura:  "629a76ecd1a0cab83c01e1bf5488d85515f0115c0a1f638b0aa25dbc9f3146cd"
-    sha256 arm64_monterey: "0a4162f4f01767c76acabf13f888dc9a585b3ff72df88545704fad68ce578954"
-    sha256 arm64_big_sur:  "c5e80b820d74af67cdd25a7125b423bbe259930d35507aaabd56b82ebaca0048"
-    sha256 sonoma:         "cb72a7cd0d7bca744aa5d36dee5ffc118c20312721a3789efcd69cb120c5a153"
-    sha256 ventura:        "cce07824ab505a5acc47b5a3db22c3906ca88ab494216dcbba14be7a66e9b51f"
-    sha256 monterey:       "4e35b5a5e6f0c0ef134630be137142aecc42a73ce8d9ee1c1df8c7a478dacb7d"
-    sha256 big_sur:        "604d0e1beb8fb68b0dcf12b83a2209f34c7d0f9d3fc47c3b9b34222c93faa593"
-    sha256 catalina:       "ef38aabd458e85e3cbfb7bfbe1ca96949baad75397a1a4fbb25cdf299a713dfe"
-    sha256 x86_64_linux:   "310ccd7518b730389ca3d5162faa9866fc68d023f84c2c24147c7551b990dc9b"
+    sha256 arm64_sequoia: "bd6ac8890d23ab42b9e8b18f3a37347d018505dd32400784f815ba7f4785cc40"
+    sha256 arm64_sonoma:  "8d6663fa83b28dce17eccaab7d451d4e9972b9578a947317c536c91f0c264a9e"
+    sha256 arm64_ventura: "ced3c83d58132c8c96491b2fa254a76818bd52e5b851fe6964529b1d9cea86e2"
+    sha256 sonoma:        "78ac157cb68a35256aae2fbd1a713d4991b74222d7e7548eedd1313447dbfefb"
+    sha256 ventura:       "1816f4b3d07cfdcfb6563f0b258a80cfbe90ba289db42b4696fd0eeaf5dc01dc"
+    sha256 x86_64_linux:  "2ee9844a83a586c602bb1a598f3dba7ff5bc1a9e54f6d2a0a9e01ca5c771cf36"
   end
 
   head do
@@ -31,41 +26,47 @@ class Fltk < Formula
 
   depends_on "jpeg-turbo"
   depends_on "libpng"
+  uses_from_macos "zlib"
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
+    depends_on "fontconfig"
+    depends_on "libx11"
+    depends_on "libxext"
+    depends_on "libxfixes"
     depends_on "libxft"
+    depends_on "libxrender"
     depends_on "libxt"
+    depends_on "mesa"
     depends_on "mesa-glu"
   end
 
   def install
     if build.head?
-      args = std_cmake_args
-
-      # Don't build docs / require doxygen
-      args << "-DOPTION_BUILD_HTML_DOCUMENTATION=OFF"
-      args << "-DOPTION_BUILD_PDF_DOCUMENTATION=OFF"
-
-      # Don't build tests
-      args << "-DFLTK_BUILD_TEST=OFF"
-
-      # Build both shared & static libs
-      args << "-DOPTION_BUILD_SHARED_LIBS=ON"
-
-      system "cmake", ".", *args
-      system "cmake", "--build", "."
-      system "cmake", "--install", "."
+      args = [
+        # Don't build docs / require doxygen
+        "-DFLTK_BUILD_HTML_DOCS=OFF",
+        "-DFLTK_BUILD_PDF_DOCS=OFF",
+        # Don't build tests
+        "-DFLTK_BUILD_TEST=OFF",
+        # Build both shared & static libs
+        "-DFLTK_BUILD_SHARED_LIBS=ON",
+      ]
+      system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+      system "cmake", "--build", "build"
+      system "cmake", "--install", "build"
     else
-      system "./configure", "--prefix=#{prefix}",
-                            "--enable-threads",
-                            "--enable-shared"
+      args = %w[
+        --enable-threads
+        --enable-shared
+      ]
+      system "./configure", *args, *std_configure_args
       system "make", "install"
     end
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <FL/Fl.H>
       #include <FL/Fl_Window.H>
       #include <FL/Fl_Box.H>
@@ -79,7 +80,7 @@ class Fltk < Formula
         window->end();
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-L#{lib}", "-lfltk", "-o", "test"
     system "./test"
   end

@@ -1,12 +1,13 @@
 class Fetch < Formula
   desc "Download assets from a commit, branch, or tag of GitHub repositories"
   homepage "https://www.gruntwork.io/"
-  url "https://github.com/gruntwork-io/fetch/archive/v0.4.6.tar.gz"
+  url "https://github.com/gruntwork-io/fetch/archive/refs/tags/v0.4.6.tar.gz"
   sha256 "81086290cc82a990a7369c710179869e3d1a5b3fea60df5997138a96688e9899"
   license "MIT"
   head "https://github.com/gruntwork-io/fetch.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "e8f939d5d6749844ca829cfb0cca8512c1e454fbb01659c0d2c0e61ecf8f6e8e"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "0a21b760276b6a748ecb20263b36dc40911a174d471667307aca3f7f9457d440"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "f9f3c901ec977773483320bd408f284ced92de106232b45469a5e1c241acd7a9"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "f9f3c901ec977773483320bd408f284ced92de106232b45469a5e1c241acd7a9"

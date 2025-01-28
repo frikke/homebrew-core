@@ -1,8 +1,8 @@
 class Bde < Formula
   desc "Basic Development Environment: foundational C++ libraries used at Bloomberg"
   homepage "https://github.com/bloomberg/bde"
-  url "https://github.com/bloomberg/bde/archive/3.123.0.0.tar.gz"
-  sha256 "17254dc8bedd081e18c118881df13bffe42b6175836f998e87cc27ea0c4d8949"
+  url "https://github.com/bloomberg/bde/archive/refs/tags/4.18.0.0.tar.gz"
+  sha256 "87426d6837a1261e385e755361e961c5d75ec35fb1a227a9763a6388de4129fc"
   license "Apache-2.0"
 
   livecheck do
@@ -11,44 +11,44 @@ class Bde < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "1339d9b1c6d5d200e2976ffbbdcbf170205bcf365d871c06cdfb232e0dd219aa"
-    sha256 cellar: :any,                 arm64_monterey: "8cf31eea8fe8b7339af8779b7c4d22e097e92bde46d3579293e22dd1cb3b25d0"
-    sha256 cellar: :any,                 arm64_big_sur:  "a46ee4eb904081a33c898ae7a0aecf78a5b12a555681a7ca386d16665b572225"
-    sha256 cellar: :any,                 ventura:        "1a8251173a88df9386233d8c13927aca254ccb57f96dcbf302873086bdacb542"
-    sha256 cellar: :any,                 monterey:       "e1eb4806f33aa9d9866f0eeaa5dfa5cd9142d8430f300c2ebf01f1f1387e0f22"
-    sha256 cellar: :any,                 big_sur:        "de9b109a18d344ae06dcf852b011e09ca07914b76b6d7ae4966b09f6cf2af550"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a5a1d5d353d6f8b2cc94a292b13c6226bf89689a7f11010191cf4a73d0c6a5f8"
+    sha256 cellar: :any,                 arm64_sequoia: "18c5f09e30f7f505fed326240086dc6845882f54bc438d4bcd6eb0da855b4f0a"
+    sha256 cellar: :any,                 arm64_sonoma:  "eab1e15ad41fc1e6a5786cebca8b344a2765ff05e8c1bf2cb786dcaef287df95"
+    sha256 cellar: :any,                 arm64_ventura: "d2c3615e8fc71ae75abe5ef5ba866044f2b60a12e27b01a54f0e69451e32e76b"
+    sha256 cellar: :any,                 sonoma:        "4e78518f55df6ef43f24161615bee765951ae64ce0b47d6c2d4d8d51d64529ed"
+    sha256 cellar: :any,                 ventura:       "05a07a35eb98203bc715687c2d03b6edc573295460c2bfbbc7e6228c121017f3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4d1d4dcd8a06831ed13ef9f8a70510db7e90e591d4f18929a925787edda28e02"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python@3.13" => :build
   depends_on "pcre2"
 
   resource "bde-tools" do
-    url "https://github.com/bloomberg/bde-tools/archive/3.123.0.0.tar.gz"
-    sha256 "9dac9d89e8485595a92db9d5464d5f54e487879382cd8dd708e20f5d022ca531"
+    url "https://github.com/bloomberg/bde-tools/archive/refs/tags/4.13.0.0.tar.gz"
+    sha256 "d70ab85eb1a4325f3d569a6b7ea0f0a44a6143fd91905ab5fbaa5e1fed111a68"
   end
 
   def install
     (buildpath/"bde-tools").install resource("bde-tools")
 
     # Use brewed pcre2 instead of bundled sources
+    rm_r buildpath/"thirdparty/pcre2"
     inreplace "project.cmake", "${listDir}/thirdparty/pcre2\n", ""
     inreplace "groups/bdl/group/bdl.dep", "pcre2", "libpcre2-posix"
     inreplace "groups/bdl/bdlpcre/bdlpcre_regex.h", "#include <pcre2/pcre2.h>", "#include <pcre2.h>"
 
     toolchain_file = "bde-tools/cmake/toolchains/#{OS.kernel_name.downcase}/default.cmake"
-    args = std_cmake_args + %W[
+    args = %W[
       -DBUILD_BITNESS=64
       -DUFID=opt_exc_mt_64_shr
       -DCMAKE_MODULE_PATH=./bde-tools/cmake
       -DCMAKE_INSTALL_RPATH=#{rpath}
       -DCMAKE_TOOLCHAIN_FILE=#{toolchain_file}
-      -DPYTHON_EXECUTABLE=#{which("python3.11")}
+      -DPYTHON_EXECUTABLE=#{which("python3.13")}
     ]
 
-    system "cmake", "-S", ".", "-B", "build", *args
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
 
@@ -58,11 +58,9 @@ class Bde < Formula
   end
 
   test do
-    assert_equal version, resource("bde-tools").version, "`bde-tools` resource needs updating!"
-
     # bde tests are incredibly performance intensive
     # test below does a simple sanity check for linking against bsl.
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <bsl_string.h>
       #include <bslma_default.h>
       int main() {
@@ -70,7 +68,7 @@ class Bde < Formula
         bsl::string string(bslma::Default::globalAllocator());
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-I#{include}", "test.cpp", "-L#{lib}", "-lbsl", "-o", "test"
     system "./test"
   end

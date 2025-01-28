@@ -1,26 +1,26 @@
-require "language/node"
-
 class Stepci < Formula
   desc "API Testing and Monitoring made simple"
   homepage "https://stepci.com"
-  url "https://registry.npmjs.org/stepci/-/stepci-2.6.8.tgz"
-  sha256 "ea54af641198d0048a69740ee7380a4697fde1fab4b1b78e182b4f8c77e7be3b"
+  url "https://registry.npmjs.org/stepci/-/stepci-2.8.2.tgz"
+  sha256 "0ba4ed74a5f51414b0ed86651e37a1b5e6af4e027187bedfc94dbd2176793178"
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "bec57fbe98e6870b11cae1bda25432c94b21bcf8db8f326fb67d681452eb00c7"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "bec57fbe98e6870b11cae1bda25432c94b21bcf8db8f326fb67d681452eb00c7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bec57fbe98e6870b11cae1bda25432c94b21bcf8db8f326fb67d681452eb00c7"
-    sha256 cellar: :any_skip_relocation, ventura:        "9131cd315876209a85f9c0d4ab578256fbc506e7b8f4e889644723c3c823c672"
-    sha256 cellar: :any_skip_relocation, monterey:       "9131cd315876209a85f9c0d4ab578256fbc506e7b8f4e889644723c3c823c672"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9131cd315876209a85f9c0d4ab578256fbc506e7b8f4e889644723c3c823c672"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bec57fbe98e6870b11cae1bda25432c94b21bcf8db8f326fb67d681452eb00c7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "5734ebe30193bf703e1e8abf64b3c3085dfbbc3be250494fbae9607b81a42ca5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "b51a4218cbf325447634057a0362fa99de98611348196764ba954f53baeb2eba"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b51a4218cbf325447634057a0362fa99de98611348196764ba954f53baeb2eba"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b51a4218cbf325447634057a0362fa99de98611348196764ba954f53baeb2eba"
+    sha256 cellar: :any_skip_relocation, sonoma:         "c59c4b4fa04b0d69872f8bbe4a27a0b1313afcc689b4ac00104963f540fcfad7"
+    sha256 cellar: :any_skip_relocation, ventura:        "c59c4b4fa04b0d69872f8bbe4a27a0b1313afcc689b4ac00104963f540fcfad7"
+    sha256 cellar: :any_skip_relocation, monterey:       "c59c4b4fa04b0d69872f8bbe4a27a0b1313afcc689b4ac00104963f540fcfad7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f06503b493bdddd590715fc784086f1c9a4241c67450af3f07cd4077099d581a"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
@@ -28,7 +28,7 @@ class Stepci < Formula
     # https://docs.stepci.com/legal/privacy.html
     ENV["STEPCI_DISABLE_ANALYTICS"] = "1"
 
-    (testpath/"workflow.yml").write <<~EOS
+    (testpath/"workflow.yml").write <<~YAML
       version: "1.1"
       name: Status Check
       env:
@@ -42,7 +42,7 @@ class Stepci < Formula
                 method: GET
                 check:
                   status: /^20/
-    EOS
+    YAML
 
     expected = <<~EOS
       Tests: 0 failed, 1 passed, 1 total

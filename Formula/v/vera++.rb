@@ -7,9 +7,11 @@ class Veraxx < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "99507020d8491dc44e6404d4d2d859ec8f05270afd4aef8b75f5f1ebb04be413"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "70c7c8d7038196b5360a0c35c2d76545ab6c71c40e9d98cd5ccc5ef61a410328"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "c71cdf0709dfbdcd7cf1628a500de2aa59d229a818f5bf265a0906a628b1d762"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fb1646c3a9cb8a0707a2674d546b6db25dcbea0fffd7461358c43247ae35ddcc"
+    sha256 cellar: :any_skip_relocation, sonoma:         "88fa0e8078500d31ca2a4b44d35847e0f188f8cb9c1b210e730da796138adc1a"
     sha256 cellar: :any_skip_relocation, ventura:        "4e2cb9ea3299ad6bd01536e167272eb9e8a90b8a1e90f70f0ad69c70075f0cfc"
     sha256 cellar: :any_skip_relocation, monterey:       "52eb0f8c9c1faee12df61ff3419d4a168c589fd05c2370f918a2b8e72ffb1d56"
     sha256 cellar: :any_skip_relocation, big_sur:        "f28290171b8cc68f972b3cdbf811c1491d4be7dd8307fe1551dbfbdbc38269ba"
@@ -20,6 +22,11 @@ class Veraxx < Formula
     sha256 cellar: :any_skip_relocation, el_capitan:     "76dcb0b9340b8fc9413fc848dff27e8805d7b2a9c63d5128fc83ce5bd3bd1cd5"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "ad710a6d70551b2d74732c9774a926f8a3c63f2db1aa87373701cfc90039d996"
   end
+
+  # luabind resource tarball is no longer available so does not build.
+  # Also uses unmaintained/EOL versions of `boost` and `lua` as resources.
+  # Last release on 2015-01-22
+  deprecate! date: "2024-10-09", because: :does_not_build
 
   depends_on "cmake" => :build
 
@@ -38,12 +45,12 @@ class Veraxx < Formula
   end
 
   resource "lua" do
-    url "https://github.com/LuaDist/lua/archive/5.2.3.tar.gz"
+    url "https://github.com/LuaDist/lua/archive/refs/tags/5.2.3.tar.gz"
     sha256 "c8aa2c74e8f31861cea8f030ece6b6cb18974477bd1e9e1db4c01aee8f18f5b6"
   end
 
   resource "luabind" do
-    url "https://github.com/verateam/luabind/archive/vera-1.3.0.tar.gz"
+    url "https://github.com/verateam/luabind/archive/refs/tags/vera-1.3.0.tar.gz"
     sha256 "7d93908b7d978e44ebe5dfad6624e6daa033f284a5f24013f37cac162a18f71a"
   end
 

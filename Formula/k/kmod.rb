@@ -1,8 +1,8 @@
 class Kmod < Formula
   desc "Linux kernel module handling"
   homepage "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git"
-  url "https://mirrors.edge.kernel.org/pub/linux/utils/kernel/kmod/kmod-30.tar.xz"
-  sha256 "f897dd72698dc6ac1ef03255cd0a5734ad932318e4adbaebc7338ef2f5202f9f"
+  url "https://mirrors.edge.kernel.org/pub/linux/utils/kernel/kmod/kmod-33.tar.xz"
+  sha256 "dc768b3155172091f56dc69430b5481f2d76ecd9ccb54ead8c2540dbcf5ea9bc"
   license all_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later"]
 
   livecheck do
@@ -11,15 +11,14 @@ class Kmod < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "fd2381a295cd23ad7ed2c8ea088d4a23b48071cc71c8c385418fb80ee822cb1a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "22ddfea85715ea371171452f7cb754e1433bcea2135fb786c480d4cfee27ab70"
   end
 
+  depends_on "scdoc" => :build
   depends_on :linux
 
   def install
-    system "./configure", "--with-bashcompletiondir=#{bash_completion}",
-      *std_configure_args, "--disable-silent-rules"
-    system "make"
+    system "./configure", "--with-bashcompletiondir=#{bash_completion}", "--disable-silent-rules", *std_configure_args
     system "make", "install"
 
     bin.install_symlink "kmod" => "depmod"
@@ -31,7 +30,7 @@ class Kmod < Formula
   end
 
   test do
-    system "#{bin}/kmod", "help"
+    system bin/"kmod", "help"
     assert_match "Module", shell_output("#{bin}/kmod list")
   end
 end

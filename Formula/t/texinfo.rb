@@ -1,22 +1,18 @@
 class Texinfo < Formula
   desc "Official documentation format of the GNU project"
   homepage "https://www.gnu.org/software/texinfo/"
-  url "https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz"
-  mirror "https://ftpmirror.gnu.org/texinfo/texinfo-7.0.3.tar.xz"
-  sha256 "74b420d09d7f528e84f97aa330f0dd69a98a6053e7a4e01767eed115038807bf"
+  url "https://ftp.gnu.org/gnu/texinfo/texinfo-7.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/texinfo/texinfo-7.2.tar.xz"
+  sha256 "0329d7788fbef113fa82cb80889ca197a344ce0df7646fe000974c5d714363a6"
   license "GPL-3.0-or-later"
-  revision 1
 
   bottle do
-    sha256 arm64_sonoma:   "c1cb88feb1a8464858f0d65a30ee80623acbe770efa7f391b3fb1e728609404d"
-    sha256 arm64_ventura:  "1da60ed030da20fe03388dc0a40271783c5bcc2dfb3d50710ca431f943ef48b1"
-    sha256 arm64_monterey: "d36424fb6c196b55f5acc459c393c8950b26cc71d05f15b7d5c7879ac438685b"
-    sha256 arm64_big_sur:  "f5af81647753a8f2e1f5882a7ced2d5c6a6c3b55d16a7b21d35f91951bb99eec"
-    sha256 sonoma:         "d7f2725cedafc0a11ce472a390c49a5434312f0d36db11eeba163ec99e358bbf"
-    sha256 ventura:        "023fb6a619944667e4c1601c260f4b5d12602af3e4a0acdab615426b3856ef66"
-    sha256 monterey:       "b6b367a26527726756c1addb017425929b6fc5f344171366c607c842fa53e205"
-    sha256 big_sur:        "37d2829b2d1127a25cc761de8d1ae8595720c889e24ba94695dd1786abaef626"
-    sha256 x86_64_linux:   "ec964dfd6398ab50dd10181d0fe2df909d6475942f1e1b47b35cffada2aa3236"
+    sha256 arm64_sequoia: "abfc842bb08fd512dd878e2233ea6d0d3682685dd9d5a03a86c6c8d170ca104e"
+    sha256 arm64_sonoma:  "948d36004ea61e34f1b27d04d4b56c5b1e2cf7bc28861c89fa9cd7c3c87cbdb5"
+    sha256 arm64_ventura: "71ed6d2d1b181f10f9fabac5935ff3956d7b63f670e652465b601c2929a19cc2"
+    sha256 sonoma:        "4bc4f8a0d5ed88dbee2565088997164573ca8c2e7f229030b2035ba8905172a2"
+    sha256 ventura:       "a8e566d23516d94e0f573b648122c74c317c7eea8d16acf55645e5347759c363"
+    sha256 x86_64_linux:  "46fdddc6b9297240790546b7f1405a7ea103a7c652c74c05cc1bef6b88f320f1"
   end
 
   uses_from_macos "ncurses"
@@ -24,6 +20,7 @@ class Texinfo < Formula
 
   on_system :linux, macos: :high_sierra_or_older do
     depends_on "gettext"
+    depends_on "libunistring"
   end
 
   def install
@@ -37,7 +34,7 @@ class Texinfo < Formula
   def post_install
     info_dir = HOMEBREW_PREFIX/"share/info/dir"
     info_dir.delete if info_dir.exist?
-    info_dir.dirname.glob("*.info") do |f|
+    info_dir.dirname.glob(["*.info", "*.info.gz"]) do |f|
       quiet_system("#{bin}/install-info", "--quiet", f, info_dir)
     end
   end
@@ -50,7 +47,8 @@ class Texinfo < Formula
       @end ifnottex
       @bye
     EOS
-    system "#{bin}/makeinfo", "test.texinfo"
-    assert_match "Hello World!", File.read("test.info")
+
+    system bin/"makeinfo", "test.texinfo"
+    assert_match "Hello World!", (testpath/"test.info").read
   end
 end

@@ -2,19 +2,19 @@ class Grc < Formula
   include Language::Python::Shebang
 
   desc "Colorize logfiles and command output"
-  homepage "http://kassiopeia.juls.savba.sk/~garabik/software/grc.html"
-  url "https://github.com/garabik/grc/archive/v1.13.tar.gz"
+  homepage "https://kassiopeia.juls.savba.sk/~garabik/software/grc.html"
+  url "https://github.com/garabik/grc/archive/refs/tags/v1.13.tar.gz"
   sha256 "a7b10d4316b59ca50f6b749f1d080cea0b41cb3b7258099c3eb195659d1f144f"
   license "GPL-2.0-or-later"
   revision 1
   head "https://github.com/garabik/grc.git", branch: "devel"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "841503533bb5af397541ac6231a6c836b8079d9024c5045a754759d7c163bf85"
+    rebuild 4
+    sha256 cellar: :any_skip_relocation, all: "c53a320fd40831dbfd74a3add881c94b5d8bca074b6826c190f35c1a3316d96d"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     # fix non-standard prefix installs

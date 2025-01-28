@@ -11,9 +11,12 @@ class Ifstat < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "7929e573cc9e8172c16c8a9d4a5c3ff51fb02ba824a70c4e749cea56e9d33ed2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "077e591c44a830e200e6587ea68eefdc06be3fd5ab6eafe867743b3f24a4d498"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "7c6dab0fa026b8e652bdefaf589924b6dab3ec148299090b9df4cb645aa5f7e7"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "e47fd692e61f239ebcf2f92d7bd6bf039f5f5eed49a3ccd699cc2075125667a4"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b10871840559de217d7a096eccc52f9f4115be20d03eee1c17c97e60e331ac0d"
+    sha256 cellar: :any_skip_relocation, sonoma:         "26750a5b02680ff19a5d8009360516de185fa5e048fa8ef1924e92549597f962"
     sha256 cellar: :any_skip_relocation, ventura:        "be15673cd3ce2675c9e2e350891ad0c888c0691b53be77f649a95556ca810307"
     sha256 cellar: :any_skip_relocation, monterey:       "963b568e9888e27dbbc4b93d94231713104fbe0ea48093eb6363b719dbb773f7"
     sha256 cellar: :any_skip_relocation, big_sur:        "e78cdbeab6d2b938879ae80e9a611ea2042cf2806f9d2447b6117518d545083b"
@@ -25,10 +28,15 @@ class Ifstat < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "80bb1ac13a6750229f428e108b349523896fa1bbe1823300f07e366e58cfa1c9"
   end
 
-  # Fixes 32/64 bit incompatibility for snow leopard
+  # Fixes 32/64 bit incompatibility
   patch :DATA
 
   def install
+    # Fix compile with newer Clang
+    if DevelopmentTools.clang_build_version >= 1403
+      ENV.append_to_cflags "-Wno-implicit-function-declaration -Wno-implicit-int"
+    end
+
     system "./configure", "--disable-debug", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
                           "--mandir=#{man}"
@@ -36,7 +44,7 @@ class Ifstat < Formula
   end
 
   test do
-    system "#{bin}/ifstat", "-v"
+    system bin/"ifstat", "-v"
   end
 end
 

@@ -12,6 +12,7 @@ class Libaacs < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "ff23fb9dd6dd26f6dde8ac12c298be21546d2e3696fe7b064af1647b3788156d"
     sha256 cellar: :any,                 arm64_sonoma:   "7299a85edecb49ec7e77d70dbda59f4ef4d4879f7c7c28f01b7ccfe213675c2b"
     sha256 cellar: :any,                 arm64_ventura:  "17fb11e42e6b614543f8bdb7f79ab5ed918a5d2fac7442b9abc46c0bcbab3712"
     sha256 cellar: :any,                 arm64_monterey: "821c6fed1af02d4446d3e376bf8eda6ef671e9623ff1332b5d299a60ef1f2dbc"
@@ -48,7 +49,7 @@ class Libaacs < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "libaacs/aacs.h"
       #include <stdio.h>
 
@@ -60,7 +61,7 @@ class Libaacs < Formula
         printf("%d.%d.%d", major_v, minor_v, micro_v);
         return(0);
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-laacs",
                    "-o", "test"
     system "./test"

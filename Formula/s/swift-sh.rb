@@ -1,34 +1,39 @@
 class SwiftSh < Formula
   desc "Scripting with easy zero-conf dependency imports"
   homepage "https://github.com/mxcl/swift-sh"
-  url "https://github.com/mxcl/swift-sh/archive/2.4.0.tar.gz"
-  sha256 "5255e497d985fbbe2df44ed69ed1552b43fb58c175bd2dd254b52e5cf888d629"
+  url "https://github.com/mxcl/swift-sh/archive/refs/tags/2.5.0.tar.gz"
+  sha256 "07f3c2d1215b82eb56ebfeb676b5e3860c23a828c14fd482c7c1935817f3220f"
   license "Unlicense"
+  revision 1
   head "https://github.com/mxcl/swift-sh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7544737098ecda67ac57df17568121bb3875c1773a0e276c49298c33475f9866"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c18ed52ff47b163562ceaec064b64bdaa474fc7b96679f972aa6a5859da3d912"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d67e477cf1645b1eec138b94e5e4ff40e477421fecabe7a3f9959e14ed7bbae2"
-    sha256 cellar: :any_skip_relocation, ventura:        "c5d18cbd7bca379a34b918ade17f576c3321b31cbc7ab19b36af1f874b2fcbf0"
-    sha256 cellar: :any_skip_relocation, monterey:       "0cab36a85f37f26946b2c6dc4ef1672c6aa892fdcf8fd69eb64a35a1d283be10"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ed4fc395a22c3ad54255cb55756de1a2e95605d7cc09515f79a892f56ca99852"
-    sha256                               x86_64_linux:   "1bb33c15a6225672861ef3e3ab515634dbdad7342dce3cd0594e7f9a84c38a9d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "548765a57eec4a8a0ad39eb4dc096edd45c1c97a781658c52fd86e28b8c936d9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "96521fbeb28a32d2663b9219b95aab9c0c05853f47dd5afc6871f3626de31df1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "9c68d0216ef02718872c9f7947441000d6cdda72cec6dc137ca45eb8ab580430"
+    sha256 cellar: :any_skip_relocation, sonoma:        "bcdbf8f07f26f137a6e67ff2a8e0b28b3a682d7ef72715d098ade8653a28ffff"
+    sha256 cellar: :any_skip_relocation, ventura:       "5d1400ffcbae6faa9bb66ce62915972758d4028b19686e2e927abd42b0d1b227"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "71745bc8b439b6b0f689f0f00a2973060c1962e7591f8bc65ccd82b61de8fd76"
   end
 
   depends_on xcode: ["11.0", :build]
 
-  uses_from_macos "swift"
+  uses_from_macos "swift" => :build
 
   def install
-    system "swift", "build", "--disable-sandbox", "-c", "release"
+    args = if OS.mac?
+      ["--disable-sandbox"]
+    else
+      ["--static-swift-stdlib"]
+    end
+    system "swift", "build", *args, "-c", "release"
     bin.install ".build/release/swift-sh"
     bin.install ".build/release/swift-sh-edit" if OS.mac?
   end
 
   test do
     (testpath/"test.swift").write "#!/usr/bin/env swift sh"
-    system "#{bin}/swift-sh", "eject", "test.swift"
+    system bin/"swift-sh", "eject", "test.swift"
     assert_predicate testpath/"Test"/"Package.swift", :exist?
   end
 end

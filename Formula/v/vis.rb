@@ -1,23 +1,23 @@
 class Vis < Formula
   desc "Vim-like text editor"
   homepage "https://github.com/martanne/vis"
-  url "https://github.com/martanne/vis/archive/v0.8.tar.gz"
-  sha256 "61b10d40f15c4db2ce16e9acf291dbb762da4cbccf0cf2a80b28d9ac998a39bd"
+  url "https://github.com/martanne/vis/archive/refs/tags/v0.9.tar.gz"
+  sha256 "bd37ffba5535e665c1e883c25ba5f4e3307569b6d392c60f3c7d5dedd2efcfca"
   license "ISC"
   head "https://github.com/martanne/vis.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura:  "32908c8b3e0251376b5a5020fde49c276c652a71eeee6a624dea98ab61211260"
-    sha256 arm64_monterey: "4175e1489036cb6b42e68c2073e4b5626cfb2ae3fadfba52e2e32d0a7e324dc3"
-    sha256 arm64_big_sur:  "067127470533d46e86b8ef7c6aba0e203061347fa1e6a74933e0fbc833d81ff2"
-    sha256 ventura:        "8311b635e107ec0cb5282cf86920bee36d5cc32219fb9b41a0b77f0980c4b745"
-    sha256 monterey:       "fc879a20d56fbe7eb9956dda54fd0f603f4d14d4a3f903462946f23fba5766a0"
-    sha256 big_sur:        "6d2d2178c60f3d091818d80c9e9c86744e946661f1dede662d3b248c2cb1a858"
-    sha256 x86_64_linux:   "98848b044f51a151d7ca4cc2ad97b8d1c33a1002c3dd3eb2ce27ef6be0fd263c"
+    sha256 arm64_sequoia:  "6edc0624be797ed3bbee95686dd3af6f164c24e95d520b809004f12518d02553"
+    sha256 arm64_sonoma:   "04a4e8d45b5442ffb3397012eccde1c747b249ae42e8468b24d557dd15ea6081"
+    sha256 arm64_ventura:  "ce1c6d2521a9ab11b32316850690289887a739b2b88a9809b1678682b586fc26"
+    sha256 arm64_monterey: "aeb76e19c965bce4434207059279cae63e30be3e51e933bee8ff52f579b8035d"
+    sha256 sonoma:         "77bfde98fc76bf93d057923482bd1e9b3d538ef8c3875f4b9b579a63cbb75d22"
+    sha256 ventura:        "b27829afe0c6cbb2792f3340ac3605caa16c68677764a1c586879f5387064ca4"
+    sha256 monterey:       "30d9272d1e6e00b8b87c61157e157df124a32c265d4f8befc52df8ac8e2545fb"
+    sha256 x86_64_linux:   "6f7e0f61479a8c931556361f8c0dd42a913211ddff0a8b8dfb6b2240f6fb2c6b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libtermkey"
   depends_on "lpeg"
   depends_on "lua"
@@ -26,7 +26,7 @@ class Vis < Formula
   uses_from_macos "ncurses"
 
   def install
-    system "./configure", "--prefix=#{prefix}", "--enable-lua"
+    system "./configure", "--enable-lua", "--enable-lpeg-static=no", *std_configure_args
     system "make", "install"
 
     return unless OS.mac?

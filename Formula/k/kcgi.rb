@@ -1,8 +1,8 @@
 class Kcgi < Formula
   desc "Minimal CGI and FastCGI library for C/C++"
   homepage "https://kristaps.bsd.lv/kcgi/"
-  url "https://kristaps.bsd.lv/kcgi/snapshots/kcgi-0.13.0.tgz"
-  sha256 "d886e5700f5ec72b00cb668e9f06b7b3906b6ccdc5bab4c89e436d4cc4c0c7a1"
+  url "https://kristaps.bsd.lv/kcgi/snapshots/kcgi-0.13.4.tgz"
+  sha256 "cc5f75ea75e42ed4f67e9ef831c0387717cedbc65c2261a828bee7956e46a259"
   license "ISC"
 
   livecheck do
@@ -11,18 +11,17 @@ class Kcgi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "554fd1a334f699a9b632d4f51092a202f817acaf3adfd3fb14c4ddc08742a03b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "94328c333800419711f54bb6bb199c632e8dd665dd04f8fdac22d54a2391c2fa"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "477a66993f541e9b595996d577c766c5eb205730b97885853322b32bb3d66285"
-    sha256 cellar: :any_skip_relocation, ventura:        "dd6b93a3da7b6b33bc534e05983f10b3bdb2c518d4cb5555ae052aefc1cb7b0c"
-    sha256 cellar: :any_skip_relocation, monterey:       "d8559957ace2184733fa9d74ebee348137efa4093e6f07b5c907cc924aaa1532"
-    sha256 cellar: :any_skip_relocation, big_sur:        "aea0950090e27a079ea4f104a726676c13f01de6c56284b2f98e8bfd1a208e21"
-    sha256 cellar: :any_skip_relocation, catalina:       "de0d79ace2d35397df1fa1e8d7e09128372d9c7989992675ae835d2d21a502e8"
-    sha256 cellar: :any_skip_relocation, mojave:         "a4779378456da9d3887e45136c69df85d47bef12d57b7f8903f840f4c2b12002"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1dbc844befbf8fcff4b08055dd7c9964ece3e846b6d0bbd6282663ebd89a6ff4"
+    sha256 cellar: :any,                 arm64_sequoia: "1ede6da1f7d9ea340cc19bf6a539948dd87a0aa20bb179e4c669a7fa94a6bd99"
+    sha256 cellar: :any,                 arm64_sonoma:  "9da91cadc2de7c8b9736dd73a28f2e9f39f5d7fb25acae212efdb5d6e52a25ef"
+    sha256 cellar: :any,                 arm64_ventura: "0314195b4c86b877610fd9035b7906122316bddd3cfaa2982395797a4bb75912"
+    sha256 cellar: :any,                 sonoma:        "4bd93297c59a4102abb6ddb1ef0e1d53de162e7c71aeb53e8da29824d3a1dbbe"
+    sha256 cellar: :any,                 ventura:       "ea274424cd3b9f8b69bb7e7a78c89aeda17728716a4b4576b73bdfb8253f5ad1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "be1d317a28397ff207c48149f3b9d4241bbf44b88f6f712091dfcb5b1f6963a2"
   end
 
   depends_on "bmake" => :build
+
+  uses_from_macos "zlib"
 
   on_linux do
     depends_on "libseccomp"
@@ -38,7 +37,7 @@ class Kcgi < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <sys/types.h>
       #include <stdarg.h>
       #include <stddef.h>
@@ -54,7 +53,7 @@ class Kcgi < Formula
         khttp_parse(&r, NULL, 0, &pages, 1, 0);
         return 0;
       }
-    EOS
+    C
     flags = %W[
       -L#{lib}
       -lkcgi

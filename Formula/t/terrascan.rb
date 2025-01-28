@@ -1,29 +1,32 @@
 class Terrascan < Formula
   desc "Detect compliance and security violations across Infrastructure as Code"
-  homepage "https://github.com/tenable/terrascan"
-  url "https://github.com/tenable/terrascan/archive/v1.18.3.tar.gz"
-  sha256 "214f96d009d2aed4e589b456e469c7ebc2225329c124a082f05d961e481e158b"
+  homepage "https://runterrascan.io/"
+  url "https://github.com/tenable/terrascan/archive/refs/tags/v1.19.9.tar.gz"
+  sha256 "13c120a63d7024ca8c54422e047424e318622625336ed77b2c1a36ef5fb1441c"
   license "Apache-2.0"
   head "https://github.com/tenable/terrascan.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "461ff9bc01555c0027ee35c47023bd42a1d83c509410c3373a6c0e64b3d803a0"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f2cfa6ef466a099cba86462f587c91a9c3e26fcd68b1a3b820a6ca671975789e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "aeed001333afc15e2f9251642bd8c0eb731f9766874d1ed7ba44355b338b98fa"
-    sha256 cellar: :any_skip_relocation, ventura:        "eb2cf1c5c897aeb34ff80ba721a74650bb7a3ed6a9e971643e38b4089ac7eb9c"
-    sha256 cellar: :any_skip_relocation, monterey:       "377cd3d30d3142fd714846f4b07c50e1016bcc04872367ebd3cc44915176222a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "37926d5c24058e236994513c8d685e47c9a381444c67a6d10c58a0242ae18232"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dac495eb1901a28dfc1cd11abf8a606178fb89eebc955989299a4b4181fc718f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "55eba53ea3122827a508c8e157c2454488eba175c7be3f8bf5b936de423b0139"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f60423de629cd20ce0ff69e89135366135b39210338c3888c2431b4c7426b9d0"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "592b8157f3ccc5c93b0639f8309a4a5a302ca89df28ac7d2d0952844db61966a"
+    sha256 cellar: :any_skip_relocation, sonoma:        "32e3939c3b64a6998af3fdb27aa6d47e783c4add9025b96b26a752075c5759c8"
+    sha256 cellar: :any_skip_relocation, ventura:       "d8339a426f1cdf82ac986fdf3a72ecb4b8405c2c34f17552aca0ff55218de9ec"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dc9651bca3ae4b21cea476f602ee391066e161aa1151a3eb80d32b5c725ffe1e"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/terrascan"
+    ldflags = "-s -w -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=ignore"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/terrascan"
+
+    generate_completions_from_executable(bin/"terrascan", "completion")
   end
 
   test do
-    (testpath/"ami.tf").write <<~EOS
+    (testpath/"ami.tf").write <<~HCL
       resource "aws_ami" "example" {
         name                = "terraform-example"
         virtualization_type = "hvm"
@@ -35,7 +38,7 @@ class Terrascan < Formula
           volume_size = 8
         }
       }
-    EOS
+    HCL
 
     expected = <<~EOS
       \tViolated Policies   :\t0

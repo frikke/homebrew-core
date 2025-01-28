@@ -2,9 +2,13 @@ class Usbutils < Formula
   desc "List detailed info about USB devices"
   # Homepage for multiple Linux USB tools, 'usbutils' is one of them.
   homepage "http://www.linux-usb.org/"
-  url "https://mirrors.edge.kernel.org/pub/linux/utils/usb/usbutils/usbutils-015.tar.gz"
-  sha256 "2b8140664578f39c3f6f0166a1b950f8655304e63e3d7f89899acb99bc5cb8e7"
-  license any_of: ["GPL-2.0-only", "GPL-3.0-only"]
+  url "https://mirrors.edge.kernel.org/pub/linux/utils/usb/usbutils/usbutils-018.tar.gz"
+  sha256 "0048d2d8518fb0cc7c0516e16e52af023e52b55ddb3b2068a77041b5ef285768"
+  license all_of: [
+    "GPL-2.0-only",
+    "GPL-2.0-or-later",
+    any_of: ["GPL-2.0-only", "GPL-3.0-only"],
+  ]
 
   livecheck do
     url "https://mirrors.edge.kernel.org/pub/linux/utils/usb/usbutils/"
@@ -12,34 +16,34 @@ class Usbutils < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "0e99cf12fb0f563a2b3d1989c9d48a1e32b50929698adce3b55ec987cfebd7bf"
-    sha256 cellar: :any,                 arm64_monterey: "c67a9bb88a9cd63c920331a86db072da46957021de78c4a6f3d8283978b85473"
-    sha256 cellar: :any,                 arm64_big_sur:  "947ef6a6c17f7874a41d3c2320f91fa494ca29ff9c61e23c8de1964407853d7e"
-    sha256 cellar: :any,                 ventura:        "f8adae8b13b1fbf6df63cd14b9f0da8449c6cbbbece3ced1e11ede87b7f46070"
-    sha256 cellar: :any,                 monterey:       "df6424c3b6aedb0cb484679980e452ea4af24cd65ac94f674084f209f19f0915"
-    sha256 cellar: :any,                 big_sur:        "d1a3c62a690bf4bf4697ce22690468495a97e79bece17d464a6b961de8fa7c7f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ada2b7a26c837e0cc24b81aec12a29d5bbff51366a4222a6b14ae5013e102b27"
+    sha256 cellar: :any, arm64_sequoia: "19bc5627cb39ad4877754708f98e513f74d74d51a66a2c40e5fb904b44c97851"
+    sha256 cellar: :any, arm64_sonoma:  "04127d6f7b7f69f9cf13d59e64c41f75628b9ac4cd4c72da70d9ee892eec1be5"
+    sha256 cellar: :any, arm64_ventura: "620a18e00aedf3f6216972e411044b3b212186daf06de35aaba4c01b0da88b75"
+    sha256 cellar: :any, sonoma:        "5a46602f76dd8cc39b901f1ec384593ca95183ecb8c013dd5db6be6692129ef9"
+    sha256 cellar: :any, ventura:       "4e352bf259ad82c3c2f794c009cb7adcc3fe29829373720529180c28a03902b5"
+    sha256               x86_64_linux:  "b6f4d16b0e4a42673c5725cbc31c25a8bfbe702ca82ecc1b58493248285f57c4"
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => :build
   depends_on "libusb"
 
-  conflicts_with "lsusb", because: "both provide an `lsusb` binary"
+  on_linux do
+    depends_on "systemd"
+  end
+
+  conflicts_with "lsusb", "lsusb-laniksj", because: "both provide an `lsusb` binary"
 
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/9ef20debdfb9995fec347e401f2b5eb7b6c76f07/usbutils/portable.patch"
-    sha256 "645cf353cd2ce0c0ee4f8c4129c3b39488c23d0ab13f4cfdef07f55f23381933"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/24a6945778381a62ecdcc1d78bcc16b9f86778c1/usbutils/portable.patch"
+    sha256 "ec09531017e1fa45dbc37233b286a736a24d7f98668e38a92e3697559f739c7f"
   end
 
   def install
-    system "autoreconf", "--verbose", "--force", "--install"
-    system "./configure", "--disable-debug",
-                          *std_configure_args
-
-    system "make", "install"
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   def caveats

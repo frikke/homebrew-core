@@ -1,8 +1,9 @@
 class Ratfor < Formula
   desc "Rational Fortran"
   homepage "http://www.dgate.org/ratfor/"
-  url "http://www.dgate.org/ratfor/tars/ratfor-1.05.tar.gz"
-  sha256 "826278c5cec11f8956984f146e982137e90b0722af5dde9e8c5bf1fef614853c"
+  url "http://www.dgate.org/ratfor/tars/ratfor-1.07.tar.gz"
+  sha256 "943b5de328d7b890cb444b17fb7dab656ffaa0d388c7d40b649d34b736b137ff"
+  license :public_domain
 
   livecheck do
     url :homepage
@@ -10,16 +11,12 @@ class Ratfor < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "02426cb3f91d13a212cfdd581c550ce0c02a769ffc472b7497b5110426268760"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7b7dd12c9a6ec7c9b817cc0f6179dd4b23a517b99a9645818b6dfdf297336ea6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "86d1de3e075edcc1e493b46fc7186bd21906644ba69a7032f3bc827487eb9449"
-    sha256 cellar: :any_skip_relocation, ventura:        "c2ad80a40dc2def3eb4601d88532af4500903e11bcd4582ec71ded200331ed21"
-    sha256 cellar: :any_skip_relocation, monterey:       "fc0242f98c14b752d27ed3bf1ce4c92827474918c87e38f541fc95c8cd95a267"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0d9bfcd885197bf8bbfbd38469cd831e16f2dceb6cb6155acf075f0dfebcf095"
-    sha256 cellar: :any_skip_relocation, catalina:       "053917ccdf191b7cb15adb1c207cb3f18553def7d4cc9584b09222be07754660"
-    sha256 cellar: :any_skip_relocation, mojave:         "054cb6d92e13050233c54a5bbfdd1dc9fbaed09d63937b8426d543d9569ee07b"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "16c83b337e66de93f5e1b21d77242b849a4a1613e2c2e38d1971a77277924bce"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fc4ca4d1047a943807d656cadc90ed26f141e91435dd60b94a9d4633e729de70"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "aed7f3e144962eab6d49fdae060b421362c76899d45716d8e6099488e853f6ac"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b680bdc4a42beaa254be409281e3ac948edde6feef824945895b44fc5d0ec827"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f96ec748ab19e92ad157a25a6b8a45683d236a090ba19932ca7d653a80c39747"
+    sha256 cellar: :any_skip_relocation, sonoma:        "5b700039e4301b9b7e6ae3c9d4e377f0486673c450e63badb8d7c8fd953e5257"
+    sha256 cellar: :any_skip_relocation, ventura:       "1bb410b5c28cb156882880dd1fd0c561c303017220a47d5e22183d608419ba19"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a8f68d0f668b609b9f5aaca3b14983db4f4c3b149eb6d3506a09cabf038b0446"
   end
 
   depends_on "gcc" # for gfortran
@@ -59,7 +56,7 @@ class Ratfor < Formula
       end
     EOS
 
-    system "#{bin}/ratfor", "-o", "test.f", testpath/"test.r"
+    system bin/"ratfor", "-o", "test.f", testpath/"test.r"
     system "gfortran", "test.f", "-o", "test"
     system "./test"
   end

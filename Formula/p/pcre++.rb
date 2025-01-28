@@ -8,9 +8,11 @@ class Pcrexx < Formula
 
   bottle do
     rebuild 2
+    sha256 cellar: :any,                 arm64_sonoma:   "8229a7705bb8acd30c7dbf142c68d6d53f4af94e68f4456aa4d2a2ab012698b9"
     sha256 cellar: :any,                 arm64_ventura:  "67b2481140ac7c4101d443b54f4d6c7bb7bb1ede6338bae81a4c78509ff49f52"
     sha256 cellar: :any,                 arm64_monterey: "07536c89d8da585a2604dbc109e7cefa2784c83c25b505541b7f407444266f87"
     sha256 cellar: :any,                 arm64_big_sur:  "1232e288cacfd0124da243208e1584caf1925be4dcdcc7b94b96585fb50bfabf"
+    sha256 cellar: :any,                 sonoma:         "1e22e67bbade1d70735cb637249c8439a249a95dadc7d48ade1ecf008f85d85d"
     sha256 cellar: :any,                 ventura:        "ce44cf5554199289582744bb08fb4f2361e4d502ead44860aa6442a1381a72ab"
     sha256 cellar: :any,                 monterey:       "9212f378a4e73bd4bfd55a91dcdc54cf9ce589b2abdf35bc1d1201d4ab06cdd1"
     sha256 cellar: :any,                 big_sur:        "0b05be19479fa7181d354dfafc905f874a17c3135170bedfc324fe0873e113c4"
@@ -20,7 +22,7 @@ class Pcrexx < Formula
   end
 
   # Last release on 2004-08-25 and it is a wrapper around EOL `pcre`
-  deprecate! date: "2023-02-19", because: :unmaintained
+  disable! date: "2024-02-12", because: :unmaintained
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
@@ -36,13 +38,12 @@ class Pcrexx < Formula
     # about references to the compiler shims that exist there, and there doesn't
     # seem to be much reason to keep it around
     inreplace "doc/Makefile.am", "../config.log", ""
-    system "autoreconf", "-fvi"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
+
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-silent-rules",
                           "--with-pcre-lib=#{pcre.opt_lib}",
-                          "--with-pcre-include=#{pcre.opt_include}"
+                          "--with-pcre-include=#{pcre.opt_include}",
+                          *std_configure_args
     system "make", "install"
 
     # Pcre++ ships Pcre.3, which causes a conflict with pcre.3 from pcre
@@ -60,7 +61,7 @@ class Pcrexx < Formula
   end
 
   test do
-    (testpath/"test.cc").write <<~EOS
+    (testpath/"test.cc").write <<~CPP
       #include <pcre++.h>
       #include <iostream>
 
@@ -76,7 +77,7 @@ class Pcrexx < Formula
         }
         return 0;
       }
-    EOS
+    CPP
     flags = ["-I#{include}", "-L#{lib}",
              "-I#{Formula["pcre"].opt_include}", "-L#{Formula["pcre"].opt_lib}",
              "-lpcre++", "-lpcre"] + ENV.cflags.to_s.split
@@ -95,11 +96,11 @@ index d80b387..21869fc 100644
  #include <stdexcept>
  #include <iostream>
 +#include <clocale>
- 
- 
+
+
  extern "C" {
    #include <pcre.h>
 -  #include <locale.h>
  }
- 
+
  namespace pcrepp {

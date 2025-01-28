@@ -3,48 +3,46 @@ class GalleryDl < Formula
 
   desc "Command-line downloader for image-hosting site galleries and collections"
   homepage "https://github.com/mikf/gallery-dl"
-  url "https://files.pythonhosted.org/packages/7b/b1/7695f743070f369d76b802372faeec7a4ff4a43327d8942c54d5f5091eb9/gallery_dl-1.25.8.tar.gz"
-  sha256 "eaad85f73486669d2266806f39422e204a8db3dee16ec6f3136dd72724d95037"
+  url "https://files.pythonhosted.org/packages/e5/bf/9758417620763595e420d6e37806243cef14f536fcd12aa8ed983be12098/gallery_dl-1.28.4.tar.gz"
+  sha256 "de2eff1032fcf6cf1f6b1d942ea230246a63eb0c71530dd3b23413f0e5e692ed"
   license "GPL-2.0-only"
-  revision 1
   head "https://github.com/mikf/gallery-dl.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "15809a724a7ecb8460f6b1a31a8c3dd487d3db3ae855f4ef844eb629595e0ca6"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "772197c1740c4a4cf76a6800c41335c5169b8ca07a25e3a226194d679df7390f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "54504ee2a636e07985a2fc781693cfafad7961432f58e8a81a419aa9bd47d28b"
-    sha256 cellar: :any_skip_relocation, ventura:        "ea3994b29450abe1c7601003f04aa3203b730c0351c707e70febd8f4e67b680b"
-    sha256 cellar: :any_skip_relocation, monterey:       "f48275647e74622d59965f9bb1d7110ee7aa95f4022ade1dd72155b3c7e09989"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c566b11083df7d8e1d915ec1d626669055694ae797da5b0bac67c7cd0fe50e05"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0da6c094ec16f44a23a35d4e8dcb4895eebede063af843067015dd057053425d"
+    sha256 cellar: :any_skip_relocation, all: "66df5086ab86628ded83bdbf84ada8eea87511719da957f6b2f703f1ddca6e13"
   end
 
-  depends_on "python-certifi"
-  depends_on "python@3.11"
+  depends_on "certifi"
+  depends_on "python@3.13"
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/2a/53/cf0a48de1bdcf6ff6e1c9a023f5f523dfe303e4024f216feac64b6eb7f67/charset-normalizer-3.2.0.tar.gz"
-    sha256 "3bb3d25a8e6c0aedd251753a79ae98a093c7e7b471faa3aa9a93a81431987ace"
+    url "https://files.pythonhosted.org/packages/16/b0/572805e227f01586461c80e0fd25d65a2115599cc9dad142fee4b747c357/charset_normalizer-3.4.1.tar.gz"
+    sha256 "44251f18cd68a75b56585dd00dae26183e102cd5e0f9f1466e6df5da2ed64ea3"
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz"
-    sha256 "814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"
+    url "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz"
+    sha256 "12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz"
-    sha256 "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
+    url "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz"
+    sha256 "55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/31/ab/46bec149bbd71a4467a3063ac22f4486ecd2ceb70ae8c70d5d8e4c2a7946/urllib3-2.0.4.tar.gz"
-    sha256 "8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11"
+    url "https://files.pythonhosted.org/packages/aa/63/e53da845320b757bf29ef6a9062f5c669fe997973f966045cb019c3f4b66/urllib3-2.3.0.tar.gz"
+    sha256 "f8c5449b3cf0861679ce7e0503c7b44b5ec981bec0d1d3795a07f1ba96f0204d"
   end
 
   def install
+    system "make", "man", "completion" if build.head?
     virtualenv_install_with_resources
+    man1.install_symlink libexec/"share/man/man1/gallery-dl.1"
+    man5.install_symlink libexec/"share/man/man5/gallery-dl.conf.5"
+    bash_completion.install libexec/"share/bash-completion/completions/gallery-dl"
+    zsh_completion.install libexec/"share/zsh/site-functions/_gallery-dl"
+    fish_completion.install libexec/"share/fish/vendor_completions.d/gallery-dl.fish"
   end
 
   test do

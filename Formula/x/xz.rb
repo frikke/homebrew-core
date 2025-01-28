@@ -1,38 +1,29 @@
-# Upstream project has requested we use a mirror as the main URL
-# https://github.com/Homebrew/legacy-homebrew/pull/21419
 class Xz < Formula
   desc "General-purpose data compression with high compression ratio"
   homepage "https://tukaani.org/xz/"
-  # The archive.org mirror below needs to be manually created at `archive.org`.
-  url "https://downloads.sourceforge.net/project/lzmautils/xz-5.4.4.tar.gz"
-  mirror "https://tukaani.org/xz/xz-5.4.4.tar.gz"
-  mirror "https://archive.org/download/xz-5.4.4/xz-5.4.4.tar.gz"
-  mirror "http://archive.org/download/xz-5.4.4/xz-5.4.4.tar.gz"
-  sha256 "aae39544e254cfd27e942d35a048d592959bd7a79f9a624afb0498bb5613bdf8"
+  url "https://github.com/tukaani-project/xz/releases/download/v5.6.4/xz-5.6.4.tar.gz"
+  mirror "https://downloads.sourceforge.net/project/lzmautils/xz-5.6.4.tar.gz"
+  mirror "http://downloads.sourceforge.net/project/lzmautils/xz-5.6.4.tar.gz"
+  sha256 "269e3f2e512cbd3314849982014dc199a7b2148cf5c91cedc6db629acdf5e09b"
   license all_of: [
-    :public_domain,
-    "LGPL-2.1-or-later",
+    "0BSD",
     "GPL-2.0-or-later",
-    "GPL-3.0-or-later",
   ]
+  version_scheme 1
 
   bottle do
-    sha256 cellar: :any, arm64_sonoma:   "2e78578e241975899342fa4ad4ca4315a4e74117696af09440cf2ce485febebb"
-    sha256 cellar: :any, arm64_ventura:  "ba318d89eea54f33cc3613b1cb69ca4217a8f961e59026418e569e8421afbb8c"
-    sha256 cellar: :any, arm64_monterey: "c8a9e7812c258a3b5043c0207b8044ba099a0a4a97d3ab5314a0dbd171fff3f4"
-    sha256 cellar: :any, arm64_big_sur:  "1857edbbd38cff88854e529670e708e6d87e9d01641e291efee79cafa82fe5b2"
-    sha256 cellar: :any, sonoma:         "bc3b9885851178a5363c88917f7a439af880ec4ecdac24b0061608c5963b6bf6"
-    sha256 cellar: :any, ventura:        "4c25f68798c0b4c9b869e78fdfbd9cd7f8f723c51ea56d643b5644456288d69e"
-    sha256 cellar: :any, monterey:       "39a76706744e6f78f883c38e800d277bc6df71186313cc5fa362072d6c79f991"
-    sha256 cellar: :any, big_sur:        "7bc66bbf17c331e226b65947a7b2c326a883bc70ccdd13127802612713ae1cc2"
-    sha256               x86_64_linux:   "f68637417bc856ba59f1ec25f7fcb0ccba14a9d53557837dcf2ab0ddb652fb8b"
+    sha256 cellar: :any,                 arm64_sequoia: "b49f3559f9425b0a8c8de8806b2162d757196c06d4043e65c6654e88cdac15e0"
+    sha256 cellar: :any,                 arm64_sonoma:  "928cd470a16d10f9c8d444336314101e7b524f9aa5aeaa108569982c2bd83a63"
+    sha256 cellar: :any,                 arm64_ventura: "47bd10fdb1173d54ce37deea250eef4a1a05f45420422d824bf43efea13c28f6"
+    sha256 cellar: :any,                 sonoma:        "5d81f474f98ede15215878db75db8359b154ae17a4710c1d0dd1534c5fda451c"
+    sha256 cellar: :any,                 ventura:       "6e91c631057824a93598109c8fed9eae289ea8118db9c4204d5c334647982892"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c40857ccdacee0eaf8a19a2851f9e4389443da7c10cd6cf50e9c1ef56872c59c"
   end
 
+  deny_network_access! [:build, :postinstall]
+
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args, "--disable-silent-rules", "--disable-nls"
     system "make", "check"
     system "make", "install"
   end
@@ -56,7 +47,9 @@ class Xz < Formula
       next if mirror.start_with?("https")
 
       xz_tar.unlink if xz_tar.exist?
-      system "curl", "--location", mirror, "--output", xz_tar
+
+      # Set fake CA Cert to block any HTTPS redirects.
+      system "curl", "--location", mirror, "--cacert", "/fake", "--output", xz_tar
       assert_equal stable.checksum.hexdigest, xz_tar.sha256
     end
   end

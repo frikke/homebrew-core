@@ -1,20 +1,19 @@
-require "language/node"
-
 class VscodeLangserversExtracted < Formula
   desc "Language servers for HTML, CSS, JavaScript, and JSON extracted from vscode"
   homepage "https://github.com/hrsh7th/vscode-langservers-extracted"
-  url "https://registry.npmjs.org/vscode-langservers-extracted/-/vscode-langservers-extracted-4.7.0.tgz"
-  sha256 "879a28e431f65d3b529d566b47ac8b469581f4c379b28ec3d9da026fe517c722"
+  url "https://registry.npmjs.org/vscode-langservers-extracted/-/vscode-langservers-extracted-4.10.0.tgz"
+  sha256 "d6e2d090d09c4b91daa74e9e7462a3d3f244efb96aa5111004cfffa49d6dc9ef"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5af2c304517f720a9fb73623cdc83b7cbd4807a048a2d7b49e0bf2b5d2ba687c"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "1d95f2ff8fdf6fd36f817214ae5435cd51d0d6490a3e01e25780f8728d4c9999"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 

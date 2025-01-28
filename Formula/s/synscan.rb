@@ -1,7 +1,7 @@
 class Synscan < Formula
   desc "Asynchronous half-open TCP portscanner"
-  homepage "http://digit-labs.org/files/tools/synscan/"
-  url "http://digit-labs.org/files/tools/synscan/releases/synscan-5.02.tar.gz"
+  homepage "https://digit-labs.org/files/tools/synscan/"
+  url "https://digit-labs.org/files/tools/synscan/releases/synscan-5.02.tar.gz"
   sha256 "c4e6bbcc6a7a9f1ea66f6d3540e605a79e38080530886a50186eaa848c26591e"
   license "GPL-2.0-or-later"
   revision 1
@@ -12,9 +12,12 @@ class Synscan < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "5c810311391581f8e9c6c8638d6e11c467198c36c9ebe08ee2f7a25da0d19636"
+    sha256 cellar: :any,                 arm64_sonoma:   "42ea1012c638a378b12bd8966916393692e227186e424c06385cc32ed0f27680"
     sha256 cellar: :any,                 arm64_ventura:  "452098c37c8f4161baa099c7bdf5681453505c53a6b0cb08d2d84f4691fda6a4"
     sha256 cellar: :any,                 arm64_monterey: "a396a4340087cff3494d296c0134cb4089b02b181e6757e01c2428685d12a516"
     sha256 cellar: :any,                 arm64_big_sur:  "86677760d68a0a9efc11560003b4291ff8510b55a03f76a06916c989ec1aa428"
+    sha256 cellar: :any,                 sonoma:         "afd77d2ccf5cd89e3143cfe7046ff6d17d1ec67629513a773a6f8969723ecad5"
     sha256 cellar: :any,                 ventura:        "d97475a0355c1b1a01c782fccbcd46c27ec12b622e8866d0137f02e5ed4a9166"
     sha256 cellar: :any,                 monterey:       "69aeb3d3c862761b228189eeed429dc25a5786f24cebe108cdc1dead01e0aeaf"
     sha256 cellar: :any,                 big_sur:        "df49f836a6552dfba8d127e53d4a87cf50030c63ab906dd1f5c40f549d32bf86"
@@ -40,6 +43,6 @@ class Synscan < Formula
   end
 
   test do
-    system "#{bin}/synscan", "-V"
+    system bin/"synscan", "-V"
   end
 end

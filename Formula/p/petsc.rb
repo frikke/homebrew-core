@@ -1,29 +1,30 @@
 class Petsc < Formula
   desc "Portable, Extensible Toolkit for Scientific Computation (real)"
   homepage "https://petsc.org/"
-  url "https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-3.19.5.tar.gz"
-  sha256 "511aa78cad36db2dfd298acf35e9f7afd2ecc1f089da5b0b5682507a31a5d6b2"
+  url "https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-3.22.2.tar.gz"
+  sha256 "83624de0178b42d37ca1f7f905e1093556c6919fe5accd3e9f11d00a66e11256"
   license "BSD-2-Clause"
 
   livecheck do
-    url "https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/"
-    regex(/href=.*?petsc-lite[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url "https://web.cels.anl.gov/projects/petsc/download/release-snapshots/"
+    regex(/href=.*?petsc[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_ventura:  "46d058b508d1903c0885745c294b1861dac8f3464b3d43815d3cd3e3c1baaf9f"
-    sha256 arm64_monterey: "64560eeed1c2d5dd32bce9758c7748f0cd9561d2d3d61f9e15a8426214160888"
-    sha256 arm64_big_sur:  "7f3da5735a586ecfc808cb6fe3c72fa34abad551c33645a4182b29d1ce1efdcb"
-    sha256 ventura:        "a956e6422c380af16e999466a1ae880ab17a9fc9fa835c2cecf3f0a7e2b0ceeb"
-    sha256 monterey:       "c1f604413f3ed8c2422dcf1442bea7065c672beac25268c93b01e160e5ba92a5"
-    sha256 big_sur:        "938ddfb33bac63563fe0e0ee9937691163f68fcc9ee95db4ed4fbef396bae13a"
-    sha256 x86_64_linux:   "23128291d7798c04bc1c8f242b216054e345b21d871e02855e31c8db7927cd86"
+    rebuild 1
+    sha256 arm64_sequoia: "c6f2699a609b603e9162a9704638e058cb17dd0c7f30075d9a6fdf04c7e227a8"
+    sha256 arm64_sonoma:  "d2b776e79442cadba666805f9f491c040897054af03ed9b37b1b42ef1d1f8523"
+    sha256 arm64_ventura: "b959e714c9c0fe00390de755dc010f570415b840157ff0317cd7337a47edee1f"
+    sha256 sonoma:        "afb7cea8ea8efa54da66caf0822ccca7588ef2f17d1872d5b563f500e579f873"
+    sha256 ventura:       "94d9e611dba8a8f6d16ddf4922c3951ef3a057ff0070fb84742ad53050140ed3"
+    sha256 x86_64_linux:  "31d23ac85ce807347fd06b30bcbf0ac87604db7dc6c8fbea77edba5ac4ee8de7"
   end
 
-  depends_on "hdf5"
+  depends_on "fftw"
+  depends_on "gcc"
+  depends_on "hdf5-mpi"
   depends_on "hwloc"
   depends_on "metis"
-  depends_on "netcdf"
   depends_on "open-mpi"
   depends_on "openblas"
   depends_on "scalapack"
@@ -42,6 +43,11 @@ class Petsc < Formula
                           "--CXX=mpicxx",
                           "--F77=mpif77",
                           "--FC=mpif90",
+                          "--with-fftw-dir=#{Formula["fftw"].opt_prefix}",
+                          "--with-hdf5-dir=#{Formula["hdf5-mpi"].opt_prefix}",
+                          "--with-hdf5-fortran-bindings=1",
+                          "--with-metis-dir=#{Formula["metis"].opt_prefix}",
+                          "--with-scalapack-dir=#{Formula["scalapack"].opt_prefix}",
                           "MAKEFLAGS=$MAKEFLAGS"
 
     # Avoid references to Homebrew shims (perform replacement before running `make`, or else the shim
@@ -52,7 +58,7 @@ class Petsc < Formula
     system "make", "install"
 
     # Avoid references to Homebrew shims
-    rm_f lib/"petsc/conf/configure-hash"
+    rm(lib/"petsc/conf/configure-hash")
 
     if OS.mac? || File.foreach("#{lib}/petsc/conf/petscvariables").any? { |l| l[Superenv.shims_path.to_s] }
       inreplace lib/"petsc/conf/petscvariables", "#{Superenv.shims_path}/", ""

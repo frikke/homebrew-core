@@ -1,38 +1,60 @@
 class Iblinter < Formula
   desc "Linter tool for Interface Builder"
   homepage "https://github.com/IBDecodable/IBLinter"
-  url "https://github.com/IBDecodable/IBLinter/archive/0.5.0.tar.gz"
+  url "https://github.com/IBDecodable/IBLinter/archive/refs/tags/0.5.0.tar.gz"
   sha256 "d1aafdca18bc81205ef30a2ee59f33513061b20184f0f51436531cec4a6f7170"
   license "MIT"
   head "https://github.com/IBDecodable/IBLinter.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b7feaf0f8989fa59389fb0788d91688ea5cac2ffeed12ee872aace5110f7bf8b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "83ffc3e0bd87735dce4868ce4540fb025d94c8a491e6b029d537f7594d653935"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1022dcabaa9a097c554000519d2ba6c424d7612a6cb344c8b2697477f7f40e2a"
-    sha256 cellar: :any_skip_relocation, ventura:        "63bd9e8532fa5e7b741e5ba07952ca62a51e1c14608f15c90871093b28664e6e"
-    sha256 cellar: :any_skip_relocation, monterey:       "c29c85d68c136f5c706167c47c79092facfbc4a5b02956233ea6d8617ac6aa05"
-    sha256 cellar: :any_skip_relocation, big_sur:        "aa478f72715391c8e25e31ead3a9b25503158eb37a6d4d4ae5ab222f5026c13a"
-    sha256 cellar: :any_skip_relocation, catalina:       "558920fbd33ed70ba3ebe56543756dc51fbece752be655691e46ac33b8bec8e0"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "ab02ce27d16504d8ec99411983ecec5503a128fd940bc6d0c9c13ba7347d7632"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "c629f36cf48f2703306e635ad77c25ff9d6423789664bcda698403588461a598"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7f71014fe66db0a03768d59175053f6d3575dcc7ea91e806cec6912d808df667"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2e63e2fe2324d295afb9bba5b8a3b7475480543fcf8145b61cb5931cda5ca97d"
+    sha256 cellar: :any_skip_relocation, sonoma:         "769206183628990b57eec91a82781e399a6e1581551f85308bdc1342cc8b0265"
+    sha256 cellar: :any_skip_relocation, ventura:        "cc719fe755a7c5af129d7e9cf053935ff4daf35fe48ead5fbff3d4a74be49cd4"
+    sha256 cellar: :any_skip_relocation, monterey:       "dc4ca4585eaa86c2fec24e712100925b460dd75ed13c8d15eab5141a88a43a30"
   end
 
   depends_on xcode: ["10.2", :build]
 
+  # Fetch a copy of SourceKitten in order to fix build with newer Swift.
+  # Issue ref: https://github.com/IBDecodable/IBLinter/issues/189
+  resource "SourceKitten" do
+    on_sequoia :or_newer do
+      # https://github.com/IBDecodable/IBLinter/blob/0.5.0/Package.resolved#L41-L47
+      url "https://github.com/jpsim/SourceKitten.git",
+          tag:      "0.29.0",
+          revision: "77a4dbbb477a8110eb8765e3c44c70fb4929098f"
+
+      # Backport of import from HEAD
+      patch :DATA
+    end
+  end
+
   def install
-    system "make", "install", "PREFIX=#{prefix}"
+    args = ["--disable-sandbox", "--configuration", "release"]
+    if OS.mac? && MacOS.version >= :sequoia
+      (buildpath/"SourceKitten").install resource("SourceKitten")
+      system "swift", "package", *args, "edit", "SourceKitten", "--path", buildpath/"SourceKitten"
+    end
+
+    system "swift", "build", *args
+    bin.install ".build/release/iblinter"
   end
 
   test do
     # Test by showing the help scree
-    system "#{bin}/iblinter", "help"
+    system bin/"iblinter", "help"
 
     # Test by linting file
-    (testpath/".iblinter.yml").write <<~EOS
+    (testpath/".iblinter.yml").write <<~YAML
       ignore_cache: true
       enabled_rules: [ambiguous]
-    EOS
+    YAML
 
-    (testpath/"Test.xib").write <<~EOS
+    (testpath/"Test.xib").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch">
         <objects>
@@ -41,9 +63,30 @@ class Iblinter < Formula
           </view>
         </objects>
       </document>
-    EOS
+    XML
 
     assert_match "#{testpath}/Test.xib:0:0: error: UIView (iGg-Eg-h0O) has ambiguous constraints",
                  shell_output("#{bin}/iblinter lint --config #{testpath}/.iblinter.yml --path #{testpath}", 2).chomp
   end
 end
+
+__END__
+diff --git a/Source/SourceKittenFramework/SwiftDocs.swift b/Source/SourceKittenFramework/SwiftDocs.swift
+index 1d2473c..70de287 100644
+--- a/Source/SourceKittenFramework/SwiftDocs.swift
++++ b/Source/SourceKittenFramework/SwiftDocs.swift
+@@ -10,6 +10,14 @@
+ import SourceKit
+ #endif
+
++#if os(Linux)
++import Glibc
++#elseif os(Windows)
++import CRT
++#else
++import Darwin
++#endif
++
+ /// Represents docs for a Swift file.
+ public struct SwiftDocs {
+     /// Documented File.

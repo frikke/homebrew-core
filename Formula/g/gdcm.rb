@@ -1,10 +1,9 @@
 class Gdcm < Formula
   desc "Grassroots DICOM library and utilities for medical files"
   homepage "https://sourceforge.net/projects/gdcm/"
-  url "https://github.com/malaterre/GDCM/archive/v3.0.22.tar.gz"
-  sha256 "2ee9bf6787046a508ec3fe38e3cf85ab074e11de2e503bdaf8f30f00cbeff386"
+  url "https://github.com/malaterre/GDCM/archive/refs/tags/v3.0.24.tar.gz"
+  sha256 "d88519a094797c645ca34797a24a14efc10965829c4c3352c8ef33782a556336"
   license "BSD-3-Clause"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,22 +11,22 @@ class Gdcm < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "f88e00083894931c70ca5615d1f9121e25974a98c2790bd2d5736b5c2717c899"
-    sha256 arm64_monterey: "890350c5ccc9f071ec406cdb13a1ad853e2c0b3c1a9398b4f5507f23f0a001c2"
-    sha256 arm64_big_sur:  "abf95208b5648a166cec0a8e8595f67e5e76b9320bd9e05d14c6eb0207d46fa5"
-    sha256 ventura:        "015fc368cc727537c6fa4b53b47371a5fb475ced6c833ffdc33e48ea4d0d87b8"
-    sha256 monterey:       "f1c979f2946d54a371246cfc6f7f8f491d489c3e311aaf7c77c7e0fea996a04b"
-    sha256 big_sur:        "655a89dd712212d3eaae854ddbfc2f45a328dcff16667f88305b8ab73500e938"
-    sha256 x86_64_linux:   "4bef238f56d20cbb8c70ee6fa9e5fe632be5bca470423009b548cb1a1043539e"
+    rebuild 1
+    sha256 arm64_sequoia: "d0561a6d8ee2b31305adfec2635876226ed217d5ac3ad8cc7355e0395ec6d545"
+    sha256 arm64_sonoma:  "b93f40bfae7fe20b367cf26010142d9baa88ce4dd9e11b3930a6aa506e4a7854"
+    sha256 arm64_ventura: "53f749235948d44c0a61dfe1d16aa25e63a00d5742434702b4148a84363bbdfa"
+    sha256 sonoma:        "8bad60afc9f145ffc913c78d8e8fb813eefa09e9080db5e7fc907dfa32bf605c"
+    sha256 ventura:       "86e513e03c33cd69b5e341bfb74292ddb7975c3a1bbff5c39d48328f0fd6dea5"
+    sha256 x86_64_linux:  "a443980c665157dbfb2919d3035d44947e299f9474a0703177293fc9784db186"
   end
 
   depends_on "cmake" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "swig" => :build
   depends_on "openjpeg"
   depends_on "openssl@3"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   uses_from_macos "expat"
   uses_from_macos "zlib"
@@ -36,16 +35,17 @@ class Gdcm < Formula
     depends_on "util-linux" # for libuuid
   end
 
-  fails_with gcc: "5"
-
   def python3
-    which("python3.11")
+    which("python3.13")
   end
 
   def install
-    python_include =
-      Utils.safe_popen_read(python3, "-c", "from distutils import sysconfig;print(sysconfig.get_python_inc(True))")
-           .chomp
+    xy = Language::Python.major_minor_version python3
+    python_include = if OS.mac?
+      Formula["python@#{xy}"].opt_frameworks/"Python.framework/Versions/#{xy}/include/python#{xy}"
+    else
+      Formula["python@#{xy}"].opt_include/"python#{xy}"
+    end
 
     prefix_site_packages = prefix/Language::Python.site_packages(python3)
     args = [
@@ -80,14 +80,14 @@ class Gdcm < Formula
   end
 
   test do
-    (testpath/"test.cxx").write <<~EOS
+    (testpath/"test.cxx").write <<~CPP
       #include "gdcmReader.h"
       int main(int, char *[])
       {
         gdcm::Reader reader;
         reader.SetFileName("file.dcm");
       }
-    EOS
+    CPP
 
     system ENV.cxx, "-std=c++11", "-isystem", "#{include}/gdcm-3.0", "-o", "test.cxx.o", "-c", "test.cxx"
     system ENV.cxx, "-std=c++11", "test.cxx.o", "-o", "test", "-L#{lib}", "-lgdcmDSED"

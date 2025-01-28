@@ -1,8 +1,8 @@
 class Msmtp < Formula
   desc "SMTP client that can be used as an SMTP plugin for Mutt"
   homepage "https://marlam.de/msmtp/"
-  url "https://marlam.de/msmtp/releases/msmtp-1.8.24.tar.xz"
-  sha256 "bd6644b1aaab17d61b86647993e3efad860b23c54283b00ddc579c1f5110aa59"
+  url "https://marlam.de/msmtp/releases/msmtp-1.8.28.tar.xz"
+  sha256 "3a57f155f54e4860f7dd42138d9bea1af615b99dfab5ab4cd728fc8c09a647a4"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,22 +11,21 @@ class Msmtp < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "5f5d5357335fe1c163aff3daede12982893e0510345d9a7fb1b2ffb9e9b312da"
-    sha256 arm64_monterey: "6c7e4cca084ef1440c202a24e1bc2bbd4e87fb144b20614b90f0f4dec33283c3"
-    sha256 arm64_big_sur:  "c2244185a32bc16bb6cac7f7094cb379fc925f9d0e3dedfef4761f0a012f0fba"
-    sha256 ventura:        "6cdea01606ab43764a97082cac4e486e693b557a739ab0c5b0865a9d0bac7f51"
-    sha256 monterey:       "28aa80afe8886e3d60f6b5e08bf63fb0c94e8937f0d422a3e265d76f44405620"
-    sha256 big_sur:        "04424ed650cf2330a5ff7e3cf65e2476dfae18d9b2bb961d99c2a83fea8ad8aa"
-    sha256 x86_64_linux:   "286904b8002879ca37c1d52a30b823e137322115989c1049363c830f4a449a78"
+    sha256 arm64_sequoia: "c4c70693d1e16a0c6b8a55bf52a548760b3bc16df35bf0c70312ef2d57ffe187"
+    sha256 arm64_sonoma:  "9194d0b211b262ff0022ff7e54e9c6ae3b91fbac8117e9efc4d20bafbf6a2bf1"
+    sha256 arm64_ventura: "b529bbf1481c29d5d14fe62a45ab2860c29c173071add866bfe30627ff4b5da1"
+    sha256 sonoma:        "d44aa70e8a8bebc73d42ed949d93269434aca16cd400826bba636d4a7e5d8d6e"
+    sha256 ventura:       "0df3276cf5404eec6e3d88c2b052e0d16d957033eb55aff75e2e4d83f518cb5e"
+    sha256 x86_64_linux:  "0ee69d963d12c0ec32977dcd57b555755024e480a433abb0cb40b0ecdb8425f2"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gettext"
   depends_on "gnutls"
   depends_on "libidn2"
 
   def install
-    system "./configure", *std_configure_args, "--disable-silent-rules", "--with-macosx-keyring"
+    system "./configure", "--disable-silent-rules", "--with-macosx-keyring", *std_configure_args
     system "make", "install"
     (pkgshare/"scripts").install "scripts/msmtpq"
   end

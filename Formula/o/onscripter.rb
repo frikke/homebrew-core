@@ -6,18 +6,20 @@ class Onscripter < Formula
   license "GPL-2.0-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sonoma:   "976eb85cb68b75c8d05a99a8a7229d95dde665b086d7c3487257ae7b73b2bca0"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "4500c6b81e79fcce6f25ceb5a725f3f61ca4085dffddb1e7bb2571c81cfb8c51"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "f988f81af74291e517c4e0010f086de294dd705584c186518f17fabb7dcbf027"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "988db2dba660dba1abc5c8f6145480deb8219dcbc62c4eb7ad6f6cb88afe4435"
+    sha256 cellar: :any,                 sonoma:         "f43cce01409904c02640dcfb203932816661c94e3e8cc2a976a743bbdd833651"
     sha256 cellar: :any_skip_relocation, ventura:        "ad135d147b63f7746f4ff8f8c6e4fc24ce5ec7c640aab87ef351272a73144827"
     sha256 cellar: :any_skip_relocation, monterey:       "9a89c54f6daf473e431bbf15173b2b16b117809cd422489d4407b24a5bcb16fa"
     sha256 cellar: :any_skip_relocation, big_sur:        "ab670d0f52888c0a76694a3c05e889d016d233670b1098dfdb256a6bc5aa277c"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "06626f8dbf7167cd8e5f8e9a9e6986d7d0988f1c89ba6889bec1cc191f4852c5"
   end
 
-  deprecate! date: "2023-02-05", because: "uses deprecated `sdl_image`, `sdl_mixer`, and `sdl_ttf`"
+  disable! date: "2024-02-07", because: "uses deprecated `sdl_image`, `sdl_mixer`, and `sdl_ttf`"
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "jpeg-turbo"
   depends_on "lua"
   depends_on "sdl12-compat"

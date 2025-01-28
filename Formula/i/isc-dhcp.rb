@@ -5,21 +5,22 @@ class IscDhcp < Formula
   sha256 "0ac416bb55997ca8632174fd10737fd61cdb8dba2752160a335775bc21dc73c7"
   license "MPL-2.0"
 
-  livecheck do
-    url "https://www.isc.org/download/"
-    regex(%r{href=.*?/dhcp[._-]v?(\d+(?:\.\d+)+(?:-P\d+)?)\.t}i)
-  end
-
   bottle do
+    sha256 arm64_sequoia:  "d2757d9ace5037a47edaa968d947b51afbfe271b79e5655700167ff8985d6031"
+    sha256 arm64_sonoma:   "620dbe4f0f6b3905627c1d41c597f2436ead691362ba8ebc8d435efa3ed0284e"
     sha256 arm64_ventura:  "ca26d2145b3c8040d94c1ee2b8065d1facdf47f00e4d26e93d8a15a9bab3b209"
     sha256 arm64_monterey: "53454eb5ae86cb4fe52825f7bcfec568ed205ee417d21526fa42d1c5b90141dd"
     sha256 arm64_big_sur:  "11182828a03788759a737535d2db69aa96d12df98889e62c4b8147f709b00a92"
+    sha256 sonoma:         "9eca5bab2ddcf8f6e0222c28db825e4bd66424f64f7e87eed988db312cd53923"
     sha256 ventura:        "1e27788709ff517345a449edc508cfc9dc5426baa08bb3f34167acffc84c010f"
     sha256 monterey:       "a55472a7338f26f7138000677df04f90eec5eec5120168b87c72ed14b9536fbe"
     sha256 big_sur:        "a0ca57af4461f5ecad3f0882c72e3afaa78a78d46ad2393cbf553226c471107a"
     sha256 catalina:       "0c39f7765fb83025a5b24012b692c04aaf4e78cfa6a1e450e93b191b9d33e90d"
     sha256 x86_64_linux:   "6085ad7064a861fe03a25bf6ba6172d1a50cdf0f5985dc652ba32484fb7e08ca"
   end
+
+  # see https://www.isc.org/blogs/isc-dhcp-eol/
+  disable! date: "2025-01-16", because: :deprecated_upstream, replacement: "kea"
 
   def install
     # use one dir under var for all runtime state.

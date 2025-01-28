@@ -4,34 +4,29 @@ class Mysqlxx < Formula
   url "https://tangentsoft.com/mysqlpp/releases/mysql++-3.3.0.tar.gz"
   sha256 "449cbc46556cc2cc9f9d6736904169a8df6415f6960528ee658998f96ca0e7cf"
   license "LGPL-2.1-or-later"
-  revision 2
+  revision 4
 
   livecheck do
-    url :homepage
-    regex(/href=.*?mysql\+\+[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url "https://tangentsoft.com/mysqlpp/releases/"
+    regex(/>mysql\+\+[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "9244f1ab36df8527bde5bbfa1896fc43511076cb4c1312b70b88dda97cf514d4"
-    sha256 cellar: :any,                 arm64_monterey: "c042304bf3959e8ff9f5f98c6e7121af78daeeec0d3ae9efb650eabaa713536a"
-    sha256 cellar: :any,                 arm64_big_sur:  "2a0f6e540ab0ebb1594fae343e8358d98cf22bda4887d039f9e05155ec9f5dab"
-    sha256 cellar: :any,                 ventura:        "665e4cc095a04a2e7d04edc1f8fb7f306a1b4923b2be8afce48b39c107873c43"
-    sha256 cellar: :any,                 monterey:       "675b77e64a1ca5dbb5fc8dff4a720a4182e7143906cceecbd074d274f5b19cb4"
-    sha256 cellar: :any,                 big_sur:        "aeaf076e16d85aaee1e5dddd2c926bd0a8cc142735ab585a7a1530e41dd15b2b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d04204c93a9db0aa946a735e4bef186a0f1caddab7c985c5244b8d39e129d9ec"
+    sha256 cellar: :any,                 arm64_sequoia: "5c39095c830382c0de716906058fdfc99dc8ba77c57b2682ffab177767790c21"
+    sha256 cellar: :any,                 arm64_sonoma:  "20c4acc648555402a0e94e9d4f771ae4952e1a207ff86af5b088694b5bc0195d"
+    sha256 cellar: :any,                 arm64_ventura: "40a3f055ec5b42ab64ed3996133d2250b4d01e35aadf3d4c156ed5c011708aaa"
+    sha256 cellar: :any,                 sonoma:        "57348bc88e3ed7dfccd4c0b51a7c5416473a0e81d23eb6f9c863d21da02fa236"
+    sha256 cellar: :any,                 ventura:       "5c9da073209c874fa0fd85f0d98783444e1af93e527871d7dc47366f22f9ab28"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "05a8a2b24a6e5b63f6ed9b997686059ea081726bce22555a0665c4b19826effa"
   end
 
-  depends_on "mysql-client"
-
-  fails_with gcc: "5"
+  depends_on "mariadb-connector-c"
 
   def install
-    mysql = Formula["mysql-client"]
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--with-field-limit=40",
-                          "--with-mysql-lib=#{mysql.opt_lib}",
-                          "--with-mysql-include=#{mysql.opt_include}/mysql"
+    mariadb = Formula["mariadb-connector-c"]
+    system "./configure", "--with-field-limit=40",
+                          "--with-mysql=#{mariadb.opt_prefix}",
+                          *std_configure_args
 
     # Delete "version" file incorrectly included as C++20 <version> header
     # Issue ref: https://tangentsoft.com/mysqlpp/tktview/4ea874fe67e39eb13ed4b41df0c591d26ef0a26c
@@ -42,7 +37,7 @@ class Mysqlxx < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <mysql++/cmdline.h>
       int main(int argc, char *argv[]) {
         mysqlpp::examples::CommandLine cmdline(argc, argv);
@@ -51,8 +46,8 @@ class Mysqlxx < Formula
         }
         return 0;
       }
-    EOS
-    system ENV.cxx, "test.cpp", "-I#{Formula["mysql-client"].opt_include}/mysql",
+    CPP
+    system ENV.cxx, "test.cpp", "-I#{Formula["mariadb-connector-c"].opt_include}/mariadb",
                     "-L#{lib}", "-lmysqlpp", "-o", "test"
     system "./test", "-u", "foo", "-p", "bar"
   end

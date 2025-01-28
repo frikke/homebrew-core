@@ -1,19 +1,19 @@
 class HasteClient < Formula
   desc "CLI client for haste-server"
   homepage "https://hastebin.com/"
-  url "https://github.com/toptal/haste-client/archive/v0.3.0.tar.gz"
+  url "https://github.com/toptal/haste-client/archive/refs/tags/v0.3.0.tar.gz"
   sha256 "9f7e943be47408ba0b9765328794e7b87bdb2a785f1e9edb5d541d67b4a75d31"
   license "MIT"
+  revision 2
   head "https://github.com/toptal/haste-client.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "867a679e7daef529fa36bd744eb7ce3326867bed1fb5588fe79b626121247232"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "867a679e7daef529fa36bd744eb7ce3326867bed1fb5588fe79b626121247232"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b0bf267cb522df7e54546c61342ab74db3610856894b4a6f4e010e70ba2c0308"
-    sha256 cellar: :any_skip_relocation, ventura:        "867a679e7daef529fa36bd744eb7ce3326867bed1fb5588fe79b626121247232"
-    sha256 cellar: :any_skip_relocation, monterey:       "867a679e7daef529fa36bd744eb7ce3326867bed1fb5588fe79b626121247232"
-    sha256 cellar: :any_skip_relocation, big_sur:        "867a679e7daef529fa36bd744eb7ce3326867bed1fb5588fe79b626121247232"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3e8ca7f96707ff93d23f2faf3deb15bdaf7faeca5a78115823bc1c00a22e436d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e6968438749dec734a5a5ab8c4dac48fd5eee5b2c8adfe6ec8908d17c72788c1"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e6968438749dec734a5a5ab8c4dac48fd5eee5b2c8adfe6ec8908d17c72788c1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e6968438749dec734a5a5ab8c4dac48fd5eee5b2c8adfe6ec8908d17c72788c1"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e6968438749dec734a5a5ab8c4dac48fd5eee5b2c8adfe6ec8908d17c72788c1"
+    sha256 cellar: :any_skip_relocation, ventura:       "e6968438749dec734a5a5ab8c4dac48fd5eee5b2c8adfe6ec8908d17c72788c1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dee9ebcf14e0273c14d8e28ceb77984f9fcd521e11cbc65f74762897d0e73cba"
   end
 
   uses_from_macos "ruby", since: :high_sierra

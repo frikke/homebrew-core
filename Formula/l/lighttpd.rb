@@ -1,10 +1,9 @@
 class Lighttpd < Formula
   desc "Small memory footprint, flexible web-server"
   homepage "https://www.lighttpd.net/"
-  url "https://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.71.tar.xz"
-  sha256 "b8b6915da20396fdc354df3324d5e440169b2e5ea7859e3a775213841325afac"
+  url "https://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.77.tar.xz"
+  sha256 "acafabdbfa2267d8b6452d03d85fdd2a66525f3f05a36a79b6645c017f1562ce"
   license "BSD-3-Clause"
-  revision 1
 
   livecheck do
     url :homepage
@@ -12,33 +11,32 @@ class Lighttpd < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "5d75c80e3c1b918421036f68cd3c30a1f38d677e4bbd13241de2182af220a08b"
-    sha256 arm64_monterey: "7b0ef833b3bf03ec7d1e79e39d18eda73a5436f332d8c556ef6b32f617fadaaa"
-    sha256 arm64_big_sur:  "63aab8d14f51c8748615f36035c64388f514e4e6737f9ef84ad02683967ce5c2"
-    sha256 ventura:        "dcbc9e0efa4707442a6e9a0f867aaf41b38308e316574af6199a9834899e5570"
-    sha256 monterey:       "9f6d257aab5a322ff70f296acae96dfda370e509562edf0e878080472a304150"
-    sha256 big_sur:        "ec55560b7a38ee01f6481092f429da93189c080a2a66249354a37577e25ea1ab"
-    sha256 x86_64_linux:   "4c8f0c18617cb50aca3caa112390ee1b6971cfe60fcd5e0a7f24ad66f0ce9a3b"
+    sha256 arm64_sequoia: "ea181efeede65837d89e175b9655334c6324bef636685079a16280734cf99cd1"
+    sha256 arm64_sonoma:  "bfb037e447da708a32a4b863d339c1a41b48af809ca6a47da1510d7b28d0efd7"
+    sha256 arm64_ventura: "853dff40ff89429e50a349b1c595fcd130e175b2a409f21ceb9542afe06b940c"
+    sha256 sonoma:        "85fb623779424c20ac74ca7559a56f9315ee1573acb1d110512a335dd536d8c5"
+    sha256 ventura:       "3e0178fa9120a7a92e49dea1bd4815e17408fe8c5d16838b5a811fb3c118b122"
+    sha256 x86_64_linux:  "91b5e99bae350afd3df2dc183c42c81cba441a64f9488af7e3866ad7fe55c135"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "openldap"
   depends_on "openssl@3"
   depends_on "pcre2"
 
+  uses_from_macos "bzip2"
   uses_from_macos "libxcrypt"
+  uses_from_macos "zlib"
 
   # default max. file descriptors; this option will be ignored if the server is not started as root
   MAX_FDS = 512
 
   def install
     args = %W[
-      --disable-dependency-tracking
       --disable-silent-rules
-      --prefix=#{prefix}
       --sbindir=#{bin}
       --with-bzip2
       --with-ldap
@@ -51,19 +49,20 @@ class Lighttpd < Formula
     # autogen must be run, otherwise prebuilt configure may complain
     # about a version mismatch between included automake and Homebrew's
     system "./autogen.sh"
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
 
     unless File.exist? etc/"lighttpd"
-      (etc/"lighttpd").install "doc/config/lighttpd.conf", "doc/config/modules.conf"
+      (etc/"lighttpd").install "doc/config/lighttpd.conf", "doc/config/lighttpd.annotated.conf",
+        "doc/config/modules.conf"
       (etc/"lighttpd/conf.d/").install Dir["doc/config/conf.d/*.conf"]
-      inreplace etc + "lighttpd/lighttpd.conf" do |s|
+      inreplace etc + "lighttpd/lighttpd.annotated.conf" do |s|
         s.sub!(/^var\.log_root\s*=\s*".+"$/, "var.log_root    = \"#{var}/log/lighttpd\"")
         s.sub!(/^var\.server_root\s*=\s*".+"$/, "var.server_root = \"#{var}/www\"")
         s.sub!(/^var\.state_dir\s*=\s*".+"$/, "var.state_dir   = \"#{var}/lighttpd\"")
         s.sub!(/^var\.home_dir\s*=\s*".+"$/, "var.home_dir    = \"#{var}/lighttpd\"")
         s.sub!(/^var\.conf_dir\s*=\s*".+"$/, "var.conf_dir    = \"#{etc}/lighttpd\"")
-        s.sub!(/^server\.port\s*=\s*80$/, "server.port = 8080")
+        s.sub!(/^#server\.port\s*=\s*80$/, "server.port = 8080")
         s.sub!(%r{^server\.document-root\s*=\s*server_root \+ "/htdocs"$}, "server.document-root = server_root")
 
         s.sub!(/^server\.username\s*=\s*".+"$/, 'server.username  = "_www"')
@@ -99,6 +98,6 @@ class Lighttpd < Formula
   end
 
   test do
-    system "#{bin}/lighttpd", "-t", "-f", etc/"lighttpd/lighttpd.conf"
+    system bin/"lighttpd", "-t", "-f", etc/"lighttpd/lighttpd.conf"
   end
 end

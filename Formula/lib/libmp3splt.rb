@@ -3,7 +3,8 @@ class Libmp3splt < Formula
   homepage "https://mp3splt.sourceforge.net/mp3splt_page/home.php"
   url "https://downloads.sourceforge.net/project/mp3splt/libmp3splt/0.9.2/libmp3splt-0.9.2.tar.gz"
   sha256 "30eed64fce58cb379b7cc6a0d8e545579cb99d0f0f31eb00b9acc8aaa1b035dc"
-  revision 4
+  license "GPL-2.0-only"
+  revision 6
 
   # We check the "libmp3splt" directory page since versions aren't present in
   # the RSS feed as of writing.
@@ -14,17 +15,17 @@ class Libmp3splt < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "e95a05675241b026300fd7daf6911a139300fbaa532d753240661dc69edb718c"
-    sha256 arm64_monterey: "f851c1d17d5f4b6d49baa45f1de154d14e141396429bdf5ccdf3abede2b29988"
-    sha256 arm64_big_sur:  "03087be44a54352405397931121370b1ba6621ddaa920822988938e0ed0a503e"
-    sha256 ventura:        "e70e4d3d2adfadabc9ffc01834245bf091a7d0859995754dee3fd1002482a00f"
-    sha256 monterey:       "43a2c40bbbf27714e2df4812e165ce2260e06c18a9534a830d4d603e78ab6d89"
-    sha256 big_sur:        "f6a8aea05d3277c8fd92efa9a9a0745475867e90cf91ab2a1157659a794d16ec"
-    sha256 catalina:       "e0f8a379b1bbf68300be919e9f28c6a707639c792b8db355cb1ca76eb641630b"
-    sha256 x86_64_linux:   "53af5c1f19326456730cab5b268e2574c56a24f0276795296916206e8d3485e9"
+    sha256 arm64_sequoia:  "e31a09566eee7d33d8651ab83872b7901e404bc536806dacb359becf2c784fdd"
+    sha256 arm64_sonoma:   "ee6cd10b82e446a48c36e769b33e4a7d706c832111e72a9d3847d18f727524da"
+    sha256 arm64_ventura:  "590a704b1d379b286d91f152ec8e9dda4bdac13635d7621a61e7a69d049c8d0f"
+    sha256 arm64_monterey: "71fd93524a5a30b9c643151e376e16271b6ebdb7158a89a0d67761c84f0f4667"
+    sha256 sonoma:         "c24510f2bd1c336a844ec2c6cab805a0ade60948c3ce098be49a0172b43be76d"
+    sha256 ventura:        "759e7813fb3cb7dadba9c539aeca84f18f6b2dd9f7f84c7c197e12d9d0adf19a"
+    sha256 monterey:       "a81be532fc8d2b8f1e0cdc293d47130a9d361e9133d6117442e23cee79bc411b"
+    sha256 x86_64_linux:   "61f6d9accf005b87e7ef35000094703019abab54d6e7b851019552060cc93aae"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "flac"
   depends_on "gettext"
   depends_on "libid3tag"
@@ -35,9 +36,7 @@ class Libmp3splt < Formula
   depends_on "pcre"
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 end

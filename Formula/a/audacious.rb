@@ -2,14 +2,19 @@ class Audacious < Formula
   desc "Lightweight and versatile audio player"
   homepage "https://audacious-media-player.org/"
   license "BSD-2-Clause"
+  revision 1
 
   stable do
-    url "https://distfiles.audacious-media-player.org/audacious-4.3.1.tar.bz2"
-    sha256 "85e9e26841505b51e342ee72a2d05f19bef894f567a029ebb3f3e0c1adb42042"
+    url "https://distfiles.audacious-media-player.org/audacious-4.4.2.tar.bz2"
+    sha256 "34509504f8c93b370420d827703519f0681136672e42d56335f26f7baec95005"
 
     resource "plugins" do
-      url "https://distfiles.audacious-media-player.org/audacious-plugins-4.3.1.tar.bz2"
-      sha256 "2dea26e3af583a2d684df240b27b2b2932bcd653df4db500a85f4fe5d5fdc8a6"
+      url "https://distfiles.audacious-media-player.org/audacious-plugins-4.4.2.tar.bz2"
+      sha256 "50f494693b6b316380fa718c667c128aa353c01e954cd77a65c9d8aedf18d4bd"
+
+      livecheck do
+        formula :parent
+      end
     end
   end
 
@@ -19,13 +24,11 @@ class Audacious < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "25f3142a4ca788ca2b4d57853ac8d98c4ee1d8229b728462af226323720339b8"
-    sha256 arm64_monterey: "1f5a9d58989dbcdf06ae5732091ee93ebc6b29398d8cea949cf30dd7c90ddae3"
-    sha256 arm64_big_sur:  "c1e294e3fbe48409e07f1b924003f764bb70943ff1added3bb4d0dafe75b113d"
-    sha256 ventura:        "0f3c9cacff3ff240a13e88f08055f3a3bfc0cfda6ba46200286f355f5f421fca"
-    sha256 monterey:       "23828385f46ff08c4149b36923b564d6a2696e74ebc48d86a4ddbd3da5b1639e"
-    sha256 big_sur:        "ab1f11e873c42f1f75645724dffaa80c828c6d26532383c5c69fc96f13036a8c"
-    sha256 x86_64_linux:   "d51a93f3d472cf7bd0814dda1f99ab25b4bbdf7fd01c886150aadbeda1b3dad7"
+    sha256 arm64_sonoma:  "794c8b22de09e8f6828e9dd513c1cb71551bf4ac8bad5ed9617d7c4a671afaa4"
+    sha256 arm64_ventura: "42c0965028465f832c7e0d3c879a539531d929e407fe4a148dc32f5048b8d7c7"
+    sha256 sonoma:        "9a23e849d93017672bb9d4f9ed142773558ced6855586f0edb18fe120f08a468"
+    sha256 ventura:       "dc7fbd11ef3ce5c6216659d14ec4a8876cf6633bad943ba21dd8bb7a1b785c99"
+    sha256 x86_64_linux:  "5ca7ee309f4b2e3c5efb2676120eb3f47beee8b2d7b9499b7bd932c4669bf318"
   end
 
   head do
@@ -39,19 +42,23 @@ class Audacious < Formula
   depends_on "gettext" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "faad2"
   depends_on "ffmpeg"
   depends_on "flac"
   depends_on "fluid-synth"
+  depends_on "gdk-pixbuf"
   depends_on "glib"
   depends_on "lame"
   depends_on "libbs2b"
   depends_on "libcue"
   depends_on "libmodplug"
   depends_on "libnotify"
+  depends_on "libogg"
   depends_on "libopenmpt"
   depends_on "libsamplerate"
+  depends_on "libsidplayfp"
+  depends_on "libsndfile"
   depends_on "libsoxr"
   depends_on "libvorbis"
   depends_on "mpg123"
@@ -62,16 +69,29 @@ class Audacious < Formula
   depends_on "wavpack"
 
   uses_from_macos "curl"
+  uses_from_macos "zlib"
 
-  fails_with gcc: "5"
+  on_macos do
+    depends_on "gettext"
+    depends_on "opus"
+  end
+
+  on_linux do
+    depends_on "alsa-lib"
+    depends_on "jack"
+    depends_on "libx11"
+    depends_on "libxml2"
+    depends_on "pulseaudio"
+  end
 
   def install
+    odie "plugins resource needs to be updated" if build.stable? && version != resource("plugins").version
+
     args = %w[
       -Dgtk=false
-      -Dqt6=true
     ]
 
-    system "meson", "setup", "build", *std_meson_args, *args, "-Ddbus=false"
+    system "meson", "setup", "build", "-Ddbus=false", *args, *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
 
@@ -82,7 +102,7 @@ class Audacious < Formula
       ]
 
       ENV.prepend_path "PKG_CONFIG_PATH", lib/"pkgconfig"
-      system "meson", "setup", "build", *std_meson_args, *args
+      system "meson", "setup", "build", *args, *std_meson_args
       system "meson", "compile", "-C", "build", "--verbose"
       system "meson", "install", "-C", "build"
     end
@@ -91,7 +111,8 @@ class Audacious < Formula
   def caveats
     <<~EOS
       audtool does not work due to a broken dbus implementation on macOS, so it is not built.
-      GTK+ GUI is not built by default as the Qt GUI has better integration with macOS, and the GTK GUI would take precedence if present.
+      GTK+ GUI is not built by default as the Qt GUI has better integration with macOS,
+      and the GTK GUI would take precedence if present.
     EOS
   end
 

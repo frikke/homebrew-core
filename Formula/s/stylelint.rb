@@ -1,42 +1,39 @@
-require "language/node"
-
 class Stylelint < Formula
   desc "Modern CSS linter"
   homepage "https://stylelint.io/"
-  url "https://registry.npmjs.org/stylelint/-/stylelint-15.10.3.tgz"
-  sha256 "8de9f620d6db5200d4d9cb1821b520eddca1ea0d2afd110fe05c39ffcdaaf851"
+  url "https://registry.npmjs.org/stylelint/-/stylelint-16.14.1.tgz"
+  sha256 "4984085a54dc0ea761eb7024da8b2c01bfa964720ec7cc1115abfa140cb6f1d2"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2a61415e692378fa48489ccbf9e4efe1961f4b7c79ae0cefe54dfabe8379b751"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2a61415e692378fa48489ccbf9e4efe1961f4b7c79ae0cefe54dfabe8379b751"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2a61415e692378fa48489ccbf9e4efe1961f4b7c79ae0cefe54dfabe8379b751"
-    sha256 cellar: :any_skip_relocation, ventura:        "7ecda50cf2b90cbc3219c296b93f3a56baa19b4e2208b51a353db9ccc29253c7"
-    sha256 cellar: :any_skip_relocation, monterey:       "7ecda50cf2b90cbc3219c296b93f3a56baa19b4e2208b51a353db9ccc29253c7"
-    sha256 cellar: :any_skip_relocation, big_sur:        "7ecda50cf2b90cbc3219c296b93f3a56baa19b4e2208b51a353db9ccc29253c7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2a61415e692378fa48489ccbf9e4efe1961f4b7c79ae0cefe54dfabe8379b751"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "19d0c1319ca9536d49e9244f310bc3ba4cc26952c1eb5fe98c41f381b0f468a5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "19d0c1319ca9536d49e9244f310bc3ba4cc26952c1eb5fe98c41f381b0f468a5"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "19d0c1319ca9536d49e9244f310bc3ba4cc26952c1eb5fe98c41f381b0f468a5"
+    sha256 cellar: :any_skip_relocation, sonoma:        "8f67a2080a147d82d76092da4a11f5df7c8eb7b178c8962b2242e83bdd4fa6ba"
+    sha256 cellar: :any_skip_relocation, ventura:       "8f67a2080a147d82d76092da4a11f5df7c8eb7b178c8962b2242e83bdd4fa6ba"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "19d0c1319ca9536d49e9244f310bc3ba4cc26952c1eb5fe98c41f381b0f468a5"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
-    (testpath/".stylelintrc").write <<~EOS
+    (testpath/".stylelintrc").write <<~JSON
       {
         "rules": {
           "block-no-empty": true
         }
       }
-    EOS
+    JSON
 
-    (testpath/"test.css").write <<~EOS
+    (testpath/"test.css").write <<~CSS
       a {
       }
-    EOS
+    CSS
 
     output = shell_output("#{bin}/stylelint test.css 2>&1", 2)
     assert_match "Unexpected empty block", output

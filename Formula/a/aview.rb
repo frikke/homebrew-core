@@ -3,7 +3,7 @@ class Aview < Formula
   homepage "https://aa-project.sourceforge.net/"
   url "https://downloads.sourceforge.net/project/aa-project/aview/1.3.0rc1/aview-1.3.0rc1.tar.gz"
   sha256 "42d61c4194e8b9b69a881fdde698c83cb27d7eda59e08b300e73aaa34474ec99"
-  license "GPL-2.0"
+  license "GPL-2.0-only"
 
   livecheck do
     url :stable
@@ -11,9 +11,12 @@ class Aview < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "e0d6d2b0ec534cc1f23d9a43cca5d6e56afae2da62b68eb2f0675907456e0ad6"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "0209d8c38cb00d749453ae8525b7f54f730930f497026b01d4192c1a732deea8"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "bab18a87647013db5d6556072629a8e138e664a7c7b8f2154179b5eaa6379f7d"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "91d8305546f435e4702c333f28d0ce8590c8b14d8b37707ff2ce398d0b618ff5"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4616c937f328391a9ad212bbdd51818d97c629eeaa649ddcdf97e0332e7964bf"
+    sha256 cellar: :any_skip_relocation, sonoma:         "9aadc4e50975200d3ed6fe3a2172a516aefece83c83c80ea56bb107b5f8f5891"
     sha256 cellar: :any_skip_relocation, ventura:        "093f941166a79fd776fafdf09576b47208a1a18ce02aa26f404e2b16fe74ed69"
     sha256 cellar: :any_skip_relocation, monterey:       "2d671edc613c82993fae031b0a2795aae4a88a19ca4051095ae174aed038b100"
     sha256 cellar: :any_skip_relocation, big_sur:        "7a32c517ba508c6febe9605d4c9f4d8bde9200393cd8e4dd51adeb7c6e85fb6f"
@@ -33,6 +36,11 @@ class Aview < Formula
   end
 
   def install
+    # Fix compile with newer Clang
+    if DevelopmentTools.clang_build_version >= 1403
+      ENV.append_to_cflags "-Wno-implicit-function-declaration -Wno-implicit-int"
+    end
+
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
@@ -41,6 +49,6 @@ class Aview < Formula
   end
 
   test do
-    system "#{bin}/aview", "--version"
+    system bin/"aview", "--version"
   end
 end

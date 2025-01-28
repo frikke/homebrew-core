@@ -1,29 +1,32 @@
 class Pygobject3 < Formula
   desc "GNOME Python bindings (based on GObject Introspection)"
-  homepage "https://wiki.gnome.org/Projects/PyGObject"
-  url "https://download.gnome.org/sources/pygobject/3.46/pygobject-3.46.0.tar.xz"
-  sha256 "426008b2dad548c9af1c7b03b59df0440fde5c33f38fb5406b103a43d653cafc"
+  homepage "https://pygobject.gnome.org"
+  url "https://download.gnome.org/sources/pygobject/3.50/pygobject-3.50.0.tar.xz"
+  sha256 "8d836e75b5a881d457ee1622cae4a32bcdba28a0ba562193adb3bbb472472212"
   license "LGPL-2.1-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any, arm64_sonoma:   "d966b22fcc02c79021526432ebc551d759391bc56e6a549bc6c19562da881925"
-    sha256 cellar: :any, arm64_ventura:  "753aa7bb341bdf7d86175bbaf0517efa2782ff01b72e47589ca6941fc9cfb7e9"
-    sha256 cellar: :any, arm64_monterey: "ba7a1a0adbfa956c44ee9f91918942d6dd4f1e2a48252d7db665fb92c2d888f2"
-    sha256 cellar: :any, arm64_big_sur:  "ebd45a21cb9738bd37fea9dbb1275fef65772e674f23779475bbbe56270e797f"
-    sha256 cellar: :any, sonoma:         "f3862d795fff79616ff37cde3d7c251d4b73418709c6c846ab48161ee9019f6d"
-    sha256 cellar: :any, ventura:        "6186edc561f0a9e4a5abc967cdf4ecfa19ea08f33e454bf01a042789904b8d11"
-    sha256 cellar: :any, monterey:       "d671097f271a950109eeee539e2d7d1d199eaf00a67337cbb982e6befdd7986c"
-    sha256 cellar: :any, big_sur:        "826f450d3b316fe03610394af7e0f6bf3278454da0029487f93f3169f8e67adb"
-    sha256               x86_64_linux:   "9db8d5022e6f7831e85c81a13fd6143fc3d47df8b0dfa12a69f469133ff57200"
+    sha256 cellar: :any, arm64_sequoia: "2c86ffbaf32b22811f8fff5a6040677f4268af2578660fb007a5c5d4956c1133"
+    sha256 cellar: :any, arm64_sonoma:  "e8d0149368484d81a54f759a584db813c3184e630504b61534b734949bc286fc"
+    sha256 cellar: :any, arm64_ventura: "def28c144b1960f13894245dbb785fbef6862557e36b9b8ddc13953896807b9e"
+    sha256 cellar: :any, sonoma:        "3fd16304b9bea30514a67e69e74d9aeb6fc84aec60bbbe21f25ae5a4790323b0"
+    sha256 cellar: :any, ventura:       "fb878d036fe1ac67746de24cd89eadd9fb1921f005d34e283f9772426a923384"
+    sha256               x86_64_linux:  "35b1199c46cd42b0e3adbe11e4587ab1fc6abd2715eb1e6a562fb22d032c3746"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.10" => [:build, :test]
-  depends_on "python@3.11" => [:build, :test]
+  depends_on "pkgconf" => :build
+  depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
+
+  depends_on "cairo"
+  depends_on "glib"
   depends_on "gobject-introspection"
   depends_on "py3cairo"
+
+  uses_from_macos "libffi"
 
   def pythons
     deps.map(&:to_formula)
@@ -31,34 +34,31 @@ class Pygobject3 < Formula
         .map { |f| f.opt_libexec/"bin/python" }
   end
 
-  def site_packages(python)
-    prefix/Language::Python.site_packages(python)
-  end
-
   def install
     pythons.each do |python|
       xy = Language::Python.major_minor_version(python)
       builddir = "buildpy#{xy}".delete(".")
+      site_packages = prefix/Language::Python.site_packages(python)
 
       system "meson", "setup", builddir, "-Dpycairo=enabled",
                                          "-Dpython=#{python}",
-                                         "-Dpython.platlibdir=#{site_packages(python)}",
-                                         "-Dpython.purelibdir=#{site_packages(python)}",
+                                         "-Dpython.platlibdir=#{site_packages}",
+                                         "-Dpython.purelibdir=#{site_packages}",
+                                         "-Dtests=false",
                                          *std_meson_args
-
       system "meson", "compile", "-C", builddir, "--verbose"
       system "meson", "install", "-C", builddir
     end
   end
 
   test do
-    Pathname("test.py").write <<~EOS
+    Pathname("test.py").write <<~PYTHON
       import gi
       gi.require_version("GLib", "2.0")
       assert("__init__" in gi.__file__)
       from gi.repository import GLib
       assert(31 == GLib.Date.get_days_in_month(GLib.DateMonth.JANUARY, 2000))
-    EOS
+    PYTHON
 
     pythons.each do |python|
       system python, "test.py"

@@ -1,19 +1,18 @@
 class Hpack < Formula
   desc "Modern format for Haskell packages"
   homepage "https://github.com/sol/hpack"
-  url "https://github.com/sol/hpack/archive/0.35.5.tar.gz"
-  sha256 "48dd4d3b66fb0631287c2afaf8261b471f98a2376ee6f0252832cdd7cac85cfa"
+  url "https://github.com/sol/hpack/archive/refs/tags/0.38.0.tar.gz"
+  sha256 "2bd41314b87e4cff9bfec7ac327f8f0bf8b2b6461c209a3241629aeeb05111a3"
   license "MIT"
   head "https://github.com/sol/hpack.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "547854b9c5c141dee7c94af977222d646e115239fe8f2a93b5bc88b25c2bb98d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5cac8bd71e1ba98fcbfe15240bc587a5c5dd74b443c0931d62a946df963ac031"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9f621addbe7e80dfac23cef29795c15024db0040e4adcf789fa424fd54d97c15"
-    sha256 cellar: :any_skip_relocation, ventura:        "f0c64f6eae95a2136e31964c83f56494e1405807620dd55fada7a3ba0a200b55"
-    sha256 cellar: :any_skip_relocation, monterey:       "e55197613bc884ab254648715ccdc61a8547dcbfef06048f424e9d0f25df0231"
-    sha256 cellar: :any_skip_relocation, big_sur:        "739ef17b5a8037765f8fe4c32ea23e0e52442f6304207f5e56a4fca1bdadd193"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "53911a87894c0d41c4748d547fac8e2abca67ec30925ea3e7a62bb8a92229103"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fee14b444f7879ac1c82fcb7eb00914f56c3ed451272cceec2e09dbe598995ea"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "83c35465ecc6b8b340d5df6a100403dd00a4dcf86e4be9e353c9f22f1522b0f2"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "99a3c126854d781ec4f5744cef4c069f80688781b7e399d7b3a07d23fbacaf3c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2200458de6722f4566382ca01fa69be6005ad6d462dd47dda24ef1a1af45e6d3"
+    sha256 cellar: :any_skip_relocation, ventura:       "c1eecf23e948de0da278bb02d1477870c68139c26980402fc8a041e26271dc7d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5e7dcdd7b3acc57d6785a9b71e417df3a345d31a670d57140c00f25d9f9f8c01"
   end
 
   depends_on "cabal-install" => :build
@@ -32,12 +31,12 @@ class Hpack < Formula
   # be aware that failures here can probably be fixed by tweaking the
   # expected output a bit.
   test do
-    (testpath/"package.yaml").write <<~EOS
+    (testpath/"package.yaml").write <<~YAML
       name: homebrew
       dependencies: base
       library:
         exposed-modules: Homebrew
-    EOS
+    YAML
     expected = <<~EOS
       name:           homebrew
       version:        0.0.0
@@ -53,7 +52,7 @@ class Hpack < Formula
         default-language: Haskell2010
     EOS
 
-    system "#{bin}/hpack"
+    system bin/"hpack"
 
     # Skip the first lines because they contain the hpack version number.
     assert_equal expected, (testpath/"homebrew.cabal").read.lines[6..].join

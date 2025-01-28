@@ -1,8 +1,8 @@
 class Vgrep < Formula
   desc "User-friendly pager for grep"
   homepage "https://github.com/vrothberg/vgrep"
-  url "https://github.com/vrothberg/vgrep/archive/v2.6.1.tar.gz"
-  sha256 "61ffc1dc7445bd890a25a8bb733f7b33dc4de45388ae51c87db484def1c6f391"
+  url "https://github.com/vrothberg/vgrep/archive/refs/tags/v2.8.0.tar.gz"
+  sha256 "325b28bd5e8da316e319361f2dd8e3cc74fcd55724fc8ad4b2a73c21b2903bd8"
   license "GPL-3.0-only"
   version_scheme 1
   head "https://github.com/vrothberg/vgrep.git", branch: "main"
@@ -19,13 +19,13 @@ class Vgrep < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "11b3c10a4af215979a24aabf66547cee7351ab4e1cfe04c5ae4bd18de8e5f8ab"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "535140983985f51fc0aa1d4f0e2536596d8f6f621b8b051525d9e1a5297eac4a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d636d0c3519f258615c5bfe6c1c5d19287e82673df0f4f9b7537a58fa255a5dd"
-    sha256 cellar: :any_skip_relocation, ventura:        "7d89622548b464e5830526f96c940d478a8a2a41c856f05974ec34c0f94e150b"
-    sha256 cellar: :any_skip_relocation, monterey:       "955f7b40061f709f7b6d508776ac670e5ec9a41609fd1cabae130260d2de8f6a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d797ec24b06eaebcdeda87a6b1e8880f0f067428f6f35943fe0134ec4392ec95"
-    sha256 cellar: :any_skip_relocation, catalina:       "df09022412dbf0ede1c3680e73466bb848c5383ea0a9e2d57476805d9d266248"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "0533a4c02c2376d7e5d41a529de7519be4092d4c66b4ad66cfd4cd277fb1fc6b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "61e6682d7f0a226d7f0a58d29540c30caf07f6cc49ed243bdde5a8e64f238dab"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "fa7ba93c9e1de2091f5aa809bc772e383160c14bc1c53fc623be305ebb8053a3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "875458d3eafd19ab0490d73130dc93e75e09c6080dbd65080855b2b53dad6bb0"
+    sha256 cellar: :any_skip_relocation, sonoma:         "7a2adca7bf767eb1385fb51fbbbab3ec42b048ec1d4e839fea1f8c9248a07a9f"
+    sha256 cellar: :any_skip_relocation, ventura:        "98268b0618e3050e2082400d38ff4ae366804775eca808f01984036611e4f3d5"
+    sha256 cellar: :any_skip_relocation, monterey:       "ae3ceae715d522bfedb2ddb04f15e80b4049b8e55d4c08290ab4fa6272c0ab96"
   end
 
   depends_on "go" => :build

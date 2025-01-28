@@ -1,8 +1,8 @@
 class Pianod < Formula
   desc "Pandora client with multiple control interfaces"
   homepage "https://deviousfish.com/pianod/"
-  url "https://deviousfish.com/Downloads/pianod2/pianod2-398.tar.gz"
-  sha256 "4e66991a13e3a5c6a4c53c66ac9e2c96ab15e071469183b6c4e38acc69d26951"
+  url "https://deviousfish.com/Downloads/pianod2/pianod2-405.tar.gz"
+  sha256 "f77c8196123ddb0bbb33a40f9fc29862f1df0997e19e19ecd8cbce05b336bf61"
   license "MIT"
 
   livecheck do
@@ -11,42 +11,39 @@ class Pianod < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "55d74e9ebc2a8a1fbbb19a26d82b1a8b3f58ae6f7ba9f14474a7806b8d6a398d"
-    sha256 arm64_monterey: "deb01b9092fb54c22e172106b28e0f4fa9c3c370c585ae9b4f7a775a40a5bbd8"
-    sha256 arm64_big_sur:  "59789677f0daab80e31665c32bb9a8cf642c37f244b8a2c273cfbf776e2b435a"
-    sha256 ventura:        "be645800d92e0de4d595c8e20f745d9c442cd6ec3f71dc2742bcc078d12c596c"
-    sha256 monterey:       "a8e246508edd581e5b8b3e8b9fbd175e282395d3b4eda32f29e5ab5959e96613"
-    sha256 big_sur:        "50ed9be59734e6413a70d4618267e96296c5a38b91738018bc544088abfa8218"
-    sha256 x86_64_linux:   "f874720872630c1add72fb66af7a918a57dc07b2788d9935ad260bed77e32103"
+    rebuild 1
+    sha256 arm64_sequoia: "7ba115df7f0b2732813d9cc76acf5c46326ef23ed41a5ac1bf9afae28802f596"
+    sha256 arm64_sonoma:  "2fd956f025a295366260df48b9b1b6b9413d6a5f3c9f71543a6f26f604f6a03b"
+    sha256 arm64_ventura: "5ee2f4e67ed74af5cea17b602da4b316137fb1579ac9bfb2f33ee1e0ac250a82"
+    sha256 sonoma:        "7abe07668a763670004b538dd8fde9ee73f52621b015c2c424b9040e19818021"
+    sha256 ventura:       "469acffbe775244383fde055be74a683adc7bd2dacefb32f0468082d0e8f4d2a"
+    sha256 x86_64_linux:  "6c4a5d6a8442f8880e47750f614b62e0f1cfe547de683b871d3b2e3830d05084"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "glib"
+  depends_on "gnutls"
   depends_on "gstreamer"
-  depends_on "json-c"
-  depends_on "libao"
-  depends_on "libgcrypt"
+  depends_on "taglib"
 
   uses_from_macos "curl"
   uses_from_macos "libxcrypt"
+  uses_from_macos "zlib"
 
   on_macos do
-    depends_on "ncurses"
+    depends_on "gettext"
   end
 
   on_linux do
-    depends_on "gnutls"
     depends_on "libbsd"
   end
 
-  fails_with gcc: "5"
-
   def install
-    ENV["OBJCXXFLAGS"] = "-std=c++14"
-    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/pianod", "-v"
+    system bin/"pianod", "-v"
   end
 end

@@ -1,15 +1,15 @@
 class RbenvDefaultGems < Formula
   desc "Auto-installs gems for Ruby installs"
   homepage "https://github.com/rbenv/rbenv-default-gems"
-  url "https://github.com/rbenv/rbenv-default-gems/archive/v1.0.0.tar.gz"
+  url "https://github.com/rbenv/rbenv-default-gems/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "8271d58168ab10f0ace285dc4c394e2de8f2d1ccc24032e6ed5924f38dc24822"
   license "MIT"
   revision 1
   head "https://github.com/rbenv/rbenv-default-gems.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "1e1fdba37bf88db84ae56cd101d333b958c3adfab8b0e4515838cf5c3ad6b753"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "ec2121dbae6293c76ef8493c2a22b95f44e2ba23442525daba4757bd9cc3b535"
   end
 
   depends_on "rbenv"

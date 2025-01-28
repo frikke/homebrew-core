@@ -1,44 +1,45 @@
 class Gofumpt < Formula
   desc "Stricter gofmt"
   homepage "https://github.com/mvdan/gofumpt"
-  url "https://github.com/mvdan/gofumpt/archive/v0.5.0.tar.gz"
-  sha256 "e27f04b8b5619747ebfb955699d6895c1e4c7c5e4478507ca4e2d8b658b8b51c"
+  url "https://github.com/mvdan/gofumpt/archive/refs/tags/v0.7.0.tar.gz"
+  sha256 "d994902b3cb7eeacb23ccb949185dd036a65b9fc316a11a8842f7aa60f5ef4ba"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "241c7a1670da1fd7fd0220237c541fd5e3fcf45d750084a9b9ad354b01929a01"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "241c7a1670da1fd7fd0220237c541fd5e3fcf45d750084a9b9ad354b01929a01"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "241c7a1670da1fd7fd0220237c541fd5e3fcf45d750084a9b9ad354b01929a01"
-    sha256 cellar: :any_skip_relocation, ventura:        "898b89543bde7a2d79d2f298960115cafa3a8f566f18f97ccce67d7715518a2e"
-    sha256 cellar: :any_skip_relocation, monterey:       "898b89543bde7a2d79d2f298960115cafa3a8f566f18f97ccce67d7715518a2e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "898b89543bde7a2d79d2f298960115cafa3a8f566f18f97ccce67d7715518a2e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8c200163cfb0748b11aecc5bce47c8a4071541541a0a01247a816a2c948a6105"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "ce9d1a180a706c889da51616f5d0a94b84c685cb4ea69abee95d91985984d684"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "802a9c765f76388742f10deb24d0a8ead35ad976993a5709dabb90cf4d373588"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "802a9c765f76388742f10deb24d0a8ead35ad976993a5709dabb90cf4d373588"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "802a9c765f76388742f10deb24d0a8ead35ad976993a5709dabb90cf4d373588"
+    sha256 cellar: :any_skip_relocation, sonoma:         "dcdd825b173315f71b186d428d7b4fcdd831ca4d6132af041f26adc63a75b97a"
+    sha256 cellar: :any_skip_relocation, ventura:        "dcdd825b173315f71b186d428d7b4fcdd831ca4d6132af041f26adc63a75b97a"
+    sha256 cellar: :any_skip_relocation, monterey:       "dcdd825b173315f71b186d428d7b4fcdd831ca4d6132af041f26adc63a75b97a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "db3d516cdc64e75aed5d8e651cca5e75ff5bc06400fafec9fd11b64379433f8e"
   end
 
   depends_on "go"
 
   def install
     ldflags = "-s -w -X mvdan.cc/gofumpt/internal/version.version=#{version}"
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
   end
 
   test do
-    (testpath/"test.go").write <<~EOS
+    (testpath/"test.go").write <<~GO
       package foo
 
       func foo() {
         println("bar")
 
       }
-    EOS
+    GO
 
-    (testpath/"expected.go").write <<~EOS
+    (testpath/"expected.go").write <<~GO
       package foo
 
       func foo() {
       	println("bar")
       }
-    EOS
+    GO
 
     assert_match shell_output("#{bin}/gofumpt test.go"), (testpath/"expected.go").read
   end

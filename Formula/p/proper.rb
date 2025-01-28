@@ -1,15 +1,18 @@
 class Proper < Formula
   desc "QuickCheck-inspired property-based testing tool for Erlang"
   homepage "https://proper-testing.github.io"
-  url "https://github.com/proper-testing/proper/archive/v1.4.tar.gz"
+  url "https://github.com/proper-testing/proper/archive/refs/tags/v1.4.tar.gz"
   sha256 "38b14926f974c849fad74b031c25e32bf581974103e7a30ec2b325990fc32334"
   license "GPL-3.0-or-later"
 
   bottle do
     rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "a566b9d8925d5912685ebcd4391e790d2ca05d24ac02dd5027fed6024749f632"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "9e3f49c043a708e27699c534dc9c4ee5e7762f5c4ffa62a9b0ae464406f008df"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "8ba16c265d878f2385d16020577833fc18f3f34ebfacebf9806ffae99caaed6f"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "1fb7580b8ec4be37ae5eb66f3d474f5cb7134d91968b6a3ffd57e946601c3e7c"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "77657642632df4b47ea81fe644f297b729b6727a65c14e4b55205878b7c2efa4"
+    sha256 cellar: :any_skip_relocation, sonoma:         "21f4baa4e3c3ed5f9cc2b2820799c77892abab08b825a03899e41575243bcc1c"
     sha256 cellar: :any_skip_relocation, ventura:        "0595b2fcc45df233b568344d6169b781ea9e7c5ae95fbfb6696d77ae5fa0d5cd"
     sha256 cellar: :any_skip_relocation, monterey:       "61c38ab31cc8a971a833b3659cf7ca0907d2c3a8fe76ce9a83e17ae322154a2f"
     sha256 cellar: :any_skip_relocation, big_sur:        "90cc29581b44ff082445a03c2955dba09000b8d4734d739764c702e6da72dda3"

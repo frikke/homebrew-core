@@ -1,21 +1,18 @@
 class Libxlsxwriter < Formula
   desc "C library for creating Excel XLSX files"
   homepage "https://libxlsxwriter.github.io/"
-  url "https://github.com/jmcnamara/libxlsxwriter/archive/RELEASE_1.1.5.tar.gz"
-  sha256 "12843587d591cf679e6ec63ecc629245befec2951736804a837696cdb5d61946"
+  url "https://github.com/jmcnamara/libxlsxwriter/archive/refs/tags/v1.1.9.tar.gz"
+  sha256 "03ae330d50f74c8a70be0b06b52bd50868f7cd1251ed040fe3b68d1ad6fd11dc"
   license "BSD-2-Clause"
   head "https://github.com/jmcnamara/libxlsxwriter.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "43ba6037cc33e3a62efcf760d6cac299ba04091fb8820f7312f28043cdd1686e"
-    sha256 cellar: :any,                 arm64_ventura:  "af227826caecade95706ed808c915c0491e41c3a530583f8f5e44b031521d5d4"
-    sha256 cellar: :any,                 arm64_monterey: "720f746cd873de406ad3ea9ab632ddcf0c29121776aa5fe7b692ffd209e7c999"
-    sha256 cellar: :any,                 arm64_big_sur:  "4b9c76ab2fecc1335accfcbd3d0139f3d318c5e2c7230dfd2732681e4f59ace0"
-    sha256 cellar: :any,                 sonoma:         "9621132cb5ff13f727dae0f7dc541e1950f5473b3c806a3a70423715e721b90c"
-    sha256 cellar: :any,                 ventura:        "99a222cd01b4dfc883e86289c76379f3e08f070630df45442e8297c17e53327c"
-    sha256 cellar: :any,                 monterey:       "8223c8847c8d0799381165387ce7e999c8651b655ebe025a3f617d0ff6db11e2"
-    sha256 cellar: :any,                 big_sur:        "7dcd601f57c94ac878c06cd247f7d25130b9618ef9ed72b1efd1bf5973b107a1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1565e3f517d9a96aa04aa572d1152dc1838a083c55a3126e7d5b6d169aff87dd"
+    sha256 cellar: :any,                 arm64_sequoia: "b280205134eaf3fe3e68ce2ce3cded36e004b6f62631967261e168b4731084b8"
+    sha256 cellar: :any,                 arm64_sonoma:  "bef02f42df7748a43b1448997506be2f36e31655bdccfde2a750c2c283e8677f"
+    sha256 cellar: :any,                 arm64_ventura: "6f119440dbbc4144c1a2f6e110fea9e6d197a1d758046864e7794e3ee9e21073"
+    sha256 cellar: :any,                 sonoma:        "680953124eb8cfa063c79d095ea0e5789c3dc912b09b13d11e126f53c2bfaee5"
+    sha256 cellar: :any,                 ventura:       "d136ee61c5a24da5e728625c44f0ba9bf5f35e6e030c529f21da6e0433bdab8c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f1186d8d949a1673eac903322330644875f4bc908aa7c85566ad3ba22406c5a9"
   end
 
   uses_from_macos "zlib"
@@ -25,7 +22,7 @@ class Libxlsxwriter < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "xlsxwriter.h"
 
       int main() {
@@ -38,7 +35,7 @@ class Libxlsxwriter < Formula
 
           return workbook_close(workbook);
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-L#{lib}", "-I#{include}", "-lxlsxwriter", "-o", "test"
     system "./test"

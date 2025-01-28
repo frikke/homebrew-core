@@ -1,8 +1,8 @@
 class Ascii < Formula
   desc "List ASCII idiomatic names and octal/decimal code-point forms"
   homepage "http://www.catb.org/~esr/ascii/"
-  url "http://www.catb.org/~esr/ascii/ascii-3.18.tar.gz"
-  sha256 "728422d5f4da61a37a17b4364d06708e543297de0a5f70305243236d80df072d"
+  url "http://www.catb.org/~esr/ascii/ascii-3.30.tar.gz"
+  sha256 "ed2fdc973e1b87da2af83050e560e731b0f3bf5f6b4fd9babc9f60bb2b992443"
   license "BSD-2-Clause"
 
   livecheck do
@@ -11,18 +11,14 @@ class Ascii < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c42b02694d8703f1836d83604657231e06bbf02bf7ec9dc49d3f2182db6729ec"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "742c3b7dc29fc1df468027631c0bee9e5db9ee562adcc54f6081291d27ab0295"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "961354b48b260c83374340b6f50bb440977edc81ffa6cb11293bd6265f94dd3e"
-    sha256 cellar: :any_skip_relocation, ventura:        "b9153efffb59622c7cd261653a3937f5f7a7d3b1f41176425c3b4408a5b4ce13"
-    sha256 cellar: :any_skip_relocation, monterey:       "3512701bc58ec647bd059ebcf0c56ad6b02fa1c437e51372e6d942aef6910e87"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ae1f4bca216200b2633f93da6d99c991f15755a130bd1cbc680377c251555d32"
-    sha256 cellar: :any_skip_relocation, catalina:       "2c106e2d3ce3534f09a5ce147f6fc0778e884d06f15e7c272ee99ccabaf947bd"
-    sha256 cellar: :any_skip_relocation, mojave:         "d5f4c8fe4ad1467c1708e49268a42f0d201f8c18ed912cf3de330bdf1f219cc1"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "858e5bd8f55367349f936f47346a7d4dc2afed7c8f3d9fca16c42071f537f644"
-    sha256 cellar: :any_skip_relocation, sierra:         "52fb2a78a1409f4f6db0b59589f773c4427c87a84a7fee1809e5f0a4d50e4d65"
-    sha256 cellar: :any_skip_relocation, el_capitan:     "bbb5f365f96e42dfaa8af31f21daa8809b0a628451599fab7bc7509ceeb0d14f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "31952089908444514e2e97d6d7a325d52136f8d7c8297210045a04608bf49ae8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "2e225f8d820c8a2a106ecaa694d127747e33367cf2a3ad817c6b5252f61368e5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "4b09302d5da1fde775d54d424f6c0170f37f1da1b2513d51b1f823735852828b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0139a6c8bb456eae23940a7c52c35b41312de889f6ef3f83629772939a745bca"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "47ba21ef26f596735cd2c3b7de685190497ad837127b3d1fa5807fc59845243c"
+    sha256 cellar: :any_skip_relocation, sonoma:         "45a69a2b921833d1baf72f0d09b468ab454288be54e06a98cba131341b7dca9f"
+    sha256 cellar: :any_skip_relocation, ventura:        "4b0846635b36a199106674d2afd42d8e7dea53f853787653cd4ecb6db150ac72"
+    sha256 cellar: :any_skip_relocation, monterey:       "22f33f9d9ac7142411fb7d9d7108c630c139a171ab68551adb5338c7bbba265b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e4be383b6e806721fc89c09ab1e971ad2d5be5922952f8d67141fa765a50d8dc"
   end
 
   head do

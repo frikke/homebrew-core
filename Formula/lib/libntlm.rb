@@ -1,8 +1,8 @@
 class Libntlm < Formula
   desc "Implements Microsoft's NTLM authentication"
   homepage "https://gitlab.com/gsasl/libntlm/"
-  url "https://download.savannah.nongnu.org/releases/libntlm/libntlm-1.6.tar.gz"
-  sha256 "f2376b87b06d8755aa3498bb1226083fdb1d2cf4460c3982b05a9aa0b51d6821"
+  url "https://download.savannah.nongnu.org/releases/libntlm/libntlm-1.8.tar.gz"
+  sha256 "ce6569a47a21173ba69c990965f73eb82d9a093eb871f935ab64ee13df47fda1"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,33 +11,27 @@ class Libntlm < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "b4dc0f1daed24b50ca4e781f8e59ae1f77a8ebeb0c664b1d4a1a19802082597d"
-    sha256 cellar: :any,                 arm64_ventura:  "d8d6009fd8f61ed5c328f0dc175769f814070d7df24e112c13c4a41852eff77b"
-    sha256 cellar: :any,                 arm64_monterey: "2f27227db0e6572c8332911e61888cbbc0cf223426de87191f97b35164ef20fa"
-    sha256 cellar: :any,                 arm64_big_sur:  "0b3b553a37a15dd0ffd396e8d07b295197e39f8f4e8670dc49a5ae214ded1cc1"
-    sha256 cellar: :any,                 sonoma:         "3e5f804fd463824049c6310a8ced98662b68a892700553e17a6fd08b6a3733a0"
-    sha256 cellar: :any,                 ventura:        "0f53829f0f54569250c5e698e582ec9caeb48ab8c0f7b43c729f2778e5e248e1"
-    sha256 cellar: :any,                 monterey:       "77de0ff9606d4701c26356065cc8ee0f6bbe9ca13b12e3494addf1b0e41f4c01"
-    sha256 cellar: :any,                 big_sur:        "c8662388829c4cacb52f1c948b8ae2ba19ad8c28ef53cda651b0e5cf8c0529fe"
-    sha256 cellar: :any,                 catalina:       "7e34bd216191b40a86075d825c98c929d4f61842be989b605caba169ac68c999"
-    sha256 cellar: :any,                 mojave:         "a7de6d5c400b83a6f5e18423d396321aa45fb1a12dd1577df04389a7379e743a"
-    sha256 cellar: :any,                 high_sierra:    "e9b9b29b0f54e3349be1fad6f281d7ed0b972deaab07a0febe2ab75a73028ea5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a4d65c7586feae3a5fa694b88d3ec258e7825ca6e14dee9403541dd5be2b0b40"
+    sha256 cellar: :any,                 arm64_sequoia:  "bebdb2ee8c5ef33fc95cd079147d06234b5661f869b6a88d23d68d4abd6fb28f"
+    sha256 cellar: :any,                 arm64_sonoma:   "2629d0038710546db1d05c77d273189bed4554ab7b6f7e67444a80b6fd52cb0d"
+    sha256 cellar: :any,                 arm64_ventura:  "6a07ff33c447c44d0271951ff00810244d7e46fbdbbefa3697533d442e807f31"
+    sha256 cellar: :any,                 arm64_monterey: "3cdeede8fb7af5aeaf2e29d7a2c1b8d77f49602830eb7cda1bd541bcc468d379"
+    sha256 cellar: :any,                 sonoma:         "a7d7f2c53526d724adea9d98fbef0219052797daef5ef6d0e3f12ebe38a105e7"
+    sha256 cellar: :any,                 ventura:        "d01d0c60d1f35088786efd8b5a4f943a6feaeb5f03f484e43dfa342aba675877"
+    sha256 cellar: :any,                 monterey:       "9d1dad1589edba9d4490611fb7a8499e8d2ab0c89f23a81f1d3426aec0b755a9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0ebc4d50ef8a904ec1c686c8e869a83d727c55fd490990fb5481d6a34b970ce1"
   end
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules",
+                          *std_configure_args.reject { |s| s["--disable-debug"] }
     system "make", "install"
-    pkgshare.install "config.h", "test_ntlm.c", "test.txt", "gl/md4.c", "gl/md4.h"
-    pkgshare.install "gl/byteswap.h" if OS.mac?
+    pkgshare.install "config.h", "test_ntlm.c", "test.txt", "lib/md4-stream.c", "lib/md4.c", "lib/md4.h"
+    pkgshare.install "lib/byteswap.h" if OS.mac?
   end
 
   test do
     cp pkgshare.children, testpath
-    system ENV.cc, "test_ntlm.c", "md4.c", "-I#{testpath}", "-L#{lib}", "-lntlm",
+    system ENV.cc, "test_ntlm.c", "md4-stream.c", "md4.c", "-I#{testpath}", "-L#{lib}", "-lntlm",
                    "-DNTLM_SRCDIR=\"#{testpath}\"", "-o", "test_ntlm"
     system "./test_ntlm"
   end

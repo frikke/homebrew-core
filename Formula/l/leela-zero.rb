@@ -6,20 +6,21 @@ class LeelaZero < Formula
       tag:      "v0.17",
       revision: "3f297889563bcbec671982c655996ccff63fa253"
   license "GPL-3.0-or-later"
-  revision 4
+  revision 9
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "ddbffea78b40a3c37948bfd51e86087298d06147234e11afd2415b7d90d0f3dc"
-    sha256 cellar: :any,                 arm64_monterey: "f734ef107e6d5c16523ae1bc807b892ddae7b692c9c538288d698dc36d57c47c"
-    sha256 cellar: :any,                 arm64_big_sur:  "0c6c2bf6d9dd92e6637fe431089c9efcdc4a672a75c010848482b59ab8a08b52"
-    sha256 cellar: :any,                 ventura:        "fec16c9e60dfabf87969cbc54fdc234d352d71501048110039b4ce9a34d9a35c"
-    sha256 cellar: :any,                 monterey:       "7301489a06ca98bf2c214b3266a37089dee980bd11409125ca8a59aac1730839"
-    sha256 cellar: :any,                 big_sur:        "de294e82925db4e06a028b29b04aba9bd9724a7924a2b062ab2a766ef4a77c5f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "22d6b86dbe066b256131fbdb074ff4e9bde8ecc710b25d80d2a5253998a4d6cd"
+    sha256 cellar: :any,                 arm64_sequoia: "85cae46d6ad50e1b55c9e1abbaa02248745b34108f2cfc0808392da051f395eb"
+    sha256 cellar: :any,                 arm64_sonoma:  "e9d5144b47601a7df7c5577e6955e485eabe370ded9be2d92bf289c921e3879e"
+    sha256 cellar: :any,                 arm64_ventura: "da325324c8d07bc25b9144320a660ed4cda2f2063be15c32804fad0c726763a6"
+    sha256 cellar: :any,                 sonoma:        "802f87d15cc5b7a713c5799c90159d48f7b49cd04bda131ba06202a509c55e3a"
+    sha256 cellar: :any,                 ventura:       "21f62b985c0c352d1ccf1ec3c363c259682ca28b74fbe76e61ad1dd34046b656"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f68323949e99f4584b041b8f310855c30deabc898db999ff306ea2773560ad23"
   end
 
   depends_on "cmake" => :build
   depends_on "boost"
+
+  uses_from_macos "zlib"
 
   on_linux do
     depends_on "opencl-headers" => :build

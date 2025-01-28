@@ -1,14 +1,14 @@
 class Chruby < Formula
   desc "Ruby environment tool"
-  homepage "https://github.com/postmodern/chruby#readme"
+  homepage "https://github.com/postmodern/chruby"
   url "https://github.com/postmodern/chruby/releases/download/v0.3.9/chruby-0.3.9.tar.gz"
   sha256 "7220a96e355b8a613929881c091ca85ec809153988d7d691299e0a16806b42fd"
   license "MIT"
   head "https://github.com/postmodern/chruby.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "977cf9319a21ddbbd26d3f0a43ed75825eb2a514bdce56b4045e5214732ec13b"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, all: "a93d7f31af99177bb1884086e94e0c9dcb99ba4ef1ffb1f6fe33bff584c385de"
   end
 
   def install

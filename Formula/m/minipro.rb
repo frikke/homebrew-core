@@ -1,32 +1,21 @@
 class Minipro < Formula
   desc "Open controller for the MiniPRO TL866xx series of chip programmers"
   homepage "https://gitlab.com/DavidGriffith/minipro/"
+  url "https://gitlab.com/DavidGriffith/minipro/-/archive/0.7.2/minipro-0.7.2.tar.gz"
+  sha256 "77961e24da3fd14844768102893b291c55b379e49938b3665a9033622def8cbb"
   license "GPL-3.0-or-later"
   head "https://gitlab.com/DavidGriffith/minipro.git", branch: "master"
 
-  stable do
-    url "https://gitlab.com/DavidGriffith/minipro/-/archive/0.6/minipro-0.6.tar.gz"
-    sha256 "16b4220b5fc07dddc4d1d49cc181a2c6a735c833cc27f24ab73eac2572c9304a"
-
-    # Fix version number, remove in next release
-    patch do
-      url "https://gitlab.com/DavidGriffith/minipro/-/commit/6b0074466ea5e2c2664362b5fcba4bc8b0172a44.diff"
-      sha256 "a71e107701ff17d1731c3aa57868a822106b0fe1f808f40a88cfbe236faed289"
-    end
-  end
-
   bottle do
-    sha256 arm64_ventura:  "c3fb5f07a52ff36e6a477c432a3f6519ebaa1648a8370843c6e873b3bfa8ee38"
-    sha256 arm64_monterey: "5ca7bf6b78312ce94a7ce84a1f2e846f76b4932ad18b3e9f2c5549b8a45cd684"
-    sha256 arm64_big_sur:  "2494b2555acb90436d868b9d1487a0fc53ad8db168be6fd3a4699e04aa0e7165"
-    sha256 ventura:        "5c6f3e4eaf2ea7492e319ff09dc6b47a7f0849723eee2372fd3d33a31feb747f"
-    sha256 monterey:       "7d955b7ea2350118bdd03baee5e366648ff5aa43ed14aa6b8f4d09e794a46870"
-    sha256 big_sur:        "8661941fc4441e0a8dc145030f60cf20c171159612ec2b1135a3c5aa9aff698e"
-    sha256 catalina:       "568b6057efc9388716d4ade043f0483d1a62bd510fb4dc9be0c0d95bfd4e78eb"
-    sha256 x86_64_linux:   "fb07f4a40d15f74501b8bbf7623598eb466464fd4d3b60df2dba32d90152b783"
+    sha256 arm64_sequoia: "49928d7fc034b02531e4c7cced9ebc7475f8aaa22119fe80a5e991ad393b9626"
+    sha256 arm64_sonoma:  "9516b8133d1301aa662a9b6fe7be10ecdf2516399da38fef7ab1277d36cec240"
+    sha256 arm64_ventura: "615be8caf35c15d4b0c8446545dd812c2993ff6dd97191bdf975a06b959902c9"
+    sha256 sonoma:        "b6db0de40d57c21ab00d71bb28c979c81c17746ce881ca1c8552634eb6fea1c6"
+    sha256 ventura:       "f6b63ad0e8201c67ae3812ac40543837a428a663bad1398fd4a5f8d9ef42d55e"
+    sha256 x86_64_linux:  "7c0587d281ee52203b8346e78d4d42631fc008e47f60298e2559524122515413"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libusb"
   depends_on "srecord"
 

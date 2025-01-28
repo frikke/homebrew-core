@@ -1,8 +1,8 @@
 class OsinfoDbTools < Formula
   desc "Tools for managing the libosinfo database files"
   homepage "https://libosinfo.org/"
-  url "https://releases.pagure.org/libosinfo/osinfo-db-tools-1.10.0.tar.xz"
-  sha256 "802cdd53b416706ea5844f046ddcfb658c1b4906b9f940c79ac7abc50981ca68"
+  url "https://releases.pagure.org/libosinfo/osinfo-db-tools-1.12.0.tar.xz"
+  sha256 "f3315f675d18770f25dea8ed04b20b8fc80efb00f60c37ee5e815f9c3776e7f3"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,19 +11,17 @@ class OsinfoDbTools < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "4c36d9142080cc03a5bbb5a7ade982081d79719508a67ba42d169c84ee94d2f7"
-    sha256 arm64_monterey: "1d1c7ce896178ca36d6e80d74c4ee079ccef9d33aa23b3497507ae10a0e639ba"
-    sha256 arm64_big_sur:  "82486837eb8ac3f291f0c19417fb3c039a6f8dc964a53cdbefd38a3ace4f4082"
-    sha256 ventura:        "6f5e709bed6a434e739b0dbb045acd2ad934d67cf43ac6ca266d5b36cc43ee51"
-    sha256 monterey:       "5fd3aecf2c0b5d73a53ca7f040492b18488fcae29e95a87f472e5b7748b4656d"
-    sha256 big_sur:        "b8f2bb99ccdf6e52e3b9210047975945e145b710066a870562a16ab1d1e8fa1d"
-    sha256 catalina:       "b15b9a51705d8bdcfd115f9e43fd9129a84a7004efc3229e19d3e0286432914d"
-    sha256 x86_64_linux:   "ff2927f346097164c57287e06974a74455e79d9f0ef62f438ff0e4ffadfaa266"
+    sha256 arm64_sequoia: "80f2f1a41f22df092e66ad09f9859a2e8803624c721a35fb1ebfb8686f16c29f"
+    sha256 arm64_sonoma:  "4e67be0abc92b903e05fe4f6f9a9ff4a184e2c389131867266514fa4133b99a8"
+    sha256 arm64_ventura: "0290289cbf19411222251e9ddd30034f5eb3ef07d1522433604553ad37ed6084"
+    sha256 sonoma:        "6e8998ee30a50e1f554a2b60ba07fa41b060ca5e0bbd2127141c7ab3dfe14c21"
+    sha256 ventura:       "77dc1ed0d15dec8a1e439b0d90e536e341b44ff30a0cdce795040d1dbf176537"
+    sha256 x86_64_linux:  "0b59eccfaf5d2d701369a0feebbfeed127dbdf4cbf20acc31a71e22400a1a692"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gettext"
   depends_on "glib"
   depends_on "json-glib"
@@ -34,10 +32,8 @@ class OsinfoDbTools < Formula
   uses_from_macos "libxml2"
 
   def install
-    mkdir "build" do
-      system "meson", *std_meson_args, ".."
-      system "ninja", "install", "-v"
-    end
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "install", "-C", "build"
   end
 
   def post_install

@@ -1,19 +1,18 @@
 class Sslh < Formula
   desc "Forward connections based on first data packet sent by client"
   homepage "https://www.rutschle.net/tech/sslh.shtml"
-  url "https://www.rutschle.net/tech/sslh/sslh-v2.0.0.tar.gz"
-  sha256 "5231dd575885024ed4b8217fdc6105d27b5780a538be4bee999610837ee71eb1"
+  url "https://www.rutschle.net/tech/sslh/sslh-v2.1.4.tar.gz"
+  sha256 "c9d76a627839b5f779e21dd49c40762918f47b46197418b3715ec0c52e3c5cb7"
   license all_of: ["GPL-2.0-or-later", "BSD-2-Clause"]
   head "https://github.com/yrutschle/sslh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "e46cf7a86fadc579eaac97b9092c3bcda307b4f217e62efed9e11ce2b6a96114"
-    sha256 cellar: :any,                 arm64_monterey: "bb9e8015f0f0b91eeda6fcba621a09f8e73af0fc2821bdcdf9ba95a3f54bb86a"
-    sha256 cellar: :any,                 arm64_big_sur:  "b9a51df44dad81d17bbf8139d29ed1afe0c0d672b8c31ee0b45b51b252e6c111"
-    sha256 cellar: :any,                 ventura:        "f628b7a35c410244ddb20de437614feaf530f632f54b345cfdb036b67bb764cc"
-    sha256 cellar: :any,                 monterey:       "1b91815e5bc6a322f1fd78c76f5b3409be8cbc8dbd3cdf3b9bfc3e7c6153e3c6"
-    sha256 cellar: :any,                 big_sur:        "3bfe89196ee7a9cb80a630527e3317264fcbc1a00bd6126bc447c0fb03f9a812"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2372eff0ce1ee5bc4f3bee1d3a29cd693ed63423f4d5d77ac1e1e9db8b6309d1"
+    sha256 cellar: :any,                 arm64_sequoia: "9ffce8f7acbb17eccb7b998789b299562f3fa8c3f74d08478657309b514b93a4"
+    sha256 cellar: :any,                 arm64_sonoma:  "e4f05c08d30f736361c1715449895516a8a3327d4f964a7fc3cb9a89bb1cdec4"
+    sha256 cellar: :any,                 arm64_ventura: "e4afb69a6efed5c7eab76e8df5e30fc2cb8c19e27d6f1d1409d0298f8fdafd53"
+    sha256 cellar: :any,                 sonoma:        "17a668ad78929b1ea207279c0f12d2c7be04e0a0e9d6aabc9e9a44c336691dbc"
+    sha256 cellar: :any,                 ventura:       "da63de34dec87066332f8cb6520ad897242ac4cfac09b851aab81ec43d393f18"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "364c9146c23390ab94bd76339a2ff5d0ded405381379eb16e4a0dfe631a8c0e0"
   end
 
   depends_on "libconfig"
@@ -23,7 +22,7 @@ class Sslh < Formula
   uses_from_macos "netcat" => :test
 
   def install
-    ENV.deparallelize
+    system "./configure", *std_configure_args
     system "make", "install", "PREFIX=#{prefix}"
   end
 
@@ -31,11 +30,10 @@ class Sslh < Formula
     listen_port = free_port
     target_port = free_port
 
-    fork do
-      exec sbin/"sslh", "--http=localhost:#{target_port}", "--listen=localhost:#{listen_port}", "--foreground"
-    end
+    spawn sbin/"sslh", "--http=localhost:#{target_port}", "--listen=localhost:#{listen_port}", "--foreground"
 
     sleep 1
+    sleep 5 if OS.mac? && Hardware::CPU.intel?
     system "nc", "-z", "localhost", listen_port
   end
 end

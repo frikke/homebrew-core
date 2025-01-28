@@ -1,8 +1,8 @@
 class Scummvm < Formula
   desc "Graphic adventure game interpreter"
   homepage "https://www.scummvm.org/"
-  url "https://downloads.scummvm.org/frs/scummvm/2.7.1/scummvm-2.7.1.tar.xz"
-  sha256 "d6bbf62e33154759a609d59f3034d71652ecdb64ed5c800156718ab1f1d5d063"
+  url "https://downloads.scummvm.org/frs/scummvm/2.9.0/scummvm-2.9.0.tar.xz"
+  sha256 "d5b33532bd70d247f09127719c670b4b935810f53ebb6b7b6eafacaa5da99452"
   license "GPL-3.0-or-later"
   head "https://github.com/scummvm/scummvm.git", branch: "master"
 
@@ -12,13 +12,12 @@ class Scummvm < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "6e72919f378fc00fa734fdcbc032ec9dd6a526d832afcbad2dc2508309e8a0c5"
-    sha256 arm64_monterey: "e0dbf93235c69abcdc74739a86c993a1cda5af2178b9b10e570fc9c39c277738"
-    sha256 arm64_big_sur:  "cfefac96fcf8ea55b34727b1e1246e847c423459eaa06449f1f17068079af7c6"
-    sha256 ventura:        "bc4d8eef158398d33c5b69fd4bf74b781414aaf383c1ac318a522716c89c978a"
-    sha256 monterey:       "718314462b5ab77647835511ab5c5c951d96aff71df6dabfd5969c5c826b8c5d"
-    sha256 big_sur:        "217f483d0b009c406c3cf07c917d086214cc6ce818d1215caa4626ede53b074e"
-    sha256 x86_64_linux:   "71f71a1bd138c5b4e97a8db656ec662af5259fd93f49b14617a31d66c18b6135"
+    rebuild 1
+    sha256 arm64_sequoia: "fd386b790796cd93212f0a48afa615a96f38dab6f8100b9a106d7b162daa575e"
+    sha256 arm64_sonoma:  "b5d4e2c4810e5891a7e4cf6a81a393cefb136ad120542995d5f05ea28c9f7e46"
+    sha256 arm64_ventura: "11a8e89fafed34c094e689e1b93457afd24a56416fe49f3e6eb085dfb40bebe0"
+    sha256 sonoma:        "6043f6417fbbfd4b12b4412804ad9e11ccc1874eb9a846a182aa182f9cf3d30d"
+    sha256 ventura:       "7972f1c506a5241495960fcbc77d366567a7d0f66ecd0b01ebbc351a2e9d5851"
   end
 
   depends_on "a52dec"
@@ -26,22 +25,32 @@ class Scummvm < Formula
   depends_on "flac"
   depends_on "fluid-synth"
   depends_on "freetype"
+  depends_on "fribidi"
+  depends_on "giflib"
   depends_on "jpeg-turbo"
   depends_on "libmpeg2"
+  depends_on "libogg"
+  depends_on "libopenmpt"
   depends_on "libpng"
   depends_on "libvorbis"
+  depends_on "libvpx"
   depends_on "mad"
+  depends_on "musepack"
   depends_on "sdl2"
   depends_on "theora"
 
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "alsa-lib"
+  end
+
   def install
-    system "./configure", "--prefix=#{prefix}",
-                          "--enable-release",
-                          "--with-sdl-prefix=#{Formula["sdl2"].opt_prefix}"
-    system "make"
+    system "./configure", "--enable-release", "--with-sdl-prefix=#{Formula["sdl2"].opt_prefix}", *std_configure_args
     system "make", "install"
-    (share/"pixmaps").rmtree
-    (share/"icons").rmtree
+
+    rm_r(share/"pixmaps")
+    rm_r(share/"icons")
   end
 
   test do

@@ -14,6 +14,7 @@ class Nexus < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, sonoma:       "1ef405d468f02b4d97e3e61d83d36341e7550642ac097bdfba458f515ad04e78"
     sha256 cellar: :any_skip_relocation, ventura:      "9114db0415c4582f0d1e97e8d7cb8758a1bd2d8094222eae33119f189a3dc85d"
     sha256 cellar: :any_skip_relocation, monterey:     "2d4e904050b210d103b36b47aaed37dcef075aa24b3713d54f040203308cf0e3"
     sha256 cellar: :any_skip_relocation, big_sur:      "ebcc0f030b0c84158344636dc0884d511ad386df587d92725f251725066c7151"
@@ -32,8 +33,8 @@ class Nexus < Formula
     system "mvn", "install", "-DskipTests"
     system "unzip", "-o", "-d", "target", "assemblies/nexus-base-template/target/nexus-base-template-#{version}.zip"
 
-    rm_f Dir["target/nexus-base-template-#{version}/bin/*.bat"]
-    rm_f "target/nexus-base-template-#{version}/bin/contrib"
+    rm(Dir["target/nexus-base-template-#{version}/bin/*.bat"])
+    rm_r("target/nexus-base-template-#{version}/bin/contrib")
     libexec.install Dir["target/nexus-base-template-#{version}/*"]
 
     env = {
@@ -60,7 +61,7 @@ class Nexus < Formula
     mkdir "data"
     fork do
       ENV["NEXUS_KARAF_DATA"] = testpath/"data"
-      exec "#{bin}/nexus", "server"
+      exec bin/"nexus", "server"
     end
     sleep 100
     assert_match "<title>Nexus Repository Manager</title>", shell_output("curl --silent --fail http://localhost:8081")

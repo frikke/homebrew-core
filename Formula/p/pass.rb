@@ -12,26 +12,29 @@ class Pass < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7ee1c46e172270c3161ef1d843c37f0bc21fb874af0b55dcd16ad32e795d17e5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7ee1c46e172270c3161ef1d843c37f0bc21fb874af0b55dcd16ad32e795d17e5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dbf5e1b314720d846525cc81a51f30e7cf7319a943f2fb395fb62202eff2c95c"
-    sha256 cellar: :any_skip_relocation, ventura:        "d667e58dae216055777c9780d522b68c6868d7b23f9f712c09c29b1daf215b35"
-    sha256 cellar: :any_skip_relocation, monterey:       "d667e58dae216055777c9780d522b68c6868d7b23f9f712c09c29b1daf215b35"
-    sha256 cellar: :any_skip_relocation, big_sur:        "80812f17b470ea37c9027851ed71a6a09a8d0be359e6770c9e836646c68ade9e"
-    sha256 cellar: :any_skip_relocation, catalina:       "80812f17b470ea37c9027851ed71a6a09a8d0be359e6770c9e836646c68ade9e"
-    sha256 cellar: :any_skip_relocation, mojave:         "80812f17b470ea37c9027851ed71a6a09a8d0be359e6770c9e836646c68ade9e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "59753aa6bb5027b238e43bcdf87f603c9850166b485b85b6e457ecc8f4aff25c"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "28e5b23335b5260675224af5d330a5d4f3b5e3d9be5f9491c68dbdb48ab8a6fb"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "14e3206a94f04e911f0168b7e458f0149b8c42cd34014a113610431d2a142e1b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "14e3206a94f04e911f0168b7e458f0149b8c42cd34014a113610431d2a142e1b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "14e3206a94f04e911f0168b7e458f0149b8c42cd34014a113610431d2a142e1b"
+    sha256 cellar: :any_skip_relocation, sonoma:         "1132f363a63efb874ebf98f406dcc6f9346496b10b0a3b3c2063b447c8035180"
+    sha256 cellar: :any_skip_relocation, ventura:        "1132f363a63efb874ebf98f406dcc6f9346496b10b0a3b3c2063b447c8035180"
+    sha256 cellar: :any_skip_relocation, monterey:       "1132f363a63efb874ebf98f406dcc6f9346496b10b0a3b3c2063b447c8035180"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ee3104f2584abf3c35e811152282541832cc3e672d8b28024ee8d77d49cca172"
   end
 
-  depends_on "gnu-getopt"
   depends_on "gnupg"
   depends_on "qrencode"
   depends_on "tree"
 
+  on_macos do
+    depends_on "gnu-getopt"
+  end
+
   def install
     system "make", "PREFIX=#{prefix}", "WITH_ALLCOMP=yes", "BASHCOMPDIR=#{bash_completion}",
                    "ZSHCOMPDIR=#{zsh_completion}", "FISHCOMPDIR=#{fish_completion}", "install"
-    inreplace "#{bin}/pass",
+    inreplace bin/"pass",
               /^SYSTEM_EXTENSION_DIR=.*$/,
               "SYSTEM_EXTENSION_DIR=\"#{HOMEBREW_PREFIX}/lib/password-store/extensions\""
     elisp.install "contrib/emacs/password-store.el"
@@ -53,7 +56,7 @@ class Pass < Formula
     begin
       system Formula["gnupg"].opt_bin/"gpg", "--batch", "--gen-key", "batch.gpg"
       system bin/"pass", "init", "Testing"
-      system bin/"pass", "generate", "Email/testing@foo.bar", "15"
+      assert_match "The generated password for", shell_output("#{bin}/pass generate Email/testing@foo.bar 15")
       assert_predicate testpath/".password-store/Email/testing@foo.bar.gpg", :exist?
     ensure
       system Formula["gnupg"].opt_bin/"gpgconf", "--kill", "gpg-agent"

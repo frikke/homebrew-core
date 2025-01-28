@@ -1,14 +1,17 @@
 class Termshark < Formula
   desc "Terminal UI for tshark, inspired by Wireshark"
   homepage "https://termshark.io"
-  url "https://github.com/gcla/termshark/archive/v2.4.0.tar.gz"
+  url "https://github.com/gcla/termshark/archive/refs/tags/v2.4.0.tar.gz"
   sha256 "949c71866fcd2f9ed71a754ea9e3d1bdc23dee85969dcdc78180f1d18ca8b087"
   license "MIT"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "a0c4f19d16204de97425576057c2ac0d841a78bb26981703c919ed102e104982"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "097ad857907c26ef893a9f0863fbe6d21d49d5015068c3bc981f0c7a522ba52f"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "11cf99e534c667d968ea4daff6c3baf9a86345a6823627ad722398e5c5daeedd"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "37948c9f61f945ad6044eb03753da35bf735a2ef0599c21ee957c24c6549e670"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d95e25d67a299e15d5e9c861c5f1b99b98a58802ba78ec847d1801f6f1ef1432"
+    sha256 cellar: :any_skip_relocation, sonoma:         "b32b42612b27155cf760d7411e2644b25ba09fb662b1b8bdd4d0b84821ceb914"
     sha256 cellar: :any_skip_relocation, ventura:        "c5b4d2aa47e0f3796c68add48dfd28b7f79780261d00a62897ab23fa977b8423"
     sha256 cellar: :any_skip_relocation, monterey:       "b22556c8b7777479e5a36c5c8abb9fbcff1e2774feb96383533ece79da6a5a6d"
     sha256 cellar: :any_skip_relocation, big_sur:        "8b19aa1bd9d176bb52410f2751fd3877e22a8d4ba21ee7cccd93d08ef32c8653"
@@ -16,20 +19,15 @@ class Termshark < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "69ee110ad437376b219f4aaa960818850be8e28868c8a0dc3ceff715849c8b1f"
   end
 
+  # https://github.com/gcla/termshark/issues/167
+  deprecate! date: "2025-01-03", because: :unmaintained
+
   depends_on "go" => :build
   depends_on "socat" => :test
   depends_on "wireshark"
 
   def install
-    # Don't set GOPATH because we want to build using go modules to
-    # ensure our dependencies are the ones specified in go.mod.
-    mkdir_p buildpath
-    ln_sf buildpath, buildpath/"termshark"
-
-    cd "termshark" do
-      system "go", "build", "-o", bin/"termshark",
-             "cmd/termshark/termshark.go"
-    end
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/termshark"
   end
 
   test do

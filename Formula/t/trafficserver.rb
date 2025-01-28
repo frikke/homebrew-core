@@ -1,82 +1,52 @@
 class Trafficserver < Formula
-  desc "HTTP/1.1 compliant caching proxy server"
+  desc "HTTP/1.1 and HTTP/2 compliant caching proxy server"
   homepage "https://trafficserver.apache.org/"
-  url "https://downloads.apache.org/trafficserver/trafficserver-9.2.2.tar.bz2"
-  mirror "https://archive.apache.org/dist/trafficserver/trafficserver-9.2.2.tar.bz2"
-  sha256 "5960dd2d075e8f1c71d299a09155ca8ed6dd02af1d39678e7379c1e5bd81c388"
+  url "https://downloads.apache.org/trafficserver/trafficserver-10.0.2.tar.bz2"
+  mirror "https://archive.apache.org/dist/trafficserver/trafficserver-10.0.2.tar.bz2"
+  sha256 "21b42ec8bcae0ec22f55688d83e7ca13821b73261ebb25f9d1fdded5e804c657"
   license "Apache-2.0"
-  revision 1
 
   bottle do
-    sha256 arm64_ventura:  "9deeccd755fa83b9570c876b4fcaff07d116552e7e06af1ce7f6ca3f690412fc"
-    sha256 arm64_monterey: "16f589e488c325a0bbcc55e46ef39468526286bbcd38a4277e189cea42f6bceb"
-    sha256 arm64_big_sur:  "2f340076bfcb24ab8e723166171a7ce5a9a0aeffa681f1bebd7b6918f9a49795"
-    sha256 ventura:        "defc92934de8f85f91674b7974b0e7bf29a91d899d8a004b09f63cc3b8429074"
-    sha256 monterey:       "8509309e4f08579095ccbc35fc1d6f5ccb8e7df0abbe63d02791079981939723"
-    sha256 big_sur:        "be51035d713408d1fe9d3136c8732350816fb3e7b257900249c3348c9d466609"
-    sha256 x86_64_linux:   "fb19527c0a3d968e9ca1f3fdfd190ed5072eedaab0d373d288e56012b7a49137"
+    sha256 arm64_sequoia: "ac295e2be0157ee5c1b85450ec723a6da7f69f5c7733fea17176b09837f7cc80"
+    sha256 arm64_sonoma:  "8b94765353338915e12cf310316df54f95a4a24dd281da11e2eb1a5437bd6870"
+    sha256 arm64_ventura: "05464a026d9c405703061cf3ac88ad71e97acb6cf6e0a680c78aa9a03789c142"
+    sha256 sonoma:        "577215262b7bd8094314d2a521e8b4c0fcb72d2978a3741fc919ec659ed2d8a8"
+    sha256 ventura:       "07737dd01472d55d6b590c1a4eb19d7c91a92f054c11305a62d6323277ec5e48"
+    sha256 x86_64_linux:  "56795be7b8ba2852b92de0f92df9489a5eb2700ba9bc06f1683330e7b826995c"
   end
 
-  head do
-    url "https://github.com/apache/trafficserver.git", branch: "master"
+  depends_on "cmake" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => :build
 
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool"  => :build
-  end
-
-  depends_on "pkg-config" => :build
+  depends_on "brotli"
   depends_on "hwloc"
-  depends_on macos: :mojave # `error: call to unavailable member function 'value': introduced in macOS 10.14`
+  depends_on "imagemagick"
+  depends_on "libmaxminddb"
+  depends_on "luajit"
+  depends_on "nuraft"
   depends_on "openssl@3"
-  depends_on "pcre"
+  depends_on "pcre" # PCRE2 issue: https://github.com/apache/trafficserver/issues/8780
+  depends_on "xz"
   depends_on "yaml-cpp"
 
-  on_macos do
-    # Need to regenerate configure to fix macOS 11+ build error due to undefined symbols
-    # See https://github.com/apache/trafficserver/pull/8556#issuecomment-995319215
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool"  => :build
-  end
+  uses_from_macos "flex" => :build
+  uses_from_macos "curl"
+  uses_from_macos "ncurses"
+  uses_from_macos "zlib"
 
-  fails_with gcc: "5" # needs C++17
-
-  fails_with :clang do
-    build 800
-    cause "needs C++17"
+  on_linux do
+    depends_on "libcap"
+    depends_on "libunwind"
   end
 
   def install
-    # Per https://luajit.org/install.html: If MACOSX_DEPLOYMENT_TARGET
-    # is not set then it's forced to 10.4, which breaks compile on Mojave.
-    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s
-
-    args = %W[
-      --prefix=#{prefix}
-      --mandir=#{man}
-      --localstatedir=#{var}
-      --sysconfdir=#{pkgetc}
-      --with-openssl=#{Formula["openssl@3"].opt_prefix}
-      --with-yaml-cpp=#{Formula["yaml-cpp"].opt_prefix}
-      --with-group=admin
-      --disable-tests
-      --disable-silent-rules
-      --enable-experimental-plugins
-    ]
-
-    system "autoreconf", "-fvi" if build.head? || OS.mac?
-    system "./configure", *args
-
-    # Fix wrong username in the generated startup script for bottles.
-    inreplace "rc/trafficserver.in", "@pkgsysuser@", "$USER"
-
-    inreplace "lib/perl/Makefile",
-      "Makefile.PL INSTALLDIRS=$(INSTALLDIRS)",
-      "Makefile.PL INSTALLDIRS=$(INSTALLDIRS) INSTALLSITEMAN3DIR=#{man3}"
-
-    system "make" if build.head?
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DBUILD_EXPERIMENTAL_PLUGINS=ON",
+                    "-DEXTERNAL_YAML_CPP=ON",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   def post_install
@@ -96,7 +66,7 @@ class Trafficserver < Formula
       assert_match "Apache Traffic Server is not running", output
     else
       output = shell_output("#{bin}/trafficserver status 2>&1", 3)
-      assert_match "traffic_manager is not running", output
+      assert_match "traffic_server is not running", output
     end
   end
 end

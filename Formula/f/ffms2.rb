@@ -1,61 +1,54 @@
 class Ffms2 < Formula
   desc "Libav/ffmpeg based source library and Avisynth plugin"
   homepage "https://github.com/FFMS/ffms2"
+  url "https://github.com/FFMS/ffms2/archive/refs/tags/5.0.tar.gz"
+  mirror "https://deb.debian.org/debian/pool/main/f/ffms2/ffms2_5.0.orig.tar.gz"
+  sha256 "7770af0bbc0063f9580a6a5c8e7c51f1788f171d7da0b352e48a1e60943a8c3c"
   # The FFMS2 source is licensed under the MIT license, but its binaries
   # are licensed under the GPL because GPL components of FFmpeg are used.
-  license "GPL-2.0"
-  revision 4
+  license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/FFMS/ffms2.git", branch: "master"
 
-  stable do
-    url "https://github.com/FFMS/ffms2/archive/2.40.tar.gz"
-    mirror "https://deb.debian.org/debian/pool/main/f/ffms2/ffms2_2.40.orig.tar.gz"
-    sha256 "82e95662946f3d6e1b529eadbd72bed196adfbc41368b2d50493efce6e716320"
-
-    # Fix build with FFmpeg 5/6. Remove patches in the next release.
-    patch do
-      url "https://github.com/FFMS/ffms2/commit/586d87de3f896d0c4ff01b21f572375e11f9c3f1.patch?full_index=1"
-      sha256 "cd946d9f30698a5a7e17698c75e74572ecaa677b379dc92d92e4a986243d69c6"
-    end
-    patch do
-      url "https://github.com/FFMS/ffms2/commit/45673149e9a2f5586855ad472e3059084eaa36b1.patch?full_index=1"
-      sha256 "33d7af8efd9b44ea6414fc2856ef93aeff733c92dd45e57b859989766f32be66"
-    end
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "023582cd7706fb178e3673a44f19202e96cb7b743883cd3cf2a622bdc28a910f"
-    sha256 cellar: :any,                 arm64_monterey: "208bea2bad3ab0e3421a05fb95f3d09234dacfd3dbd7846f37abf9198c725ffd"
-    sha256 cellar: :any,                 arm64_big_sur:  "6b0a6c8555f81efe0d9d60a486fc1e132706c4c85dfa38214ae9f5cb7d9348e6"
-    sha256 cellar: :any,                 ventura:        "812acac7fead7e70c367494d0847ae9063196157902047c6b4a6226178073d6a"
-    sha256 cellar: :any,                 monterey:       "b43c093dba63116882aa97a66d7574fe892e456bf8d4cf08938cbde965039c10"
-    sha256 cellar: :any,                 big_sur:        "8af6d5615773b98e695ddc3987ae14ed89900ea3600b9e0c61a76d02e28fef64"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b09a1bb54bde4251dff1f4e4f3dfd7bba9a93023bf1c1387a61240a54d220544"
+    sha256 cellar: :any,                 arm64_sequoia:  "03575bd3c5cd87878dc46b92f96f7e0b16ceca81b69492d2968cf596ad93778e"
+    sha256 cellar: :any,                 arm64_sonoma:   "13954ff5340289c90c5db2366c1893cd48b30c62a65625df74a8df0e3340a891"
+    sha256 cellar: :any,                 arm64_ventura:  "64fc6597466170a7d8c595ab3a3c9b56005f5a47c571111944012aa7dbd1e047"
+    sha256 cellar: :any,                 arm64_monterey: "563a1537a4c8573205e5ca1bdaf03928c5dac901ecbdd9a2a85b6a51a300e2a1"
+    sha256 cellar: :any,                 sonoma:         "8d659a7c438d83d9894c177e6f3b66aaf77535732761f9fc8db04aa4c2837f6a"
+    sha256 cellar: :any,                 ventura:        "5fd68b4056bbc5a74134479eff08729bbb9cc0c3bcd0f4917236feaea232ae62"
+    sha256 cellar: :any,                 monterey:       "61cd167e26cca0414ba2d91c7d09a2a9cd7056e845dc67b1f3136ebddb28abd3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0c34b82acbfacbdddbf99efb5fd55d7b6e2d27498f76e62f354d275af69da706"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "ffmpeg"
 
-  fails_with gcc: "5" # ffmpeg is compiled with GCC
-
-  resource "videosample" do
-    url "https://samples.mplayerhq.hu/V-codecs/lm20.avi"
-    sha256 "a0ab512c66d276fd3932aacdd6073f9734c7e246c8747c48bf5d9dd34ac8b392"
-  end
+  uses_from_macos "zlib"
 
   def install
-    system "./autogen.sh", *std_configure_args, "--enable-avresample"
+    system "./autogen.sh", "--enable-avresample", *std_configure_args
     system "make", "install"
   end
 
   test do
+    resource "homebrew-videosample" do
+      url "https://samples.mplayerhq.hu/V-codecs/lm20.avi"
+      sha256 "a0ab512c66d276fd3932aacdd6073f9734c7e246c8747c48bf5d9dd34ac8b392"
+    end
+
     # download small sample and check that the index was created
-    resource("videosample").stage do
+    resource("homebrew-videosample").stage do
       system bin/"ffmsindex", "lm20.avi"
-      assert_predicate Pathname.pwd/"lm20.avi.ffindex", :exist?
+      assert_path_exists Pathname.pwd/"lm20.avi.ffindex"
     end
   end
 end

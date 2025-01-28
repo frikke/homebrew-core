@@ -10,11 +10,6 @@ class GhcAT810 < Formula
     any_of: ["LGPL-3.0-or-later", "GPL-2.0-or-later"], # GMP
   ]
 
-  livecheck do
-    url "https://www.haskell.org/ghc/download.html"
-    regex(/href=.*?download[._-]ghc[._-][^"' >]+?\.html[^>]*?>\s*?v?(8\.10(?:\.\d+)+)\s*?</i)
-  end
-
   bottle do
     sha256 cellar: :any,                 arm64_monterey: "5af941f345ced100c706b50beb3c1dfc0d88882aaa5dec2c403561f15def895f"
     sha256 cellar: :any,                 arm64_big_sur:  "57662ecdde5b435ad10fa13730d176d84f056ab81ca42f016dd1b1d4da625636"
@@ -26,6 +21,9 @@ class GhcAT810 < Formula
   end
 
   keg_only :versioned_formula
+
+  # Original deprecation date: 2023-11-16
+  disable! date: "2024-07-26", because: :unmaintained
 
   depends_on "python@3.10" => :build
   depends_on "sphinx-doc" => :build
@@ -128,7 +126,7 @@ class GhcAT810 < Formula
   end
 
   def post_install
-    system "#{bin}/ghc-pkg", "recache"
+    system bin/"ghc-pkg", "recache"
   end
 
   test do

@@ -1,28 +1,29 @@
 class Fdupes < Formula
   desc "Identify or delete duplicate files"
   homepage "https://github.com/adrianlopezroche/fdupes"
-  url "https://github.com/adrianlopezroche/fdupes/releases/download/v2.2.1/fdupes-2.2.1.tar.gz"
-  sha256 "846bb79ca3f0157856aa93ed50b49217feb68e1b35226193b6bc578be0c5698d"
+  url "https://github.com/adrianlopezroche/fdupes/releases/download/v2.3.2/fdupes-2.3.2.tar.gz"
+  sha256 "808d8decbe7fa41cab407ae4b7c14bfc27b8cb62227540c3dcb6caf980592ac7"
   license "MIT"
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "2d4923b54b24b67a3e1c01a0e230a7aff23c5be96bc448fa4b819ba961720b2d"
-    sha256 cellar: :any,                 arm64_monterey: "4ec16494f0ec45087289875f4f2eb02df77e21ba937f0b5069976241fdd072a1"
-    sha256 cellar: :any,                 arm64_big_sur:  "0dfb5e0dee88c277a48187d32892968da7f646efd032e80ea082242377907295"
-    sha256 cellar: :any,                 ventura:        "b9ad08ebb908b91bb9b0d3e7b46770dc7afadd948b12fc8cfd3c8f64526db1f5"
-    sha256 cellar: :any,                 monterey:       "2e25670f381e0554075a19f280f21c5d5703dae94332514af2ff521be94cda98"
-    sha256 cellar: :any,                 big_sur:        "274cf06310fb49f0bc5548cc39a6a6b7a80b595019e4adbd79897dff9b5d9b9a"
-    sha256 cellar: :any,                 catalina:       "44b821561c585b3b258120c18524b459813b889b298b0fa99ac21bdb096fe66f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3c4145b2b6b20271a0cf652e2ff650b668154ce5d74cc0e0f48c00369eb7cd56"
+    sha256 cellar: :any,                 arm64_sequoia:  "4b36f431443bb485436062a901736cf32d5300ad54a727a8686344b98a0439c3"
+    sha256 cellar: :any,                 arm64_sonoma:   "3e61741f1fad31c0d9a30944d32a8097474bfb50b8cfcb892dea68252a9d5799"
+    sha256 cellar: :any,                 arm64_ventura:  "16f9f0943dd140f6c91acfae645b3d911aba4526613a130c21fa275f9be4ce06"
+    sha256 cellar: :any,                 arm64_monterey: "dea22eee9147298c50e3e41d930c869effc6a99b9a2e20d25b270e069ff58f41"
+    sha256 cellar: :any,                 sonoma:         "43a2ae20a78911bff4710314601bb5369bc6f615f46efb2d6013b518937eb926"
+    sha256 cellar: :any,                 ventura:        "933ac3a985ebbfcfc34402d6579cf8f1694b93395192e953a618173027f4fa58"
+    sha256 cellar: :any,                 monterey:       "13c75942d279704a1556dbc9f3bbe8052594a7c3cdd09fd6deae4e68f0342f3b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "52b7e8485e9933e6d3154d07908b0f433d8dd3b611f6b078d7fdf077b18a6350"
   end
 
   depends_on "pcre2"
 
   uses_from_macos "ncurses"
+  uses_from_macos "sqlite"
 
   def install
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", *std_configure_args.reject { |s| s["--disable-debug"] }
     system "make"
     system "make", "install"
   end

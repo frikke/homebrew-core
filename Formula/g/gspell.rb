@@ -1,58 +1,65 @@
 class Gspell < Formula
   desc "Flexible API to implement spellchecking in GTK+ applications"
   homepage "https://gitlab.gnome.org/GNOME/gspell"
-  url "https://download.gnome.org/sources/gspell/1.12/gspell-1.12.2.tar.xz"
-  sha256 "b4e993bd827e4ceb6a770b1b5e8950fce3be9c8b2b0cbeb22fdf992808dd2139"
+  url "https://download.gnome.org/sources/gspell/1.14/gspell-1.14.0.tar.xz"
+  sha256 "64ea1d8e9edc1c25b45a920e80daf67559d1866ffcd7f8432fecfea6d0fe8897"
   license "LGPL-2.1-or-later"
+  revision 2
 
   bottle do
-    sha256 arm64_ventura:  "7bfb5fdecb36da507e6234090327933860b173f9c08a9e7682badae3bbc22717"
-    sha256 arm64_monterey: "e1ce8928f95abc14f8a2a61d91d649606dd89e01996158ace98e12e989088ca8"
-    sha256 arm64_big_sur:  "adbbfccca9d4485334b7bafdd26377a677d5bc231e338695bb9ce2558bd3fb71"
-    sha256 ventura:        "f54298f524ea6f40d3296aee5cd4b3feb326cc5398c21c9a8329973ff4c0ba33"
-    sha256 monterey:       "011bcc30fc443fa9a280706cb3ec7313eb30083a6e7f11c4eadf8ddac433ac06"
-    sha256 big_sur:        "62927471883510fe62139fd7c82595601872549c92fe94b522905de0174f5220"
-    sha256 x86_64_linux:   "94b89a03bd2ba58d82701cc63bb3d81d0704a0e0c41e75eedb81f816b4e6581e"
+    sha256 arm64_sequoia: "03106944ffad6a23ddd95ca647a7808698374337309aba617c63d11eb4a47130"
+    sha256 arm64_sonoma:  "3c67a5a4434cc8faa2b0abe80843891a565dd81afdca0e4aff24b71ae2896f6f"
+    sha256 arm64_ventura: "9a1ea15e3f7b7b0c7213d63f565cad2e312fae9a6f5c1ef4b76c632d3f43b831"
+    sha256 sonoma:        "055cb331155fc7a4627c5e27f09491285922fe28967fb2e3af7296711ce961e0"
+    sha256 ventura:       "5713495649b5b21951f2e39574b9335333298276f9c96dfe5ffb3cf03f5e96e8"
+    sha256 x86_64_linux:  "b6fa120befbae62fff98ae659831ef563b621fe32e8b1c137b79cb401360feed"
   end
 
   depends_on "gobject-introspection" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => [:build, :test]
   depends_on "vala" => :build
+
+  depends_on "at-spi2-core"
+  depends_on "cairo"
   depends_on "enchant"
+  depends_on "gdk-pixbuf"
   depends_on "glib"
   depends_on "gtk+3"
-  depends_on "icu4c"
+  depends_on "harfbuzz"
+  depends_on "icu4c@76"
+  depends_on "pango"
 
   on_macos do
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "gtk-doc" => :build
-    depends_on "libtool" => :build
-    depends_on "gtk-mac-integration"
-
-    patch :DATA
+    depends_on "gettext"
   end
 
   def install
-    system "autoreconf", "--force", "--install", "--verbose" if OS.mac?
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules",
-                          "--enable-introspection=yes",
-                          "--enable-vala=yes"
-    system "make", "install"
+    args = %w[
+      -Dgtk_doc=false
+      -Dtests=false
+      -Dinstall_tests=false
+    ]
+
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gspell/gspell.h>
 
       int main(int argc, char *argv[]) {
         const GList *list = gspell_language_get_available();
         return 0;
       }
-    EOS
-    ENV.prepend_path "PKG_CONFIG_PATH", Formula["icu4c"].opt_lib/"pkgconfig" if OS.mac?
-    flags = shell_output("pkg-config --cflags --libs gspell-1").chomp.split
+    C
+
+    icu4c = deps.map(&:to_formula).find { |f| f.name.match?(/^icu4c@\d+$/) }
+    ENV.prepend_path "PKG_CONFIG_PATH", icu4c.opt_lib/"pkgconfig"
+    flags = shell_output("pkgconf --cflags --libs gspell-1").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     ENV["G_DEBUG"] = "fatal-warnings"
 
@@ -61,30 +68,3 @@ class Gspell < Formula
     system "./test"
   end
 end
-
-__END__
-diff --git a/gspell/Makefile.am b/gspell/Makefile.am
-index 076a9fd..6c67184 100644
---- a/gspell/Makefile.am
-+++ b/gspell/Makefile.am
-@@ -91,6 +91,7 @@ nodist_libgspell_core_la_SOURCES = \
-	$(BUILT_SOURCES)
-
- libgspell_core_la_LIBADD =	\
-+	$(GTK_MAC_LIBS) \
-	$(CODE_COVERAGE_LIBS)
-
- libgspell_core_la_CFLAGS =	\
-@@ -155,6 +156,12 @@ gspell_private_headers += \
- gspell_private_c_files += \
-	gspell-osx.c
-
-+libgspell_core_la_CFLAGS += \
-+	-xobjective-c
-+
-+libgspell_core_la_LDFLAGS += \
-+	-framework Cocoa
-+
- endif # OS_OSX
-
- if HAVE_INTROSPECTION

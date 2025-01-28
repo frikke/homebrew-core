@@ -1,26 +1,27 @@
 class Zorba < Formula
   desc "NoSQL query processor"
   homepage "http://www.zorba.io/"
-  url "https://github.com/28msec/zorba/archive/3.1.tar.gz"
+  url "https://github.com/28msec/zorba/archive/refs/tags/3.1.tar.gz"
   sha256 "05eed935c0ff3626934a5a70724a42410fd93bc96aba1fa4821736210c7f1dd8"
   license "Apache-2.0"
-  revision 18
+  revision 20
 
   bottle do
-    sha256 arm64_sonoma:   "3a4731e66825f7baf0781385e6ff7fa1c0908dceb5154715a0126201d43cc055"
-    sha256 arm64_ventura:  "97f108986cb35b6a09113fb9fb18b5e40e6b2321212981ab1eeeedf8830fa46b"
-    sha256 arm64_monterey: "c1a3ea5f34bb0523a68124e5f40a95e9048b063c37cf041363fe71131efee4e1"
-    sha256 arm64_big_sur:  "785f9a1aa5f5e2823c8bea4b1853b43af2817b407ebbd54e8dd863afe1b398fe"
-    sha256 sonoma:         "d06711ee8347f22f2f9e4dbebe179467d2be03d26a54fa0a93dfb99d6cfa11fa"
-    sha256 ventura:        "c3ab863eb030b2adbc8b033040319b67cc0fe9a93c1c97554d5347559a66d183"
-    sha256 monterey:       "0ac8239e4e37f74590940e3c5f8e37202aa6942cbf241e3d5827241c205a7faa"
-    sha256 big_sur:        "a4baa74dcb62830f6bbc21a224fece87287d372b9ab1deffd3c3b437929073b6"
+    sha256 arm64_sequoia: "531dae378c0007fe5b28d122ad9e03158f87653321070f53fa7a8016125611b7"
+    sha256 arm64_sonoma:  "7bfa2637276cbc0fbade2f450da1b68e88fb7aedd944ce83a658014ac035607e"
+    sha256 arm64_ventura: "b8760ea3d7df545813b9f333fcf49c6dd9187558b3701e281383336a3e62c674"
+    sha256 sonoma:        "368e4b11f65d08b39c602a001f26719b491d92b03ac98de86719d7a86ddbdcb5"
+    sha256 ventura:       "7b79034310f8f4f18b21d777540d03279dd7de8ba6e9950f722ca2b93439992e"
   end
+
+  # https://github.com/28msec/zorba/issues/232
+  # no longer build due to `'boost/filesystem/convenience.hpp' file not found`
+  disable! date: "2025-05-01", because: :unmaintained
 
   depends_on "cmake" => :build
   depends_on "openjdk" => :build
   depends_on "flex"
-  depends_on "icu4c"
+  depends_on "icu4c@74"
   depends_on "xerces-c"
 
   uses_from_macos "libxml2"
@@ -47,7 +48,6 @@ class Zorba < Formula
   end
 
   test do
-    assert_equal shell_output("#{bin}/zorba -q 1+1").strip,
-                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n2"
+    assert_equal "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n2", shell_output("#{bin}/zorba -q 1+1").strip
   end
 end

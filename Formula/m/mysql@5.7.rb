@@ -1,31 +1,25 @@
 class MysqlAT57 < Formula
   desc "Open source relational database management system"
   homepage "https://dev.mysql.com/doc/refman/5.7/en/"
-  url "https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-5.7.43.tar.gz"
-  sha256 "22998c0fe8439a6946644f175b6f219d5f503d4c194b246a338f1dfcd87db045"
+  url "https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-5.7.44.tar.gz"
+  sha256 "b8fe262c4679cb7bbc379a3f1addc723844db168628ce2acf78d33906849e491"
   license "GPL-2.0-only"
-
-  livecheck do
-    url "https://dev.mysql.com/downloads/mysql/5.7.html?tpl=files&os=src&version=5.7"
-    regex(/href=.*?mysql[._-](?:boost[._-])?v?(5\.7(?:\.\d+)*)\.t/i)
-  end
+  revision 1
 
   bottle do
-    sha256 arm64_sonoma:   "4b69c3381dc94ec413f48e786be30c53a20000f8bc3c4870971c02a7815426cc"
-    sha256 arm64_ventura:  "ca8626687368282a0dfc23d451e2d41a418642c2ae66cf38b1138b994224c2f5"
-    sha256 arm64_monterey: "80bae6d458cc8947d81469ded28ca1d107183fe90533d42e049d46a921b0db58"
-    sha256 arm64_big_sur:  "c3324d764ce81e9d8848139d9539fd7caa935f90b45a8d821e507395089a603d"
-    sha256 sonoma:         "3fc1a8a490f54b97e111c15e6f8ac570986b4b4307a2932fef01128825ff0d65"
-    sha256 ventura:        "29d83234fed92cf4d932c6101f36f40fbb8679e3057422c352f0e605c4556cb9"
-    sha256 monterey:       "c59712c401c2dab69c6a61d8717e8bcd848e6ce5fe252ac0c4a489ab2192505c"
-    sha256 big_sur:        "f28d9d37d617ff9e72245c7fef70efff874665e8015a894e6eac50ada5d645b7"
-    sha256 x86_64_linux:   "d992bf4f717c499d73a0ab653ff48efaa59003493e325b48e975c26ef1285a3b"
+    sha256 arm64_sonoma:   "ca2e5c8b98bd92843578ffeae0e6280d3066afc33c814cb1ba49299fe9285f50"
+    sha256 arm64_ventura:  "c0ff4905882e49d8baf0446652ee9fa6158b00bcd0d17ef2c1a017d0875c5ae5"
+    sha256 arm64_monterey: "326f59da12d2b0f0c18465085d6539930cb75dc500856e7dd05ecc734b91a3f4"
+    sha256 sonoma:         "8676947218acdace558ac56f01a14c4499963201aa5834041146f8b3efe6eea0"
+    sha256 ventura:        "6e9e12bd8918e60560b4c95f3d3b4135bffba820bcdb7b671e7a43af3e948f5c"
+    sha256 monterey:       "de04d1a5af2794e0ee6ff76f3f17882ce4e8bbe81705483c7bfb799d42227266"
+    sha256 x86_64_linux:   "cf11c67e97a5a88a6788a07e7088f4525979f7eb4192dd41948ddcac6f1016c2"
   end
 
   keg_only :versioned_formula
 
   # https://www.oracle.com/us/support/library/lifetime-support-technology-069183.pdf
-  deprecate! date: "2023-10-01", because: :unsupported
+  disable! date: "2024-08-01", because: :unsupported
 
   depends_on "cmake" => :build
   depends_on "libevent"
@@ -38,7 +32,7 @@ class MysqlAT57 < Formula
   uses_from_macos "libedit"
 
   on_linux do
-    depends_on "pkg-config" => :build
+    depends_on "pkgconf" => :build
     depends_on "libtirpc"
   end
 
@@ -79,7 +73,6 @@ class MysqlAT57 < Formula
       -DWITH_NUMA=OFF
       -DWITH_UNIT_TESTS=OFF
       -DWITH_EMBEDDED_SERVER=ON
-      -DENABLED_LOCAL_INFILE=1
     ]
 
     args << if OS.mac?
@@ -97,11 +90,11 @@ class MysqlAT57 < Formula
     end
 
     # Remove the tests directory
-    rm_rf prefix/"mysql-test"
+    rm_r(prefix/"mysql-test")
 
     # Don't create databases inside of the prefix!
     # See: https://github.com/Homebrew/homebrew/issues/4975
-    rm_rf prefix/"data"
+    rm_r(prefix/"data")
 
     # Fix up the control script and link into bin.
     inreplace "#{prefix}/support-files/mysql.server",
@@ -110,12 +103,12 @@ class MysqlAT57 < Formula
     bin.install_symlink prefix/"support-files/mysql.server"
 
     # Install my.cnf that binds to 127.0.0.1 by default
-    (buildpath/"my.cnf").write <<~EOS
+    (buildpath/"my.cnf").write <<~INI
       # Default Homebrew MySQL server config
       [mysqld]
       # Only allow connections from localhost
       bind-address = 127.0.0.1
-    EOS
+    INI
     etc.install "my.cnf"
   end
 
@@ -166,13 +159,13 @@ class MysqlAT57 < Formula
       "--basedir=#{prefix}", "--datadir=#{testpath}/mysql", "--tmpdir=#{testpath}/tmp"
     port = free_port
     fork do
-      system "#{bin}/mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
+      system bin/"mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
         "--datadir=#{testpath}/mysql", "--port=#{port}", "--tmpdir=#{testpath}/tmp"
     end
     sleep 5
     assert_match "information_schema",
       shell_output("#{bin}/mysql --port=#{port} --user=root --password= --execute='show databases;'")
-    system "#{bin}/mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
+    system bin/"mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
   end
 end
 

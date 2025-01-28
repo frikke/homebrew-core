@@ -3,18 +3,17 @@ class Ns3 < Formula
 
   desc "Discrete-event network simulator"
   homepage "https://www.nsnam.org/"
-  url "https://gitlab.com/nsnam/ns-3-dev/-/archive/ns-3.39/ns-3-dev-ns-3.39.tar.gz"
-  sha256 "99be388a851fb5fa01f25c814fafef3d3d989d9a932f04374bf7bcc31cf72924"
+  url "https://gitlab.com/nsnam/ns-3-dev/-/archive/ns-3.43/ns-3-dev-ns-3.43.tar.gz"
+  sha256 "45c33fddf95195a51a5929341fa3e1ff0f1e6f01e7049a06216ced509256c7f3"
   license "GPL-2.0-only"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "425aa33224b1e9489e519ba617b14d89ade0f1f773d48f295628778a10f94417"
-    sha256 cellar: :any,                 arm64_monterey: "a39ccabec24aa09e65a29cf07eef4ba7afe714dac5fe9c408306839745f9bab0"
-    sha256 cellar: :any,                 arm64_big_sur:  "c8c0d0b83542f2b0556bc5d35b010792090b1fbd2ddbfc9f1f64bc488cb8d6d1"
-    sha256 cellar: :any,                 ventura:        "8dc7444cc41497a4ff9f875b6b75d3b9bd7e897313c7e4583aed724a38b13f29"
-    sha256 cellar: :any,                 monterey:       "f1355a3e689c8097dd70377c500295d47c45ed435fd3077821e57f43949b9489"
-    sha256 cellar: :any,                 big_sur:        "b75eabe4098d7b7ef12a88cfae762a7a464d21524e56ec359068398342b83a4e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "026abf308e4d4d0b1604e2fefd322972e07d3494d2693f132bc5585c7cdd479a"
+    sha256                               arm64_sequoia: "b6318cc6fc405c621489ec232845c47ed6803fe08f4ed19826290932d52a820d"
+    sha256                               arm64_sonoma:  "c772e9dbfc8736fe744de2810c663c3dad63beea603341110ff3e1ff8ef088d0"
+    sha256                               arm64_ventura: "d201dcc8e9002a69b6cb1355e9ddd1968e98a679b92415b01bd19a20393d17ac"
+    sha256                               sonoma:        "7937bdf9b3dab13f7090d78dd5d7b95f099b094460431a5edea6fb2dddd102c5"
+    sha256                               ventura:       "06cad0f469a9e59a5b63c4531b4da59920f29de396ae9503334f42f0c47317a9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8dc43626ba9e906d66ddf573b9c1188da8298fdf8a94aae943d857119a3d1430"
   end
 
   depends_on "boost" => :build
@@ -43,10 +42,9 @@ class Ns3 < Formula
   end
 
   test do
-    system ENV.cxx, pkgshare/"first.cc", "-I#{include}", "-L#{lib}",
+    system ENV.cxx, "-std=c++20", "-o", "test", pkgshare/"first.cc", "-I#{include}", "-L#{lib}",
            "-lns#{version}-core", "-lns#{version}-network", "-lns#{version}-internet",
-           "-lns#{version}-point-to-point", "-lns#{version}-applications",
-           "-std=c++17", "-o", "test"
+           "-lns#{version}-point-to-point", "-lns#{version}-applications"
     system "./test"
   end
 end

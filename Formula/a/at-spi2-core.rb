@@ -1,27 +1,37 @@
 class AtSpi2Core < Formula
   desc "Protocol definitions and daemon for D-Bus at-spi"
-  homepage "https://www.freedesktop.org/wiki/Accessibility/AT-SPI2"
-  url "https://download.gnome.org/sources/at-spi2-core/2.44/at-spi2-core-2.44.1.tar.xz"
-  sha256 "4beb23270ba6cf7caf20b597354d75194d89afb69d2efcf15f4271688ba6f746"
+  homepage "https://www.freedesktop.org/wiki/Accessibility/AT-SPI2/"
+  url "https://download.gnome.org/sources/at-spi2-core/2.54/at-spi2-core-2.54.1.tar.xz"
+  sha256 "f0729e5c8765feb1969bb6c1fba18afa2582126b0359aa75a173fda1acf93c4c"
   license "LGPL-2.1-or-later"
 
   bottle do
-    rebuild 1
-    sha256 x86_64_linux: "5886c9ff2107a4f37c76767958c35c3fb1f5547f0a6d0342b533b58bbeb47222"
+    sha256 arm64_sequoia: "4264bd769015c0ccdbb58594426089453dc8a2d87e96903bd5e472a6f4ad657a"
+    sha256 arm64_sonoma:  "242f10012d6f91d57a00cc89f493c36ac8397855c6e1054dfa53fb1de56b1d41"
+    sha256 arm64_ventura: "37647494241aaf057e9be263d3ebcbb1424d2f1bc3697623202ff5d903036adb"
+    sha256 sonoma:        "4429f84c5a3a1824cbd55a0c662123bc7d03bda08efa898a754912875a745067"
+    sha256 ventura:       "e435be0dddb4487ccd8107f6deb4eeed662e58a8f9c856a8e5ae4c8028e89a86"
+    sha256 x86_64_linux:  "6306633df318eab967fcba50c9814926df2462d67b0b3c1f5583c4233ac5dbc2"
   end
 
   depends_on "gettext" => :build
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => [:build, :test]
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => [:build, :test]
+
   depends_on "dbus"
   depends_on "glib"
   depends_on "libx11"
+  depends_on "libxi"
   depends_on "libxtst"
-  depends_on :linux
   depends_on "xorgproto"
+
+  uses_from_macos "libxml2"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     system "meson", "setup", "build", *std_meson_args
@@ -30,7 +40,7 @@ class AtSpi2Core < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       /*
        * List the applications registered on at-spi.
        */
@@ -60,7 +70,7 @@ class AtSpi2Core < Formula
 
         return 1;
       }
-    EOS
+    C
 
     pkg_config_cflags = shell_output("pkg-config --cflags --libs atspi-2").chomp.split
     system ENV.cc, "test.c", *pkg_config_cflags, "-lgobject-2.0", "-o", "test"

@@ -1,13 +1,14 @@
 class Pex < Formula
   desc "Package manager for PostgreSQL"
   homepage "https://github.com/petere/pex"
-  url "https://github.com/petere/pex/archive/1.20140409.tar.gz"
+  url "https://github.com/petere/pex/archive/refs/tags/1.20140409.tar.gz"
   sha256 "5047946a2f83e00de4096cd2c3b1546bc07be431d758f97764a36b32b8f0ae57"
   license "MIT"
   revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e234606cb3b25042d187ef86b637c01e451eaf69542a2860452704558c7f111b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "81df4ae64bf5d25705cdb0fbaf1c09ab32bc0aecb2280fea08568ecfb10ac301"
   end
 
   depends_on "libpq"

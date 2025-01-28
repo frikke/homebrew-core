@@ -18,7 +18,8 @@ class Libaio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "780180556365b75239ec9086fb73b2f77bd5c9350e9ed6d0fbd222ce758c6dcc"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "16a507765ad5025007d29b1a251ca01567a5e25ca82fe01aa4aae87e324646fc"
   end
 
   depends_on :linux
@@ -29,14 +30,14 @@ class Libaio < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libaio.h>
 
       int main(int argc, char *argv[])
       {
         struct io_event *event;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-laio", "-o", "test"
     system "./test"

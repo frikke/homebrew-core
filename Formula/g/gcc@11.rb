@@ -1,9 +1,10 @@
 class GccAT11 < Formula
   desc "GNU compiler collection"
   homepage "https://gcc.gnu.org/"
-  url "https://ftp.gnu.org/gnu/gcc/gcc-11.4.0/gcc-11.4.0.tar.xz"
-  mirror "https://ftpmirror.gnu.org/gcc/gcc-11.4.0/gcc-11.4.0.tar.xz"
-  sha256 "3f2db222b007e8a4a23cd5ba56726ef08e8b1f1eb2055ee72c1402cea73a8dd9"
+  # TODO: Remove maximum_macos if Xcode 16 support is added to https://github.com/iains/gcc-11-branch
+  url "https://ftp.gnu.org/gnu/gcc/gcc-11.5.0/gcc-11.5.0.tar.xz"
+  mirror "https://ftpmirror.gnu.org/gcc/gcc-11.5.0/gcc-11.5.0.tar.xz"
+  sha256 "a6e21868ead545cf87f0c01f84276e4b5281d672098591c1c896241f09363478"
   license "GPL-3.0-or-later" => { with: "GCC-exception-3.1" }
 
   livecheck do
@@ -12,19 +13,20 @@ class GccAT11 < Formula
   end
 
   bottle do
-    sha256                               arm64_ventura:  "3ce21c85558296a85d1d812068b7f025490677fdd5147f5f1278b59637541b22"
-    sha256                               arm64_monterey: "b24f95edca8b2f73c7d75f83d2acbf5b03b27fc5f575de84183002f093a7c77b"
-    sha256                               arm64_big_sur:  "5b069149e7d61489428816cad9143bf5ed1db6122d13026bf57c2fed22cadda0"
-    sha256                               ventura:        "c9de346027021d6d3cf858b0baf79173900930556d57b68e84a9c43acb817bc8"
-    sha256                               monterey:       "a7d2b4a88d82f6f18eea6a5f845e97a38faee6f0322156bbcedeb13cd2a591f3"
-    sha256                               big_sur:        "2256527e6fbef29473cc43c8220ac0d1274000949f64f71d7fb5e6832d251d8a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8d9a19ebac8d51fd1c9169b11ae64647fedcd041ba1e6ef3a9fa6436ec2cfa2c"
+    sha256                               arm64_sonoma:   "55ec3e36278e110b74b148fefe5ccacf82223d0fb2fceb3c8230a03bfbc2857f"
+    sha256                               arm64_ventura:  "b0936cf63d97795bfe8e17a9e4a4f75be0fd3f9407e467d5d02df1fba5caa499"
+    sha256                               arm64_monterey: "85d430ddf596edf1f14639ca164d7370a46456c017008723392fcf9cd1f91bfa"
+    sha256                               sonoma:         "9c0f839a23e3b7f12c72f3833823ca9cbd9d2b0e3a744e1d436daeeffc77cc82"
+    sha256                               ventura:        "ceae737d0fe4ec0e8fc10356007d09c9250401443b5ccd632ee960a00004cba1"
+    sha256                               monterey:       "af5d635ec43e4fc786abafe5f963ea26ac147ac10880d3ab4e2eea49948051cc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c7f02fea0754abb9c33f142cfc8d30bdc16d5d80a27ad2ca72ba562540bb1a44"
   end
 
   # The bottles are built on systems with the CLT installed, and do not work
   # out of the box on Xcode-only systems due to an incorrect sysroot.
   pour_bottle? only_if: :clt_installed
 
+  depends_on maximum_macos: [:ventura, :build] # Xcode < 16
   depends_on "gmp"
   depends_on "isl"
   depends_on "libmpc"
@@ -43,8 +45,8 @@ class GccAT11 < Formula
   # Branch from the Darwin maintainer of GCC, with a few generic fixes and
   # Apple Silicon support, located at https://github.com/iains/gcc-11-branch
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/c233b1a8d81b9c9f5827510d8d285080ee11de2e/gcc/gcc-11.4.0.diff"
-    sha256 "440f6e965966c86a7925506e63eb06f7f54c00b1d146db8d0c567bdb8820072f"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/5c9419923ddb3e5302ddd277bc524f4d4b0f8722/gcc/gcc-11.5.0.diff"
+    sha256 "213b332bd09452e0cf081f874f32d028911fa871875f85b200b55c5b588ce193"
   end
 
   def install
@@ -87,6 +89,12 @@ class GccAT11 < Formula
       # System headers may not be in /usr/include
       sdk = MacOS.sdk_path_if_needed
       args << "--with-sysroot=#{sdk}" if sdk
+
+      # Work around a bug in Xcode 15's new linker (FB13038083)
+      if DevelopmentTools.clang_build_version >= 1500
+        toolchain_path = "/Library/Developer/CommandLineTools"
+        args << "--with-ld=#{toolchain_path}/usr/bin/ld-classic"
+      end
     else
       # Fix cc1: error while loading shared libraries: libisl.so.15
       args << "--with-boot-ldflags=-static-libstdc++ -static-libgcc #{ENV.ldflags}"
@@ -97,6 +105,7 @@ class GccAT11 < Formula
       # Change the default directory name for 64-bit libraries to `lib`
       # https://stackoverflow.com/a/54038769
       inreplace "gcc/config/i386/t-linux64", "m64=../lib64", "m64="
+      inreplace "gcc/config/aarch64/t-aarch64-linux", "lp64=../lib64", "lp64="
     end
 
     mkdir "build" do
@@ -119,11 +128,11 @@ class GccAT11 < Formula
     # Rename man7.
     man7.glob("*.7") { |file| add_suffix file, version.major }
     # Even when we disable building info pages some are still installed.
-    info.rmtree
+    rm_r(info)
 
     # Work around GCC install bug
     # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105664
-    rm_rf bin.glob("*-gcc-tmp")
+    rm_r(bin.glob("*-gcc-tmp"))
   end
 
   def add_suffix(file, suffix)
@@ -157,7 +166,7 @@ class GccAT11 < Formula
       specs = libgcc/"specs"
       ohai "Creating the GCC specs file: #{specs}"
       specs_orig = Pathname.new("#{specs}.orig")
-      rm_f [specs_orig, specs]
+      rm([specs_orig, specs].select(&:exist?))
 
       system_header_dirs = ["#{HOMEBREW_PREFIX}/include"]
 
@@ -214,18 +223,18 @@ class GccAT11 < Formula
   end
 
   test do
-    (testpath/"hello-c.c").write <<~EOS
+    (testpath/"hello-c.c").write <<~C
       #include <stdio.h>
       int main()
       {
         puts("Hello, world!");
         return 0;
       }
-    EOS
-    system "#{bin}/gcc-#{version.major}", "-o", "hello-c", "hello-c.c"
+    C
+    system bin/"gcc-#{version.major}", "-o", "hello-c", "hello-c.c"
     assert_equal "Hello, world!\n", shell_output("./hello-c")
 
-    (testpath/"hello-cc.cc").write <<~EOS
+    (testpath/"hello-cc.cc").write <<~CPP
       #include <iostream>
       struct exception { };
       int main()
@@ -236,11 +245,11 @@ class GccAT11 < Formula
           catch (...) { }
         return 0;
       }
-    EOS
-    system "#{bin}/g++-#{version.major}", "-o", "hello-cc", "hello-cc.cc"
+    CPP
+    system bin/"g++-#{version.major}", "-o", "hello-cc", "hello-cc.cc"
     assert_equal "Hello, world!\n", shell_output("./hello-cc")
 
-    (testpath/"test.f90").write <<~EOS
+    (testpath/"test.f90").write <<~FORTRAN
       integer,parameter::m=10000
       real::a(m), b(m)
       real::fact=0.5
@@ -250,21 +259,21 @@ class GccAT11 < Formula
       end do
       write(*,"(A)") "Done"
       end
-    EOS
-    system "#{bin}/gfortran-#{version.major}", "-o", "test", "test.f90"
+    FORTRAN
+    system bin/"gfortran-#{version.major}", "-o", "test", "test.f90"
     assert_equal "Done\n", shell_output("./test")
 
     return unless Hardware::CPU.intel?
 
-    (testpath/"hello_d.d").write <<~EOS
+    (testpath/"hello_d.d").write <<~D
       import std.stdio;
       int main()
       {
         writeln("Hello, world!");
         return 0;
       }
-    EOS
-    system "#{bin}/gdc-#{version.major}", "-o", "hello-d", "hello_d.d"
+    D
+    system bin/"gdc-#{version.major}", "-o", "hello-d", "hello_d.d"
     assert_equal "Hello, world!\n", shell_output("./hello-d")
   end
 end

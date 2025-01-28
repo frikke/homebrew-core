@@ -1,10 +1,9 @@
 class Gambit < Formula
   desc "Software tools for game theory"
   homepage "http://www.gambit-project.org"
-  url "https://github.com/gambitproject/gambit/archive/v16.0.2.tar.gz"
-  sha256 "49837f2ccb9bb65dad2f3bba9c436c7a7df8711887e25f6bf54b074508a682d4"
+  url "https://github.com/gambitproject/gambit/archive/refs/tags/v16.3.0.tar.gz"
+  sha256 "d72e991ce935a3dc893947c413410348e2c2eb9cd912ec3b083699a4ccae4d77"
   license all_of: ["GPL-2.0-or-later", "Zlib"]
-  revision 3
 
   livecheck do
     url :stable
@@ -12,14 +11,12 @@ class Gambit < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "183dc5a8d5d31cd73296b04216727a1049cebb34788f1b58c421536a6d9d9d36"
-    sha256 cellar: :any,                 arm64_monterey: "9e8a6532979a76099a1aec227b3b581f72ace90d5d6df95ef92a9aee4695ea91"
-    sha256 cellar: :any,                 arm64_big_sur:  "8095ee116fc0670d6f2a162851c65bcfd975bafdb728c3a7748a09a59f09c72b"
-    sha256 cellar: :any,                 ventura:        "7c088cdd93af9aa729243909d2f0d1b6b4d04e2893c5b49293f22ea1b75a9059"
-    sha256 cellar: :any,                 monterey:       "bcfcbfc39abea04e9a9f724ac800042003ce9d3dd56a9bab77615825032e0ef0"
-    sha256 cellar: :any,                 big_sur:        "57c1e208efcda541d09673f8852ef2903a5bae47ddfcaccfcfa5b42b9f46070a"
-    sha256 cellar: :any,                 catalina:       "a05c834248ab760aeffe219b232ef13c10e002350e91bde1bfa4259bbb879d7c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d1ebe528c6a77da1d27ad4460732d11bc0daddaf4a7afe2a4db0e0af96991f0f"
+    sha256 cellar: :any,                 arm64_sequoia: "6256d9e52330844dda1d10774c65a57368f5209548f2d5a9fbeb2bcdb84a91f1"
+    sha256 cellar: :any,                 arm64_sonoma:  "f2895dba2b2a7ded50d39eb905ae51047dece63c9deb659175a3809edf3ded5d"
+    sha256 cellar: :any,                 arm64_ventura: "dd3135d73ac6f13cb70dd512f0e814df73e5147aa9527a5dcc1ef70189a3b62e"
+    sha256 cellar: :any,                 sonoma:        "222ccdc2f9b564c8c25fc3524745201634a892964ad325779661181dfbb28921"
+    sha256 cellar: :any,                 ventura:       "c3a9408f35080bf0962de6843a662b8184d540a19e81f863131014d7923212d7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a87956816c0145f8e347b5a2b65ebb81a51146db66d8b326fd945bfddf48330a"
   end
 
   depends_on "autoconf" => :build
@@ -29,10 +26,9 @@ class Gambit < Formula
 
   def install
     system "autoreconf", "--force", "--install", "--verbose"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--with-wx-prefix=#{Formula["wxwidgets"].opt_prefix}"
+    system "./configure", "--disable-silent-rules",
+                          "--with-wx-prefix=#{Formula["wxwidgets"].opt_prefix}",
+                          *std_configure_args
     system "make", "install"
 
     # Sanitise references to Homebrew shims
@@ -42,7 +38,6 @@ class Gambit < Formula
 
   test do
     system bin/"gambit-enumpure", pkgshare/"contrib/games/e02.efg"
-    system bin/"gambit-enumpoly", pkgshare/"contrib/games/e01.efg"
     system bin/"gambit-enummixed", pkgshare/"contrib/games/e02.nfg"
     system bin/"gambit-gnm", pkgshare/"contrib/games/e02.nfg"
     system bin/"gambit-ipa", pkgshare/"contrib/games/e02.nfg"

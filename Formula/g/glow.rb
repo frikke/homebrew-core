@@ -1,24 +1,27 @@
 class Glow < Formula
   desc "Render markdown on the CLI"
   homepage "https://github.com/charmbracelet/glow"
-  url "https://github.com/charmbracelet/glow/archive/v1.5.1.tar.gz"
-  sha256 "b4ecf269b7c6447e19591b1d23f398ef2b38a6a75be68458390b42d3efc44b92"
+  url "https://github.com/charmbracelet/glow/archive/refs/tags/v2.0.0.tar.gz"
+  sha256 "55872e36c006e7e715b86283baf14add1f85b0a0304e867dd0d80e8d7afe49a8"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3c0d7b294dd4a8a12bca0eb53c9dec78c43a98c28436bd949074ba22b6a55380"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3c0d7b294dd4a8a12bca0eb53c9dec78c43a98c28436bd949074ba22b6a55380"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3c0d7b294dd4a8a12bca0eb53c9dec78c43a98c28436bd949074ba22b6a55380"
-    sha256 cellar: :any_skip_relocation, ventura:        "b6552b824d49b18f65dda0a80364c88952e6ec64513ce3fdcff8fb748acccbbe"
-    sha256 cellar: :any_skip_relocation, monterey:       "b6552b824d49b18f65dda0a80364c88952e6ec64513ce3fdcff8fb748acccbbe"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b6552b824d49b18f65dda0a80364c88952e6ec64513ce3fdcff8fb748acccbbe"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cc5970c0f0ab674039f840c12fdb5e3764bf90c879831e6038bdb6c55ba12382"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "285b38283a9d92de47832c73aacb9ef46db02adf6814e2b3962a2dba321d7f9d"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "f2fb47736f87b48761db48dfed4a9590363d9add8862ca9f71ef492e350bd476"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f2fb47736f87b48761db48dfed4a9590363d9add8862ca9f71ef492e350bd476"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f2fb47736f87b48761db48dfed4a9590363d9add8862ca9f71ef492e350bd476"
+    sha256 cellar: :any_skip_relocation, sonoma:         "dce632f932d1e7d7548dafb8187d02b5752f4071505df75905e45bc1858f98b1"
+    sha256 cellar: :any_skip_relocation, ventura:        "dce632f932d1e7d7548dafb8187d02b5752f4071505df75905e45bc1858f98b1"
+    sha256 cellar: :any_skip_relocation, monterey:       "dce632f932d1e7d7548dafb8187d02b5752f4071505df75905e45bc1858f98b1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8c0a44d1f7c7a47053fc73f3fef4d05e12c5fd30de38d409f875f5d1f5d6e66f"
   end
 
   depends_on "go" => :build
 
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w -X main.Version=#{version}")
+
+    generate_completions_from_executable(bin/"glow", "completion")
   end
 
   test do

@@ -1,23 +1,20 @@
 class Leptonica < Formula
   desc "Image processing and image analysis library"
   homepage "http://www.leptonica.org/"
-  url "https://github.com/DanBloomberg/leptonica/releases/download/1.83.1/leptonica-1.83.1.tar.gz"
-  sha256 "8f18615e0743af7df7f50985c730dfcf0c93548073d1f56621e4156a8b54d3dd"
+  url "https://github.com/DanBloomberg/leptonica/releases/download/1.85.0/leptonica-1.85.0.tar.gz"
+  sha256 "3745ae3bf271a6801a2292eead83ac926e3a9bc1bf622e9cd4dd0f3786e17205"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "457cedb4639b87cff6b170181e565c1f135977978bc1ea64733d56b549039ffd"
-    sha256 cellar: :any,                 arm64_ventura:  "296fb19d6f6a934416ecc0f65789a0016ae1a500ac38bd67de50664d32da62e3"
-    sha256 cellar: :any,                 arm64_monterey: "b644e4e2378628b56a2a73b321c5b24296d6fc405caa611f473faa3df7de7e15"
-    sha256 cellar: :any,                 arm64_big_sur:  "8595af74ef54be9ac4ceeac23ccc90d924611fe95704e2beb159e17b317bb0ec"
-    sha256 cellar: :any,                 sonoma:         "043c3d7b9eaead2deb28afe59c26b030b4680c718c208da319cbdab80d8f2dc8"
-    sha256 cellar: :any,                 ventura:        "88df9cb03f737d381155e43acb70057b9542f6d77163288e11fb0fab8c8ed897"
-    sha256 cellar: :any,                 monterey:       "68605d71c607a9fb5167f7a3d1e5701478f133162cfaed8b4fd6efb0e0116f23"
-    sha256 cellar: :any,                 big_sur:        "e3c2af5c8374bf1f24e8c1ad2e96656a4b0476e405325855554e5e35d1c7651d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bf01d5a6a61839ed96055e37d76f53a1068f94b30953c9f31c1ddaaf4bcc38a6"
+    sha256 cellar: :any,                 arm64_sequoia: "d2d966918337ee5feda18544d4546734f77aeaf4dde87ae8979589bd97c799c1"
+    sha256 cellar: :any,                 arm64_sonoma:  "4b742a3445f7a24454ebf897551b8d49fc5cdc2ab7c93fc5a5c6ec4695292ef0"
+    sha256 cellar: :any,                 arm64_ventura: "c63d4257101ed2af4aca050ce013a6825ca189ec0f4cea03bdd650ecea77cc71"
+    sha256 cellar: :any,                 sonoma:        "97b295e17239dca10dbc284995b439594ad857afa84b9e81b12b6dd597e8daa8"
+    sha256 cellar: :any,                 ventura:       "b85f75996d77b388e32d762a3b5c9d70f6a4d6be088353822b57b52c71a4d8b6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9b2c01e724c093ba4b4bf19bdd65edcc3ff70dbc5071e5e801f07b9f24cc2d63"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "giflib"
   depends_on "jpeg-turbo"
   depends_on "libpng"
@@ -25,15 +22,15 @@ class Leptonica < Formula
   depends_on "openjpeg"
   depends_on "webp"
 
+  uses_from_macos "zlib"
+
   def install
-    system "./configure", *std_configure_args,
-                          "--with-libwebp",
-                          "--with-libopenjpeg"
+    system "./configure", "--with-libwebp", "--with-libopenjpeg", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <iostream>
       #include <leptonica/allheaders.h>
 
@@ -41,10 +38,10 @@ class Leptonica < Formula
           fprintf(stdout, "%d.%d.%d", LIBLEPT_MAJOR_VERSION, LIBLEPT_MINOR_VERSION, LIBLEPT_PATCH_VERSION);
           return 0;
       }
-    EOS
+    CPP
 
     flags = ["-I#{include}/leptonica"] + ENV.cflags.to_s.split
     system ENV.cxx, "test.cpp", *flags
-    assert_equal version.to_s, `./a.out`
+    assert_equal version.to_s, shell_output("./a.out")
   end
 end

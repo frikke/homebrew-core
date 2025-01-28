@@ -1,12 +1,12 @@
 class Libosmium < Formula
   desc "Fast and flexible C++ library for working with OpenStreetMap data"
   homepage "https://osmcode.org/libosmium/"
-  url "https://github.com/osmcode/libosmium/archive/v2.19.0.tar.gz"
-  sha256 "6911a8ca8e81d49205357177982df908af11376919f93b814cccf02f1d4d63e3"
+  url "https://github.com/osmcode/libosmium/archive/refs/tags/v2.21.0.tar.gz"
+  sha256 "5a222e555865f742102d2802a7ad7ef91d6e1c8944c097c70a924214e079c858"
   license "BSL-1.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "6914081ff3d264c208c771080b8495541c58a97e13454659d2ac0bd3779fb28d"
+    sha256 cellar: :any_skip_relocation, all: "e36c3ca06d60a08a72479e436040569bd26405fd07a2fa5c35037a07825f5191"
   end
 
   depends_on "boost" => :build
@@ -18,17 +18,22 @@ class Libosmium < Formula
   uses_from_macos "zlib"
 
   resource "protozero" do
-    url "https://github.com/mapbox/protozero/archive/v1.7.1.tar.gz"
-    sha256 "27e0017d5b3ba06d646a3ec6391d5ccc8500db821be480aefd2e4ddc3de5ff99"
+    url "https://github.com/mapbox/protozero/archive/refs/tags/v1.8.0.tar.gz"
+    sha256 "d95ca543fc42bd22b8c4bce1e6d691ce1711eda4b4910f7863449e6517fade6b"
   end
 
   def install
     resource("protozero").stage { libexec.install "include" }
-    system "cmake", ".", "-DINSTALL_GDALCPP=ON",
-                         "-DINSTALL_UTFCPP=ON",
-                         "-DPROTOZERO_INCLUDE_DIR=#{libexec}/include",
-                         *std_cmake_args
-    system "make", "install"
+
+    args = %W[
+      -DINSTALL_GDALCPP=ON
+      -DINSTALL_UTFCPP=ON
+      -DPROTOZERO_INCLUDE_DIR=#{libexec}/include
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -49,7 +54,7 @@ class Libosmium < Formula
       </osm>
     EOS
 
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <cstdlib>
       #include <iostream>
       #include <osmium/io/xml_input.hpp>
@@ -60,9 +65,9 @@ class Libosmium < Formula
         while (osmium::memory::Buffer buffer = reader.read()) {}
         reader.close();
       }
-    EOS
+    CPP
 
-    system ENV.cxx, "test.cpp", "-std=c++11", "-lexpat", "-o", "libosmium_read", "-pthread"
+    system ENV.cxx, "test.cpp", "-std=c++17", "-lexpat", "-o", "libosmium_read", "-pthread"
     system "./libosmium_read", "test.osm"
   end
 end

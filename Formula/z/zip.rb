@@ -13,9 +13,12 @@ class Zip < Formula
 
   bottle do
     rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "525f3c06d55dd30c2c67b44f28070a53c258328b669ce3a36b8d12fb5d533750"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "99265457598a09b6312520471980b7b8429ebfef5be40d3e00a0980544ff12c2"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "7dcf7b9f3dd27efa70508ea258ccaa218e7c87fd9412b9ff15ac5814e3f3555d"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "eccd9c527ca597b460197f731bf726623475b239c9372267d8c667d8ac1b68e1"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9bed17ac27c80c0553f32c572561660637547075e0c566f95805e2088e5945fb"
+    sha256 cellar: :any_skip_relocation, sonoma:         "db28293ae6aeac6f23a4d85f45358f3a618aa84c9934f1521e573a8461b8e52a"
     sha256 cellar: :any_skip_relocation, ventura:        "c35430007c35207c868add1c123dfa2833c31fcbdaff59c2af8b56ab0a284519"
     sha256 cellar: :any_skip_relocation, monterey:       "cf5690223dfcc1683280d1692d3f41339981d9b4eacf68f3dedf9cd2cbc68ec1"
     sha256 cellar: :any_skip_relocation, big_sur:        "fac1760831eeaab6595e56b31f38d2c768de2e7c214a6f646a61ef16429a4b91"
@@ -47,6 +50,13 @@ class Zip < Formula
     ]
   end
 
+  # Fix compile with newer Clang
+  # Otherwise configure thinks memset() and others are missing
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/d2b59930/zip/xcode15.diff"
+    sha256 "99cb7eeeb6fdb8df700f40bfffbc30516c94774cbf585f725d81c3224a2c530c"
+  end
+
   def install
     system "make", "-f", "unix/Makefile", "CC=#{ENV.cc}", "generic"
     system "make", "-f", "unix/Makefile", "BINDIR=#{bin}", "MANDIR=#{man1}", "install"
@@ -57,14 +67,14 @@ class Zip < Formula
     (testpath/"test2").write "Bonjour!"
     (testpath/"test3").write "Moien!"
 
-    system "#{bin}/zip", "test.zip", "test1", "test2", "test3"
-    assert_predicate testpath/"test.zip", :exist?
+    system bin/"zip", "test.zip", "test1", "test2", "test3"
+    assert_path_exists testpath/"test.zip"
     # zip -T needs unzip, disabled under Linux to avoid a circular dependency
     assert_match "test of test.zip OK", shell_output("#{bin}/zip -T test.zip") if OS.mac?
 
     # test bzip2 support that should be automatically linked in using the bzip2 library in macOS
-    system "#{bin}/zip", "-Z", "bzip2", "test2.zip", "test1", "test2", "test3"
-    assert_predicate testpath/"test2.zip", :exist?
+    system bin/"zip", "-Z", "bzip2", "test2.zip", "test1", "test2", "test3"
+    assert_path_exists testpath/"test2.zip"
     # zip -T needs unzip, disabled under Linux to avoid a circular dependency
     assert_match "test of test2.zip OK", shell_output("#{bin}/zip -T test2.zip") if OS.mac?
   end

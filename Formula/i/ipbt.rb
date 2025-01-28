@@ -1,9 +1,9 @@
 class Ipbt < Formula
   desc "Program for recording a UNIX terminal session"
   homepage "https://www.chiark.greenend.org.uk/~sgtatham/ipbt/"
-  url "https://www.chiark.greenend.org.uk/~sgtatham/ipbt/ipbt-20220403.d4e7fcd.tar.gz"
-  version "20220403"
-  sha256 "8c7f325166b86055232cca9d745c6a18dcdcb6d30a0685e07ac0eab677912b05"
+  url "https://www.chiark.greenend.org.uk/~sgtatham/ipbt/ipbt-20240909.a852474.tar.gz"
+  version "20240909"
+  sha256 "89d95b6c806461ac0dc2096732e266dfb288d08cd8cbe68df83cea9fe0895bfe"
   license "MIT"
 
   livecheck do
@@ -12,14 +12,14 @@ class Ipbt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0321ec60acd8a30dd7eeea9b679637304318669b1ed43e1b6fbb93a3277f2903"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "347ce1b20027c44a89574d58a960b3e1126a0e7b39c24e3ee855e67da6c94726"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2ef9e7bf3fa26b211ffb1fa2592b6595eea314a8aa7dbe0858cc75d877004b28"
-    sha256 cellar: :any_skip_relocation, ventura:        "782c7751fe18f69f7409be21fcf1c037d111d01b99141043dd43bd3fce30972a"
-    sha256 cellar: :any_skip_relocation, monterey:       "677064f3ddf5de10e21b57cb755659c8a5269f533d7979650377567d265d32ca"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b0db9c92b9bc916ecd88f7b67e4d5fee7378c0a85d576ba12f1e12362aec2456"
-    sha256 cellar: :any_skip_relocation, catalina:       "c58b151b7c65f18cfc11daaae87fc532d9021a9b09de9287696dcab6d4b90b43"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "13a8dfbb93b8ddf44dc033e892ed3846e1ac2760d56e0bb8b0ffb24aef465a75"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "92e01edfa69f113441a864b0a8f64ff02089a7f058da34d9a8a0d92c0cb9bdaa"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "2b9aa1ec59dbb646fa05808cd92db6f11cb16027349a2c3d29ad0bbdf56bf76f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cc6c27b8f14f12fbca7cdba7ad7f0a2fd31919f6589a2cb331fa2d490cf9d08f"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "540baf21bc21eaeac9079d0f674b00a2d5d306a8b0e6ce3fe02ef3c282f49d36"
+    sha256 cellar: :any_skip_relocation, sonoma:         "62353f1d79b73c4a914726299f572ec461d23eca472ca88c876f87e91f811fe3"
+    sha256 cellar: :any_skip_relocation, ventura:        "9679a46da3f945ff493a4235ad49a562073a6c3da5ce96b33f6731f535dfdf1c"
+    sha256 cellar: :any_skip_relocation, monterey:       "1a7a751716a0df2221e6cbfdb528720936a0c2054a219a9012765f39fe1081ad"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ee0805604e97eaceb23bc1c424867e48c4f8e158e84ab807963fbe7dce5c3d0d"
   end
 
   depends_on "cmake" => :build
@@ -27,11 +27,12 @@ class Ipbt < Formula
   uses_from_macos "ncurses"
 
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    system "#{bin}/ipbt"
+    system bin/"ipbt"
   end
 end

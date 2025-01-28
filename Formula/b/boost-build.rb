@@ -1,8 +1,8 @@
 class BoostBuild < Formula
   desc "C++ build system"
   homepage "https://www.boost.org/build/"
-  url "https://github.com/boostorg/build/archive/refs/tags/boost-1.82.0.tar.gz"
-  sha256 "34a99b0287a25b96460c78f89f29d6e6ba869c444eda8697dbcb8a7ea9ff6c86"
+  url "https://github.com/boostorg/build/archive/refs/tags/boost-1.87.0.tar.gz"
+  sha256 "827cf29078d41d6906e07f32715fccf1b4635f8995170e500b18b89a55fec10b"
   license "BSL-1.0"
   version_scheme 1
   head "https://github.com/boostorg/build.git", branch: "develop"
@@ -13,13 +13,12 @@ class BoostBuild < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1cb3bddfbcf340f3c10e953a79d8e7866f7d14e1f49f9ee5613e4a32e406031d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "8593e39c554a72af96f8c8f55f86ef042b9f53c78beab4912b82bb26acc73f7b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ba944be9122cc25bc9f381dafcdb822a845d391b33e77843fb96566b75d8af94"
-    sha256 cellar: :any_skip_relocation, ventura:        "ab83d8d3e372d41c366b11e868972d432d7edbb4983510a7b0079b7dd7d2840f"
-    sha256 cellar: :any_skip_relocation, monterey:       "c8bd4dc1776ec74fbdc18587770e90d3d97954b95f7ba558e3c7c05e353cf7d8"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4ab50110a3d3d0bf8c836484ee36c9967fd88000113ace82b29c69c934d9a4f8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7e7f8a222ac15f549aaebc1886a13c543754b9a66c29931627015047b8afa5ca"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a92b4f6677f1ead6b81704da69661f073e6daac301d7aebf7d7fba4de3b82f5f"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d7f71f2097e82437b2a63d11a24998c587fcb2c26d3ee0919400b7ebcbaaf24d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "09bd99e989f72fae2dd9d9a4cd406e178671056d801ee8fa1a58f4d250c6eb53"
+    sha256 cellar: :any_skip_relocation, sonoma:        "43c6affb034c0ce4bce611dee59a3e9fe513b3361cb02fdf05c14595e6bc967c"
+    sha256 cellar: :any_skip_relocation, ventura:       "f9d4cf057b39d46c79284e45c2ffe7049c396571693bf24d76ba85244b3fd274"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d37c59ecf713a4ab40c5cb44ff105bbaaab5cfbf463abf281d0c84b2c303d653"
   end
 
   conflicts_with "b2-tools", because: "both install `b2` binaries"
@@ -30,18 +29,17 @@ class BoostBuild < Formula
   end
 
   test do
-    (testpath/"hello.cpp").write <<~EOS
+    (testpath/"hello.cpp").write <<~CPP
       #include <iostream>
       int main (void) { std::cout << "Hello world"; }
-    EOS
-    (testpath/"Jamroot.jam").write("exe hello : hello.cpp ;")
+    CPP
+    (testpath/"Jamroot.jam").write <<~JAM
+      exe hello : hello.cpp ;
+      install install-bin : hello : <location>"#{testpath}" ;
+    JAM
 
     system bin/"b2", "release"
-
-    compiler = File.basename(ENV.cc)
-    out = Dir["bin/#{compiler}*/release/hello"]
-    assert out.length == 1
-    assert_predicate testpath/out[0], :exist?
-    assert_equal "Hello world", shell_output(out[0])
+    assert_path_exists testpath/"hello"
+    assert_equal "Hello world", shell_output("./hello")
   end
 end

@@ -13,7 +13,7 @@ class Goofys < Formula
   end
 
   # Discussion ref: https://github.com/Homebrew/homebrew-core/pull/122082#issuecomment-1436535501
-  deprecate! date: "2023-02-20", because: :does_not_build
+  disable! date: "2024-02-12", because: :does_not_build
 
   depends_on "go" => :build
   depends_on "libfuse"
@@ -27,7 +27,6 @@ class Goofys < Formula
     cd "src/github.com/kahing/goofys" do
       system "go", "build", "-o", "goofys", "-ldflags", "-X main.Version=#{Utils.git_head}"
       bin.install "goofys"
-      prefix.install_metafiles
     end
   end
 

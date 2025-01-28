@@ -1,24 +1,26 @@
 class PandocPlot < Formula
   desc "Render and include figures in Pandoc documents using many plotting toolkits"
   homepage "https://github.com/LaurentRDC/pandoc-plot"
-  url "https://hackage.haskell.org/package/pandoc-plot-1.7.0/pandoc-plot-1.7.0.tar.gz"
-  sha256 "065b5b6240661a36a0a5447274559a7ca9e9b75100e51e3760858fad644dc905"
+  url "https://hackage.haskell.org/package/pandoc-plot-1.9.1/pandoc-plot-1.9.1.tar.gz"
+  sha256 "a34a08faf483ed7c9c5e7c439ac275077b9262bb3384d1f551e47d6aa59dd434"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "05e423a3062a6726bd5071458671cfc56f13bf94a64586e682cb95f71f323371"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "91b61102d61edd3d1fa86839624d69f66ace3657aeaffaa1626102177991fcc7"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "14258e2896e38667f6db42bf296c9a547dff12740397b975fbbcc8cd1fa7ea0b"
-    sha256 cellar: :any_skip_relocation, ventura:        "255b988924910ac16a3048c375a7732d4e8cdd09824b534232b2d604ab61cfe5"
-    sha256 cellar: :any_skip_relocation, monterey:       "2f7b198c2a252971bac5d9a92412c5cc260d864862e6b13713bf4e2dfd3b83c2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a9b733f8557cebce38a80c758a7f554be2a93e1b1eede5c21043a35cb939ad84"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c07f706b8a08202b84cc0b27077a306c0cb29149ec8e75504616154372a968fa"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "277fe6f242119166f8d77f2b07b109129425ed673547fbaaa2d6f01e68c5d7c3"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4647b4e4e30b594f08bd6c871dac82b26d7bb1fbe75d850a77d8c445a1b8774a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "a576bb85965c0aaab47ea0d10b1ce99310ce7ea453361e28f90fd6142644da7c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "eb0f022f0722c571818a6d9a4786e6aa92ed6a7ce0af8e47ce43bae83dd0c193"
+    sha256 cellar: :any_skip_relocation, ventura:       "624f4ee454a269b92a633a306632b99e0365e952b0bd2de17e40bfec21443fb6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "177f0c90f6cb82159908834ad1ad93a3b60d4df9e282036862a9b9634f29bb2f"
   end
 
   depends_on "cabal-install" => :build
-  depends_on "ghc" => :build
+  depends_on "ghc@9.10" => :build
   depends_on "graphviz" => :test
+
   depends_on "pandoc"
+
+  uses_from_macos "zlib"
 
   def install
     system "cabal", "v2-update"
@@ -26,7 +28,7 @@ class PandocPlot < Formula
   end
 
   test do
-    input_markdown_1 = <<~EOS
+    input_markdown_1 = <<~MARKDOWN
       # pandoc-plot demo
 
       ```{.graphviz}
@@ -34,9 +36,9 @@ class PandocPlot < Formula
         pandoc -> plot
       }
       ```
-    EOS
+    MARKDOWN
 
-    input_markdown_2 = <<~EOS
+    input_markdown_2 = <<~MARKDOWN
       # repeat the same thing
 
       ```{.graphviz}
@@ -44,18 +46,18 @@ class PandocPlot < Formula
         pandoc -> plot
       }
       ```
-    EOS
+    MARKDOWN
 
     output_html_1 = pipe_output("pandoc --filter #{bin}/pandoc-plot -f markdown -t html5", input_markdown_1)
     output_html_2 = pipe_output("pandoc --filter #{bin}/pandoc-plot -f markdown -t html5", input_markdown_2)
     filename = output_html_1.match(%r{(plots/[\da-z]+\.png)}i)
 
-    expected_html_2 = <<~EOS
+    expected_html_2 = <<~HTML
       <h1 id="repeat-the-same-thing">repeat the same thing</h1>
       <figure>
       <img src="#{filename}" />
       </figure>
-    EOS
+    HTML
 
     assert_equal expected_html_2, output_html_2
   end

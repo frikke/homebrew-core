@@ -17,15 +17,18 @@ class Clisp < Formula
   end
 
   livecheck do
-    url "https://ftp.gnu.org/gnu/clisp/release/?C=M&O=D"
-    regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["' >]}i)
+    url "https://alpha.gnu.org/gnu/clisp/?C=M&O=D"
+    regex(/href=.*?clisp[._-]v?(\d+(?:\.\d+)+)\.t/i)
     strategy :page_match
   end
 
   bottle do
+    sha256 cellar: :any, arm64_sequoia:  "a01927a4f8f0c88f8aca8aa3ca0d52745d17bd352239651719042e414f5c8f90"
+    sha256 cellar: :any, arm64_sonoma:   "e94752975afb5181821d2eff44c22247d224fabf1961ada3e0091cca6352d067"
     sha256 cellar: :any, arm64_ventura:  "2be9e60ec5595599b60733d43ade1ea29007214d3c05837d58cffc43bfb6e412"
     sha256 cellar: :any, arm64_monterey: "bfad1c6c3b4787711bc126ed360647a6ad6458dd24ff4cd9e3be5252b897ed82"
     sha256 cellar: :any, arm64_big_sur:  "8108810c5af0ce990d9052ca96f6aa75af1f59589a103e21a86f8b1f2e801956"
+    sha256 cellar: :any, sonoma:         "00920ed9b13c34a10e199cbea5703ed30e1e2bf2aa9047fc07b4bc406f98050c"
     sha256 cellar: :any, ventura:        "16c062ce5c0d6ff467fe082d36bc22a0455972c19a34e37520eb0134f77b24ec"
     sha256 cellar: :any, monterey:       "b2fc7c67341df7f9766f66054445e342bd61acc22c7260bac3589266ba78f8a3"
     sha256 cellar: :any, big_sur:        "4b81399840c98918cda6447d86852ffcb96294f228cb26f6c289f22d90df5a7a"
@@ -49,9 +52,9 @@ class Clisp < Formula
   end
 
   test do
-    (testpath/"main.lisp").write <<~EOS
+    (testpath/"main.lisp").write <<~LISP
       (format t "Hello, World!")
-    EOS
+    LISP
     assert_equal "Hello, World!", shell_output(bin/"clisp main.lisp").chomp
   end
 end

@@ -1,8 +1,8 @@
 class Tin < Formula
   desc "Threaded, NNTP-, and spool-based UseNet newsreader"
   homepage "http://www.tin.org"
-  url "https://www.nic.funet.fi/pub/unix/news/tin/v2.6/tin-2.6.2.tar.xz"
-  sha256 "91df3cc009017ac0fcc6bb8b625784a0a006f921fb0fd5b87229f74edb1d068c"
+  url "https://sunsite.icm.edu.pl/pub/unix/news/tin/v2.6/tin-2.6.4.tar.xz"
+  sha256 "c66a1e8db30ddabe7e3313e6870f7877fe20f0da99afb65db3d8c41012fe55f7"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,20 +11,19 @@ class Tin < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256                               arm64_ventura:  "279325cdda955514a69d824ce8a10a5d93e2118561133fa8b1adc5a3c847e4c6"
-    sha256                               arm64_monterey: "20081eeca41e91c2cd9d23313fc97180e92f19f6f375dce9dc7a361298e5f709"
-    sha256                               arm64_big_sur:  "e7d9f551293c92c6a2726856204303eb18e122e24693bbf1b4efb93a51c2c8b5"
-    sha256                               ventura:        "bd598a16a48913db70e0ee74bf976b9ad62a7e5219046fdf587d6578f768cfbf"
-    sha256                               monterey:       "7b2fab82e93e8a5a769cb83a781ba4e95b14b623d40c14b93d160c8075a280f5"
-    sha256                               big_sur:        "26d6c3893d0db776c0ed9d03a9436739137fa1b9c006b19449702066fe11e0e8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "386f648f9235e7ddfa23de2e0e5a6e6cf7af4c4045ca316037819b002640adbb"
+    sha256                               arm64_sequoia: "3d597df858bc4fffb3f8be38154eaf650d981fbd36a609e1a0eb8b1113a01086"
+    sha256                               arm64_sonoma:  "e729c23660a5a51cb38391405c50fec69f2713c8517e319e4f425894ac1d98c5"
+    sha256                               arm64_ventura: "0bab093b5385450e3f87471243afe4b341443a141b971f5a02f7ad82a161f13b"
+    sha256                               sonoma:        "b426577ee9e85591383eb389a0b2077228699af99fe7f7fdf5cc942f8b486264"
+    sha256                               ventura:       "e9ee890eefb1b3cdde1c3c4420fab41c632163b30ce7429d74a67bf03b092fd6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7da69315726b0f03dd42918f5e545befd3afc660d08f2b6ec70f1a651c421abb"
   end
 
   depends_on "pcre2"
 
   uses_from_macos "bison" => :build
   uses_from_macos "ncurses"
+  uses_from_macos "zlib"
 
   on_macos do
     depends_on "gettext"
@@ -34,7 +33,7 @@ class Tin < Formula
 
   def install
     # Remove bundled libraries
-    %w[intl pcre].each { |l| (buildpath/l).rmtree }
+    rm_r buildpath/"pcre"
 
     system "./configure", *std_configure_args,
                           "--mandir=#{man}",
@@ -44,6 +43,6 @@ class Tin < Formula
   end
 
   test do
-    system "#{bin}/tin", "-H"
+    system bin/"tin", "-H"
   end
 end

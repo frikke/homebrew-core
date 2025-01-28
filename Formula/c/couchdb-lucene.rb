@@ -1,15 +1,18 @@
 class CouchdbLucene < Formula
   desc "Full-text search of CouchDB documents using Lucene"
   homepage "https://github.com/rnewson/couchdb-lucene"
-  url "https://github.com/rnewson/couchdb-lucene/archive/v2.1.0.tar.gz"
+  url "https://github.com/rnewson/couchdb-lucene/archive/refs/tags/v2.1.0.tar.gz"
   sha256 "8297f786ab9ddd86239565702eb7ae8e117236781144529ed7b72a967224b700"
   license "Apache-2.0"
   revision 2
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "e51dc09d265658f719623e8e19ae3500b9e798fddb6baacbfe17f31d5ed41dfd"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "f739d9de763e66d5ccfbfb3d14034352e0d9e0c4e37799aca78487b395f029a2"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "eaa814fcca3f76e89a767b2ee41759690e5cfe7b90fac27e9b1c8be31c54126b"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "5729f57b791c90e176835e8ec3b21889b0a8e8b9dcd57c3e995cf377b8b0cd84"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dd2d73a35db77da8eaed04fc2f1afb87dcc995c1f79acbae54e831c36782b286"
+    sha256 cellar: :any_skip_relocation, sonoma:         "a0bc6e1e6d57a43c6e38f9a10179104dcb080a9c1256026bfd1b6b3502ebbd2b"
     sha256 cellar: :any_skip_relocation, ventura:        "3db1128166f7c71200fcccf92414e16fc1a0f20921bd00a46460f508716aacbe"
     sha256 cellar: :any_skip_relocation, monterey:       "0bdd89c21b0a7f779e79afe8b44f816aa84a47680f78888d3ef9ca60d9bc59d6"
     sha256 cellar: :any_skip_relocation, big_sur:        "8c75a95f3c1909e99602f51ed4c55fc2eb495910d8772b9b693347c633141715"
@@ -17,6 +20,8 @@ class CouchdbLucene < Formula
     sha256 cellar: :any_skip_relocation, mojave:         "d7e8191c66bc938d7c8e15c10c13612be41ef601f5f6ab78b9ef5275c04bf89d"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "0d08b00d0ef852160eb6f5fef96f8cc9387b2fa4c29a792cfe9a13ccdf2d690b"
   end
+
+  disable! date: "2024-12-13", because: :repo_archived
 
   depends_on "maven" => :build
   depends_on "couchdb"
@@ -26,8 +31,7 @@ class CouchdbLucene < Formula
     system "mvn"
     system "tar", "-xzf", "target/couchdb-lucene-#{version}-dist.tar.gz", "--strip", "1"
 
-    prefix.install_metafiles
-    rm_rf Dir["bin/*.bat"]
+    rm_r(Dir["bin/*.bat"])
     libexec.install Dir["*"]
 
     env = Language::Java.overridable_java_home_env

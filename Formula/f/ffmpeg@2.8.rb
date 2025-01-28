@@ -1,12 +1,12 @@
 class FfmpegAT28 < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-2.8.21.tar.xz"
-  sha256 "e5d956c19bff2aa5bdd60744509c9d8eb01330713d52674a7f650d54b570c82d"
+  url "https://ffmpeg.org/releases/ffmpeg-2.8.22.tar.xz"
+  sha256 "1fbbf622806a112c5131d42b280a9e980f676ffe1c81a4e0f2ae4cb121241531"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
-  revision 2
+  revision 4
 
   livecheck do
     url "https://ffmpeg.org/download.html"
@@ -14,18 +14,17 @@ class FfmpegAT28 < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "39ab9275cf8e96084bf71186064c3b44a266bb9738bfbed6e276182acbc62c9e"
-    sha256 arm64_monterey: "e2933796de987f8b85ccf3a8ad0cfc762866a5d51cea54fd0202d74c64736050"
-    sha256 arm64_big_sur:  "be1a0c4ce83319cb11a6df578ac665968e8ce79696229bcb3d9624cdf1c1dca2"
-    sha256 ventura:        "1de0658a8355e4879bed836d15f58e30832b42ed3b0b968c810874d5408d5eb1"
-    sha256 monterey:       "7d9ed87744201a90e1c40432484584b5485e359002f982796e07425dfe85a8e3"
-    sha256 big_sur:        "b68fb395e1651b58d0f5edd40f49bbaf7a9a02b2f5aa1466dd62a991ea967676"
-    sha256 x86_64_linux:   "c82117dfcbefff995ca06b5f033ffa37f7ba0b1e22030083a9e440c536e8c86b"
+    sha256 arm64_sequoia: "13a13bc5e5925cc58c9537f0855fe2850c337af0f6399f1ae9fdf51fe143a383"
+    sha256 arm64_sonoma:  "9172b677b6d999bb32f9f71bc02707feadd7506dd89faf34f15ad815278acf3b"
+    sha256 arm64_ventura: "e65a35476a811374581f95b18feb2e245963064b8fc5e7c05d13e9e572673c87"
+    sha256 sonoma:        "18b83d9f3571338fba54ed29c94c0179067179104c8f08279e3df88d5f20618b"
+    sha256 ventura:       "b340b32bce5da478d359568816637da29a3efcf514cf07084ea9a921e3aec274"
+    sha256 x86_64_linux:  "5dada8be047205bd21c2f1d7b56e78595e42c8f89b3a6a6446645c26e0da1d07"
   end
 
   keg_only :versioned_formula
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "texi2html" => :build
   depends_on "yasm" => :build
 
@@ -34,10 +33,12 @@ class FfmpegAT28 < Formula
   depends_on "frei0r"
   depends_on "lame"
   depends_on "libass"
+  depends_on "libogg"
   depends_on "libvo-aacenc"
   depends_on "libvorbis"
   depends_on "libvpx"
   depends_on "opencore-amr"
+  depends_on "openssl@3"
   depends_on "opus"
   depends_on "rtmpdump"
   depends_on "sdl12-compat"
@@ -47,11 +48,20 @@ class FfmpegAT28 < Formula
   depends_on "x264"
   depends_on "x265"
   depends_on "xvid"
-  depends_on "xz" # try to change to uses_from_macos after python is not a dependency
+  depends_on "xz"
+
+  uses_from_macos "bzip2"
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "alsa-lib"
+  end
 
   def install
+    # Work-around for build issue with Xcode 15.3
+    ENV.append_to_cflags "-Wno-incompatible-function-pointer-types" if DevelopmentTools.clang_build_version >= 1500
+
     args = %W[
-      --prefix=#{prefix}
       --enable-shared
       --enable-pthreads
       --enable-gpl
@@ -80,6 +90,7 @@ class FfmpegAT28 < Formula
       --enable-libopencore-amrwb
       --enable-librtmp
       --enable-libspeex
+      --enable-vda
       --disable-indev=jack
       --disable-libxcb
       --disable-xlib
@@ -87,17 +98,7 @@ class FfmpegAT28 < Formula
 
     args << "--enable-opencl" if OS.mac?
 
-    # A bug in a dispatch header on 10.10, included via CoreFoundation,
-    # prevents GCC from building VDA support. GCC has no problems on
-    # 10.9 and earlier.
-    # See: https://github.com/Homebrew/homebrew/issues/33741
-    args << if ENV.compiler == :clang
-      "--enable-vda"
-    else
-      "--disable-vda"
-    end
-
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args.reject { |s| s["--disable-dependency-tracking"] }
 
     inreplace "config.mak" do |s|
       shflags = s.get_make_var "SHFLAGS"
@@ -115,6 +116,6 @@ class FfmpegAT28 < Formula
     # Create an example mp4 file
     mp4out = testpath/"video.mp4"
     system bin/"ffmpeg", "-y", "-filter_complex", "testsrc=rate=1:duration=1", mp4out
-    assert_predicate mp4out, :exist?
+    assert_path_exists mp4out
   end
 end

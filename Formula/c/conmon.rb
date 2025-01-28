@@ -1,16 +1,16 @@
 class Conmon < Formula
   desc "OCI container runtime monitor"
   homepage "https://github.com/containers/conmon"
-  url "https://github.com/containers/conmon/archive/refs/tags/v2.1.8.tar.gz"
-  sha256 "e72c090210a03ca3b43a0fad53f15bca90bbee65105c412468009cf3a5988325"
+  url "https://github.com/containers/conmon/archive/refs/tags/v2.1.12.tar.gz"
+  sha256 "842f0b5614281f7e35eec2a4e35f9f7b9834819aa58ecdad8d0ff6a84f6796a6"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "7395ca1145b1f25da94ed751c6d2f8ab65a15940e51680688a8583abb0dd7465"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "359daaba693d6bfa76c073e9f329fdd360ef59fa00d87cc1dd7e50c1b6a3d1a2"
   end
 
   depends_on "go" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   depends_on "glib"
   depends_on "libseccomp"

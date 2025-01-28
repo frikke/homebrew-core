@@ -3,7 +3,7 @@ class Intercal < Formula
   homepage "http://catb.org/~esr/intercal/"
   url "http://catb.org/~esr/intercal/intercal-0.31.tar.gz"
   sha256 "93d842b81ecdc82b352beb463fbf688749b0c04445388a999667e1958bba4ffc"
-  license "GPL-2.0"
+  license "GPL-2.0-or-later"
 
   # The latest version tags in the Git repository are `0.31` (2019-06-12) and
   # `0.30` (2015-04-02) but there are older versions like `1.27` (2010-08-25)
@@ -18,6 +18,7 @@ class Intercal < Formula
   end
 
   bottle do
+    sha256 sonoma:       "bdbcb6b6741a84e30ab923c62dc0dbced0348ba9c35b95f9441bdc4bb821130a"
     sha256 ventura:      "996598c6c8145f0a45dac7109aa3cb39b5854396b58c3b7ab75c784844160877"
     sha256 monterey:     "a691470666ee0f15af22265be65eda2757fabd8f6fbc5fa8341f8c3059749d34"
     sha256 big_sur:      "487fc70071a54c09cccdbba0284db23c156983b76416a4b4c03f44130531213c"
@@ -37,6 +38,10 @@ class Intercal < Formula
 
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
+
+  on_macos do
+    depends_on arch: :x86_64 # test fails on arm64
+  end
 
   def install
     if build.head?

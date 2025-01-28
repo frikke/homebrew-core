@@ -2,34 +2,32 @@ class Fprettify < Formula
   include Language::Python::Virtualenv
 
   desc "Auto-formatter for modern fortran source code"
-  homepage "https://github.com/pseewald/fprettify/"
-  url "https://github.com/pseewald/fprettify/archive/v0.3.7.tar.gz"
+  homepage "https://github.com/fortran-lang/fprettify/"
+  url "https://github.com/fortran-lang/fprettify/archive/refs/tags/v0.3.7.tar.gz"
   sha256 "052da19a9080a6641d3202e10572cf3d978e6bcc0e7db29c1eb8ba724e89adc7"
   license "GPL-3.0-or-later"
-  head "https://github.com/pseewald/fprettify.git", branch: "master"
+  head "https://github.com/fortran-lang/fprettify.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4eaf9f8515de83e38a2279f945676e4c634b7831f91095b1da7321fc58dcb39c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4eaf9f8515de83e38a2279f945676e4c634b7831f91095b1da7321fc58dcb39c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4eaf9f8515de83e38a2279f945676e4c634b7831f91095b1da7321fc58dcb39c"
-    sha256 cellar: :any_skip_relocation, ventura:        "e7bf15a8edcf12f4aa936c7da9ce8e771f84a9e4177897351a87d25d1f281ba6"
-    sha256 cellar: :any_skip_relocation, monterey:       "e7bf15a8edcf12f4aa936c7da9ce8e771f84a9e4177897351a87d25d1f281ba6"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e7bf15a8edcf12f4aa936c7da9ce8e771f84a9e4177897351a87d25d1f281ba6"
-    sha256 cellar: :any_skip_relocation, catalina:       "e7bf15a8edcf12f4aa936c7da9ce8e771f84a9e4177897351a87d25d1f281ba6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "51fb193432c7ed43d63e9b13a8e946058f91277e3d601abfa7f5de25f56a4b70"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, all: "f9d9e214fb3810e34036e058e5dd26087ff761ff4ff07d993badd0eeb2de2de5"
   end
 
   depends_on "gcc" => :test
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  resource "configargparse" do
+    url "https://files.pythonhosted.org/packages/70/8a/73f1008adfad01cb923255b924b1528727b8270e67cb4ef41eabdc7d783e/ConfigArgParse-1.7.tar.gz"
+    sha256 "e7067471884de5478c58a511e529f0f9bd1c66bfef1dea90935438d6c23306d1"
+  end
 
   def install
     virtualenv_install_with_resources
   end
 
   test do
-    system "#{bin}/fprettify", "--version"
-    (testpath/"test.f90").write <<~EOS
+    system bin/"fprettify", "--version"
+    (testpath/"test.f90").write <<~FORTRAN
       program demo
       integer :: endif,if,elseif
       integer,DIMENSION(2) :: function
@@ -43,8 +41,8 @@ class Fprettify < Formula
       print*,endif
       endif
       end program
-    EOS
-    system "#{bin}/fprettify", testpath/"test.f90"
+    FORTRAN
+    system bin/"fprettify", testpath/"test.f90"
     ENV.fortran
     system ENV.fc, testpath/"test.f90", "-o", testpath/"test"
     system testpath/"test"

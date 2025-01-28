@@ -3,100 +3,115 @@ class OpenaiWhisper < Formula
 
   desc "General-purpose speech recognition model"
   homepage "https://github.com/openai/whisper"
-  url "https://files.pythonhosted.org/packages/80/8b/13b7bf32b83fce396a814678661afdb8839b6b4713b3f2f2bc1499888654/openai-whisper-20230314.tar.gz"
-  sha256 "7a8e62334f97a8d143b439ae8ed6638d78f41ad921a0205382354004b7271725"
+  url "https://files.pythonhosted.org/packages/f5/77/952ca71515f81919bd8a6a4a3f89a27b09e73880cebf90957eda8f2f8545/openai-whisper-20240930.tar.gz"
+  sha256 "b7178e9c1615576807a300024f4daa6353f7e1a815dac5e38c33f1ef055dd2d2"
   license "MIT"
+  revision 1
   head "https://github.com/openai/whisper.git", branch: "main"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_ventura:  "2b50faf647c94306e10382f23edc5e417d1ea2729981adc5794dbeb726e7112c"
-    sha256 cellar: :any,                 arm64_monterey: "e65e96ce611455d093548ebe8470677e9dd5adb7736a670e5658f86a65bc94af"
-    sha256 cellar: :any,                 monterey:       "987fb47740fd27b3501570f99d7f22ce1b5454713d9fbf31ae81c43c0eacfe6b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "71780b5c1f8bed96dd915f1a37434831ecca2ac472a444d79e5a44d716292f71"
+    sha256 cellar: :any,                 arm64_sequoia: "fb20c184addee014fbd43a8035592e76c148b5ea8ce30e22fd5b1f17ca38b7aa"
+    sha256 cellar: :any,                 arm64_sonoma:  "2ff5f9e031d71cdc3b66795bfadb17c67f9ad75466e695ad601dde1a60dce069"
+    sha256 cellar: :any,                 arm64_ventura: "175aba1ee80e67f54dae13ef88f265a53cce12e0acf3c43353a780cf11979573"
+    sha256 cellar: :any,                 sonoma:        "60a4054c514839aade340a6f9e394c57f1f6d43e8f85bad84aa775c2aa5d49a3"
+    sha256 cellar: :any,                 ventura:       "3b78fc5f446614ae7367a8c8204da6f3af00501437381e40306c904ad1dcad88"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d1b019e05f4ec4d9a1cab322adc279ec2d89d07b32e0fa48b906902a3eaeb2c6"
   end
 
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build # for tiktoken
+  depends_on "certifi"
   depends_on "ffmpeg"
-  depends_on "huggingface-cli"
-  depends_on "llvm@14"
-  depends_on "python@3.11"
+  depends_on "llvm@16" # LLVM 17 PR: https://github.com/numba/llvmlite/pull/1042
+  depends_on "numpy"
+  depends_on "python@3.13"
   depends_on "pytorch"
-  depends_on "pyyaml"
 
-  on_linux do
-    depends_on "pkg-config" => :build
+  resource "charset-normalizer" do
+    url "https://files.pythonhosted.org/packages/f2/4f/e1808dc01273379acc506d18f1504eb2d299bd4131743b9fc54d7be4df1e/charset_normalizer-3.4.0.tar.gz"
+    sha256 "223217c3d4f82c3ac5e29032b3f1c2eb0fb591b72161f86d93f5719079dae93e"
   end
 
-  resource "ffmpeg-python" do
-    url "https://files.pythonhosted.org/packages/dd/5e/d5f9105d59c1325759d838af4e973695081fbbc97182baf73afc78dec266/ffmpeg-python-0.2.0.tar.gz"
-    sha256 "65225db34627c578ef0e11c8b1eb528bb35e024752f6f10b78c011f6f64c4127"
-  end
-
-  resource "future" do
-    url "https://files.pythonhosted.org/packages/8f/2e/cf6accf7415237d6faeeebdc7832023c90e0282aa16fd3263db0eb4715ec/future-0.18.3.tar.gz"
-    sha256 "34a17436ed1e96697a86f9de3d15a3b0be01d8bc8de9c1dffd59fb8234ed5307"
+  resource "idna" do
+    url "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz"
+    sha256 "12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"
   end
 
   resource "llvmlite" do
-    url "https://files.pythonhosted.org/packages/fe/82/3405e76ec3eac1857002ea79d8ce7e6314e27d025aecddab01e9c0179636/llvmlite-0.40.0rc1.tar.gz"
-    sha256 "f87877f4703bbc73b2c1a872a5487f4720031b9ad7bc8e2bf3dc5fe616db6b15"
+    # Fetch from Git hash for compatibility with the new version of `numba` below.
+    # Use git checkout to avoid .gitattributes causing checksum changes and unknown version info
+    url "https://github.com/numba/llvmlite.git",
+        revision: "ca123c3ae2a6f7db865661ae509862277ec5d692"
+  end
+
+  resource "more-itertools" do
+    url "https://files.pythonhosted.org/packages/51/78/65922308c4248e0eb08ebcbe67c95d48615cc6f27854b6f2e57143e9178f/more-itertools-10.5.0.tar.gz"
+    sha256 "5482bfef7849c25dc3c6dd53a6173ae4795da2a41a80faea6700d9f5846c5da6"
   end
 
   resource "numba" do
-    url "https://files.pythonhosted.org/packages/f0/51/cc9d67b9357ac04e7c838dfa880acbfee0c15e02ca5a35b3e064a36131f7/numba-0.57.1.tar.gz"
-    sha256 "33c0500170d213e66d90558ad6aca57d3e03e97bb11da82e6d87ab793648cb17"
-  end
-
-  # numba needs to support numpy 1.25, https://github.com/numba/numba/issues/8698
-  resource "numpy" do
-    url "https://files.pythonhosted.org/packages/2c/d4/590ae7df5044465cc9fa2db152ae12468694d62d952b1528ecff328ef7fc/numpy-1.24.3.tar.gz"
-    sha256 "ab344f1bf21f140adab8e47fdbc7c35a477dc01408791f8ba00d018dd0bc5155"
+    # Fetch from Git hash for numpy 2.1 and python 3.13 compatibility.
+    # Use git checkout to avoid .gitattributes causing checksum changes and unknown version info
+    url "https://github.com/numba/numba.git",
+        revision: "391511bcb0b97af8d311cd276a46030774bc30b7"
   end
 
   resource "regex" do
-    url "https://files.pythonhosted.org/packages/d8/29/bd8de07107bc952e0e2783243024e1c125e787fd685725a622e4ac7aeb3c/regex-2023.3.23.tar.gz"
-    sha256 "dc80df325b43ffea5cdea2e3eaa97a44f3dd298262b1c7fe9dbb2a9522b956a7"
+    url "https://files.pythonhosted.org/packages/f9/38/148df33b4dbca3bd069b963acab5e0fa1a9dbd6820f8c322d0dd6faeff96/regex-2024.9.11.tar.gz"
+    sha256 "6c188c307e8433bcb63dc1915022deb553b4203a70722fc542c363bf120a01fd"
+  end
+
+  resource "requests" do
+    url "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz"
+    sha256 "55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"
   end
 
   resource "tiktoken" do
-    url "https://files.pythonhosted.org/packages/fb/d9/c38fee002c5979f29c182aee8e28c31538eabf40022e304f97ff82324199/tiktoken-0.3.1.tar.gz"
-    sha256 "8295912429374f5f3c6c6bf053a091ce1de8c1792a62e3b30d4ad36f47fa8b52"
+    url "https://files.pythonhosted.org/packages/37/02/576ff3a6639e755c4f70997b2d315f56d6d71e0d046f4fb64cb81a3fb099/tiktoken-0.8.0.tar.gz"
+    sha256 "9ccbb2740f24542534369c5635cfd9b2b3c2490754a78ac8831d99f89f94eeb2"
   end
 
-  resource "test-audio" do
-    url "https://raw.githubusercontent.com/openai/whisper/7858aa9c08d98f75575035ecd6481f462d66ca27/tests/jfk.flac"
-    sha256 "63a4b1e4c1dc655ac70961ffbf518acd249df237e5a0152faae9a4a836949715"
+  resource "tqdm" do
+    url "https://files.pythonhosted.org/packages/58/83/6ba9844a41128c62e810fddddd72473201f3eacde02046066142a2d96cc5/tqdm-4.66.5.tar.gz"
+    sha256 "e1020aef2e5096702d8a025ac7d16b1577279c9d63f8375b63083e9a5f0fcbad"
   end
 
-  resource "test-model" do
-    url "https://openaipublic.azureedge.net/main/whisper/models/d3dd57d32accea0b295c96e26691aa14d8822fac7d9d27d5dc00b4ca2826dd03/tiny.en.pt"
-    sha256 "d3dd57d32accea0b295c96e26691aa14d8822fac7d9d27d5dc00b4ca2826dd03"
+  resource "urllib3" do
+    url "https://files.pythonhosted.org/packages/ed/63/22ba4ebfe7430b76388e7cd448d5478814d3032121827c12a2cc287e2260/urllib3-2.2.3.tar.gz"
+    sha256 "e7d814a81dad81e6caf2ec9fdedb284ecc9c73076b62654547cc64ccdcae26e9"
   end
 
   def install
-    python3 = "python3.11"
-    venv = virtualenv_create(libexec, python3)
-    ENV["LLVM_CONFIG"] = Formula["llvm@14"].opt_bin/"llvm-config"
-    venv.pip_install resources.reject { |r| r.name.start_with? "test-" }
-    venv.pip_install_and_link buildpath
+    ENV["LLVM_CONFIG"] = Formula["llvm@16"].opt_bin/"llvm-config"
+    inreplace "setup.py", "version=read_version()", "version='#{version}'"
+    venv = virtualenv_install_with_resources without: "numba"
 
-    # link dependent virtualenvs to this one
-    site_packages = Language::Python.site_packages(python3)
-    paths = %w[pytorch huggingface-cli].map do |package_name|
-      package = Formula[package_name].opt_libexec
-      package/site_packages
-    end
-    (libexec/site_packages/"homebrew-deps.pth").write paths.join("\n")
+    # We depend on pytorch, but that's a separate formula, so install a `.pth` file to link them.
+    # NOTE: This is an exception to our usual policy as building `pytorch` is complicated
+    site_packages = Language::Python.site_packages(venv.root/"bin/python3")
+    pth_contents = "import site; site.addsitedir('#{Formula["pytorch"].opt_libexec/site_packages}')\n"
+    (venv.site_packages/"homebrew-pytorch.pth").write pth_contents
+
+    # We install `numba` separately without build isolation to avoid building another `numpy`
+    venv.pip_install(resource("numba"), build_isolation: false)
   end
 
   test do
-    testpath.install resource("test-audio")
-    (testpath/"models").install resource("test-model")
+    resource "homebrew-test-audio" do
+      url "https://raw.githubusercontent.com/openai/whisper/7858aa9c08d98f75575035ecd6481f462d66ca27/tests/jfk.flac"
+      sha256 "63a4b1e4c1dc655ac70961ffbf518acd249df237e5a0152faae9a4a836949715"
+    end
+
+    resource "homebrew-test-model" do
+      url "https://openaipublic.azureedge.net/main/whisper/models/d3dd57d32accea0b295c96e26691aa14d8822fac7d9d27d5dc00b4ca2826dd03/tiny.en.pt"
+      sha256 "d3dd57d32accea0b295c96e26691aa14d8822fac7d9d27d5dc00b4ca2826dd03"
+    end
+
+    testpath.install resource("homebrew-test-audio")
+    (testpath/"models").install resource("homebrew-test-model")
     # for some unknown reason, the file is installed as `tests` rather than `jfk.flac`
-    system "#{bin}/whisper", "tests", "--model", "tiny.en", "--model_dir", "models", "--output_format", "txt"
-    transcription = File.read("tests.txt")
-    assert_equal transcription, <<~EOS
+    system bin/"whisper", "tests", "--model", "tiny.en", "--model_dir", "models", "--output_format", "txt"
+    assert_equal <<~EOS, (testpath/"tests.txt").read
       And so, my fellow Americans ask not what your country can do for you
       ask what you can do for your country.
     EOS

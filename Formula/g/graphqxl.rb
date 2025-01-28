@@ -1,19 +1,20 @@
 class Graphqxl < Formula
   desc "Language for creating big and scalable GraphQL server-side schemas"
   homepage "https://gabotechs.github.io/graphqxl"
-  url "https://github.com/gabotechs/graphqxl/archive/refs/tags/v0.39.0.tar.gz"
-  sha256 "46c9331f12ffd9fb0d5d9d00116315adbf0f53b8eb6aa6db6d675ee861bd65c4"
+  url "https://github.com/gabotechs/graphqxl/archive/refs/tags/v0.40.2.tar.gz"
+  sha256 "2ddc205e3943e97273984e64bdac3d41c70b87eb408976d7d2108163fca35d4e"
   license "MIT"
   head "https://github.com/gabotechs/graphqxl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f032e6335417a0095a2f554d811c8c089b3ac65badd518dcb1d22b40ca28775b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f9a71aa0bd56882621eb24f5ccff6dd8034329e34a71cd52b4d56b65bbb4a268"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7452c9d8e43dfb5d4a74ba1b0dc7d7a409b6a8d4493668b8f07ae5e01ef599ca"
-    sha256 cellar: :any_skip_relocation, ventura:        "07d6aa6dc0e58bc0822f994cd79e75e45e8f969f14af28534697ccafcd7bbc34"
-    sha256 cellar: :any_skip_relocation, monterey:       "f84714cec431e0cf0dc317fe2bbbe5f4bf232b2fc9c9476bf403729fefabb12e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b6d0f904cf302e4b752f470368e6c1d909746a770396f9ad009880f001c0a37b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "662474fd9fdaec4d3ba8635fbdee1997c6103c0b3f56356eda11e5d94ad0f6fe"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "18eac4ebc83fcdae08fbc9fb551a1bcb8482c335a6fb8e8dcbbf4094b2d68a54"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "db650e0cf356bd6d3110efdee992a5fa0274aefe1c1234f3346088892f5fb4ef"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "da797791cfabeead0366235dac708006bfedb1484dee814bc50099c8fbb63b74"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "eaa39d46d3686e1333450664b027cbc6c3647da3500f7dcd579562cb7be434fd"
+    sha256 cellar: :any_skip_relocation, sonoma:         "7f6672a7d830d21d5a8650857ec9abf5cf28085547afc9bc5fccb7beed939840"
+    sha256 cellar: :any_skip_relocation, ventura:        "b891e5456d2bc434589d9f8e3bfc6f30c6b94792a546e8bdbbc54f1930b57702"
+    sha256 cellar: :any_skip_relocation, monterey:       "b373aa6635fb39ab61ba72892128510c76e797ac2bac64021aa2830b9d36c070"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0590778c7bf3f82a06c692f8dd55b47a24f97aff7ed5fa23e37d61dc8f074492"
   end
 
   depends_on "rust" => :build
@@ -26,6 +27,6 @@ class Graphqxl < Formula
     test_file = testpath/"test.graphqxl"
     test_file.write "type MyType { foo: String! }"
     system bin/"graphqxl", test_file
-    assert_equal "type MyType {\n  foo: String!\n}\n\n\n", (testpath/"test.graphql").read
+    assert_equal "type MyType {\n  foo: String!\n}\n\n", (testpath/"test.graphql").read
   end
 end

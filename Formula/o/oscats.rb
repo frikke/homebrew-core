@@ -3,22 +3,27 @@ class Oscats < Formula
   homepage "https://code.google.com/archive/p/oscats/"
   url "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/oscats/oscats-0.6.tar.gz"
   sha256 "2f7c88cdab6a2106085f7a3e5b1073c74f7d633728c76bd73efba5dc5657a604"
-  revision 6
+  license "GPL-3.0-or-later"
+  revision 7
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "3ec330e90206d25a5d892d835f6bd6ab42bc1c21f557a578e4875add50315eff"
-    sha256 cellar: :any,                 arm64_monterey: "8f09201bc284042b8bc6b011e32b51a1d538a6296ffc131b42a185b97abc434f"
-    sha256 cellar: :any,                 arm64_big_sur:  "b5c6f901dc2b45d722e956303ed3641fe01244e68f62fa8cf10470cc3265b958"
-    sha256 cellar: :any,                 ventura:        "8b192935c2d2e8464a7fcd794ef01bb3c54b254791edbe4b2490a5e2a48ee4b3"
-    sha256 cellar: :any,                 monterey:       "c9d55286b8b305eae9dfb3197106f554b0d1bdcf92633d6c6427f5344a850f1c"
-    sha256 cellar: :any,                 big_sur:        "73cb9b21da4992eff3d190c845f4155b0944c5fad019fdd283cee03c85227de6"
-    sha256 cellar: :any,                 catalina:       "95b0bdf846ead03d50cd163c7f457049684a4b6c07cb30a7c2cd4953adb43389"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "51df849c182c9456521c13b109ac58acc24df705578bfacc3be312ba49e1405e"
+    sha256 cellar: :any,                 arm64_sequoia:  "14bdf254ea5eb224c087cc3bdc7ba53b46d52b77e2c440f738871e747ad7e33a"
+    sha256 cellar: :any,                 arm64_sonoma:   "ee65d5fb7e853cf11866ad5d82e42443a2c899089538f7563a3d63268af2855e"
+    sha256 cellar: :any,                 arm64_ventura:  "dae032204b3f3d0d874482bec11e6ba4cc34cdf088929e5e432e75960800ddd2"
+    sha256 cellar: :any,                 arm64_monterey: "f348f164c17601c6fe88cbf6c0e403615f6466c286fdc6b7b5a809e0c4af0347"
+    sha256 cellar: :any,                 sonoma:         "13bd95cd190928092251cd826497867f03f36d6a3f4f1deee6e00577c2bb4c23"
+    sha256 cellar: :any,                 ventura:        "cafcdb6c91e58beebb50ab5fdf28a7f9246df0256be3285a49f70e6b79f6323c"
+    sha256 cellar: :any,                 monterey:       "d86233a0472773367baa7cded028f338d8ee4121b742bfa8a0aa9fd275ac95fe"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cea14d82ea0d9f7fea63cbd5364ccd2a85d0d8b8e02a498904b3f1bec140712c"
   end
 
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "glib"
   depends_on "gsl"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   # Fix -flat_namespace being used on Big Sur and later.
   patch do
@@ -42,15 +47,15 @@ class Oscats < Formula
     if OS.mac?
       inreplace pkgshare/"examples/Makefile",
         Superenv.shims_path/"pkg-config",
-        Formula["pkg-config"].opt_bin/"pkg-config"
+        Formula["pkgconf"].opt_bin/"pkg-config"
     else
       inreplace pkgshare/"examples/Makefile", Superenv.shims_path/"ld", "ld"
     end
   end
 
   test do
-    pkg_config_flags = shell_output("pkg-config --cflags --libs oscats glib-2.0").chomp.split
-    system ENV.cc, pkgshare/"examples/ex01.c", *pkg_config_flags, "-o", "ex01"
+    pkgconf_flags = shell_output("pkgconf --cflags --libs oscats glib-2.0").chomp.split
+    system ENV.cc, pkgshare/"examples/ex01.c", *pkgconf_flags, "-o", "ex01"
     assert_match "Done", shell_output("#{testpath}/ex01")
   end
 end

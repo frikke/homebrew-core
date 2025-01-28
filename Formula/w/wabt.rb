@@ -2,9 +2,10 @@ class Wabt < Formula
   desc "Web Assembly Binary Toolkit"
   homepage "https://github.com/WebAssembly/wabt"
   url "https://github.com/WebAssembly/wabt.git",
-      tag:      "1.0.33",
-      revision: "963f973469b45969ce198e0c86d3af316790a780"
+      tag:      "1.0.36",
+      revision: "3e826ecde1adfba5f88d10d361131405637e65a3"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -12,29 +13,37 @@ class Wabt < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "420800d9acb60c8bb5a8cdeed2bd6f3f1a2e35e048dd8b2d3d09cfb097461d0d"
-    sha256 cellar: :any,                 arm64_monterey: "d8c1cd106d8b9bffee03675b55702b66752cfc7d8191997e939fb682882103ff"
-    sha256 cellar: :any,                 arm64_big_sur:  "7148f5d2dfa56da56a4df51843493a2a5f72b1bae748da0e5e94a8484d4c1db7"
-    sha256 cellar: :any,                 ventura:        "cafbe4b7f8cd4b86aaefa31ae01a3fe67d24614c7414eaf6eeb6258a784bdbf3"
-    sha256 cellar: :any,                 monterey:       "9db80d4b0eb11cc665eba586100ea872a70f5773ed32554b19ebe83e35990317"
-    sha256 cellar: :any,                 big_sur:        "b52a3276d284cd520b8f07d32d8de17a71650d135ccda2044a05edaa2cad9bb1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a5d76141576f861a87c72b94da7fc0009f67de6a9a0c4469dc985d215de8b369"
+    sha256 cellar: :any,                 arm64_sequoia: "9c8c3383a667f9930bf6b7e92a5ecfada06d52dc973aaebfe74fad1c9cf413e9"
+    sha256 cellar: :any,                 arm64_sonoma:  "6623b6eda3ef06355df0aa5826f0048ed47363608df17fe4ce04b083723ba68a"
+    sha256 cellar: :any,                 arm64_ventura: "cacc4321f1793cf3de5ce0cd5c7e815bb304b9d685a5be0b42d08d8cb08d2969"
+    sha256 cellar: :any,                 sonoma:        "0177a246fb21ff547aa0df436f337ab1923e3d7e87ff521e8a9e27b2df9b66b4"
+    sha256 cellar: :any,                 ventura:       "a3a3ba1408a348483f6b710080ad55eb0a02d367fde5a457bb9164683472b21e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9db533eaf5d9e50fc16896ae6525eda7a3a0b0bbc512578b652d1ff0a79bde2e"
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.11" => :build
   depends_on "openssl@3"
 
-  fails_with gcc: "5" # C++17
+  uses_from_macos "python" => :build
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DBUILD_TESTS=OFF", "-DWITH_WASI=ON"
+    ENV.append_to_cflags "-fPIC" if OS.linux?
+
+    args = %w[
+      -DBUILD_TESTS=OFF
+      -DWITH_WASI=ON
+      -DFETCHCONTENT_FULLY_DISCONNECTED=OFF
+    ]
+
+    system "cmake", *args, *std_cmake_args
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
     (testpath/"sample.wast").write("(module (memory 1) (func))")
-    system "#{bin}/wat2wasm", testpath/"sample.wast"
+    system bin/"wat2wasm", testpath/"sample.wast"
   end
 end

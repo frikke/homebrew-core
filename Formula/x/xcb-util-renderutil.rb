@@ -6,6 +6,7 @@ class XcbUtilRenderutil < Formula
   license all_of: ["X11", "HPND-sell-variant"]
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "098b22877ee1d5c2c16b1827117f13f95566c1bf06d042943170c6590a06e379"
     sha256 cellar: :any,                 arm64_sonoma:   "f2533358b260aa2fb9f819e75a259123791bb4838b2bd1a2986f756e248c3109"
     sha256 cellar: :any,                 arm64_ventura:  "2ed461a699bf32016f2a95f313ed16c492dfedd98249dd86b2b6e558374fb0ae"
     sha256 cellar: :any,                 arm64_monterey: "295e5e58b68d75ee1938c78dda67904e0ba42ed6173357ea357f22140069b7dd"
@@ -19,23 +20,22 @@ class XcbUtilRenderutil < Formula
   end
 
   head do
-    url "https://gitlab.freedesktop.org/xorg/lib/libxcb-render-util.git"
+    url "https://gitlab.freedesktop.org/xorg/lib/libxcb-render-util.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "libxcb"
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
+    system "./configure", "--disable-silent-rules",
                           "--localstatedir=#{var}",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules"
+                          "--sysconfdir=#{etc}",
+                          *std_configure_args
     system "make"
     system "make", "install"
   end

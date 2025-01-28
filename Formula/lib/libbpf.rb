@@ -1,19 +1,18 @@
 class Libbpf < Formula
   desc "Berkeley Packet Filter library"
   homepage "https://github.com/libbpf/libbpf"
-  url "https://github.com/libbpf/libbpf/archive/refs/tags/v1.2.2.tar.gz"
-  sha256 "32b0c41eabfbbe8e0c8aea784d7495387ff9171b5a338480a8fbaceb9da8d5e5"
+  url "https://github.com/libbpf/libbpf/archive/refs/tags/v1.5.0.tar.gz"
+  sha256 "53492aff6dd47e4da04ef5e672d753b9743848bdb38e9d90eafbe190b7983c44"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "550513c17e3dbc0f32727c7d4b49963ba7923dca98cabbee0f495db26d6c303b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "ff0139bb799097722a2a15a5593ebb0c6e13ba2e8f61f8add855bef223329c33"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "elfutils"
   depends_on :linux
-
-  uses_from_macos "zlib"
+  depends_on "zlib"
 
   def install
     system "make", "-C", "src"
@@ -21,7 +20,7 @@ class Libbpf < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "bpf/libbpf.h"
       #include <stdio.h>
 
@@ -29,7 +28,7 @@ class Libbpf < Formula
         printf("%s", libbpf_version_string());
         return(0);
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lbpf", "-o", "test"
     system "./test"
   end

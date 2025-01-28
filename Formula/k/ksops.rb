@@ -1,28 +1,33 @@
 class Ksops < Formula
   desc "Flexible Kustomize Plugin for SOPS Encrypted Resources"
   homepage "https://github.com/viaduct-ai/kustomize-sops"
-  url "https://github.com/viaduct-ai/kustomize-sops/archive/refs/tags/v4.2.2.tar.gz"
-  sha256 "46f6cff603b5676f19bd0f4491c7d959e74848eb9f06b58494193522a1a8ebd4"
+  url "https://github.com/viaduct-ai/kustomize-sops/archive/refs/tags/v4.3.3.tar.gz"
+  sha256 "a843b5bbb036027c72bc37fce29135362b8a13e58e6d53a760ed0b7dbe8fe66b"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f7e324076fc702d99057b4d80c415e438141e1ce02dd2dbddbd228104305bcdc"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "fd3e25f2ae18519158931033936b7ff747fe4e1d2ac80c8a534a7928560ebf51"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "61d2fcae523d6da5d4516cd499ce0558dba6983d73ca1a05f83d08307b89db78"
-    sha256 cellar: :any_skip_relocation, ventura:        "7b33a44e303f1b0f486dca09b5aa5adf67bf3797f7a5063504202cf18d75b310"
-    sha256 cellar: :any_skip_relocation, monterey:       "f9a62e68c2a2a45aef933c36a15f150014150b72d333a9a3d8e73b3516681d1c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9ec80fb46fe7446b60c3c3822368f6788a7e10d6c34852f47581e49916a80cdd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c3ec68212748d6ac5f7c4c85feb844862c82dd0a763f5267c5f2be63a50b82f3"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4c851554d1663594aeedb701c14d4c21334585127d1395a02141ed112f9cb9f3"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4c851554d1663594aeedb701c14d4c21334585127d1395a02141ed112f9cb9f3"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "4c851554d1663594aeedb701c14d4c21334585127d1395a02141ed112f9cb9f3"
+    sha256 cellar: :any_skip_relocation, sonoma:        "ba4199945f5682c4cc98067651b0a77f8ef649f0ca598d4e331c03e371a587f0"
+    sha256 cellar: :any_skip_relocation, ventura:       "ba4199945f5682c4cc98067651b0a77f8ef649f0ca598d4e331c03e371a587f0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1a5a67b172d1685c7eb4b4bd22c08445db9afe73a139c9827d3dcd1ce4ceda07"
   end
 
   depends_on "go" => :build
+
+  # update go.mod, upstream pr ref, https://github.com/viaduct-ai/kustomize-sops/pull/269
+  patch do
+    url "https://github.com/viaduct-ai/kustomize-sops/commit/feb0eae92c10c1e248928be55f6577f28b6468a8.patch?full_index=1"
+    sha256 "a9dbae051b35f209bb64bf783f3d2c36f6b26cd395abe3d92dbbd996793a965d"
+  end
 
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do
-    (testpath/"secret-generator.yaml").write <<~EOS
+    (testpath/"secret-generator.yaml").write <<~YAML
       apiVersion: viaduct.ai/v1
       kind: ksops
       metadata:
@@ -32,7 +37,8 @@ class Ksops < Formula
             exec:
               path: ksops
       files: []
-    EOS
+    YAML
+
     system bin/"ksops", testpath/"secret-generator.yaml"
   end
 end

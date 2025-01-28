@@ -1,10 +1,10 @@
 class ScalaAT213 < Formula
   desc "JVM-based programming language"
   homepage "https://www.scala-lang.org/"
-  url "https://downloads.lightbend.com/scala/2.13.12/scala-2.13.12.tgz"
-  mirror "https://www.scala-lang.org/files/archive/scala-2.13.12.tgz"
-  mirror "https://downloads.typesafe.com/scala/2.13.12/scala-2.13.12.tgz"
-  sha256 "afe7e6fb59e3c88457e99f7018730e52fba27c8d15e3d7154f72968206ca8719"
+  url "https://downloads.lightbend.com/scala/2.13.16/scala-2.13.16.tgz"
+  mirror "https://www.scala-lang.org/files/archive/scala-2.13.16.tgz"
+  mirror "https://downloads.typesafe.com/scala/2.13.16/scala-2.13.16.tgz"
+  sha256 "937f743be315302caad15be99ab1ca425ff7e63f15ef5790db6c81bb49543256"
   license "Apache-2.0"
 
   livecheck do
@@ -13,7 +13,7 @@ class ScalaAT213 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "cb864999538aabed7a9fc26c7282a960a1de978b9a3e92de80194793e5f47efa"
+    sha256 cellar: :any_skip_relocation, all: "7095101fa3ff5a8bef712c14a3fde138274e2765afb17b33d447a0e4eb33c966"
   end
 
   keg_only :versioned_formula
@@ -45,13 +45,13 @@ class ScalaAT213 < Formula
 
   test do
     file = testpath/"Test.scala"
-    file.write <<~EOS
+    file.write <<~SCALA
       object Test {
         def main(args: Array[String]): Unit = {
           println(s"${2 + 2}")
         }
       }
-    EOS
+    SCALA
 
     out = shell_output("#{bin}/scala #{file}").strip
 

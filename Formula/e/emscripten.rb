@@ -1,10 +1,10 @@
-require "language/node"
-
 class Emscripten < Formula
   desc "LLVM bytecode to JavaScript compiler"
   homepage "https://emscripten.org/"
-  url "https://github.com/emscripten-core/emscripten/archive/3.1.46.tar.gz"
-  sha256 "2c1474286f6b3a06b3442a57ba043f809849573a179db681c6a350bf327ce360"
+  # To automate fetching the required resource revisions, you can use this helper script:
+  #   https://gist.github.com/carlocab/2db1d7245fa0cd3e92e01fe37b164021
+  url "https://github.com/emscripten-core/emscripten/archive/refs/tags/4.0.1.tar.gz"
+  sha256 "bf0d1cba7b05f0eb4814d2278a11ed9c8f1b9724f848c61d63193079d10dd9a7"
   license all_of: [
     "Apache-2.0", # binaryen
     "Apache-2.0" => { with: "LLVM-exception" }, # llvm
@@ -18,19 +18,21 @@ class Emscripten < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "437499ad734beb3a26d056ab4fc0094e03a960ff9ac129a8703ef0f941c335c9"
-    sha256 cellar: :any,                 arm64_monterey: "0468ce004d374eb22f3bb61c2d59e60ad3e6df784f595b0b8aa36bd079614f5e"
-    sha256 cellar: :any,                 arm64_big_sur:  "e128662febaeb9ba2bd7c0cfb4cc19b749a115ca3dbf5ebd016de77b2091808e"
-    sha256 cellar: :any,                 ventura:        "9942eb140dd053356af58cb6d00f8abf683de8fd7350dbf09cb43b920a0f8e7d"
-    sha256 cellar: :any,                 monterey:       "040f49e834c757385005d8633cb05ae04632aed635e7ad273ea3ee1ab7d8527a"
-    sha256 cellar: :any,                 big_sur:        "194b81958ad918e230c6e61ff20946714034ac752e53100cd975ae064018eb39"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2b0b7c70b67419eac81187b9b98ce59ba022e19517671c73803757ceb9b1731f"
+    sha256 cellar: :any,                 arm64_sequoia: "b3dfe758865342c2d0e36c7deeeb06dc5c437c63f3a2671f321ad1e2a932775a"
+    sha256 cellar: :any,                 arm64_sonoma:  "d3083a7fb4f1d309dbb2abe6dccca479e98280303c5a5b15f7eebefedd9e4b8b"
+    sha256 cellar: :any,                 arm64_ventura: "1efb5436cc88243829631028e2bca160d90857e7e9812b83f710261f047371e2"
+    sha256 cellar: :any,                 sonoma:        "5c0f3b5e3ded0336ada62eae10803d348622ad9f5d66e37500c388f40b6d67d1"
+    sha256 cellar: :any,                 ventura:       "a0b7f1a491ff1223763eeb1e51956b3aa86320f7ca3ec18902b9f374814239f1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f672f4f602d8a6507ce7d3649a870b1bc5c10738e11b661d88dcadcd11569f0d"
   end
 
   depends_on "cmake" => :build
   depends_on "node"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "yuicompressor"
+
+  uses_from_macos "llvm" => :build
+  uses_from_macos "zlib"
 
   # OpenJDK is needed as a dependency on Linux and ARM64 for google-closure-compiler,
   # an emscripten dependency, because the native GraalVM image will not work.
@@ -44,26 +46,34 @@ class Emscripten < Formula
     depends_on "openjdk"
   end
 
-  fails_with gcc: "5"
+  # We use LLVM to work around an error while building bundled `google-benchmark` with GCC
+  fails_with :gcc do
+    cause <<~EOS
+      .../third-party/benchmark/src/thread_manager.h:50:31: error: expected ‘)’ before ‘(’ token
+         50 |   GUARDED_BY(GetBenchmarkMutex()) Result results;
+            |                               ^
+    EOS
+  end
 
   # Use emscripten's recommended binaryen revision to avoid build failures.
   # https://github.com/emscripten-core/emscripten/issues/12252
-  # See llvm resource below for instructions on how to update this.
+  # To find the correct binaryen revision, find the corresponding version commit at:
+  # https://github.com/emscripten-core/emsdk/blob/main/emscripten-releases-tags.json
+  # Then take this commit and go to:
+  # https://chromium.googlesource.com/emscripten-releases/+/<commit>/DEPS
+  # Then use the listed binaryen_revision for the revision below.
   resource "binaryen" do
     url "https://github.com/WebAssembly/binaryen.git",
-        revision: "16a59938563c93d8459bf36679c83497aeba7cc7"
+        revision: "e4bfcd2a06db0640bfbf1654f575239ecab72443"
   end
 
   # emscripten does not support using the stable version of LLVM.
   # https://github.com/emscripten-core/emscripten/issues/11362
-  # To find the correct llvm revision, find a corresponding commit at:
-  # https://github.com/emscripten-core/emsdk/blob/main/emscripten-releases-tags.json
-  # Then take this commit and go to:
-  # https://chromium.googlesource.com/emscripten-releases/+/<commit>/DEPS
-  # Then use the listed llvm_project_revision for the resource below.
+  # See binaryen resource above for instructions on how to update this.
+  # Then use the listed llvm_project_revision for the tarball below.
   resource "llvm" do
-    url "https://github.com/llvm/llvm-project.git",
-        revision: "75501f53624de92aafce2f1da698b249a7293dc7"
+    url "https://github.com/llvm/llvm-project/archive/a32e36faf84bd7da3df0c7d50bb9020568128417.tar.gz"
+    sha256 "ef59e10e9df3aa5eb4152871c170be719469e691951c52b310cd0185b7fbde7b"
   end
 
   def install
@@ -80,7 +90,7 @@ class Emscripten < Formula
     libexec.install buildpath.children
 
     # Remove unneeded files. See `tools/install.py`.
-    (libexec/"test/third_party").rmtree
+    rm_r(libexec/"test/third_party")
 
     # emscripten needs an llvm build with the following executables:
     # https://github.com/emscripten-core/emscripten/blob/#{version}/docs/packaging.md#dependencies
@@ -157,24 +167,26 @@ class Emscripten < Formula
     end
 
     cd libexec do
-      system "npm", "install", *Language::Node.local_npm_install_args
-      rm_f "node_modules/ws/builderror.log" # Avoid references to Homebrew shims
+      system "npm", "install", *std_npm_args(prefix: false)
       # Delete native GraalVM image in incompatible platforms.
       if OS.linux?
-        rm_rf "node_modules/google-closure-compiler-linux"
+        rm_r("node_modules/google-closure-compiler-linux")
       elsif Hardware::CPU.arm?
-        rm_rf "node_modules/google-closure-compiler-osx"
+        rm_r("node_modules/google-closure-compiler-osx")
       end
     end
 
     # Add JAVA_HOME to env_script on ARM64 macOS and Linux, so that google-closure-compiler
     # can find OpenJDK
-    emscript_env = { PYTHON: Formula["python@3.11"].opt_bin/"python3.11" }
+    emscript_env = { PYTHON: Formula["python@3.13"].opt_bin/"python3.13" }
     emscript_env.merge! Language::Java.overridable_java_home_env if OS.linux? || Hardware::CPU.arm?
 
     emscripts.each do |emscript|
       (bin/emscript).write_env_script libexec/emscript, emscript_env
     end
+
+    # Replace universal binaries with their native slices
+    deuniversalize_machos libexec/"node_modules/fsevents/fsevents.node"
   end
 
   def post_install
@@ -186,7 +198,6 @@ class Emscripten < Formula
       s.change_make_var! "LLVM_ROOT", "'#{libexec}/llvm/bin'"
       s.change_make_var! "BINARYEN_ROOT", "'#{libexec}/binaryen'"
       s.change_make_var! "NODE_JS", "'#{Formula["node"].opt_bin}/node'"
-      s.change_make_var! "JAVA", "'#{Formula["openjdk"].opt_bin}/java'"
     end
   end
 
@@ -203,21 +214,21 @@ class Emscripten < Formula
   end
 
   test do
+    ENV["EM_CACHE"] = testpath
+
     # We're targeting WASM, so we don't want to use the macOS SDK here.
     ENV.remove_macosxsdk if OS.mac?
     # Avoid errors on Linux when other formulae like `sdl12-compat` are installed
     ENV.delete "CPATH"
 
-    ENV["NODE_OPTIONS"] = "--no-experimental-fetch"
-
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       int main()
       {
         printf("Hello World!");
         return 0;
       }
-    EOS
+    C
 
     system bin/"emcc", "test.c", "-o", "test.js", "-s", "NO_EXIT_RUNTIME=0"
     assert_equal "Hello World!", shell_output("node test.js").chomp

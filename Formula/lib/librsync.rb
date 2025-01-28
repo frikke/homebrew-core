@@ -1,11 +1,12 @@
 class Librsync < Formula
   desc "Library that implements the rsync remote-delta algorithm"
   homepage "https://librsync.github.io/"
-  url "https://github.com/librsync/librsync/archive/v2.3.4.tar.gz"
+  url "https://github.com/librsync/librsync/archive/refs/tags/v2.3.4.tar.gz"
   sha256 "a0dedf9fff66d8e29e7c25d23c1f42beda2089fb4eac1b36e6acd8a29edfbd1f"
   license "LGPL-2.1-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "d9636c7490adcc95354151caa325f5a88d79eae4579427afe070624cf0704ce8"
     sha256 cellar: :any,                 arm64_sonoma:   "1a4dd37b91633fb0ca4ff0298be03a5877762a2a25dc50f97da96b50de64cdb6"
     sha256 cellar: :any,                 arm64_ventura:  "ecf222fd327da97f55371c9c790dd373a4ff7c5db9ad8d3d94a18235c77cd7dd"
     sha256 cellar: :any,                 arm64_monterey: "e2062c102af08ddda0befc3c942256fc1e9135c1f3a5ace59cb89033b2fd430b"
@@ -21,8 +22,10 @@ class Librsync < Formula
   depends_on "popt"
 
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
     man1.install "doc/rdiff.1"
     man3.install "doc/librsync.3"
   end

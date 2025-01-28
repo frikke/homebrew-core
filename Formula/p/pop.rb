@@ -1,14 +1,17 @@
 class Pop < Formula
   desc "Send emails from your terminal"
   homepage "https://github.com/charmbracelet/pop"
-  url "https://github.com/charmbracelet/pop/archive/v0.2.0.tar.gz"
+  url "https://github.com/charmbracelet/pop/archive/refs/tags/v0.2.0.tar.gz"
   sha256 "360db66ff46cf6331b2851f53477b7bf3a49303b0b46aaacff3d6c1027bf3f40"
   license "MIT"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "f942784cbbe4d0e5e24f74f9e4431d8a798d6109c2ea3f483405430ca7279f5b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "dfda627b23f5fe1cef94ea1f9932edcd93f8930af29e6ded7161546112e30e60"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "03eb314794237b4fc005f0d7128d4679dda5415979c7ee28646d8c88f176a696"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "03eb314794237b4fc005f0d7128d4679dda5415979c7ee28646d8c88f176a696"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "03eb314794237b4fc005f0d7128d4679dda5415979c7ee28646d8c88f176a696"
+    sha256 cellar: :any_skip_relocation, sonoma:         "6d3084e9113707d91e78dad216111b682b2a3d3e69a2113f16bdd1afbf154815"
     sha256 cellar: :any_skip_relocation, ventura:        "4e17cddc694a0d7da02829d8dd7039dad792b31801468cd13beac526a0855d2b"
     sha256 cellar: :any_skip_relocation, monterey:       "4e17cddc694a0d7da02829d8dd7039dad792b31801468cd13beac526a0855d2b"
     sha256 cellar: :any_skip_relocation, big_sur:        "4e17cddc694a0d7da02829d8dd7039dad792b31801468cd13beac526a0855d2b"

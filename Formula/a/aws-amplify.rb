@@ -1,31 +1,28 @@
-require "language/node"
-
 class AwsAmplify < Formula
   desc "Build full-stack web and mobile apps in hours. Easy to start, easy to scale"
-  homepage "https://aws.amazon.com/amplify"
-  url "https://registry.npmjs.org/@aws-amplify/cli-internal/-/cli-internal-12.4.0.tgz"
-  sha256 "a0d9016b2fcda8f911314310e8ca05ce1e2b699181afc05fcbae67f265866283"
+  homepage "https://aws.amazon.com/amplify/"
+  url "https://registry.npmjs.org/@aws-amplify/cli-internal/-/cli-internal-12.14.1.tgz"
+  sha256 "df63d83a593eb955668d2e019828b02549916e862eab145fa59e0e9aeac557b7"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "08c0fb9cb26db8d867406614a10e8d95e9af7f6c85be7116fad540cafdd1c389"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "08c0fb9cb26db8d867406614a10e8d95e9af7f6c85be7116fad540cafdd1c389"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "08c0fb9cb26db8d867406614a10e8d95e9af7f6c85be7116fad540cafdd1c389"
-    sha256 cellar: :any_skip_relocation, ventura:        "6d137a1236a705e24793e929744a4e4ec4060d657ef02a3fd1fff8da70e7476e"
-    sha256 cellar: :any_skip_relocation, monterey:       "6d137a1236a705e24793e929744a4e4ec4060d657ef02a3fd1fff8da70e7476e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "6d137a1236a705e24793e929744a4e4ec4060d657ef02a3fd1fff8da70e7476e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3baed96d99cf449db41d3a09b086225e68b3d2b27086a739833420679a543fbb"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c4949f7d3af0d80fb711d74642af27516cbd7faf78a420fbdc1639a65b61cf84"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c4949f7d3af0d80fb711d74642af27516cbd7faf78a420fbdc1639a65b61cf84"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c4949f7d3af0d80fb711d74642af27516cbd7faf78a420fbdc1639a65b61cf84"
+    sha256 cellar: :any_skip_relocation, sonoma:        "38a3901a6bc2eb414cde8721b973f05e0fc5c2927afafde0e9419d50e159c2a0"
+    sha256 cellar: :any_skip_relocation, ventura:       "38a3901a6bc2eb414cde8721b973f05e0fc5c2927afafde0e9419d50e159c2a0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "25e0e00492060234a6a833a34939d7b213da3b5c1230ca8d557afb2255cf27bb"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
-    bin.install_symlink Dir["#{libexec}/bin/*"]
+    system "npm", "install", *std_npm_args
+    bin.install_symlink libexec.glob("bin/*")
 
     unless Hardware::CPU.intel?
-      rm_rf "#{libexec}/lib/node_modules/@aws-amplify/cli-internal/node_modules" \
-            "/@aws-amplify/amplify-frontend-ios/resources/amplify-xcode"
+      rm_r "#{libexec}/lib/node_modules/@aws-amplify/cli-internal/node_modules" \
+           "/@aws-amplify/amplify-frontend-ios/resources/amplify-xcode"
     end
 
     # Remove non-native libsqlite4java files
@@ -43,9 +40,6 @@ class AwsAmplify < Formula
     (node_modules/"amplify-dynamodb-simulator/emulator/DynamoDBLocal_lib").glob("libsqlite4java-*").each do |f|
       rm f if f.basename.to_s != "libsqlite4java-#{os}-#{arch}"
     end
-
-    # Replace universal binaries with native slices
-    deuniversalize_machos node_modules/"fsevents/fsevents.node"
   end
 
   test do

@@ -1,27 +1,33 @@
 class Liblcf < Formula
   desc "Library for RPG Maker 2000/2003 games data"
   homepage "https://easyrpg.org/"
-  url "https://easyrpg.org/downloads/player/0.8/liblcf-0.8.tar.xz"
-  sha256 "6b0d8c7fefe3d66865336406f69ddf03fe59e52b5601687265a4d1e47a25c386"
   license "MIT"
-  revision 1
+  revision 4
   head "https://github.com/EasyRPG/liblcf.git", branch: "master"
 
+  stable do
+    url "https://easyrpg.org/downloads/player/0.8/liblcf-0.8.tar.xz"
+    sha256 "6b0d8c7fefe3d66865336406f69ddf03fe59e52b5601687265a4d1e47a25c386"
+
+    # Backport C++17 for `icu4c` 75. Remove in the next release.
+    patch do
+      url "https://github.com/EasyRPG/liblcf/commit/8c782e54ba244981141d91e7d44922952563677c.patch?full_index=1"
+      sha256 "593f729e7f9a5411e6d8548aaac0039e09eee437f525409a9ca8513a0ee15cd0"
+    end
+  end
+
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "b57f87219c7ad74923beef95e855e86792b7e9c00c1185c5e45c1a05abae7dae"
-    sha256 cellar: :any,                 arm64_ventura:  "06aff4bc7c277c9c98b2901a720a49673ad5c7d9be52a3920cb657388edb9335"
-    sha256 cellar: :any,                 arm64_monterey: "151d6daeb6f60ad56cf37569269498bda0c4d14874ce9e04d06ca5dc14dad46f"
-    sha256 cellar: :any,                 arm64_big_sur:  "37b4ca74a5ddd4f08651005cc9a74bf79cc22501df866be6016ffc00e3c01a25"
-    sha256 cellar: :any,                 sonoma:         "8d937b355f970ae9511f80e191776198fc3473e7a22068385e3b3d40efe2d3e6"
-    sha256 cellar: :any,                 ventura:        "31a39c74c9522f9033cc00d33a3858ef46df167b9c72c4f2a19aa04c1681cc9b"
-    sha256 cellar: :any,                 monterey:       "766c6ca63a83b08a67d1d45223effa736b6725fc118dac65db9e9ec9d5aff0a8"
-    sha256 cellar: :any,                 big_sur:        "1289ad51f7274e2a58d004ee702a59a80cfff8313483eb89607292353e41e51c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "47297a9348edb42e46b7b990d5531423004c168d628fb5a1fae6ae7fd6bfc9fd"
+    sha256 cellar: :any,                 arm64_sequoia: "6355bad431149665ce69b11026f48ccb0ae58505476fb0e6557fb136a11f865b"
+    sha256 cellar: :any,                 arm64_sonoma:  "2a91602aa71bc7965bc685914619e140d2b76a13459d648c88deb4de928ead63"
+    sha256 cellar: :any,                 arm64_ventura: "974f251736ba73d68903ad6ca9b46af831eb158b371690cfc699dffd0f209023"
+    sha256 cellar: :any,                 sonoma:        "e4e8950dcb83fcbebbce42dd72e3ae62b63eacef56530c97af1d4e9347eeb7c9"
+    sha256 cellar: :any,                 ventura:       "2acbd7fde87895999e6d46da68e7d3af88f0079be342a02c20490c58b34d2748"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "36aa0604b238176ba7e17c14c9c29e80c6c84bf292feb443b7bb32ec02488f88"
   end
 
   depends_on "cmake" => :build
   depends_on "expat" # Building against `liblcf` fails with `uses_from_macos`
-  depends_on "icu4c"
+  depends_on "icu4c@76"
 
   def install
     system "cmake", "-S", ".", "-B", "build",
@@ -33,7 +39,7 @@ class Liblcf < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include "lcf/lsd/reader.h"
       #include <cassert>
 
@@ -42,7 +48,7 @@ class Liblcf < Formula
         assert(current == lcf::LSD_Reader::ToUnixTimestamp(lcf::LSD_Reader::ToTDateTime(current)));
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-std=c++14", "-I#{include}", "-L#{lib}", "-llcf", \
       "-o", "test"
     system "./test"

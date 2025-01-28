@@ -3,6 +3,7 @@ class Cdlabelgen < Formula
   homepage "https://www.aczoom.com/tools/cdinsert/"
   url "https://www.aczoom.com/pub/tools/cdlabelgen-4.3.0.tgz"
   sha256 "94202a33bd6b19cc3c1cbf6a8e1779d7c72d8b3b48b96267f97d61ced4e1753f"
+  license "BSD-3-Clause"
 
   livecheck do
     url "https://www.aczoom.com/pub/tools/"
@@ -10,9 +11,12 @@ class Cdlabelgen < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "b29161d97190eea5c2afc549dbc0cf1511db27b0c48e00ff225373c135d678b1"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "9ac1cd2a6a78abdd5adff5ac90d8eb311ca1113f9a673097ae25d8619dd24eb4"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "1ba8549a259b725eb231f8ae136a290a24156dc267050796bbff796f6135c9f8"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "1ba8549a259b725eb231f8ae136a290a24156dc267050796bbff796f6135c9f8"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1ba8549a259b725eb231f8ae136a290a24156dc267050796bbff796f6135c9f8"
+    sha256 cellar: :any_skip_relocation, sonoma:         "6017838a534fbaa5f33c5905867926df9160c33e25bb4b78302708f1f73ea157"
     sha256 cellar: :any_skip_relocation, ventura:        "584f58b2a0815c049eef3b967afe1563fe3fb6251224b69b7b1622407aeda35c"
     sha256 cellar: :any_skip_relocation, monterey:       "584f58b2a0815c049eef3b967afe1563fe3fb6251224b69b7b1622407aeda35c"
     sha256 cellar: :any_skip_relocation, big_sur:        "8c1096a23f2ce2b8db912fcb9786c2f9d76b7ece60d2269512e90fa9505d0d9e"
@@ -30,7 +34,7 @@ class Cdlabelgen < Formula
   end
 
   test do
-    system bin/"cdlabelgen", "-c", "TestTitle", "-t", share/"cdlabelgen/template.ps", "--output-file", "testout.eps"
+    system bin/"cdlabelgen", "-c", "TestTitle", "-t", pkgshare/"template.ps", "--output-file", "testout.eps"
     File.file?("testout.eps")
   end
 end

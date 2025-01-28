@@ -4,36 +4,35 @@ class Pyyaml < Formula
   url "https://files.pythonhosted.org/packages/cd/e5/af35f7ea75cf72f2cd079c95ee16797de7cd71f29ea7c68ae5ce7be1eda0/PyYAML-6.0.1.tar.gz"
   sha256 "bfdf460b1736c775f2ba9f6a92bca30bc2095067b8a9d77876d1fad6cc3b4a43"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "7e21a7fd4f83a0eaa75722521742ddc8adc507d5909d49b22c377b9da8e37d59"
-    sha256 cellar: :any,                 arm64_ventura:  "7e52df0812b2d3714c1d1504cbd07597aea578b1646e35ce2275fc484dd50957"
-    sha256 cellar: :any,                 arm64_monterey: "c587e1c3c419d096678d0870087d1bb97f3b12f3bf264dde670c9d42c257bcd0"
-    sha256 cellar: :any,                 arm64_big_sur:  "0834240857ef7d9f218257b66407fcf35ec9b213c4bb47cbf1760340991a9d70"
-    sha256 cellar: :any,                 sonoma:         "e5b74ea593d6e85424a7869d44e4ce8bb923324e15bfda24da21327061038531"
-    sha256 cellar: :any,                 ventura:        "3b77e8fcf1b747a263090daaa112390f47645bbfc16e56acac7de176ba874419"
-    sha256 cellar: :any,                 monterey:       "e0b2451c2879083e566e96a20ca62ab210572789b02fe9f5c3157d818b7b91c5"
-    sha256 cellar: :any,                 big_sur:        "28519daaaae05ab448355b3ee342b36c2493a3e90eb1d1d76ec5f49161259aca"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5d040e378298ea7ec94cfd92d3f41fb6dbeb4a07de2613a043db984a5624032c"
+    sha256 cellar: :any,                 arm64_sequoia:  "87a238bf1e44a97f54755f0e95ba11860884b186678d3ce163db3034b7b2d7cc"
+    sha256 cellar: :any,                 arm64_sonoma:   "b538bcab64b4ab3f6351c219cff42e2d163201efcaa272e4ee7e58783ffb3ce6"
+    sha256 cellar: :any,                 arm64_ventura:  "eb0cb94ff9dc6ac7926c1ee71ccdc42dc844ad3ab949b9105456cf131c25027d"
+    sha256 cellar: :any,                 arm64_monterey: "d87fbc05ae74fc9f2c882c5047f6f9587bd782165776a2132ab26fd3fa11dab7"
+    sha256 cellar: :any,                 sonoma:         "1ac9a131912b8c3d48e751d7d39c17c1c8d3d84d81353ab82d66fa5fb6d31772"
+    sha256 cellar: :any,                 ventura:        "dc66728628c4bb38e894111a480f8ac86369ac73d87b148874878f8c565bb0c5"
+    sha256 cellar: :any,                 monterey:       "e01aba3d0afab94578fc5f708ee01adf0549572005aa82c2c292679663c23995"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d53f5c35de430f055c83fdbb1e857b3423cbea9c66523f929cb525876ef55fae"
   end
 
-  depends_on "cython" => :build
-  depends_on "python@3.10" => [:build, :test]
+  disable! date: "2024-10-06", because: "does not meet homebrew/core's requirements for Python library formulae"
+
   depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.12" => [:build, :test]
   depends_on "libyaml"
 
   def pythons
-    deps.select { |dep| dep.name.start_with?("python") }
+    deps.select { |dep| dep.name.start_with?("python@") }
         .map(&:to_formula)
         .sort_by(&:version)
   end
 
   def install
-    cythonize = Formula["cython"].bin/"cythonize"
-    system cythonize, "yaml/_yaml.pyx"
     pythons.each do |python|
-      python_exe = python.opt_libexec/"bin/python"
-      system python_exe, "-m", "pip", "install", *std_pip_args, "."
+      python3 = python.opt_libexec/"bin/python"
+      system python3, "-m", "pip", "install", *std_pip_args(build_isolation: true), "."
     end
   end
 
@@ -45,16 +44,21 @@ class Pyyaml < Formula
     <<~EOS
       This formula provides the `yaml` module for Python #{python_versions}.
       If you need `yaml` for a different version of Python, use pip.
+
+      Additional details on upcoming formula removal are available at:
+      * https://github.com/Homebrew/homebrew-core/issues/157500
+      * https://docs.brew.sh/Python-for-Formula-Authors#libraries
+      * https://docs.brew.sh/Homebrew-and-Python#pep-668-python312-and-virtual-environments
     EOS
   end
 
   test do
     pythons.each do |python|
-      system python.opt_libexec/"bin/python", "-c", <<~EOS
+      system python.opt_libexec/"bin/python", "-c", <<~PYTHON
         import yaml
         assert yaml.__with_libyaml__
         assert yaml.dump({"foo": "bar"}) == "foo: bar\\n"
-      EOS
+      PYTHON
     end
   end
 end

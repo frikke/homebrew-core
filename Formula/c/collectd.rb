@@ -2,10 +2,10 @@ class Collectd < Formula
   desc "Statistics collection and monitoring daemon"
   homepage "https://collectd.org/"
   license "MIT"
-  revision 6
+  revision 8
 
   stable do
-    url "https://collectd.org/files/collectd-5.12.0.tar.bz2"
+    url "https://storage.googleapis.com/collectd-tarballs/collectd-5.12.0.tar.bz2"
     sha256 "5bae043042c19c31f77eb8464e56a01a5454e0b39fa07cf7ad0f1bfc9c3a09d6"
 
     # Fix -flat_namespace being used on Big Sur and later.
@@ -16,18 +16,17 @@ class Collectd < Formula
   end
 
   livecheck do
-    url "https://collectd.org/download.shtml"
+    url "https://www.collectd.org/download.html"
     regex(/href=.*?collectd[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_ventura:  "59ed19b149a9a641f2b0363b83895c936a5da7922eced0de95c43fe636da3554"
-    sha256 arm64_monterey: "095c047682c4d5ea8a9079999e4c147c7c55175028999b2bc73a102b323fa7ff"
-    sha256 arm64_big_sur:  "71bcb1bcd36dbd77abd87eb18d3b9157ac96c3fa7ae7f6ed0bf9609c0c1f24c7"
-    sha256 ventura:        "863ae388f82ded27700e3d9fa714a6275dff55ca96c614a7439aa94234c57df9"
-    sha256 monterey:       "32b8e55327992d7ffb1235148a9f59fe19a7c830ec380b32a218b17d0424304a"
-    sha256 big_sur:        "903a45c4e92f3084608ef00aeb6ca4bc775ea40f9792db098bd79cb820e39fa5"
-    sha256 x86_64_linux:   "38b6c29a0b5aa15ea2592bff5475e1a74fec9752c6c6f309cd9976d81672fd78"
+    sha256 arm64_sequoia: "58f7a44814b1a467e4f68fcf719069fe352920ce6e800fc5d60e8ad2e6af1332"
+    sha256 arm64_sonoma:  "ceb6cf730de48b1f6eadfc3784060f0b6ed437c3a4fcb7f991e75853eb0d8295"
+    sha256 arm64_ventura: "756fa1c1b080652bc6654718c11f5955b1a674b319eb848609e0416415a0cde1"
+    sha256 sonoma:        "74e6ebaf66605da54399207a4f083833b39a90f6ff9edb92c82673f874af5e09"
+    sha256 ventura:       "cea97da9e5ba92d5d02fb688cc72bf698f245e5d849f44f2d3419f64f1ed5000"
+    sha256 x86_64_linux:  "5e73f288cbe0d9d1bd8e35b1782593ab8ef268d41bd05e34913bc63678d926d1"
   end
 
   head do
@@ -37,18 +36,29 @@ class Collectd < Formula
     depends_on "automake" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libgcrypt"
   depends_on "libtool"
   depends_on "net-snmp"
+  depends_on "protobuf-c"
   depends_on "riemann-client"
 
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
   uses_from_macos "perl"
 
+  on_macos do
+    depends_on "libgpg-error"
+  end
+
   def install
-    args = std_configure_args + %W[
+    # Workaround for: Built-in generator --c_out specifies a maximum edition
+    # PROTO3 which is not the protoc maximum 2023.
+    # Remove when fixed in `protobuf-c`:
+    # https://github.com/protobuf-c/protobuf-c/pull/711
+    ENV["PROTOC_C"] = Formula["protobuf"].opt_bin/"protoc"
+
+    args = %W[
       --localstatedir=#{var}
       --disable-java
       --enable-write_riemann
@@ -56,7 +66,7 @@ class Collectd < Formula
     args << "--with-perl-bindings=PREFIX=#{prefix} INSTALLSITEMAN3DIR=#{man3}" if OS.linux?
 
     system "./build.sh" if build.head?
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
@@ -78,7 +88,7 @@ class Collectd < Formula
     EOS
     begin
       pid = fork { exec sbin/"collectd", "-f", "-C", "collectd.conf" }
-      sleep 1
+      sleep 3
       assert_predicate log, :exist?, "Failed to create log file"
       assert_match "plugin \"memory\" successfully loaded.", log.read
     ensure

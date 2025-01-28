@@ -1,9 +1,9 @@
 class Mkvtoolnix < Formula
   desc "Matroska media files manipulation tools"
   homepage "https://mkvtoolnix.download/"
-  url "https://mkvtoolnix.download/sources/mkvtoolnix-79.0.tar.xz"
-  mirror "https://fossies.org/linux/misc/mkvtoolnix-79.0.tar.xz"
-  sha256 "f039c27b0dfe4a4d1aa870ad32e20a28a5f254de6121cb12a42328130be3afbc"
+  url "https://mkvtoolnix.download/sources/mkvtoolnix-89.0.tar.xz"
+  mirror "https://fossies.org/linux/misc/mkvtoolnix-89.0.tar.xz"
+  sha256 "6127b694b088e53270a946c178b6816da756200bdf672abdf65cfe0b50b260b2"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -12,13 +12,11 @@ class Mkvtoolnix < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "da4409f3f6cfefecd63b4f5acf5c2076dd0d040ffaf132d50fb8b65b238a8288"
-    sha256 arm64_monterey: "6739341aa687b69209e96982148f76f647401bfa6e96607b39262ccac4c5f25f"
-    sha256 arm64_big_sur:  "28f75365de508bf6ee4b68b9e07dbef275a8c028b507e6ed32f7c5598e0c0c26"
-    sha256 ventura:        "ff859363a7e469d414c91c487bad0cde33bf856bf9f6707be0f573d0ac9da70f"
-    sha256 monterey:       "3b79896e71ed53f1aa5d7f323634e9746a13f23dffa482b24c99a1449a0ca7de"
-    sha256 big_sur:        "f9f690bba57f68bedd5ba99d24b9bea98c26e7c71a82e5102b6f7e358fa95406"
-    sha256 x86_64_linux:   "d00cd6fc2cdb47c70f5f9b9545d62caaf1f4128b4a8ccd2bef692fcea7a54398"
+    sha256 cellar: :any, arm64_sonoma:  "fbf0058340c91a6424f6dc2e7bfb5e7e5a178b9929966e829a2f4337e60284be"
+    sha256 cellar: :any, arm64_ventura: "e292181925a9bd89d64e25fe3b8cf82e632bf586d3a071d9b93970b7d3cae3c6"
+    sha256 cellar: :any, sonoma:        "04569b2069b26af99959f9db2459d3db1d884641f2bdd5362944b6af308a10cb"
+    sha256 cellar: :any, ventura:       "e77c296b7ec8f98720974f6f74c0bfdc6c0448a7a2a6fa28eebe650ea6406328"
+    sha256               x86_64_linux:  "b795bebf2edef30bf53c2bd52656491ee0a0bc044d590bbf14bdf88a0535e57c"
   end
 
   head do
@@ -29,11 +27,13 @@ class Mkvtoolnix < Formula
   end
 
   depends_on "docbook-xsl" => :build
-  depends_on "pkg-config" => :build
+  depends_on "gettext" => :build
+  depends_on "nlohmann-json" => :build
+  depends_on "pkgconf" => :build
+  depends_on "utf8cpp" => :build
   depends_on "boost"
   depends_on "flac"
   depends_on "fmt"
-  depends_on "gettext"
   depends_on "gmp"
   depends_on "libebml"
   depends_on "libmatroska"
@@ -41,18 +41,23 @@ class Mkvtoolnix < Formula
   depends_on "libvorbis"
   # https://mkvtoolnix.download/downloads.html#macosx
   depends_on macos: :catalina # C++17
-  depends_on "nlohmann-json"
   depends_on "pugixml"
   depends_on "qt"
-  depends_on "utf8cpp"
 
   uses_from_macos "libxslt" => :build
   uses_from_macos "ruby" => :build
+  uses_from_macos "zlib"
 
-  fails_with gcc: "5"
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
-    ENV.cxx11
+    # Remove bundled libraries
+    rm_r(buildpath.glob("lib/*") - buildpath.glob("lib/{avilib,librmff}*"))
+
+    # Boost Math needs at least C++14, Qt needs at least C++17
+    ENV.append "CXXFLAGS", "-std=c++17"
 
     features = %w[flac gmp libebml libmatroska libogg libvorbis]
     extra_includes = ""
@@ -66,13 +71,12 @@ class Mkvtoolnix < Formula
     extra_libs.chop!
 
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-debug",
-                          "--prefix=#{prefix}",
-                          "--with-boost=#{Formula["boost"].opt_prefix}",
+    system "./configure", "--with-boost=#{Formula["boost"].opt_prefix}",
                           "--with-docbook-xsl-root=#{Formula["docbook-xsl"].opt_prefix}/docbook-xsl",
                           "--with-extra-includes=#{extra_includes}",
                           "--with-extra-libs=#{extra_libs}",
-                          "--disable-gui"
+                          "--disable-gui",
+                          *std_configure_args
     system "rake", "-j#{ENV.make_jobs}"
     system "rake", "install"
   end
@@ -86,8 +90,8 @@ class Mkvtoolnix < Formula
       Homebrew
     EOS
 
-    system "#{bin}/mkvmerge", "-o", mkv_path, sub_path
-    system "#{bin}/mkvinfo", mkv_path
-    system "#{bin}/mkvextract", "tracks", mkv_path, "0:#{sub_path}"
+    system bin/"mkvmerge", "-o", mkv_path, sub_path
+    system bin/"mkvinfo", mkv_path
+    system bin/"mkvextract", "tracks", mkv_path, "0:#{sub_path}"
   end
 end

@@ -9,18 +9,12 @@ class Wllvm < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "407bf86e983aa21c26b3b2551c60430a4f88d6673d53500204a1c4c405638f99"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "407bf86e983aa21c26b3b2551c60430a4f88d6673d53500204a1c4c405638f99"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "407bf86e983aa21c26b3b2551c60430a4f88d6673d53500204a1c4c405638f99"
-    sha256 cellar: :any_skip_relocation, ventura:        "e42c4bb6b456a9e91a62729e53a547d3df665e39ffb6cd39e9cc87d672a4fda5"
-    sha256 cellar: :any_skip_relocation, monterey:       "e42c4bb6b456a9e91a62729e53a547d3df665e39ffb6cd39e9cc87d672a4fda5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e42c4bb6b456a9e91a62729e53a547d3df665e39ffb6cd39e9cc87d672a4fda5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "213ee00f14ad940edf9be4b87d2b65f39246646173e1eee21f6fedf5d459b164"
+    rebuild 5
+    sha256 cellar: :any_skip_relocation, all: "1f51172a70e011c1666255f2ace6d910d573681b83d50c31b551616dce265e6b"
   end
 
   depends_on "llvm" => :test
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     virtualenv_install_with_resources

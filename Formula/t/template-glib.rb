@@ -1,38 +1,41 @@
 class TemplateGlib < Formula
   desc "GNOME templating library for GLib"
   homepage "https://gitlab.gnome.org/GNOME/template-glib"
-  url "https://download.gnome.org/sources/template-glib/3.36/template-glib-3.36.1.tar.xz"
-  sha256 "3b167a17385ad745afbe20fadf8106c66d30c5bd746d5aa1d9bdb7e803f6a503"
+  url "https://download.gnome.org/sources/template-glib/3.36/template-glib-3.36.3.tar.xz"
+  sha256 "d528b35b2cf90e07dae50e25e12fbadb0eb048f57fd5151cf9f6e98cce1df20e"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "774bc15db0c2b5e299f8e4d76ae83fc37204259beae21a5c8801c646f2b50c33"
-    sha256 cellar: :any, arm64_monterey: "df91f7944d110734160bcddd075cacb63080a9840204dc0a5b1878d0cdfca8c7"
-    sha256 cellar: :any, arm64_big_sur:  "323d025d1978534f458a7f877c9e4d8ea482b3fe50a00d36686b6ebb65922fd7"
-    sha256 cellar: :any, ventura:        "c07351a7b8832768973284fff89386299773e20fd07eb8def24d887005bf0b7d"
-    sha256 cellar: :any, monterey:       "c54b5045304c7098837709210ebd74a584a9c1565c9a654fa4fc6771e7912e6f"
-    sha256 cellar: :any, big_sur:        "4dead442226961da575f6d5c1a9745822baab6e874217375b29cabbf579ca33d"
-    sha256               x86_64_linux:   "20c6c8571b256ebcd3e6d76f1ea10241a87d60bb6f9ddf0e91dae900e7d7b7f9"
+    sha256 cellar: :any, arm64_sequoia: "57bcd419dd5b8203787927b3f80030cdd588dcdfb1b8d9f421d221d6ce8d620a"
+    sha256 cellar: :any, arm64_sonoma:  "34f5aa6d72e339e7f00a1c3edf3e4ca888e3287361c72608bd9059c2e160237e"
+    sha256 cellar: :any, arm64_ventura: "cbab4dae5f31a1f03b008c1c2716a392d627342f4ef0725c8acec4bf75b3af57"
+    sha256 cellar: :any, sonoma:        "d1caeed1a18c589d0254c2d5ed7f7ef3be5072ba29719dd89a80dd0e5775fc56"
+    sha256 cellar: :any, ventura:       "3274fa074958fd821bc76a53a6a029d92f0a0f4f8726279e644f54e8ea824b4e"
+    sha256               x86_64_linux:  "5c6b0220a451c784ae6a1d249fefc47d257b5e1a5bbc5aebf35fce80d01c4bc7"
   end
 
   depends_on "bison" => :build # does not appear to work with system bison
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => [:build, :test]
   depends_on "vala" => :build
   depends_on "glib"
   depends_on "gobject-introspection"
 
-  uses_from_macos "flex"
+  uses_from_macos "flex" => :build
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
-    system "meson", "setup", "build", "-Dvapi=true", "-Dintrospection=enabled", *std_meson_args
+    system "meson", "setup", "build", "-Dvapi=true", "-Dintrospection=enabled", "-Dtests=false", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <tmpl-glib.h>
 
       int main(int argc, char *argv[]) {
@@ -40,33 +43,9 @@ class TemplateGlib < Formula
         g_assert_nonnull(locator);
         return 0;
       }
-    EOS
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    pcre = Formula["pcre"]
-    flags = (ENV.cflags || "").split + (ENV.cppflags || "").split + (ENV.ldflags || "").split
-    flags += %W[
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/template-glib-1.0
-      -I#{pcre.opt_include}
-      -D_REENTRANT
-      -L#{gettext.opt_lib}
-      -L#{glib.opt_lib}
-      -L#{lib}
-      -lgio-2.0
-      -lglib-2.0
-      -lgobject-2.0
-      -ltemplate_glib-1.0
-    ]
-    if OS.mac?
-      flags += %w[
-        -lintl
-        -Wl,-framework
-        -Wl,CoreFoundation
-      ]
-    end
+    C
+
+    flags = shell_output("pkgconf --cflags --libs template-glib-1.0").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

@@ -3,9 +3,19 @@ class Pyside < Formula
 
   desc "Official Python bindings for Qt"
   homepage "https://wiki.qt.io/Qt_for_Python"
-  url "https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-6.5.2-src/pyside-setup-everywhere-src-6.5.2.tar.xz"
-  sha256 "90dbf1d14fcd41c98a7cbea44b8a4951e10d0b798e154749756e4946654d1ba8"
-  license all_of: ["GFDL-1.3-only", "GPL-2.0-only", "GPL-3.0-only", "LGPL-3.0-only"]
+  url "https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-6.7.3-src/pyside-setup-everywhere-src-6.7.3.tar.xz"
+  mirror "https://cdimage.debian.org/mirror/qt.io/qtproject/official_releases/QtForPython/pyside6/PySide6-6.7.3-src/pyside-setup-everywhere-src-6.7.3.tar.xz"
+  sha256 "a4c414be013d5051a2d10a9a1151e686488a3172c08a57461ea04b0a0ab74e09"
+  # NOTE: We omit some licenses even though they are in SPDX-License-Identifier or LICENSES/ directory:
+  # 1. LicenseRef-Qt-Commercial is removed from "OR" options as non-free
+  # 2. GFDL-1.3-no-invariants-only is only used by not installed docs, e.g. sources/{pyside6,shiboken6}/doc
+  # 3. BSD-3-Clause is only used by not installed examples, tutorials and build scripts
+  # 4. Apache-2.0 is only used by not installed examples
+  license all_of: [
+    { "GPL-3.0-only" => { with: "Qt-GPL-exception-1.0" } },
+    { any_of: ["LGPL-3.0-only", "GPL-2.0-only", "GPL-3.0-only"] },
+  ]
+  revision 1
 
   livecheck do
     url "https://download.qt.io/official_releases/QtForPython/pyside6/"
@@ -13,19 +23,20 @@ class Pyside < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "9aa2c6e8e92454251f4ef2ff53ba8badabc9a55381cfb7ebea44dfbbc9fd7966"
-    sha256 cellar: :any, arm64_monterey: "63221c34119789913be3d22d1ea3d3fe7631f60aa35880677910b56e8dfb72d6"
-    sha256 cellar: :any, arm64_big_sur:  "9ab03e7a12afefecd33ba2cd72e2228178d5a7de5866482d3c5a9f18a9f7543c"
-    sha256 cellar: :any, ventura:        "b76e848c2cac77f14cf96067002240b140f52b368ef74105f8584b5ec0b46a7e"
-    sha256 cellar: :any, monterey:       "e480b45aa70deb7ebf47996b9dd1c186079039f740b70a075e85403af85972ed"
-    sha256 cellar: :any, big_sur:        "46a22ccaa4b50f28e519e4b9c936bcbff00a4956f4165e96432b81dc5bc234d9"
+    sha256 cellar: :any,                 arm64_sonoma:  "dc93c539db28959cf90f3007bafa5aee52051e79a594e78625dc076712512471"
+    sha256 cellar: :any,                 arm64_ventura: "f5e321f36f4f35a16e504ca5c856464cfba8680cddf98714e1aca3a01bc6e64c"
+    sha256 cellar: :any,                 sonoma:        "2264961ab93c38f68e224ab9b6ccc1ee2f9b48cecbac234861ca0933e0ac7a86"
+    sha256 cellar: :any,                 ventura:       "d142edf80b5c8a07e40d56e260f3ba08ed879deedd8ebeaea0bb1580a5b26093"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "242f0b1bf3dd12c40c30b8b58b55a770a3e32e3ef4824e6fafdd99e0cd5bc538"
   end
 
   depends_on "cmake" => :build
   depends_on "ninja" => :build
+  depends_on "python-setuptools" => :build
   depends_on xcode: :build
+  depends_on "pkgconf" => :test
   depends_on "llvm"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "qt"
 
   uses_from_macos "libxml2"
@@ -35,10 +46,12 @@ class Pyside < Formula
     depends_on "mesa"
   end
 
-  fails_with gcc: "5"
+  # Fix .../sources/pyside6/qtexampleicons/module.c:4:10: fatal error: 'Python.h' file not found
+  # Upstream issue: https://bugreports.qt.io/browse/PYSIDE-2491
+  patch :DATA
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
@@ -71,9 +84,9 @@ class Pyside < Formula
                      "-DPYTHON_EXECUTABLE=#{which(python3)}",
                      "-DBUILD_TESTS=OFF",
                      "-DNO_QT_TOOLS=yes",
-                     "-DFORCE_LIMITED_API=yes",
+                     # Limited API (maybe combined with keg relocation) breaks the Linux bottle
+                     "-DFORCE_LIMITED_API=#{OS.mac? ? "yes" : "no"}",
                      *std_cmake_args
-
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
@@ -106,7 +119,7 @@ class Pyside < Formula
       ]
     end
 
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <shiboken.h>
       int main()
       {
@@ -115,11 +128,24 @@ class Pyside < Formula
         assert(!module.isNull());
         return 0;
       }
-    EOS
-    system ENV.cxx, "-std=c++17", "test.cpp",
-                    "-I#{include}/shiboken6",
-                    "-L#{lib}", "-lshiboken6.abi3",
-                    *pyincludes, *pylib, "-o", "test"
+    CPP
+    shiboken_flags = shell_output("pkgconf --cflags --libs shiboken6").chomp.split
+    system ENV.cxx, "-std=c++17", "test.cpp", *shiboken_flags, *pyincludes, *pylib, "-o", "test"
     system "./test"
   end
 end
+
+__END__
+diff --git a/sources/pyside6/qtexampleicons/CMakeLists.txt b/sources/pyside6/qtexampleicons/CMakeLists.txt
+index 1562f7b..0611399 100644
+--- a/sources/pyside6/qtexampleicons/CMakeLists.txt
++++ b/sources/pyside6/qtexampleicons/CMakeLists.txt
+@@ -32,6 +32,8 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+     target_compile_definitions(QtExampleIcons PRIVATE "-DNDEBUG")
+ endif()
+
++get_property(SHIBOKEN_PYTHON_INCLUDE_DIRS GLOBAL PROPERTY shiboken_python_include_dirs)
++
+ target_include_directories(QtExampleIcons PRIVATE ${SHIBOKEN_PYTHON_INCLUDE_DIRS})
+
+ get_property(SHIBOKEN_PYTHON_LIBRARIES GLOBAL PROPERTY shiboken_python_libraries)

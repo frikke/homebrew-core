@@ -1,6 +1,6 @@
 class Arangodb < Formula
   desc "Multi-Model NoSQL Database"
-  homepage "https://www.arangodb.com/"
+  homepage "https://arangodb.com/"
   url "https://download.arangodb.com/Source/ArangoDB-3.10.4.tar.bz2"
   sha256 "bc9cfaac5747995a6185d2cfea452b9fea8461bf91d2996dd75af75eef3cfddd"
   license "Apache-2.0"
@@ -18,7 +18,7 @@ class Arangodb < Formula
 
   # Vendors deps, has a low download count, build always breaks
   # https://github.com/Homebrew/homebrew-core/pull/135487#issuecomment-1616018628
-  deprecate! date: "2023-07-05", because: :does_not_build
+  disable! date: "2024-07-05", because: :does_not_build
 
   depends_on "cmake" => :build
   depends_on "go" => :build
@@ -35,7 +35,7 @@ class Arangodb < Formula
   end
 
   fails_with :clang do
-    cause <<-EOS
+    cause <<~EOS
       .../arangod/IResearch/AqlHelper.h:563:40: error: no matching constructor
       for initialization of 'std::string_view' (aka 'basic_string_view<char>')
               std::forward<Visitor>(visitor)(std::string_view{prev, begin});
@@ -63,24 +63,6 @@ class Arangodb < Formula
   end
 
   def install
-    if OS.mac?
-      ENV.llvm_clang
-      ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
-      # Fix building bundled boost with newer LLVM by avoiding removed `std::unary_function`.
-      # .../boost/1.78.0/boost/container_hash/hash.hpp:132:33: error: no template named
-      # 'unary_function' in namespace 'std'; did you mean '__unary_function'?
-      ENV.append "CXXFLAGS", "-DBOOST_NO_CXX98_FUNCTION_BASE=1"
-    end
-
-    resource("starter").stage do
-      ldflags = %W[
-        -s -w
-        -X main.projectVersion=#{resource("starter").version}
-        -X main.projectBuild=#{Utils.git_head}
-      ]
-      system "go", "build", *std_go_args(ldflags: ldflags)
-    end
-
     arch = if Hardware::CPU.arm?
       "neon"
     elsif !build.bottle?
@@ -96,12 +78,11 @@ class Arangodb < Formula
       Hardware.oldest_cpu
     end
 
-    args = std_cmake_args + %W[
+    cmake_args = std_cmake_args + %W[
       -DHOMEBREW=ON
       -DCMAKE_BUILD_TYPE=RelWithDebInfo
       -DCMAKE_INSTALL_LOCALSTATEDIR=#{var}
       -DCMAKE_INSTALL_SYSCONFDIR=#{etc}
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=#{MacOS.version}
       -DOPENSSL_ROOT_DIR=#{Formula["openssl@1.1"].opt_prefix}
       -DTARGET_ARCHITECTURE=#{arch}
       -DUSE_GOOGLE_TESTS=OFF
@@ -109,7 +90,28 @@ class Arangodb < Formula
       -DUSE_MAINTAINER_MODE=OFF
     ]
 
-    system "cmake", "-S", ".", "-B", "build", *args
+    if OS.mac?
+      ENV.llvm_clang
+
+      ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
+      cmake_args << "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{MacOS.version}"
+
+      # Fix building bundled boost with newer LLVM by avoiding removed `std::unary_function`.
+      # .../boost/1.78.0/boost/container_hash/hash.hpp:132:33: error: no template named
+      # 'unary_function' in namespace 'std'; did you mean '__unary_function'?
+      ENV.append "CXXFLAGS", "-DBOOST_NO_CXX98_FUNCTION_BASE=1"
+    end
+
+    resource("starter").stage do
+      ldflags = %W[
+        -s -w
+        -X main.projectVersion=#{resource("starter").version}
+        -X main.projectBuild=#{Utils.git_head}
+      ]
+      system "go", "build", *std_go_args(ldflags:)
+    end
+
+    system "cmake", "-S", ".", "-B", "build", *cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
@@ -139,7 +141,7 @@ class Arangodb < Formula
     assert_equal "it works!", output.chomp
 
     ohai "#{bin}/arangodb --starter.instance-up-timeout 1m --starter.mode single"
-    PTY.spawn("#{bin}/arangodb", "--starter.instance-up-timeout", "1m",
+    PTY.spawn(bin/"arangodb", "--starter.instance-up-timeout", "1m",
               "--starter.mode", "single", "--starter.disable-ipv6",
               "--server.arangod", "#{sbin}/arangod",
               "--server.js-dir", "#{share}/arangodb3/js") do |r, _, pid|

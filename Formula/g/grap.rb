@@ -1,8 +1,8 @@
 class Grap < Formula
   desc "Language for typesetting graphs"
   homepage "https://www.lunabase.org/~faber/Vault/software/grap/"
-  url "https://www.lunabase.org/~faber/Vault/software/grap/grap-1.46.tar.gz"
-  sha256 "7a8ecefdecfee96699913f2a412da68703911fa640bac3b964a413131f848bb4"
+  url "https://www.lunabase.org/~faber/Vault/software/grap/grap-1.48.tar.gz"
+  sha256 "89a1b02b162fbb4ad9827ebfe97a2b31f3923bf06996381a9e5f806d350584b9"
   license "BSD-2-Clause"
 
   livecheck do
@@ -11,16 +11,14 @@ class Grap < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "a24c89619a40bb01dc14808a9f9e72edd6990bcb7c269ecc85725ac9e6ec2138"
-    sha256 arm64_monterey: "e1978deb80eeb33de6b6aef7be24a3dcf5f2710238ba2a8c86ff1eb577c58406"
-    sha256 arm64_big_sur:  "b881e8e5a9e9b93597d99ad6fc3ffa06e277855fa2b49ccb697c53d463ae597b"
-    sha256 ventura:        "a9120b1bc398743c254d370f8fd0dce4870fc4c7c0e26b9890f6154cc70e83a3"
-    sha256 monterey:       "ec648b01a035f781aa3ab6c027ee8095d85b6d49376f564cefe16fad11574fc3"
-    sha256 big_sur:        "a36a748595465d9a1a85db3613a4cbd6c1511e802e56b77408581f9af567326f"
-    sha256 catalina:       "8eb83388db58c42ae00a343e1382c52948c5b203ff754fed7b6582eeb989fa3c"
-    sha256 mojave:         "d7f05f3fc8eb5c0c3f3a5a66bf4d43262a84ae1edaf7ec92897122fd069e4a96"
-    sha256 high_sierra:    "b7394034b2898da9e7a61d578f9789f642f29d3191f84041b4fb9763bdfdcc73"
-    sha256 x86_64_linux:   "0908d98399141b1cf93340d87df9055ea0ae3da80d4a06e7d7b02e98027c5252"
+    sha256 arm64_sequoia:  "b788c5d7bff50a5e551f67f8ff38481e42057d0123a02aae466ec38a2e01febe"
+    sha256 arm64_sonoma:   "aee0fb925a7b696bf99148451165a0ca69ecf103f8643ca99b268059b19fcec1"
+    sha256 arm64_ventura:  "cc5a9165ecc68e108f25c9137d1d0a97f77ab1bf98dae4e8c061ef784292655d"
+    sha256 arm64_monterey: "6be5b79b4875ae0cf474928cef30768193449bebf139672328ad5a81ce152e9e"
+    sha256 sonoma:         "86976bbb29c4d47f3bf59c5a0065b6dd9905ba24377862f58d94847743e1835d"
+    sha256 ventura:        "d6c281e795d7afc04167a13a6e903461c2dd319aa62240ee7361c82b3ab3c248"
+    sha256 monterey:       "73c7bde75b91da23b0e29acad4e10f39e5bc9347f2107f535698a8ac07e9fcdd"
+    sha256 x86_64_linux:   "464831eb93ac8007e97497163960ba9c91b6c17dba21f2178ea26863080a8d1e"
   end
 
   uses_from_macos "bison" => :build

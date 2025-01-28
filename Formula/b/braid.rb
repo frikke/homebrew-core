@@ -2,45 +2,30 @@ class Braid < Formula
   desc "Simple tool to help track vendor branches in a Git repository"
   homepage "https://cristibalan.github.io/braid/"
   url "https://github.com/cristibalan/braid.git",
-      tag:      "v1.1.9",
-      revision: "0b2f7cd4296039c0e8c0a5f563443c4f0665d026"
+      tag:      "v1.1.10",
+      revision: "16729390a2a8e6b45919545b056a1a7ac83c14d6"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3402b0a04d37a38cbe3fec1f55d4365e338b8c4c0d6220efd8830ecf6d441cfe"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3402b0a04d37a38cbe3fec1f55d4365e338b8c4c0d6220efd8830ecf6d441cfe"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "442f0a9bbf78cbcf5f3c7067ba9b727641092d770502a98b43d5edb166274020"
-    sha256 cellar: :any_skip_relocation, ventura:        "3402b0a04d37a38cbe3fec1f55d4365e338b8c4c0d6220efd8830ecf6d441cfe"
-    sha256 cellar: :any_skip_relocation, monterey:       "3402b0a04d37a38cbe3fec1f55d4365e338b8c4c0d6220efd8830ecf6d441cfe"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3402b0a04d37a38cbe3fec1f55d4365e338b8c4c0d6220efd8830ecf6d441cfe"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "88f0796512331c9add77ddc67834521dec363d1e565ab146f0e964f310d114e7"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cf994c891b0d901bceab7e31c21b326527f158a9d919c7d763d5f5a25844e6ac"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cf994c891b0d901bceab7e31c21b326527f158a9d919c7d763d5f5a25844e6ac"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "cf994c891b0d901bceab7e31c21b326527f158a9d919c7d763d5f5a25844e6ac"
+    sha256 cellar: :any_skip_relocation, sonoma:        "cf994c891b0d901bceab7e31c21b326527f158a9d919c7d763d5f5a25844e6ac"
+    sha256 cellar: :any_skip_relocation, ventura:       "cf994c891b0d901bceab7e31c21b326527f158a9d919c7d763d5f5a25844e6ac"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1a30ac7001f8b4ee4cd78f913c580d432205a7bedf006ff557de41ae771f47dd"
   end
 
-  uses_from_macos "ruby", since: :high_sierra
+  uses_from_macos "ruby"
 
-  resource "arrayfields" do
-    url "https://rubygems.org/gems/arrayfields-4.9.2.gem"
-    sha256 "1593f0bac948e24aa5e5099b7994b0fb5da69b6f29a82804ccf496bc125de4ab"
+  resource "pstore" do
+    url "https://rubygems.org/gems/pstore-0.1.3.gem"
+    sha256 "04b6a7d299379277ac3ec110a1c99785d6596c2db8ae52b8b8c2de5b8c2ab3c4"
   end
 
-  resource "chronic" do
-    url "https://rubygems.org/gems/chronic-0.10.2.gem"
-    sha256 "766f2fcce6ac3cc152249ed0f2b827770d3e517e2e87c5fba7ed74f4889d2dc3"
-  end
-
-  resource "fattr" do
-    url "https://rubygems.org/gems/fattr-2.4.0.gem"
-    sha256 "a7544665977e6ff2945e204436f3b8e932edf8ed3d7174d5d027a265e328fc08"
-  end
-
-  resource "json" do
-    url "https://rubygems.org/gems/json-2.6.3.gem"
-    sha256 "86aaea16adf346a2b22743d88f8dcceeb1038843989ab93cda44b5176c845459"
-  end
-
-  resource "main" do
-    url "https://rubygems.org/gems/main-6.2.3.gem"
-    sha256 "f630bf47a3ddfa09483a201a47c9601fd0ec9656d51b4a1196696ec57d33abf1"
+  resource "ostruct" do
+    url "https://rubygems.org/gems/ostruct-0.6.0.gem"
+    sha256 "3b1736c99f4d985de36bde1155be5e22aaf6e564b30ff9bd481e2ef7c2d9ba85"
   end
 
   resource "map" do
@@ -48,10 +33,40 @@ class Braid < Formula
     sha256 "153a6f384515b14085805f5839d318f9d3c9dab676f341340fa4300150373cbc"
   end
 
+  resource "fattr" do
+    url "https://rubygems.org/gems/fattr-2.4.0.gem"
+    sha256 "a7544665977e6ff2945e204436f3b8e932edf8ed3d7174d5d027a265e328fc08"
+  end
+
+  resource "chronic" do
+    url "https://rubygems.org/gems/chronic-0.10.2.gem"
+    sha256 "766f2fcce6ac3cc152249ed0f2b827770d3e517e2e87c5fba7ed74f4889d2dc3"
+  end
+
+  resource "arrayfields" do
+    url "https://rubygems.org/gems/arrayfields-4.9.2.gem"
+    sha256 "1593f0bac948e24aa5e5099b7994b0fb5da69b6f29a82804ccf496bc125de4ab"
+  end
+
+  resource "main" do
+    url "https://rubygems.org/gems/main-6.3.0.gem"
+    sha256 "ebd573133ab3707e2b43710de79f03bde7f10d41b86f2ba75e93da1482b04897"
+  end
+
+  resource "logger" do
+    url "https://rubygems.org/gems/logger-1.6.0.gem"
+    sha256 "0ab7c120262dd8de2a18cb8d377f1f318cbe98535160a508af9e7710ff43ef3e"
+  end
+
+  resource "json" do
+    url "https://rubygems.org/gems/json-2.7.1.gem"
+    sha256 "187ea312fb58420ff0c40f40af1862651d4295c8675267c6a1c353f1a0ac3265"
+  end
+
   def install
     ENV["GEM_HOME"] = libexec
     resources.each do |r|
-      next if r.name == "json" && MacOS.version >= :high_sierra
+      next if r.name == "json" && OS.mac? && MacOS.version >= :high_sierra
 
       r.fetch
       system "gem", "install", r.cached_download, "--ignore-dependencies",

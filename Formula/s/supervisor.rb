@@ -6,19 +6,25 @@ class Supervisor < Formula
   url "https://files.pythonhosted.org/packages/ce/37/517989b05849dd6eaa76c148f24517544704895830a50289cbbf53c7efb9/supervisor-4.2.5.tar.gz"
   sha256 "34761bae1a23c58192281a5115fb07fbf22c9b0133c08166beffc70fed3ebc12"
   license "BSD-3-Clause-Modification"
+  revision 1
   head "https://github.com/Supervisor/supervisor.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "30c5d30e66ec6a8f15adf002cac89c2a5692eefa54e1ea4626e0a29d956b6c38"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "30c5d30e66ec6a8f15adf002cac89c2a5692eefa54e1ea4626e0a29d956b6c38"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "30c5d30e66ec6a8f15adf002cac89c2a5692eefa54e1ea4626e0a29d956b6c38"
-    sha256 cellar: :any_skip_relocation, ventura:        "21d219b124dff18019063b8cd125c4548ede2110107897c5a6adf419322c1b5b"
-    sha256 cellar: :any_skip_relocation, monterey:       "21d219b124dff18019063b8cd125c4548ede2110107897c5a6adf419322c1b5b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "21d219b124dff18019063b8cd125c4548ede2110107897c5a6adf419322c1b5b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "adef8866166ae6da259889ee8645fdbdbeed275b34392b0f63aed98ed067010b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "45cc3b60f2777d22cdac9c5c3d02c6d81ab4ad54e469e404889e685cb3ee6782"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "45cc3b60f2777d22cdac9c5c3d02c6d81ab4ad54e469e404889e685cb3ee6782"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "45cc3b60f2777d22cdac9c5c3d02c6d81ab4ad54e469e404889e685cb3ee6782"
+    sha256 cellar: :any_skip_relocation, sonoma:        "dd5d653ec9ae1a0db2ddca2a58d549ea9c48d4c15be4a11eb71b3aa9e555e872"
+    sha256 cellar: :any_skip_relocation, ventura:       "dd5d653ec9ae1a0db2ddca2a58d549ea9c48d4c15be4a11eb71b3aa9e555e872"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5f432821d07fd084494beb62d4f237950f1c9b640dabb6cb85a0d2fd8f6e0598"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  resource "setuptools" do
+    url "https://files.pythonhosted.org/packages/27/b8/f21073fde99492b33ca357876430822e4800cdf522011f18041351dfa74b/setuptools-75.1.0.tar.gz"
+    sha256 "d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538"
+  end
 
   def install
     inreplace buildpath/"supervisor/skel/sample.conf" do |s|
@@ -52,7 +58,7 @@ class Supervisor < Formula
   end
 
   test do
-    (testpath/"sd.ini").write <<~EOS
+    (testpath/"sd.ini").write <<~INI
       [unix_http_server]
       file=supervisor.sock
 
@@ -64,7 +70,7 @@ class Supervisor < Formula
 
       [supervisorctl]
       serverurl=unix://supervisor.sock
-    EOS
+    INI
 
     begin
       pid = fork { exec bin/"supervisord", "--nodaemon", "-c", "sd.ini" }

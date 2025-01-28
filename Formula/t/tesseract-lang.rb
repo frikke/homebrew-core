@@ -1,13 +1,13 @@
 class TesseractLang < Formula
   desc "Enables extra languages support for Tesseract"
   homepage "https://github.com/tesseract-ocr/tessdata_fast/"
-  url "https://github.com/tesseract-ocr/tessdata_fast/archive/4.1.0.tar.gz"
+  url "https://github.com/tesseract-ocr/tessdata_fast/archive/refs/tags/4.1.0.tar.gz"
   sha256 "d0e3bb6f3b4e75748680524a1d116f2bfb145618f8ceed55b279d15098a530f9"
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "589b4e7851f76924cf8bd77155f53ffda95bb92cbb19327aed1766000a203760"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "ff6da65c5137edfec72e7826768d1d8f3fb311c45eb8c0ba21cfff191a7ed56c"
   end
 
   depends_on "tesseract"

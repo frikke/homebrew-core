@@ -17,18 +17,11 @@ class GitImerge < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d92935aec65d9d6c68d6517d0974ee7da92be9b9d2deb0b7508234499860e56b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d92935aec65d9d6c68d6517d0974ee7da92be9b9d2deb0b7508234499860e56b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d92935aec65d9d6c68d6517d0974ee7da92be9b9d2deb0b7508234499860e56b"
-    sha256 cellar: :any_skip_relocation, ventura:        "25a0367e58ad1afa702446005dc2a80e4802c9bd300b810d43cb72f29cac4959"
-    sha256 cellar: :any_skip_relocation, monterey:       "25a0367e58ad1afa702446005dc2a80e4802c9bd300b810d43cb72f29cac4959"
-    sha256 cellar: :any_skip_relocation, big_sur:        "25a0367e58ad1afa702446005dc2a80e4802c9bd300b810d43cb72f29cac4959"
-    sha256 cellar: :any_skip_relocation, catalina:       "25a0367e58ad1afa702446005dc2a80e4802c9bd300b810d43cb72f29cac4959"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fccde85a49be5f7819e50cca5dcc2fe8b06f0b10051d5a9b5369a5ffb9ddce26"
+    rebuild 5
+    sha256 cellar: :any_skip_relocation, all: "f889e12d851617cfc36b7af9f0994b42ca348d9bbd3b0ca6848b79d1bc51f55a"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     virtualenv_install_with_resources

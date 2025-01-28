@@ -1,27 +1,29 @@
 class Lf < Formula
   desc "Terminal file manager"
   homepage "https://godoc.org/github.com/gokcehan/lf"
-  url "https://github.com/gokcehan/lf/archive/r31.tar.gz"
-  sha256 "ed47fc22c58cf4f4e4116a58c500bdb9f9ccc0b89f87be09f321e8d1431226ab"
+  url "https://github.com/gokcehan/lf/archive/refs/tags/r33.tar.gz"
+  sha256 "045565197a9c12a14514b85c153dae4ee1bcd3b4313d60aec5004239d8d785a0"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "44b417555760e39467a5f936529ad18f37d141bc2a32c7584262b833878252ee"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7acab79bef9282e03fcd5bd1c35a0f8d65c9c6c7b2f454294f0ae6aa0e721d2b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8cfd9990611815ea11e9770c70511ec6ced4e01c120d2d826f01efed1f42497d"
-    sha256 cellar: :any_skip_relocation, ventura:        "c8c447b5f36fc58b75f6bb7dbd6193bfe43dc5883c160d400a29490d062eff8c"
-    sha256 cellar: :any_skip_relocation, monterey:       "023881834960674e6769e865767dabaaf5c6e66f69b429ba20ed996cc9f37224"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d7d7684867950aea4e5894a261d6e36339e27f703ad26a78a00c61f69a096299"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ad09e5718421ca4d2dde687fc364bf9c954c42a17084a4c99b1ead10140a3f14"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b73917bb1a1a185066914f34517edc4a27edb82033bc9e68ed08192606887df8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b73917bb1a1a185066914f34517edc4a27edb82033bc9e68ed08192606887df8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b73917bb1a1a185066914f34517edc4a27edb82033bc9e68ed08192606887df8"
+    sha256 cellar: :any_skip_relocation, sonoma:        "af2959ad101da355e679e0ec0da5b3030ce33f22a77f943e7f979fa20f4cbbaf"
+    sha256 cellar: :any_skip_relocation, ventura:       "af2959ad101da355e679e0ec0da5b3030ce33f22a77f943e7f979fa20f4cbbaf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d460b6949281a75c36a857d5bd84c23919171ee6dba0a782da87487682a2acc4"
   end
 
   depends_on "go" => :build
 
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w -X main.gVersion=#{version}")
+
     man1.install "lf.1"
-    zsh_completion.install "etc/lf.zsh" => "_lf"
+    bash_completion.install "etc/lf.bash" => "lf"
     fish_completion.install "etc/lf.fish"
+    zsh_completion.install "etc/lf.zsh" => "_lf"
   end
 
   test do

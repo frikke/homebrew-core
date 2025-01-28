@@ -2,34 +2,31 @@ class Lc0 < Formula
   desc "Open source neural network based chess engine"
   homepage "https://lczero.org/"
   url "https://github.com/LeelaChessZero/lc0.git",
-      tag:      "v0.30.0",
-      revision: "ee6866911663485d94c1e7ff99e607c15f2110be"
+      tag:      "v0.31.2",
+      revision: "8ba8aa426460bbeda452754ff7d6a9bb60bb0e54"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6e010af9bbc8615097befd17d72551f6271399e0ba6bf17d09b3f8a81e681b1c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "67f388251920e35eca0d28e175cf902e1add3d37ec46fa563a6959ed02bf26ec"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e062c34cde10264f2bcad3bb22e38e5dd102d838d58b6e36d5acb9b158006003"
-    sha256 cellar: :any_skip_relocation, ventura:        "6725b604ba0003035986bc7be6399fb6731341d8f3b96f087ab0a68432e87093"
-    sha256 cellar: :any_skip_relocation, monterey:       "1015c4823f4055a8c9b9b1824795e7a269c009991f4cdfa02d1bbc309118edba"
-    sha256 cellar: :any_skip_relocation, big_sur:        "07ef8d0e683d2f9ba8276461554e5950333809739e016b3bad6a8d7b449b52b1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "df45f8885b351219f6f7e47b284a39d42690e3efc71049ffaeec8cf58935528f"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f25d5b0e4a549bbc2e1dae7af722c5aec25016ce421b160f4619121b22286c19"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3f528105e9e803ce4fc4e710d3a94b02b192b0d055ec105cd460ca9c5ecaea1f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "2aeb4b6042e63d1caba7f44e7a753b54032fe2c3a5b9d30b1c49db4149adc0dd"
+    sha256 cellar: :any_skip_relocation, sonoma:        "23318830a811ab5d1047779f6c3fe6bd9d1c2cc4e8ede7713c8027624b36a445"
+    sha256 cellar: :any_skip_relocation, ventura:       "fdf20fa39a246862aa429134e633763fa585b0a9b23865fa82bbbddd29a96596"
+    sha256                               x86_64_linux:  "4f996c61da081b7421b72a5b1a7c47e0d69ccc0f626185c1016b3df45aca48a4"
   end
 
   depends_on "cmake" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build # required to compile .pb files
+  depends_on "pkgconf" => :build
   depends_on "eigen"
 
+  uses_from_macos "python" => :build # required to compile .pb files
   uses_from_macos "zlib"
 
   on_linux do
     depends_on "openblas"
   end
-
-  fails_with gcc: "5" # for C++17
 
   # We use "753723" network with 15 blocks x 192 filters (from release notes)
   # Downloaded from https://training.lczero.org/networks/?show_all=0
@@ -39,22 +36,20 @@ class Lc0 < Formula
   end
 
   def install
-    args = ["-Dgtest=false"]
+    args = ["-Dgtest=false", "-Dbindir=libexec"]
 
-    # Disable metal backend for older macOS
-    # Ref https://github.com/LeelaChessZero/lc0/issues/1814
-    args << "-Dmetal=disabled" if MacOS.version <= :big_sur
-
-    if OS.linux?
+    if OS.mac?
+      # Disable metal backend for older macOS
+      # Ref https://github.com/LeelaChessZero/lc0/issues/1814
+      args << "-Dmetal=disabled" if MacOS.version <= :big_sur
+    else
       args << "-Dopenblas_include=#{Formula["openblas"].opt_include}"
       args << "-Dopenblas_libdirs=#{Formula["openblas"].opt_lib}"
     end
-    system "meson", *std_meson_args, *args, "build/release"
 
-    cd "build/release" do
-      system "ninja", "-v"
-      libexec.install "lc0"
-    end
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
 
     bin.write_exec_script libexec/"lc0"
     resource("network").stage { libexec.install Dir["*"].first => "42850.pb.gz" }

@@ -10,25 +10,25 @@ class Percol < Formula
   head "https://github.com/mooz/percol.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6da475ab49df0faeb44eea45669d160a11113925d29fa3ccc7cc20e8500eea27"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6da475ab49df0faeb44eea45669d160a11113925d29fa3ccc7cc20e8500eea27"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6da475ab49df0faeb44eea45669d160a11113925d29fa3ccc7cc20e8500eea27"
-    sha256 cellar: :any_skip_relocation, ventura:        "c416bc3dcab1ee767c0b63f5766411bdc48f8042fa83b8068bee178ff16df39c"
-    sha256 cellar: :any_skip_relocation, monterey:       "c416bc3dcab1ee767c0b63f5766411bdc48f8042fa83b8068bee178ff16df39c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c416bc3dcab1ee767c0b63f5766411bdc48f8042fa83b8068bee178ff16df39c"
-    sha256 cellar: :any_skip_relocation, catalina:       "c416bc3dcab1ee767c0b63f5766411bdc48f8042fa83b8068bee178ff16df39c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "07ae72d152ad18f4f8565828e7da87ab3ad7839c8f59021c4fadb60ab4e59737"
+    rebuild 4
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f21f389ba2e22503900f31d63739513f239347fa1a798a24a1d57812c0b0bcd9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f21f389ba2e22503900f31d63739513f239347fa1a798a24a1d57812c0b0bcd9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f21f389ba2e22503900f31d63739513f239347fa1a798a24a1d57812c0b0bcd9"
+    sha256 cellar: :any_skip_relocation, sonoma:        "bb22665ca96a92b9319f8fdb694b809feaf104a1cfa6ea71369e13685af6fe01"
+    sha256 cellar: :any_skip_relocation, ventura:       "bb22665ca96a92b9319f8fdb694b809feaf104a1cfa6ea71369e13685af6fe01"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f21f389ba2e22503900f31d63739513f239347fa1a798a24a1d57812c0b0bcd9"
   end
 
-  depends_on "python@3.11"
-  depends_on "six"
-
-  uses_from_macos "expect" => :test
+  depends_on "python@3.13"
 
   resource "cmigemo" do
     url "https://files.pythonhosted.org/packages/2f/e4/374df50b655e36139334046f898469bf5e2d7600e1e638f29baf05b14b72/cmigemo-0.1.6.tar.gz"
     sha256 "7313aa3007f67600b066e04a4805e444563d151341deb330135b4dcdf6444626"
+  end
+
+  resource "six" do
+    url "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz"
+    sha256 "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"
   end
 
   def install
@@ -36,13 +36,24 @@ class Percol < Formula
   end
 
   test do
-    (testpath/"textfile").write <<~EOS
-      Homebrew, the missing package manager for macOS.
-    EOS
-    (testpath/"expect-script").write <<~EOS
-      spawn #{bin}/percol --query=Homebrew textfile
-      expect "QUERY> Homebrew"
-    EOS
-    assert_match "Homebrew", shell_output("expect -f expect-script")
+    expected = "Homebrew, the missing package manager for macOS."
+    (testpath/"textfile").write <<~TEXT
+      Unrelated line
+      #{expected}
+      Another unrelated line
+    TEXT
+
+    require "pty"
+    PTY.spawn("#{bin}/percol --query=Homebrew textfile > result") do |r, w, pid|
+      w.write "\n"
+      r.read
+    rescue Errno::EIO
+      # GNU/Linux raises EIO when read is done on closed pty
+    ensure
+      r.close
+      w.close
+      Process.wait(pid)
+    end
+    assert_equal expected, (testpath/"result").read.chomp
   end
 end

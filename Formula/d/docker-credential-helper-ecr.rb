@@ -1,9 +1,8 @@
 class DockerCredentialHelperEcr < Formula
   desc "Docker Credential Helper for Amazon ECR"
   homepage "https://github.com/awslabs/amazon-ecr-credential-helper"
-  url "https://github.com/awslabs/amazon-ecr-credential-helper.git",
-      tag:      "v0.7.1",
-      revision: "adf1bafd791ae7d4ff098108b1e91f36a4da5404"
+  url "https://github.com/awslabs/amazon-ecr-credential-helper/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "6067a2cb36f8b451878b4336e4bef202999281b6c31727bcda97f62cfb4aa19a"
   license "Apache-2.0"
 
   livecheck do
@@ -12,24 +11,24 @@ class DockerCredentialHelperEcr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1ea097da1828cff0652a2004c52785da654c81ac65722eb52108a129bce51a67"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "1ea097da1828cff0652a2004c52785da654c81ac65722eb52108a129bce51a67"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1ea097da1828cff0652a2004c52785da654c81ac65722eb52108a129bce51a67"
-    sha256 cellar: :any_skip_relocation, ventura:        "6e3203cb66dd05a916e756bc0e58e41f70124b57ed6878fd9537ae17f199ca7b"
-    sha256 cellar: :any_skip_relocation, monterey:       "6e3203cb66dd05a916e756bc0e58e41f70124b57ed6878fd9537ae17f199ca7b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "6e3203cb66dd05a916e756bc0e58e41f70124b57ed6878fd9537ae17f199ca7b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e1ac67bd6087eba7840fc12e21e48644dd7f51862398eb7d070f4e5101bfe095"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "162b30db65989114c0d53c3866eabcdd14ad39e656e52968a602441dd7315af8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "162b30db65989114c0d53c3866eabcdd14ad39e656e52968a602441dd7315af8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "162b30db65989114c0d53c3866eabcdd14ad39e656e52968a602441dd7315af8"
+    sha256 cellar: :any_skip_relocation, sonoma:        "0698aafc16bf4a94fe87a73fad1845f6fdfc3d62bc256590698bed8958c365ae"
+    sha256 cellar: :any_skip_relocation, ventura:       "0698aafc16bf4a94fe87a73fad1845f6fdfc3d62bc256590698bed8958c365ae"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b778b0daccf6fd640c2d3dc04355ed2fbb8791971d79cd4f4650c1a7b0a331ff"
   end
 
   depends_on "go" => :build
 
   def install
+    (buildpath/"GITCOMMIT_SHA").write tap.user
     system "make", "build"
     bin.install "bin/local/docker-credential-ecr-login"
   end
 
   test do
     output = shell_output("#{bin}/docker-credential-ecr-login", 1)
-    assert_match %r{^Usage: .*/docker-credential-ecr-login.*}, output
+    assert_match(/^Usage: .*docker-credential-ecr-login/, output)
   end
 end

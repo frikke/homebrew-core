@@ -1,20 +1,20 @@
 class Mkp224o < Formula
   desc "Vanity address generator for tor onion v3 (ed25519) hidden services"
   homepage "https://github.com/cathugger/mkp224o"
-  url "https://github.com/cathugger/mkp224o/releases/download/v1.6.1/mkp224o-1.6.1-src.tar.gz"
-  sha256 "772d4b429c08f04eca3bc45cd3f6ce57b71fa912fa6c061cd39f73bf2fec8e70"
+  url "https://github.com/cathugger/mkp224o/releases/download/v1.7.0/mkp224o-1.7.0-src.tar.gz"
+  sha256 "e38465ea893c6032ddfd7c133cbbf0de2eeaf1c428ca563fac5e85aeb609c929"
   license "CC0-1.0"
   head "https://github.com/cathugger/mkp224o.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "168d1f78395804cde88bc0ad7c087c18ed1b8d3d986efd4f9ab77cb7cefe944d"
-    sha256 cellar: :any,                 arm64_monterey: "5fd449e1ed8792a81732494b7362c75507fa96567b5b1248c76522193762a3d0"
-    sha256 cellar: :any,                 arm64_big_sur:  "77672818a99d4b11411863bd952acf9472b1b2b89415839c41600c8c7bae3cfd"
-    sha256 cellar: :any,                 ventura:        "2385ca2636a695be5689171e96f562355d3055386166855549bafb512d07cb56"
-    sha256 cellar: :any,                 monterey:       "3cef4d9204063c22271e2faca7e67b7b603ba5c2e4270431933d6715b7048dd7"
-    sha256 cellar: :any,                 big_sur:        "a3766fdff5c7010b3995300f688a0545961a19bec4137aad2c5304d3f849da85"
-    sha256 cellar: :any,                 catalina:       "4133de045c807282326009a66f7bc1d5e56be43d75cd2be4201ac450391add06"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "13c559ae3f988d2a848f7932862b22a03820ce0f2d1409d67c96c41762a74b16"
+    sha256 cellar: :any,                 arm64_sequoia:  "49b44c366d873465aa731abd4896cbd43d0b4697084cbc2c1b00e69a92ce1d79"
+    sha256 cellar: :any,                 arm64_sonoma:   "76a0f038b57586fc90bdb0688520d308e207f11902a9479a81d8149049c9f418"
+    sha256 cellar: :any,                 arm64_ventura:  "9251236b842079b87786a0ff3db1b19ff11dba9b78aecf07635842f2494e0ab4"
+    sha256 cellar: :any,                 arm64_monterey: "75bccb06af583ad85950b27658b5ffef1c99018b6cf48ec4e190df0c37be4ee7"
+    sha256 cellar: :any,                 sonoma:         "fa5df29c3c00e7877e777d3cabb36cd66252c2c952673b542afa3d5102621436"
+    sha256 cellar: :any,                 ventura:        "96cb00d8017bbd68a6cb63b75be9f61f009af25139b9be4331fd07a59ceb8936"
+    sha256 cellar: :any,                 monterey:       "45a413e61913ebe5fb046527221ae35e7de44d8607e0b4c4c112c06e75dbfd90"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7614290d244905ffde9a1c969687b56c400aa3d16a272a10ed511d2cd42737af"
   end
 
   depends_on "libsodium"
@@ -26,6 +26,6 @@ class Mkp224o < Formula
   end
 
   test do
-    assert_match "waiting for threads to finish... done", shell_output("#{bin}/mkp224o -n 3 home 2>&1")
+    assert_match "waiting for threads to finish...", shell_output("#{bin}/mkp224o -n 3 home 2>&1")
   end
 end

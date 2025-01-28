@@ -1,28 +1,30 @@
 class Nemu < Formula
   desc "Ncurses UI for QEMU"
   homepage "https://github.com/nemuTUI/nemu"
-  url "https://github.com/nemuTUI/nemu/archive/refs/tags/v3.2.0.tar.gz"
-  sha256 "f35b7e5c534bae294fe6df7685b686682145222a954b6914dfdcc17d386fecba"
+  url "https://github.com/nemuTUI/nemu/archive/refs/tags/v3.3.1.tar.gz"
+  sha256 "7cdb27cbf5df1957d0f0a258fc334f15d9e2d06a450a982bb796094efc3960c0"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 arm64_ventura:  "4c10435792d5708eef1a8fd5d1aa504616a0387f3b66e069a99d6084cd7a97ea"
-    sha256 arm64_monterey: "9a5b94e574734ff942ceef51f3c47ac203a53f636be78e2ab560d1c82dfe40cf"
-    sha256 arm64_big_sur:  "d6afaec948bdd9ef2db37ac4844e0131ad12daac732f6903818760679d8334f4"
-    sha256 ventura:        "427ed14c86065271bb18f07d4c2c409d2c24f325c4d73d63563d14cd15376910"
-    sha256 monterey:       "129e2d494fd094a2dd72c4aecd8ae11f8d78492fa9b03aa35fecdb1a378cfa89"
-    sha256 big_sur:        "acf4c11eae2001ce5332a1492711a60fe29ac879a64b15f576b968ad96bf3a19"
-    sha256 x86_64_linux:   "3b8b5991992a53932c6cc20fcd8cceb88394ff091602ab715f0ae8a0d7ac8f0d"
+    sha256 arm64_sequoia:  "4c96f0430555710f094365598dddb0e2089ab38b1c756532a11f2a3303bd2768"
+    sha256 arm64_sonoma:   "af6f110c24124397c439c2b8ffc7dd0b9186fcbfe9946ad0d45a4a3a094146de"
+    sha256 arm64_ventura:  "7ee1275f2d0d4420779817a5379e3b5aba1189a2912ccc3bc099c0d149614bf6"
+    sha256 arm64_monterey: "d1e08e1f8edafdf159a802c2f37e4413a61c15265f9cc2821b8d538d293a0a93"
+    sha256 sonoma:         "4eae6f67f094316ff9ae0aaea3be33254e870a74677b962735c2f78a5bfc7682"
+    sha256 ventura:        "f01fb55760affcd6ff698e4b680c3ae12212493b3ed530f75ef626cdba48b82b"
+    sha256 monterey:       "5feb7ba4d086208474da5fbf0c1a98ceb26d783bc2950fe3a9ae1d90519a7289"
+    sha256 x86_64_linux:   "babf6558252a668a49b3fb0552415c50ebabbcee6ba4dad54a64e8f01b8dc79f"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gettext"
   depends_on "json-c"
   depends_on "libarchive"
   depends_on "ncurses"
   depends_on "openssl@3"
 
+  uses_from_macos "libxml2"
   uses_from_macos "sqlite"
 
   on_linux do

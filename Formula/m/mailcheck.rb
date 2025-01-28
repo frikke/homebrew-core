@@ -3,12 +3,15 @@ class Mailcheck < Formula
   homepage "https://mailcheck.sourceforge.net/"
   url "https://downloads.sourceforge.net/project/mailcheck/mailcheck/1.91.2/mailcheck_1.91.2.tar.gz"
   sha256 "6ca6da5c9f8cc2361d4b64226c7d9486ff0962602c321fc85b724babbbfa0a5c"
-  license "GPL-2.0"
+  license "GPL-2.0-or-later"
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "9826a29c8ea6cc9f8a3c2c1a85c39726d0412898ab38feccdc027ccf505a5662"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "5892072eefc7d2c38a7acabbb05bb380943380d11e46ea2c6f514abe08979184"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "aa14d797b2b2de01428e52e56c0e26ffe36d72227393ec4554c0749b8189aa60"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "ebfbf5a09b426cf879dc604f856b3512febfe7013bc74039dc35dcbf0d28b57e"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9cb8f491eff846164c8732bf372b323f8546830237ac097dc55dfba3747d6331"
+    sha256 cellar: :any_skip_relocation, sonoma:         "193fcd7805d976190391ae4bcf34afd28ebd82bfd45aff54c307aa6325a7a93f"
     sha256 cellar: :any_skip_relocation, ventura:        "d6e91d19af4b560df0f8a4c02dc922e7e31273812076b8d326109f394a8d7dbf"
     sha256 cellar: :any_skip_relocation, monterey:       "212f413b638cf5e1e95f27edec31f6f197cf4ff2f20d24e0580d7db1957b2ea6"
     sha256 cellar: :any_skip_relocation, big_sur:        "59d3c8716efff8670b81cec68c47b0663ffa079938ee6aae55078770564fa481"

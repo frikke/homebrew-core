@@ -1,37 +1,36 @@
-require "language/node"
-
 class Esbuild < Formula
   desc "Extremely fast JavaScript bundler and minifier"
   homepage "https://esbuild.github.io/"
-  url "https://registry.npmjs.org/esbuild/-/esbuild-0.19.3.tgz"
-  sha256 "c2feb85d245ba2cd27c94a615e586a54d266cbb6907160c8bcb4fbb2b95372c1"
+  url "https://github.com/evanw/esbuild/archive/refs/tags/v0.24.2.tar.gz"
+  sha256 "171e1b0cd4c64222a1953203f6b3dab3c7a3f95b8939a72b4ebbd024302513b4"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5d22d8a90039a81cc8ea73e4a276d471c5ac14172c02ab0066d98cfdb048ba5e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5d22d8a90039a81cc8ea73e4a276d471c5ac14172c02ab0066d98cfdb048ba5e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5d22d8a90039a81cc8ea73e4a276d471c5ac14172c02ab0066d98cfdb048ba5e"
-    sha256 cellar: :any_skip_relocation, ventura:        "8932dc69678cf0fc5e365ea1dccd35764b5bb20243aaaf41c359b4464f4764cd"
-    sha256 cellar: :any_skip_relocation, monterey:       "8932dc69678cf0fc5e365ea1dccd35764b5bb20243aaaf41c359b4464f4764cd"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8932dc69678cf0fc5e365ea1dccd35764b5bb20243aaaf41c359b4464f4764cd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2fa630e3c085d3147f1f09b3579f95dd924b8574a191541f523e4926c03f5eca"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "36434777bdb8c71a10b067201d782cd61ff20334f57d108fda784f3f5c56afe4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "36434777bdb8c71a10b067201d782cd61ff20334f57d108fda784f3f5c56afe4"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "36434777bdb8c71a10b067201d782cd61ff20334f57d108fda784f3f5c56afe4"
+    sha256 cellar: :any_skip_relocation, sonoma:        "eda813d048b7c8e3567cdd83d8c35a6752f4f5c8a0ea2d57d78d7ce44e0ff1c5"
+    sha256 cellar: :any_skip_relocation, ventura:       "eda813d048b7c8e3567cdd83d8c35a6752f4f5c8a0ea2d57d78d7ce44e0ff1c5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e8b266ad0f0eff10d365e4908096ff12bd2fe99123a1c771815aced51173c400"
   end
 
-  depends_on "node"
+  depends_on "go" => :build
+  depends_on "node" => :test
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
-    bin.install_symlink Dir["#{libexec}/bin/*"]
+    ENV["CGO_ENABLED"] = OS.mac? ? "1" : "0"
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/esbuild"
   end
 
   test do
-    (testpath/"app.jsx").write <<~EOS
+    (testpath/"app.jsx").write <<~JS
       import * as React from 'react'
       import * as Server from 'react-dom/server'
 
       let Greet = () => <h1>Hello, world!</h1>
       console.log(Server.renderToString(<Greet />))
-    EOS
+      process.exit()
+    JS
 
     system Formula["node"].libexec/"bin/npm", "install", "react", "react-dom"
     system bin/"esbuild", "app.jsx", "--bundle", "--outfile=out.js"

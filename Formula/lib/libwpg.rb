@@ -11,6 +11,7 @@ class Libwpg < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "a062020deb99f826a9d7db555d3205c8fb56f431d19e916f7b17319641b9a00a"
     sha256 cellar: :any,                 arm64_sonoma:   "d2b1e6eed68f342f9a97a9059d84880c33316fbc4efaa011562b852432e6dd11"
     sha256 cellar: :any,                 arm64_ventura:  "c31dc532929561dc728f03ac0ff1ab2aeef0c0428df51cc8be13a7ea05a0e16e"
     sha256 cellar: :any,                 arm64_monterey: "387b98747ca1ef188c562bc3ab88283920a9ec220666b4a49ce27de7fbcd5f5c"
@@ -22,23 +23,23 @@ class Libwpg < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "c079bc2c2fc9c98e967d13ffa15b47ab25efc59ba66f731ce3758d1265017368"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "boost" => :build
+  depends_on "pkgconf" => :build
   depends_on "librevenge"
   depends_on "libwpd"
 
   def install
-    system "./configure", "--disable-debug", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <libwpg/libwpg.h>
       int main() {
         return libwpg::WPG_AUTODETECT;
       }
-    EOS
+    CPP
     system ENV.cc, "test.cpp",
                    "-I#{Formula["librevenge"].opt_include}/librevenge-0.0",
                    "-I#{include}/libwpg-0.3",

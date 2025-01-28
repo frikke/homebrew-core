@@ -1,7 +1,7 @@
 class Libmowgli < Formula
   desc "Core framework for Atheme applications"
   homepage "https://github.com/atheme/libmowgli-2"
-  url "https://github.com/atheme/libmowgli-2/archive/v2.1.3.tar.gz"
+  url "https://github.com/atheme/libmowgli-2/archive/refs/tags/v2.1.3.tar.gz"
   sha256 "b7faab2fb9f46366a52b51443054a2ed4ecdd04774c65754bf807c5e9bdda477"
   license "ISC"
   revision 1
@@ -9,6 +9,7 @@ class Libmowgli < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "00f3b1d8ae9a7210417aa4b09f041dc3e04e1a60097724fc28ebf5b1fb00ab89"
     sha256 cellar: :any,                 arm64_sonoma:   "7a949575c3803dbfd27a4ad549c6f24c67f2159b9dfd73d83b5eb9ffd872561c"
     sha256 cellar: :any,                 arm64_ventura:  "19a8d7aa0f5c72bf5c7e459c1d6924fc7f5ab479f878c8129de5a3693dae3b8d"
     sha256 cellar: :any,                 arm64_monterey: "476e3d8c4864929ada3e6a5af324c768cb18719e9b2200e7ceeb7fe8711d9a2f"
@@ -31,7 +32,7 @@ class Libmowgli < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <mowgli.h>
 
       int main(int argc, char *argv[]) {
@@ -44,7 +45,7 @@ class Libmowgli < Formula
         mowgli_object_unref(r);
         return EXIT_SUCCESS;
       }
-    EOS
+    C
     system ENV.cc, "-I#{include}/libmowgli-2", "-o", "test", "test.c", "-L#{lib}", "-lmowgli-2"
     system "./test"
   end

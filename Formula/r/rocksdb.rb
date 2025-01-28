@@ -1,19 +1,18 @@
 class Rocksdb < Formula
   desc "Embeddable, persistent key-value store for fast storage"
   homepage "https://rocksdb.org/"
-  url "https://github.com/facebook/rocksdb/archive/refs/tags/v8.5.3.tar.gz"
-  sha256 "ed4230500b9ca20bc7918c32166b2d0d46a8695c59991821daa586d55689d785"
+  url "https://github.com/facebook/rocksdb/archive/refs/tags/v9.10.0.tar.gz"
+  sha256 "fdccab16133c9d927a183c2648bcea8d956fb41eb1df2aacaa73eb0b95e43724"
   license any_of: ["GPL-2.0-only", "Apache-2.0"]
   head "https://github.com/facebook/rocksdb.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "7218ac1f28679426ccfa63ffe4418797c763b73e27231d0f60ae4ccf9888c433"
-    sha256 cellar: :any,                 arm64_monterey: "0c3e571acacb9b896abace4caf51d1e7865587d01e7ee908ebeee1de16c21d05"
-    sha256 cellar: :any,                 arm64_big_sur:  "fc0f5df40344674d7ebb7de5ef1fe6f6f600c3cd4fbe3684cb6af1ba78a47bfb"
-    sha256 cellar: :any,                 ventura:        "532c5ba65c58ad6e1c2a2f5dd541f5620e8f91e885ab6fb959826baa1e870755"
-    sha256 cellar: :any,                 monterey:       "78dd94adeaacb5fba79ce2203816aaa6533bc625bddd08b80cf0dc11b77c718e"
-    sha256 cellar: :any,                 big_sur:        "b3f5a395761823c5b85bff28950f0be55d99cf1c407e2f2d53fb3fb7727929bd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3d67465701b67bf8608a831e6fe41cc7f683d22397b427738ffa24361ec3f11b"
+    sha256 cellar: :any,                 arm64_sequoia: "ecc21a9b67c20b7f3837dc693b5749686bab49d36eaa1b301100b64a254880f2"
+    sha256 cellar: :any,                 arm64_sonoma:  "1d412c64a5c08637a29abd5541f6e727f661b5041297775b482cea8d418642af"
+    sha256 cellar: :any,                 arm64_ventura: "5588ca74caf9d3b827a420aed8ed5029f20bb0a940eacc761677ab170d657fb9"
+    sha256 cellar: :any,                 sonoma:        "1e5c28718e34b4e39c45a400d0b1cb58aff54cb36df7cde50dd5f7b0e26dd051"
+    sha256 cellar: :any,                 ventura:       "b175bf5cc562b555d0593c2d9c6c81a631499269294ac71def7f9471fc78dc03"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d50768787420a4831d998f90c0dae3ee963c7a090f20cb2d4a22cac27447da5e"
   end
 
   depends_on "cmake" => :build
@@ -24,11 +23,6 @@ class Rocksdb < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
-
-  fails_with :gcc do
-    version "6"
-    cause "Requires C++17 compatible compiler. See https://github.com/facebook/rocksdb/issues/9388"
-  end
 
   def install
     args = %W[
@@ -42,6 +36,7 @@ class Rocksdb < Formula
       -DWITH_ZSTD=ON
       -DROCKSDB_BUILD_SHARED=ON
       -DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath,#{rpath}
+      -DZSTD_INCLUDE_DIRS=#{Formula["zstd"].include}
     ]
     system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
@@ -60,7 +55,7 @@ class Rocksdb < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <assert.h>
       #include <rocksdb/options.h>
       #include <rocksdb/memtablerep.h>
@@ -69,7 +64,7 @@ class Rocksdb < Formula
         Options options;
         return 0;
       }
-    EOS
+    CPP
 
     extra_args = []
     if OS.mac?
@@ -95,7 +90,7 @@ class Rocksdb < Formula
     assert_match "rocksdb_dump:", shell_output("#{bin}/rocksdb_dump --help 2>&1", 1)
     assert_match "rocksdb_undump:", shell_output("#{bin}/rocksdb_undump --help 2>&1", 1)
 
-    db = testpath / "db"
+    db = testpath/"db"
     %w[no snappy zlib bzip2 lz4 zstd].each_with_index do |comp, idx|
       key = "key-#{idx}"
       value = "value-#{idx}"

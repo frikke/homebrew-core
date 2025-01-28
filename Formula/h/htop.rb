@@ -1,8 +1,8 @@
 class Htop < Formula
   desc "Improved top (interactive process viewer)"
   homepage "https://htop.dev/"
-  url "https://github.com/htop-dev/htop/archive/3.2.2.tar.gz"
-  sha256 "3829c742a835a0426db41bb039d1b976420c21ec65e93b35cd9bfd2d57f44ac8"
+  url "https://github.com/htop-dev/htop/archive/refs/tags/3.3.0.tar.gz"
+  sha256 "1e5cc328eee2bd1acff89f860e3179ea24b85df3ac483433f92a29977b14b045"
   license "GPL-2.0-or-later"
   head "https://github.com/htop-dev/htop.git", branch: "main"
 
@@ -12,21 +12,21 @@ class Htop < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "fa11348878695cc969b76354c14d8f8ff60554ffa89cb71a3a258b88e222a1af"
-    sha256 cellar: :any,                 arm64_ventura:  "87daed2cfe0d478a778b09b5f29428f05b15ff081f0e70b9a2609cf479572721"
-    sha256 cellar: :any,                 arm64_monterey: "76872761874d2148c1da382b3922b25916f245ef1d05fa21f95dbc1baa5ff8d4"
-    sha256 cellar: :any,                 arm64_big_sur:  "52bdaef69f06d6808896cd8325ff6b2be3f96643660cc5475e1d45ba850a594d"
-    sha256 cellar: :any,                 sonoma:         "38726954cd1d7141bc5cbfd8893bf4bdb6ae34b87959453eb4a31a466d672c00"
-    sha256 cellar: :any,                 ventura:        "38dcedb23adca849a1e1952c4a0d3249406b625f0e2094dfc47028be7df304b2"
-    sha256 cellar: :any,                 monterey:       "078c94ade63f91b01334d300f00489592361bdfef3600c0ca7f6ad3ce2032281"
-    sha256 cellar: :any,                 big_sur:        "7620c57b8abc846f264fb7906b96f3da07da7c6d2b43bde1579c29e04c77fc64"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bb45255abf5f0cd1d886bb8ea68b26c60517771268cf18ac3cec875b572b1fc6"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "3ef4d2047472d6f8fff23cc60e4171fb5cb1ad6a546f0b54e97b43e8d5f97053"
+    sha256 cellar: :any,                 arm64_sonoma:   "ea457e022296c96a73ebecc31119ea225c2b41670426a9099bccf5f1d17673ec"
+    sha256 cellar: :any,                 arm64_ventura:  "5895685e6db67598024850ca3c440e1244ee5dd54bc7c6b5345b28d74f9fa4f0"
+    sha256 cellar: :any,                 arm64_monterey: "91b0b5fe4ffb977e6381664d74ec48e890da908a346473b5e4d88f8117a2dc23"
+    sha256 cellar: :any,                 sonoma:         "c3ee757e215de2dfd151ea9eb68ef53bb64ba86c5d07a443c6477bdb952f02bf"
+    sha256 cellar: :any,                 ventura:        "69f690190833cf309baa396b7a7a8218ec012ca93e0825a2b2a4d9f0d5cafb33"
+    sha256 cellar: :any,                 monterey:       "9872ffeea0cbab0d5f2e418fd06442663a113b67be12e15b0ece20e701f4ada3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "85ee4a9f06bc81442fc93e02f8aa875a7641781aa147aab1f863e5c4d744b47d"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "ncurses" # enables mouse scroll
 
   on_linux do
@@ -50,6 +50,6 @@ class Htop < Formula
   end
 
   test do
-    pipe_output("#{bin}/htop", "q", 0)
+    pipe_output(bin/"htop", "q", 0)
   end
 end

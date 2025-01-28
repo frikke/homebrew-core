@@ -7,9 +7,11 @@ class GuileAT2 < Formula
   revision 3
 
   bottle do
+    sha256 arm64_sonoma:   "b2b612f37486f527343dd97bfbf70f7a316a78d1b8cca44286155f18db35fed6"
     sha256 arm64_ventura:  "557aa9ef8f3c8f575122150c28ba59ba9039296ce877ee4682bd4006d90c5b8c"
     sha256 arm64_monterey: "5a1b1e6a6b110db0de83ddd4e8a09aa542bdc956ffcb68929528757e6fd62279"
     sha256 arm64_big_sur:  "c121dcc2dab98dfcbfb1c6007171b64c1b5a7ab13336440d6d8f24a13e26f861"
+    sha256 sonoma:         "d2fdc5b4e60062257ba5f7bccfcdd9621f567f419a9d8f80bd704184e03c26b8"
     sha256 ventura:        "4c44b0aa055223c46d33a3025ec363ad0f4bc965b3a4a6bd3f15711cb02b0d16"
     sha256 monterey:       "2e2273836f9912d3e4dd0219f2af761d9fa014f552ecd938acb96af730813be8"
     sha256 big_sur:        "b85baae60da2568229dfcd142067ddd660764e7ac72925279147b68b1269aa4a"
@@ -20,14 +22,14 @@ class GuileAT2 < Formula
 
   # Original deprecation date: 2020-04-07
   # Temporarily undeprecated from 2022-07-29 to 2023-02-13
-  deprecate! date: "2023-02-13", because: :versioned_formula
+  disable! date: "2024-02-01", because: :versioned_formula
 
   depends_on "gnu-sed" => :build
   depends_on "bdw-gc"
   depends_on "gmp"
   depends_on "libtool"
   depends_on "libunistring"
-  depends_on "pkg-config" # guile-config is a wrapper around pkg-config.
+  depends_on "pkgconf" # guile-config is a wrapper around pkg-config.
   depends_on "readline"
 
   uses_from_macos "libffi", since: :catalina
@@ -35,7 +37,7 @@ class GuileAT2 < Formula
 
   def install
     # Avoid superenv shim
-    inreplace "meta/guile-config.in", "@PKG_CONFIG@", Formula["pkg-config"].opt_bin/"pkg-config"
+    inreplace "meta/guile-config.in", "@PKG_CONFIG@", Formula["pkgconf"].opt_bin/"pkgconf"
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
@@ -54,7 +56,7 @@ class GuileAT2 < Formula
     # of opt_prefix usage everywhere.
     inreplace lib/"pkgconfig/guile-2.2.pc" do |s|
       s.gsub! Formula["bdw-gc"].prefix.realpath, Formula["bdw-gc"].opt_prefix
-      s.gsub! Formula["libffi"].prefix.realpath, Formula["libffi"].opt_prefix if MacOS.version < :catalina
+      s.gsub! Formula["libffi"].prefix.realpath, Formula["libffi"].opt_prefix if !OS.mac? || MacOS.version < :catalina
     end
 
     (share/"gdb/auto-load").install lib.glob("*-gdb.scm")
@@ -62,10 +64,10 @@ class GuileAT2 < Formula
 
   test do
     hello = testpath/"hello.scm"
-    hello.write <<~EOS
+    hello.write <<~SCHEME
       (display "Hello World")
       (newline)
-    EOS
+    SCHEME
 
     ENV["GUILE_AUTO_COMPILE"] = "0"
 

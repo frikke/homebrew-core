@@ -1,30 +1,29 @@
 class RubyAT31 < Formula
   desc "Powerful, clean, object-oriented scripting language"
   homepage "https://www.ruby-lang.org/"
-  url "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.4.tar.gz"
-  sha256 "a3d55879a0dfab1d7141fdf10d22a07dbf8e5cdc4415da1bde06127d5cc3c7b6"
+  url "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.6.tar.gz"
+  sha256 "0d0dafb859e76763432571a3109d1537d976266be3083445651dc68deed25c22"
   license "Ruby"
 
   livecheck do
-    url "https://www.ruby-lang.org/en/downloads/"
+    url "https://www.ruby-lang.org/en/downloads/releases/"
     regex(/href=.*?ruby[._-]v?(3\.1(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_sonoma:   "183db7a989d3f4e89b1f9c6100353decf2845659b3d86084162b09c0d4db6a36"
-    sha256 arm64_ventura:  "c35d7d1f6307180afcf8cf95ffca3849353ed8b9aebe7da7b90d1df616f5ad75"
-    sha256 arm64_monterey: "22efcfab9ccb16f4787f62b1fa71ca2326b180d74ba6a2ecec95664c81a2478a"
-    sha256 arm64_big_sur:  "e5f4f7d69136dc0eb5e61bca1e0864ce824484af648a533277ac26e69162881f"
-    sha256 sonoma:         "0500d9838d5e7fd2d3c7f0e0dcc10e6cb3d4094257b4662298df4e0af880e7aa"
-    sha256 ventura:        "4e6bc850a4fcb9effb8ac61512f1c584937fc1016c60aa97414496843b3f88a0"
-    sha256 monterey:       "67342bc95cd818602a704d2a90a8a79a4c100107128dc08a4ff3af4376ad6c11"
-    sha256 big_sur:        "0c46bd1ac4b698213d8b513d19bcd54fd5715586a88741646209851f4dd6e290"
-    sha256 x86_64_linux:   "a3fd5b417468420714a664f9a7bf0cd3d0f2111aa9e2792c532160abcccd0366"
+    sha256 arm64_sequoia:  "484f40a8b1a4b2762e2c689798d3f5677bb966f84864e2880749cd91926e9289"
+    sha256 arm64_sonoma:   "7c5a047c339ba80d2a14b34ef244ed9e0af7102d340b8e5f91eca4d7a0a853bf"
+    sha256 arm64_ventura:  "4440ac18c954c2f1d0cbfa0f470fb87c26ac1aa7a6734b83e87ab9d0ef630c7c"
+    sha256 arm64_monterey: "0fdd2a2e9f8297ca292959540012c00392205312b865d1c7aeb18a09c16db428"
+    sha256 sonoma:         "33a2ac7835348d4812760725fffeacdc1e6d15a5673b6230f2337196054e2b1e"
+    sha256 ventura:        "20e409cb7b524b04e9248c9addb2e2d8a52027a8ddd3c07eb7e594b0e94fd2bf"
+    sha256 monterey:       "015c58f56f84a419659b6e777683c9ac82d87cb3da3e428614ea63161e173084"
+    sha256 x86_64_linux:   "a282cbc26752e31cc3957ee74991e08f6e12b736ecf41d5d56ff7435e8f6027c"
   end
 
   keg_only :versioned_formula
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libyaml"
   depends_on "openssl@3"
   depends_on "readline"
@@ -37,12 +36,12 @@ class RubyAT31 < Formula
   # The exception is Rubygem security fixes, which mandate updating this
   # formula & the versioned equivalents and bumping the revisions.
   resource "rubygems" do
-    url "https://rubygems.org/rubygems/rubygems-3.4.10.tgz"
-    sha256 "55f1c67fa2ae96c9751b81afad5c0f2b3792c5b19cbba6d54d8df9fd821460d3"
+    url "https://rubygems.org/rubygems/rubygems-3.5.11.tgz"
+    sha256 "4521b52f843620a9fc5ca7414526b7463b0989564c3ae80b26b68fbd1304c818"
   end
 
   def api_version
-    Utils.safe_popen_read("#{bin}/ruby", "-e", "print Gem.ruby_api_version")
+    "3.1.0"
   end
 
   def rubygems_bindir
@@ -99,7 +98,7 @@ class RubyAT31 < Formula
     resource("rubygems").stage do
       ENV.prepend_path "PATH", bin
 
-      system "#{bin}/ruby", "setup.rb", "--prefix=#{buildpath}/vendor_gem"
+      system bin/"ruby", "setup.rb", "--prefix=#{buildpath}/vendor_gem"
       rg_in = lib/"ruby/#{api_version}"
       rg_gems_in = lib/"ruby/gems/#{api_version}"
 
@@ -126,11 +125,11 @@ class RubyAT31 < Formula
     # Since Gem ships Bundle we want to provide that full/expected installation
     # but to do so we need to handle the case where someone has previously
     # installed bundle manually via `gem install`.
-    rm_f %W[
+    rm(%W[
       #{rubygems_bindir}/bundle
       #{rubygems_bindir}/bundler
-    ]
-    rm_rf Dir[HOMEBREW_PREFIX/"lib/ruby/gems/#{api_version}/gems/bundler-*"]
+    ].select { |file| File.exist?(file) })
+    rm_r(Dir[HOMEBREW_PREFIX/"lib/ruby/gems/#{api_version}/gems/bundler-*"])
     rubygems_bindir.install_symlink Dir[libexec/"gembin/*"]
 
     # Customize rubygems to look/install in the global gem directory
@@ -146,7 +145,7 @@ class RubyAT31 < Formula
   end
 
   def rubygems_config(api_version)
-    <<~EOS
+    <<~RUBY
       module Gem
         class << self
           alias :old_default_dir :default_dir
@@ -215,12 +214,10 @@ class RubyAT31 < Formula
           File.join(Gem.old_default_dir, "specifications", "default")
         end
       end
-    EOS
+    RUBY
   end
 
   def caveats
-    return unless latest_version_installed?
-
     <<~EOS
       By default, binaries installed by gem will be placed into:
         #{rubygems_bindir}
@@ -232,8 +229,11 @@ class RubyAT31 < Formula
   test do
     hello_text = shell_output("#{bin}/ruby -e 'puts :hello'")
     assert_equal "hello\n", hello_text
+
+    assert_equal api_version, shell_output("#{bin}/ruby -e 'print Gem.ruby_api_version'")
+
     ENV["GEM_HOME"] = testpath
-    system "#{bin}/gem", "install", "json"
+    system bin/"gem", "install", "json"
 
     (testpath/"Gemfile").write <<~EOS
       source 'https://rubygems.org'
@@ -241,6 +241,6 @@ class RubyAT31 < Formula
     EOS
     system bin/"bundle", "exec", "ls" # https://github.com/Homebrew/homebrew-core/issues/53247
     system bin/"bundle", "install", "--binstubs=#{testpath}/bin"
-    assert_predicate testpath/"bin/github-markup", :exist?, "github-markup is not installed in #{testpath}/bin"
+    assert_path_exists testpath/"bin/github-markup", "github-markup is not installed in #{testpath}/bin"
   end
 end

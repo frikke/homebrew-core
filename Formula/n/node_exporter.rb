@@ -1,8 +1,8 @@
 class NodeExporter < Formula
   desc "Prometheus exporter for machine metrics"
   homepage "https://prometheus.io/"
-  url "https://github.com/prometheus/node_exporter/archive/v1.6.1.tar.gz"
-  sha256 "933d191d46be31da3fd608b97506115ab63a641a3b20c3931fd63faceb89222f"
+  url "https://github.com/prometheus/node_exporter/archive/refs/tags/v1.8.2.tar.gz"
+  sha256 "f615c70be816550498dd6a505391dbed1a896705eff842628de13a1fa7654e8f"
   license "Apache-2.0"
   head "https://github.com/prometheus/node_exporter.git", branch: "master"
 
@@ -12,13 +12,14 @@ class NodeExporter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "8cae73e819d8b58983cfbcb2500e406acb8846b2dfbb9d9945bf01843f699936"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "221dc6a72fbed73d439e58e34a5afdd1cc42880b517865c5d535873774cdde3f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cc32594b9b12a5285e48aab4b7a1502ca0ba4e25109ece2ee115159a37de2108"
-    sha256 cellar: :any_skip_relocation, ventura:        "1f5fc236847e29a3f2eaf31fd801935a2448e5c75ae0af72fce44fb5e34e4360"
-    sha256 cellar: :any_skip_relocation, monterey:       "b2bfcd925ad88c66c92b9cfa234c478ca5ac4b2b7217911f9af26dbbce3446e5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "733c760bcb42a72ac6967ebcc6d3e4525bc92ad92c450772c48bfc85b2cf5b00"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "23912fa02ab47c8c08e77e350f6ba07c168edebecce7b999e53dc5f29f55dad1"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d9ed4d98edbc12270f271477c94d66b2e6c42057f74d6288f7c0114cf6a8aca6"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "763072dec71f2cbbd34b19873574e0385258f0c2879df86e0dbbbd2408f4d32c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "310634ef8185409fd48cf7c978b6015d7bc83290da06345566699e6e7ff84adb"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b6046cc85d395e2d4aebda99e3bede1eab9abf07eb3a1a95c177d10c11043c94"
+    sha256 cellar: :any_skip_relocation, sonoma:         "b6f5e9d5c2e07a113313c97b06243e94a1e1f3a8960f3a0818a3a2f56f3f5ab3"
+    sha256 cellar: :any_skip_relocation, ventura:        "62d5151b71d60d7c7ea67a703e6b348233eeb5b3b1535cb03c7a14951ee3b846"
+    sha256 cellar: :any_skip_relocation, monterey:       "0a8138efd708d76751c0c7811a28217f107dcd97a078e7ed99113dba8774ef33"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8300960df12d7d8ef8b9bb30b764b2ddc61527e09c6084a5b44eef3cc581f885"
   end
 
   depends_on "go" => :build
@@ -29,14 +30,14 @@ class NodeExporter < Formula
       -X github.com/prometheus/common/version.Version=#{version}
       -X github.com/prometheus/common/version.BuildUser=Homebrew
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
 
     touch etc/"node_exporter.args"
 
-    (bin/"node_exporter_brew_services").write <<~EOS
+    (bin/"node_exporter_brew_services").write <<~BASH
       #!/bin/bash
       exec #{bin}/node_exporter $(<#{etc}/node_exporter.args)
-    EOS
+    BASH
   end
 
   def caveats

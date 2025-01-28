@@ -1,8 +1,8 @@
 class Zig < Formula
   desc "Programming language designed for robustness, optimality, and clarity"
   homepage "https://ziglang.org/"
-  url "https://ziglang.org/download/0.11.0/zig-0.11.0.tar.xz"
-  sha256 "72014e700e50c0d3528cef3adf80b76b26ab27730133e8202716a187a799e951"
+  url "https://ziglang.org/download/0.13.0/zig-0.13.0.tar.xz"
+  sha256 "06c73596beeccb71cc073805bdb9c0e05764128f16478fa53bf17dfabc1d4318"
   license "MIT"
 
   livecheck do
@@ -11,26 +11,34 @@ class Zig < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "c86f263129502db9b998b279c79ba373a6d9e88e2e47e4492ed696a004d21980"
-    sha256 cellar: :any,                 arm64_monterey: "fbc4211c5beacb7cc1c7c36ba1db931492fb3289bbcbc2b085f0e5af6ab40659"
-    sha256 cellar: :any,                 arm64_big_sur:  "472a2c08984811317234c134d7347266ce8e30c24ef75076f397d8b50b474e3b"
-    sha256 cellar: :any,                 ventura:        "9adbe95444f3b648d1cd2ae2f8dc07891f7527cb1da369fd3f5db6c75ace1079"
-    sha256 cellar: :any,                 monterey:       "172f93925e39207a580e1d5a71b211415364e8756e0a02386c9e5f6be99b1ea5"
-    sha256 cellar: :any,                 big_sur:        "00002da55679b70ef280b06f67154a449876c5ab08b13cbdaa261bacca07fa74"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6a108d8abb0c31301daab3230db5537136281309291fcba3df62817fbbb32c13"
+    sha256 cellar: :any,                 arm64_sequoia:  "0cd64ccf3ff42f7857000ead7b3b2f09b78c2d4e1e0f661f8f4cb6552b6ad88e"
+    sha256 cellar: :any,                 arm64_sonoma:   "e2fdab9f70dba65551d21e6e9fc47d98336bcdb52658ff3f7799ad244aa2f500"
+    sha256 cellar: :any,                 arm64_ventura:  "09cbcd8fdc15b0c5cdcbdecd2f0e42337a2ddac0070b50189fb02e5db1942633"
+    sha256 cellar: :any,                 arm64_monterey: "2f197b24ce0a0d7167eacf89314407ef21103e963916c05c9a094d79d152ecc4"
+    sha256 cellar: :any,                 sonoma:         "193e35179c6695aee629a8551920237cf3c94a8a8853b9edf61e91ac7ba709e2"
+    sha256 cellar: :any,                 ventura:        "dda3491dea9cdda74d5ab8ef63a38f88ad1e73e1d7ec58c4e54333e9a3333b54"
+    sha256 cellar: :any,                 monterey:       "ea39859d4c94d9a3b5c03d5faa7552275ad74d13d24c3ea558ae3f6397a9879e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ca207335ca7208dbe6198f0c12d593f7c8251457e924bc05f3cd1875874cc3af"
   end
 
   depends_on "cmake" => :build
   depends_on "llvm" => :build
   depends_on macos: :big_sur # https://github.com/ziglang/zig/issues/13313
-  depends_on "z3"
+  depends_on "z3" # Remove when using versioned LLVM
   depends_on "zstd"
+
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
-  fails_with :gcc
-
   def install
+    llvm = deps.find { |dep| dep.name.match?(/^llvm(@\d+)?$/) }
+               .to_formula
+    if llvm.versioned_formula? && deps.any? { |dep| dep.name == "z3" }
+      # Don't remove this check even if we're using a versioned LLVM
+      # to avoid accidentally keeping it when not needed in the future.
+      odie "`z3` dependency should be removed!"
+    end
+
     # Workaround for https://github.com/Homebrew/homebrew-core/pull/141453#discussion_r1320821081.
     # This will likely be fixed upstream by https://github.com/ziglang/zig/pull/16062.
     if OS.linux?
@@ -53,27 +61,27 @@ class Zig < Formula
   end
 
   test do
-    (testpath/"hello.zig").write <<~EOS
+    (testpath/"hello.zig").write <<~ZIG
       const std = @import("std");
       pub fn main() !void {
           const stdout = std.io.getStdOut().writer();
           try stdout.print("Hello, world!", .{});
       }
-    EOS
-    system "#{bin}/zig", "build-exe", "hello.zig"
+    ZIG
+    system bin/"zig", "build-exe", "hello.zig"
     assert_equal "Hello, world!", shell_output("./hello")
 
     # error: 'TARGET_OS_IPHONE' is not defined, evaluates to 0
     # https://github.com/ziglang/zig/issues/10377
     ENV.delete "CPATH"
-    (testpath/"hello.c").write <<~EOS
+    (testpath/"hello.c").write <<~C
       #include <stdio.h>
       int main() {
         fprintf(stdout, "Hello, world!");
         return 0;
       }
-    EOS
-    system "#{bin}/zig", "cc", "hello.c", "-o", "hello"
+    C
+    system bin/"zig", "cc", "hello.c", "-o", "hello"
     assert_equal "Hello, world!", shell_output("./hello")
   end
 end

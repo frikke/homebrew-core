@@ -1,10 +1,9 @@
 class Volta < Formula
   desc "JavaScript toolchain manager for reproducible environments"
   homepage "https://volta.sh"
-  url "https://github.com/volta-cli/volta/archive/v1.1.1.tar.gz"
-  sha256 "f2289274538124984bebb09b0968c2821368d8a80d60b9615e4f999f6751366d"
+  url "https://github.com/volta-cli/volta/archive/refs/tags/v2.0.2.tar.gz"
+  sha256 "0e93d17c36fb79222b10881d6c67d667483f85b19a0498eacfc535ef31894dbe"
   license "BSD-2-Clause"
-  revision 2
   head "https://github.com/volta-cli/volta.git", branch: "main"
 
   livecheck do
@@ -13,20 +12,18 @@ class Volta < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "91f86479b539d9df009da79e569b1ab740f7e5ed635f537a639f7f65c446f69e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b8454fe11303c2d14a4e77b9dadc086bb12fa94aa71fdbec50f4e03a49d5e473"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b16b992a717720120aa9826992f4b217722b1153254a05b68afaa5f02fc8bb9d"
-    sha256 cellar: :any_skip_relocation, ventura:        "ed384b28700d57dabca74fc9a34e25840e0e241b2dca4fb8a7d6261eff0a797b"
-    sha256 cellar: :any_skip_relocation, monterey:       "edb4737847ade262f0f2812e599ae6e900d4a1c1d12e323307c70c971cf023ea"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e56c356f2c0c914da2d98d62de1b52d118e6108eadad86fa5d8c75ec1cf64e82"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d0405ae0886b099de89c2b242d70c3cc2cd4f206ce5a0478fbe2635e37b16684"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "acfec2a99f0b9365f89152d6796918fab98839f43a7f16a3a180417e2082f5fe"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bb744499c855e7fc137088663ef45db348e20727549a20c5822ef5887b896205"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "92156fa743a1700648c3ac10594c042c94ceb2b415ff800054d1a13777d49019"
+    sha256 cellar: :any_skip_relocation, sonoma:        "8cf25e1f75d7f3b228a79a986e81817c0690feb96f253b5d11309311166189a0"
+    sha256 cellar: :any_skip_relocation, ventura:       "1c41e466e6b4ce60d13addb1cb792785d4ecaef3c768491f062771603252d523"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c0eede98248c0b47f51645f2a7c051549913fcb207f48364f446611f542845ae"
   end
 
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
 
-  on_linux do
-    depends_on "pkg-config" => :build
-  end
+  uses_from_macos "bzip2"
 
   def install
     system "cargo", "install", *std_cargo_args

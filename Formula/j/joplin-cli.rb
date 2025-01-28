@@ -1,28 +1,29 @@
-require "language/node"
-
 class JoplinCli < Formula
   desc "Note taking and to-do application with synchronization capabilities"
   homepage "https://joplinapp.org/"
-  url "https://registry.npmjs.org/joplin/-/joplin-2.12.1.tgz"
-  sha256 "257b23c511f5b54e533ae2fcb6ed2796205ad52fb9003b987c7546254e7371ba"
+  url "https://registry.npmjs.org/joplin/-/joplin-3.2.3.tgz"
+  sha256 "7dffd1f21357f306958eed02a79ac1223e69b847ae55ddbd613fb1564f9cf2b4"
   license "MIT"
 
   bottle do
-    sha256                               arm64_ventura:  "5464a404afcaf28400743113b40539c3fade8f7f7bdac3e9ac16dcc89b3b3ca4"
-    sha256                               arm64_monterey: "fc9fc97408e1ad88e924b030a2f97b28d26af76735489124ffb5d6eaa9f57e83"
-    sha256                               arm64_big_sur:  "64a64501dc9ae34f45eb17e910c3b3eee2790d3300a479c29d5ab9c8a345ce32"
-    sha256                               ventura:        "27e833410ab4ca2cfbc186aac58f368db2d72f29e8cc11e226844da43327c949"
-    sha256                               monterey:       "743c535faf7a38ef6f7af36b47230417580fdc583537d7ea0368b7d8cd2956d0"
-    sha256                               big_sur:        "cd92eebbee2591622a751a2c08a9d9cf1526b56d2766045ba45eb41b817b1abc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "485e9ad92ec32ea04fc8627ef3aeb1763d2fbe4283d6b554cc36d79d5ae53615"
+    sha256                               arm64_sequoia: "3a0fb70e37cfacdd16fc7133f4a0339be831a945fed530e5ade41f622c7a8a21"
+    sha256                               arm64_sonoma:  "b9ba88cdbbd8809006f2b8bf0a61d8cb89703213a03b3799ccb9b0b92b99990b"
+    sha256                               arm64_ventura: "8dc693cfcfd51ee835358b03a1fa11db7497689aec6a8e6373b81601c15481fb"
+    sha256                               sonoma:        "e31ded0565672883780bda90b5af4e0a09ade984ec18896d648d411d234719df"
+    sha256                               ventura:       "e14c0abb59664e2e479cc0b98f54706702f3cc52a9ca9854991424c7abc48a58"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1d985598b03af1e5f55f80e87931e9d3b9e1d48f153c14693a20f25d7967c53b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python-setuptools" => :build # for node-gyp
+  depends_on "python@3.13" => :build
+  depends_on "glib"
   depends_on "node"
   depends_on "sqlite"
   depends_on "vips"
 
   on_macos do
+    depends_on "gettext"
     depends_on "terminal-notifier"
   end
 
@@ -31,11 +32,13 @@ class JoplinCli < Formula
   end
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
-    bin.install_symlink Dir["#{libexec}/bin/*"]
+    # Need node-addon-api v7+: https://github.com/lovell/sharp/issues/3920
+    system "npm", "add", "node-addon-api@8.0.0"
+    system "npm", "install", *std_npm_args
+    bin.install_symlink libexec.glob("bin/*")
 
     node_notifier_vendor_dir = libexec/"lib/node_modules/joplin/node_modules/node-notifier/vendor"
-    node_notifier_vendor_dir.rmtree # remove vendored pre-built binaries
+    rm_r(node_notifier_vendor_dir) # remove vendored pre-built binaries
 
     if OS.mac?
       terminal_notifier_dir = node_notifier_vendor_dir/"mac.noindex"
@@ -45,9 +48,6 @@ class JoplinCli < Formula
       terminal_notifier_app = Formula["terminal-notifier"].opt_prefix/"terminal-notifier.app"
       ln_sf terminal_notifier_app.relative_path_from(terminal_notifier_dir), terminal_notifier_dir
     end
-
-    # Replace universal binaries with their native slices
-    deuniversalize_machos libexec/"lib/node_modules/joplin/node_modules/fsevents/fsevents.node"
   end
 
   # All joplin commands rely on the system keychain and so they cannot run

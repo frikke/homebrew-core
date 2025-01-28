@@ -1,8 +1,8 @@
 class Zmap < Formula
   desc "Network scanner for Internet-wide network studies"
   homepage "https://zmap.io"
-  url "https://github.com/zmap/zmap/archive/v3.0.0.tar.gz"
-  sha256 "e3151cdcdf695ab7581e01a7c6ee78678717d6a62ef09849b34db39682535454"
+  url "https://github.com/zmap/zmap/archive/refs/tags/v4.3.1.tar.gz"
+  sha256 "a281eaeac415f49734e22f9219e36454843de494ab8f9723a3de7f123142050f"
   license "Apache-2.0"
   head "https://github.com/zmap/zmap.git", branch: "main"
 
@@ -12,21 +12,21 @@ class Zmap < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "684a70d7b7de73b6e8f8784d371bc09f378853a8c29f87bf30ec3e3e1846e966"
-    sha256 arm64_monterey: "96bd279a71f9d5e798047080f563868ca79b18a98db11edc138e20cf6eacf837"
-    sha256 arm64_big_sur:  "058c06f623a87893e4df2df875d34542935002167a7f17247a3dd6bb5d69fc24"
-    sha256 ventura:        "5a4d3cf68235de582a225e82e78b5672af74ae1fd1ef843093232015e5c1f751"
-    sha256 monterey:       "ed089861c3c552d6531cef3f75067dedb46b74ddff4d43bfb37b3dc20c4eb4b0"
-    sha256 big_sur:        "259f7d1b308ae26692995457b9933fd9bb4affcf17dd4429effb503a0f1b1d73"
-    sha256 x86_64_linux:   "ef0ab2fc170be2e64fc1b32b55b45b7e498d827f97c258483b399e698ecd6d61"
+    sha256 arm64_sequoia: "214e3c5e737f7e24e43a862d6a406783a26849dfce5397968d1f82f271916011"
+    sha256 arm64_sonoma:  "e9a052baa17629a915d316f4c60ecdc0bc74d4053aa2170274ca6cff52938b01"
+    sha256 arm64_ventura: "1c9c999c1502428fb651060fcf141e99c4f0ad9a543486a7b0f8ca638bca47da"
+    sha256 sonoma:        "c55f89e68237932793dd1b797d69bcaf31de04f7bcdb56e9f843bcdf0a284fd2"
+    sha256 ventura:       "5b17c50001640bb28f32f894aa24669d399d721bdabdfbaf5e722e4b1e40c345"
+    sha256 x86_64_linux:  "551d0ecdb223d03ae41d02350daccacca6863cd169895621e63b299bcca3f380"
   end
 
   depends_on "byacc" => :build
   depends_on "cmake" => :build
   depends_on "gengetopt" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gmp"
   depends_on "json-c"
+  depends_on "judy"
   depends_on "libdnet"
   depends_on "libunistring" # for unistr.h
 
@@ -43,6 +43,12 @@ class Zmap < Formula
   end
 
   test do
-    system "#{sbin}/zmap", "--version"
+    output = shell_output("#{sbin}/zmap -p 80 -N 1 8.8.8.8 2>&1", 1)
+    assert_match "[INFO] zmap: By default, ZMap will output the unique IP addresses " \
+                 "of hosts that respond successfully (e.g., SYN-ACK packet)", output
+    # need sudo permission
+    assert_match "[FATAL] recv: could not open device", output
+
+    system sbin/"zmap", "--version"
   end
 end

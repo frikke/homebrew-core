@@ -1,18 +1,17 @@
 class Sextractor < Formula
   desc "Extract catalogs of sources from astronomical images"
   homepage "https://github.com/astromatic/sextractor"
-  url "https://github.com/astromatic/sextractor/archive/refs/tags/2.28.0.tar.gz"
-  sha256 "36f5afcdfe74cbf1904038a4def0166c1e1dde883e0030b87280dfbdfcd81969"
+  url "https://github.com/astromatic/sextractor/archive/refs/tags/2.28.2.tar.gz"
+  sha256 "d92c5214ea75b8a70214d7d7f6824207fc53861ec923ceb2cc574f2ec9effa94"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "f890f87b25e094dab7f32d4e7a28d0ee9d951ce118344f6ec38ceb9d7ce37bb6"
-    sha256 arm64_monterey: "d0cba7ea8b343695f081803d00db959a4b981f80c075a9b0934ff47a1ccc36f0"
-    sha256 arm64_big_sur:  "00d3ecf36384e6b66201a1aaea674759b64774a8d835f34cd2589b046152dca2"
-    sha256 ventura:        "7ea54185b59849f1e8d270ecf9f5e38d66e8f63387cb6a87c19d06e0eeba075c"
-    sha256 monterey:       "25d43de769cd13d866c705c43b9e266230eec0235aebd2adf864859301ad6214"
-    sha256 big_sur:        "af97cc3e983b8fee3cda61881b2a0065721ce6cbc6083e6c1832ac665b98392b"
-    sha256 x86_64_linux:   "a32fa6c12d120051b9c572648f867c5b37a39f77b7d135721790893e8ed13276"
+    sha256 arm64_sequoia: "114c7e6368360d1c5ef66850b1a2090bd84f759e323d320e0dd74549baed4714"
+    sha256 arm64_sonoma:  "2138d679b5172a8f2b76d0fbacde1a67de054ccd9db6d3f5bcf5a163107f9098"
+    sha256 arm64_ventura: "ca726287370efe2c960b98a02c8bcbe3b9a8491a584864d6333fd89a020a477d"
+    sha256 sonoma:        "3a7f9a4b0880e0de0dca905679bea7e8747f3a299755f10a8437bd5432f65a30"
+    sha256 ventura:       "9d53959e43245ab7d3ebac8bf8696d42c56a512bcc89672670c9f358fbbb6586"
+    sha256 x86_64_linux:  "6b0fd897f186d16e044a010354109fbf0fd4b7ba4afddc4b7715cca6e741186e"
   end
 
   depends_on "autoconf" => :build
@@ -38,7 +37,7 @@ class Sextractor < Formula
 
   test do
     cp_r Dir[pkgshare/"tests/*"], testpath
-    system "#{bin}/sex", "galaxies.fits", "-WEIGHT_IMAGE", "galaxies.weight.fits", "-CATALOG_NAME", "galaxies.cat"
+    system bin/"sex", "galaxies.fits", "-WEIGHT_IMAGE", "galaxies.weight.fits", "-CATALOG_NAME", "galaxies.cat"
     assert_predicate testpath/"galaxies.cat", :exist?, "Failed to create galaxies.cat"
   end
 end

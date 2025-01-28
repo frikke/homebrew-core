@@ -1,12 +1,17 @@
 class BatsCore < Formula
   desc "Bash Automated Testing System"
   homepage "https://github.com/bats-core/bats-core"
-  url "https://github.com/bats-core/bats-core/archive/v1.10.0.tar.gz"
-  sha256 "a1a9f7875aa4b6a9480ca384d5865f1ccf1b0b1faead6b47aa47d79709a5c5fd"
+  url "https://github.com/bats-core/bats-core/archive/refs/tags/v1.11.1.tar.gz"
+  sha256 "5c57ed9616b78f7fd8c553b9bae3c7c9870119edd727ec17dbd1185c599f79d9"
   license "MIT"
 
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5de6006c7921a5dc26bc935254577d9e0bac2f48047371c1d2d00ee3eb273b4c"
+    sha256 cellar: :any_skip_relocation, all: "28949c0596b90bc8604d4f530e2e4a1e3c81c63b5a92ce2ecf187abb06169723"
   end
 
   depends_on "coreutils"
@@ -18,12 +23,12 @@ class BatsCore < Formula
   end
 
   test do
-    (testpath/"test.sh").write <<~EOS
+    (testpath/"test.sh").write <<~SHELL
       @test "addition using bc" {
         result="$(echo 2+2 | bc)"
         [ "$result" -eq 4 ]
       }
-    EOS
+    SHELL
     assert_match "addition", shell_output("#{bin}/bats test.sh")
   end
 end

@@ -3,7 +3,7 @@ class GnomeCommon < Formula
   homepage "https://gitlab.gnome.org/GNOME/gnome-common"
   url "https://download.gnome.org/sources/gnome-common/3.18/gnome-common-3.18.0.tar.xz"
   sha256 "22569e370ae755e04527b76328befc4c73b62bfd4a572499fde116b8318af8cf"
-  license "GPL-2.0"
+  license "GPL-2.0-or-later"
 
   bottle do
     rebuild 1
@@ -18,7 +18,7 @@ class GnomeCommon < Formula
   end
 
   # https://wiki.gnome.org/Projects/GnomeCommon
-  deprecate! date: "2023-01-25", because: :deprecated_upstream
+  disable! date: "2024-02-01", because: :deprecated_upstream
 
   conflicts_with "autoconf-archive", because: "both install ax_check_enable_debug.m4 and ax_code_coverage.m4"
 

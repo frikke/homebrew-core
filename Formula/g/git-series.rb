@@ -1,24 +1,23 @@
 class GitSeries < Formula
   desc "Track changes to a patch series over time"
   homepage "https://github.com/git-series/git-series"
-  url "https://github.com/git-series/git-series/archive/0.9.1.tar.gz"
+  url "https://github.com/git-series/git-series/archive/refs/tags/0.9.1.tar.gz"
   sha256 "c0362e19d3fa168a7cb0e260fcdecfe070853b163c9f2dfd2ad8213289bc7e5f"
   license "MIT"
-  revision 10
+  revision 12
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "09bac8a166e42326111fd8473ae3c7a9ff6291989d8a275856773ca85482ec7a"
-    sha256 cellar: :any,                 arm64_monterey: "b864619ca53b4b446f46d18f871fc10559aa566e54818ffd982c4b4aa26f9cc8"
-    sha256 cellar: :any,                 arm64_big_sur:  "ac2992338ed769e8228cb1a78aa76b0d00e9ba48d81f0d3ae8c20ce86b4a0ea9"
-    sha256 cellar: :any,                 ventura:        "e2eb3577da8e480f59a8288f3ffb1135360772651b538413bdbb20f7ce7831ae"
-    sha256 cellar: :any,                 monterey:       "8fc34ddc950682131191a0b1c7e5dabfb6a66b4d50e115cf1d73313999e52e90"
-    sha256 cellar: :any,                 big_sur:        "3874b2b34b9e86b75a71862e4d029117ecb46ce56fa359bfd7d033cbcd6c10d4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f574fa247ed592c41e75a5ebb4b0946442de12a6c23be915ac0915f89e889797"
+    sha256 cellar: :any,                 arm64_sequoia: "2e348dcdc3d49977fe6647cc92e833f174fde3b6ec3e199c0965639b6e76f868"
+    sha256 cellar: :any,                 arm64_sonoma:  "f65c2ae6393964b2aa6ca5932f2c46aa09b66516994b22a6dd9803532f69ff52"
+    sha256 cellar: :any,                 arm64_ventura: "66d9169576bcc5e0e50d8cbc4209c7576988a9ad55a38d3b2b9c0bfd66dfc545"
+    sha256 cellar: :any,                 sonoma:        "2a6340eeb3800421ce3f529d17ae243c3705c1e0842f0539f8cbcd4d9076bfc4"
+    sha256 cellar: :any,                 ventura:       "6dbec136b4be60ee749b0d9cb51c514d978840ad75c8fddf475cba6747c0b9d9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bd832576f196e9dea9d888881f89d08f9d849b7971fa5b66f1bed7ae942673e1"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
-  depends_on "libgit2"
+  depends_on "libgit2@1.8" # needs https://github.com/rust-lang/git2-rs/issues/1109 to support libgit2 1.9
   depends_on "libssh2"
   depends_on "openssl@3"
 
@@ -65,7 +64,7 @@ class GitSeries < Formula
     system bin/"git-series", "commit", "-a", "-m", "new feature v1"
 
     linked_libraries = [
-      Formula["libgit2"].opt_lib/shared_library("libgit2"),
+      Formula["libgit2@1.8"].opt_lib/shared_library("libgit2"),
       Formula["libssh2"].opt_lib/shared_library("libssh2"),
       Formula["openssl@3"].opt_lib/shared_library("libssl"),
     ]

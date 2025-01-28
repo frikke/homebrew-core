@@ -1,18 +1,18 @@
 class Latexindent < Formula
   desc "Add indentation to LaTeX files"
   homepage "https://latexindentpl.readthedocs.io"
-  url "https://github.com/cmhughes/latexindent.pl/archive/V3.23.1.tar.gz"
-  sha256 "0373bd173a23af1e4aa3685086c3cd44836911249bc53234d9b3aea5807c4559"
+  url "https://github.com/cmhughes/latexindent.pl/archive/refs/tags/V3.24.4.tar.gz"
+  sha256 "7b7216604d1e544b7f22cf520b3ca1817222e70e28fe2865bcc4d0e3284c497c"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5bc570ce1d7143783bba0306a0a422ac8a5f6204b4ad84773b05b904f8e22d03"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f69ee4c4866298fa2092b631eca009535e501de4bf6c6c952ae7082f434dd27a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a0016a2a89d2c17943a73f3757c4bfa9087f4706800cea26562ff730392c3a58"
-    sha256 cellar: :any_skip_relocation, ventura:        "a74fbe6f2d99a274cb8b8859f04f1a52cebe196008c85643681b2dd89b10fab5"
-    sha256 cellar: :any_skip_relocation, monterey:       "4c210a9776ffd63cb17c45588fc8d6a5c671cb563d718f5edb0c83baec76bc34"
-    sha256 cellar: :any_skip_relocation, big_sur:        "368f685e08fb25b31a9e99d3974588246a38b2b2cabdd2ba60ae5c9b1a08c246"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7cff7b5564e1f752a81395dc34ade4a36e5eb115d9b4bb6296586f0380b33ea7"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "83b002051cf480f85aa240da502d46ad9c0cd213f743b4134e681a76a65e5e90"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2ae745f0c6cbb2af7c11b147f35d42234f2150cca8c2c30ea638be01956e19d7"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "7c6472b59100a2d5f779e3775b1a5447cc956dea402a9acf59061388b032ccc5"
+    sha256 cellar: :any_skip_relocation, sonoma:        "6e3c07fa210342825f57e594544f4c0ca65c5e442d6ec9c4069c645997c4a37b"
+    sha256 cellar: :any_skip_relocation, ventura:       "cd2a76ce01cb9345068a69e6fea12c58f25feaf82f650cf90a65e22c7c6bf9ca"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a56577072a5f0a17392a1e787eb8877c78f54e7fa865b96941fa1461920dadba"
   end
 
   depends_on "perl"
@@ -25,8 +25,8 @@ class Latexindent < Formula
   end
 
   resource "B::Hooks::EndOfScope" do
-    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/B-Hooks-EndOfScope-0.26.tar.gz"
-    sha256 "39df2f8c007a754672075f95b90797baebe97ada6d944b197a6352709cb30671"
+    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/B-Hooks-EndOfScope-0.28.tar.gz"
+    sha256 "edac77a17fc36620c8324cc194ce1fad2f02e9fcbe72d08ad0b2c47f0c7fd8ef"
   end
 
   resource "Class::Data::Inheritable" do
@@ -40,8 +40,8 @@ class Latexindent < Formula
   end
 
   resource "Devel::StackTrace" do
-    url "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Devel-StackTrace-2.04.tar.gz"
-    sha256 "cd3c03ed547d3d42c61fa5814c98296139392e7971c092e09a431f2c9f5d6855"
+    url "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Devel-StackTrace-2.05.tar.gz"
+    sha256 "63cb6196e986a7e578c4d28b3c780e7194835bfc78b68eeb8f00599d4444888c"
   end
 
   resource "Dist::CheckConflicts" do
@@ -160,8 +160,8 @@ class Latexindent < Formula
   end
 
   resource "Variable::Magic" do
-    url "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-0.63.tar.gz"
-    sha256 "ba4083b2c31ff2694f2371333d554c826aaf24b4d98d03e48b5b4a43a2a0e679"
+    url "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-0.64.tar.gz"
+    sha256 "9f7853249c9ea3b4df92fb6b790c03a60680fc029f44c8bf9894dccf019516bd"
   end
 
   resource "XString" do
@@ -203,27 +203,27 @@ class Latexindent < Formula
   end
 
   test do
-    (testpath/"test.tex").write <<~EOS
-      \\documentclass{article}
-      \\title{latexindent Homebrew Test}
-      \\begin{document}
-      \\maketitle
-      \\begin{itemize}
-      \\item Hello
-      \\item World
-      \\end{itemize}
-      \\end{document}
-    EOS
-    assert_match <<~EOS, shell_output("#{bin}/latexindent #{testpath}/test.tex")
-      \\documentclass{article}
-      \\title{latexindent Homebrew Test}
-      \\begin{document}
-      \\maketitle
-      \\begin{itemize}
-      	\\item Hello
-      	\\item World
-      \\end{itemize}
-      \\end{document}
-    EOS
+    (testpath/"test.tex").write <<~'TEX'
+      \documentclass{article}
+      \title{latexindent Homebrew Test}
+      \begin{document}
+      \maketitle
+      \begin{itemize}
+      \item Hello
+      \item World
+      \end{itemize}
+      \end{document}
+    TEX
+    assert_match <<~'TEX', shell_output("#{bin}/latexindent #{testpath}/test.tex")
+      \documentclass{article}
+      \title{latexindent Homebrew Test}
+      \begin{document}
+      \maketitle
+      \begin{itemize}
+      	\item Hello
+      	\item World
+      \end{itemize}
+      \end{document}
+    TEX
   end
 end

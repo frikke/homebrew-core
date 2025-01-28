@@ -1,8 +1,8 @@
 class Iperf < Formula
   desc "Tool to measure maximum TCP and UDP bandwidth"
   homepage "https://sourceforge.net/projects/iperf2/"
-  url "https://downloads.sourceforge.net/project/iperf2/iperf-2.1.9.tar.gz"
-  sha256 "5c0771aab00ef14520013aef01675977816e23bb8f5d9fde016f90eb2f1be788"
+  url "https://downloads.sourceforge.net/project/iperf2/iperf-2.2.1.tar.gz"
+  sha256 "754ab0a7e28033dbea81308ef424bc7df4d6e2fe31b60cc536b61b51fefbd8fb"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,13 +11,12 @@ class Iperf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c1ea30486e89e978722b854f72a591f197419d6c529b2cf1bd2164010698c0cb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "255b5d8f43b5d0de1819d006d6d2e929874c4020243e0bac75132404a7bcb617"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7d55ff3cae4a261695736b7065c5a0b06988b35d11f806b48cd5b6da1ab62344"
-    sha256 cellar: :any_skip_relocation, ventura:        "ebc74e656e2733dc621629cf9a986a0f615a3b68061fe7dfcca74f7d969e1676"
-    sha256 cellar: :any_skip_relocation, monterey:       "dffa26177ca409e576636726281d6f84a80896aaec1e4987841a6e31703978ee"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f810f2117e5bb272d2640627f96481d12fef85d9c444e7ca789feab89eb0fed1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "72ec63f092aa146d76d83edefc618f0bae97f78b03cda0c3c6d21c4ada52b648"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "db6efa4665fb211a816b35f09bcfa864a730c6e4090db7980237fa59a21a3ca2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1c37a56093641d787d93ae9bfe6f703c2cb135426118ea840206b6cf65b6b839"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "7175c66a9b8d7b696e90924d5143cd7c4c6f70d3882a2786f3074cc76acd1771"
+    sha256 cellar: :any_skip_relocation, sonoma:        "aed94aa9afebab06799f8029472589ceec497c794a787cff72b266485d747e07"
+    sha256 cellar: :any_skip_relocation, ventura:       "64ed221535508fd70d50c162cf827e21e3753a831cd806d7a81949f9251503af"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "30cab186caf9720f6d1758b086d8df5978ea56022a32ad4367f232ab82c1750e"
   end
 
   def install

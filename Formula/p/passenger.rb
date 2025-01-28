@@ -1,20 +1,20 @@
 class Passenger < Formula
   desc "Server for Ruby, Python, and Node.js apps via Apache/NGINX"
   homepage "https://www.phusionpassenger.com/"
-  url "https://github.com/phusion/passenger/releases/download/release-6.0.18/passenger-6.0.18.tar.gz"
-  sha256 "dfcd9bcae364ce09b6ae59ea598f9dcad3e27a980b12c4b245acd336fa02c5a2"
+  url "https://github.com/phusion/passenger/releases/download/release-6.0.24/passenger-6.0.24.tar.gz"
+  sha256 "3bc636ecf3e337c9fad13842fa539dabab546d458dfe4e2ae7c83419e7b8839c"
   license "MIT"
-  revision 3
+  revision 1
   head "https://github.com/phusion/passenger.git", branch: "stable-6.0"
 
   bottle do
-    sha256                               arm64_ventura:  "64261fcbe859cb04c75c09026224619ed28117c6aa6a8e67cd1c2a6df4db940e"
-    sha256                               arm64_monterey: "290fea979c89b6d82add7ec94304678689983fbbdc34e68fcbc03482d7879d9d"
-    sha256                               arm64_big_sur:  "6dd5c3a43a584ee6b9da56f29f020bb468b797472a3ea50e7b17f831ff91e20a"
-    sha256                               ventura:        "208c33acc007dec45e421f6f47ed49c3b18bd14254128a46d4ef2c7c30d29406"
-    sha256                               monterey:       "4bbae9f2d361dfc56715ba191b2c1e00d07ecbc6bb9647ba33800e688df7af9f"
-    sha256                               big_sur:        "e3a374c42b51be97f78331948a651f62ae98f384804990323769887f46af7c63"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "50bf68e47c7d1ad046aaf8a10a1ced178bc30b089de9b761f9b95c6956ccf03d"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "ed961f7ab803475f7e25f93b5e5352d89b1f4c95d72cfb21a17227609fa1f983"
+    sha256 cellar: :any,                 arm64_sonoma:  "a7c121bef2ae0ad8946dda5fba8de2ac255dc454f1e81525b285b3e0acbf4555"
+    sha256 cellar: :any,                 arm64_ventura: "0a98b9723f58e9f3229eea6ef919d95f302d919758eed857fd998acee35f6c68"
+    sha256 cellar: :any,                 sonoma:        "c77fc41c83b077bcad91588e4b6c556bf757263ea9dee3b472df26616ba1834c"
+    sha256 cellar: :any,                 ventura:       "508334d834139aee830c243769d2c6f4dafea64bec82e3dbc62816c91ac8b954"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "670207165133288dea2910b5f21617834bb12dc668d9954025456776fc519ede"
   end
 
   depends_on "httpd" => :build # to build the apache2 module
@@ -22,16 +22,16 @@ class Passenger < Formula
   depends_on "apr"
   depends_on "apr-util"
   depends_on "openssl@3"
-  depends_on "pcre"
   depends_on "pcre2"
 
   uses_from_macos "xz" => :build
   uses_from_macos "curl"
   uses_from_macos "libxcrypt"
   uses_from_macos "ruby", since: :catalina
+  uses_from_macos "zlib"
 
   def install
-    if MacOS.version >= :mojave && MacOS::CLT.installed?
+    if OS.mac? && MacOS.version >= :mojave && MacOS::CLT.installed?
       ENV["SDKROOT"] = MacOS::CLT.sdk_path(MacOS.version)
     else
       ENV.delete("SDKROOT")
@@ -59,9 +59,9 @@ class Passenger < Formula
     (libexec/"download_cache").mkpath
 
     # Fixes https://github.com/phusion/passenger/issues/1288
-    rm_rf "buildout/libev"
-    rm_rf "buildout/libuv"
-    rm_rf "buildout/cache"
+    rm_r("buildout/libev")
+    rm_r("buildout/libuv")
+    rm_r("buildout/cache")
 
     necessary_files = %w[configure Rakefile README.md CONTRIBUTORS
                          CONTRIBUTING.md LICENSE CHANGELOG package.json
@@ -102,9 +102,6 @@ class Passenger < Formula
 
     man1.install Dir["man/*.1"]
     man8.install Dir["man/*.8"]
-
-    # See https://github.com/Homebrew/homebrew-core/pull/84379#issuecomment-910179525
-    deuniversalize_machos
   end
 
   def caveats

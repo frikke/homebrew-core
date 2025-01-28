@@ -1,58 +1,40 @@
 class CargoRelease < Formula
   desc "Cargo subcommand `release`: everything about releasing a rust crate"
   homepage "https://github.com/crate-ci/cargo-release"
-  # TODO: check if we can use unversioned `libgit2` at version bump.
-  # See comments below for details.
-  url "https://github.com/crate-ci/cargo-release/archive/refs/tags/v0.24.12.tar.gz"
-  sha256 "2b0e88b1ce96a95a97c4b136a6084d81916bb68de49bac70dd2d48e299bac654"
+  url "https://github.com/crate-ci/cargo-release/archive/refs/tags/v0.25.15.tar.gz"
+  sha256 "dee97fbcb6124f7d159cfc0ea8fb3977da1513da2135b179bd48dbcd0abde616"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   head "https://github.com/crate-ci/cargo-release.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "c1220849bf433dd4604abee375f2790118c1aa9d6cee63733c769c7ccfc87865"
-    sha256 cellar: :any,                 arm64_monterey: "b56c7ae3f7de31880a517e081b8b6e7823ed3e03dfe4eb2c340413e608119bbd"
-    sha256 cellar: :any,                 arm64_big_sur:  "426fda66942b2b406901b94959e1e6a22b4cf85f8c475a4299e41c16bf9979d5"
-    sha256 cellar: :any,                 ventura:        "8c8b4794590df563589aeafd48faaaf9af2455053ef5978e0a23fd1c5397ce11"
-    sha256 cellar: :any,                 monterey:       "3fcc8af36b4e73d4f4760c128196ef926f7630b3a65db868f58c16b687749557"
-    sha256 cellar: :any,                 big_sur:        "f2bd3595848df2a0b998127045f05153efd859d2e4e2458a0a0d8f70dbc50df1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bb0923161f4e8b978b7c4954af04900e2acf3752703206d29f9f54c5923b4a08"
+    sha256 cellar: :any,                 arm64_sequoia: "2574c100ae1015f8400a41596e75d55a42b9685b1409711f20ee9a6699b933f7"
+    sha256 cellar: :any,                 arm64_sonoma:  "0f6d3557c3ad479fb4360c77db610c57ed9c878b2e7bba9569c5d0d47d4965df"
+    sha256 cellar: :any,                 arm64_ventura: "17dc706dc7989bb6ff4f71fa805fa919e3a2d49a568a631445eed34c3233439d"
+    sha256 cellar: :any,                 sonoma:        "755d6c97605883787a5c3e41f1d95af5dd06c811355af98ae6c6f1ff650d1e80"
+    sha256 cellar: :any,                 ventura:       "f6fc62d039fac5fdce20dea2b9f1061f96f316dbe117fb0577041b829dc3212a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5e63024709978df9416b5c9f399d37aea926e3005fdb35c8cf8d47dbb4693eb4"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
-  depends_on "rustup-init" => :test
-  # To check for `libgit2` version:
-  # 1. Search for `libgit2-sys` version at https://github.com/crate-ci/cargo-release/blob/v#{version}/Cargo.lock
-  # 2. If the version suffix of `libgit2-sys` is newer than +1.6.*, then:
-  #    - Migrate to the corresponding `libgit2` formula.
-  #    - Change the `LIBGIT2_SYS_USE_PKG_CONFIG` env var below to `LIBGIT2_NO_VENDOR`.
-  #      See: https://github.com/rust-lang/git2-rs/commit/59a81cac9ada22b5ea6ca2841f5bd1229f1dd659.
-  depends_on "libgit2@1.6"
-  depends_on "openssl@3"
+  depends_on "rustup" => :test
+  depends_on "libgit2@1.8" # needs https://github.com/rust-lang/git2-rs/issues/1109 to support libgit2 1.9
 
   def install
-    ENV["LIBGIT2_SYS_USE_PKG_CONFIG"] = "1"
+    ENV["LIBGIT2_NO_VENDOR"] = "1"
     ENV["LIBSSH2_SYS_USE_PKG_CONFIG"] = "1"
-    ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
-    ENV["OPENSSL_NO_VENDOR"] = "1"
     system "cargo", "install", "--no-default-features", *std_cargo_args
   end
 
-  def check_binary_linkage(binary, library)
-    binary.dynamically_linked_libraries.any? do |dll|
-      next false unless dll.start_with?(HOMEBREW_PREFIX.to_s)
-
-      File.realpath(dll) == File.realpath(library)
-    end
-  end
-
   test do
+    require "utils/linkage"
+
     # Show that we can use a different toolchain than the one provided by the `rust` formula.
     # https://github.com/Homebrew/homebrew-core/pull/134074#pullrequestreview-1484979359
-    ENV["RUSTUP_INIT_SKIP_PATH_CHECK"] = "yes"
-    rustup_init = Formula["rustup-init"].bin/"rustup-init"
-    system rustup_init, "-y", "--profile", "minimal", "--default-toolchain", "beta", "--no-modify-path"
-    ENV.prepend_path "PATH", HOMEBREW_CACHE/"cargo_cache/bin"
+    ENV.prepend_path "PATH", Formula["rustup"].bin
+    system "rustup", "default", "beta"
+    system "rustup", "set", "profile", "minimal"
 
     system "cargo", "new", "hello_world", "--bin"
     cd "hello_world" do
@@ -60,10 +42,9 @@ class CargoRelease < Formula
     end
 
     [
-      Formula["libgit2@1.6"].opt_lib/shared_library("libgit2"),
-      Formula["openssl@3"].opt_lib/shared_library("libssl"),
+      Formula["libgit2@1.8"].opt_lib/shared_library("libgit2"),
     ].each do |library|
-      assert check_binary_linkage(bin/"cargo-release", library),
+      assert Utils.binary_linked_to_library?(bin/"cargo-release", library),
              "No linkage with #{library.basename}! Cargo is likely using a vendored version."
     end
   end

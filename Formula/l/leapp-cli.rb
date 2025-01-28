@@ -1,42 +1,45 @@
-require "language/node"
-
 class LeappCli < Formula
   desc "Cloud credentials manager cli"
   homepage "https://github.com/noovolari/leapp"
-  url "https://registry.npmjs.org/@noovolari/leapp-cli/-/leapp-cli-0.1.44.tgz"
-  sha256 "9e1315f9a8204073555bead50443be0c3d0c8b3c4cbcde1ab9c81dd54bde34f3"
+  url "https://registry.npmjs.org/@noovolari/leapp-cli/-/leapp-cli-0.1.65.tgz"
+  sha256 "a770256e2ce62f08c17650a30e785e46f92e7acb03e2bcbdec949054467b711c"
   license "MPL-2.0"
 
   bottle do
-    sha256                               arm64_ventura:  "3ab44b6b35e451ef844bca9bb6044377506fb4d35da9db9e65a955fe311c49fe"
-    sha256                               arm64_monterey: "75f6f8ee61477413c4a54f050b651b006b0ba1a3947740b3454b97291b49c067"
-    sha256                               arm64_big_sur:  "017b82c0f1847de1aba6c0a5b4553cc6dd85aee869fdbce9693498edfe70c6bc"
-    sha256                               ventura:        "d826665b23ec4271a14c845b465571ef3f3df0f3ec49e31537c30dd52c95d582"
-    sha256                               monterey:       "61b88f0e747b0b31e0781df5b97ac3d1da043aab0fdd4d844883913359bdda1f"
-    sha256                               big_sur:        "58916ddc03fcc4ecd253e94219a5a4528a75698ffeda0a8385407be1318c760c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dfbde245ace91fb7947a903f73981a463e61de4a92de2484fef126dea5bbdc53"
+    rebuild 1
+    sha256                               arm64_sequoia:  "a9f0381ebb60002b45fb92808def37bb0d636c0b3f843277e24e96f8a5b5b3de"
+    sha256                               arm64_sonoma:   "db6a98507e65188b1fe4eb7708746e9a0e9e5fb7966a0f824b6f70ab2ca7891f"
+    sha256                               arm64_ventura:  "1a9d83cc2ab81ea856376671c9cf61dfa0274030cd58db67a63b5233d8b055f8"
+    sha256                               arm64_monterey: "b418a493285d50efe1cce5809193c085243026e22664ac795c8c352dcc60fa01"
+    sha256                               sonoma:         "ee8f75982419c3a730061d07335b51a2911c3c22dc21a398c8d68f3bcfe8f0ba"
+    sha256                               ventura:        "fe8abfb2954f71fb7c34d7611235983d0878086a378e1945d62f8686963616fb"
+    sha256                               monterey:       "d53b9cb4420f95a20647b6d0ca02da15c005941889272b7aa00e4a2d1e5206cb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d9b5a0a0f4dfdef5663463397ef4b2d68d917de753f7bc0ccafeda392a1356d7"
   end
 
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => :build
   depends_on "node"
 
+  uses_from_macos "python" => :build
+
   on_linux do
+    depends_on "python-setuptools" => :build
+    depends_on "glib"
     depends_on "libsecret"
   end
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   def caveats
-    <<~EOS
-      This formula only installs the command-line utilities by default.
-
-      Install Leapp.app with Homebrew Cask:
-        brew install --cask leapp
-    EOS
+    on_macos do
+      <<~EOS
+        Only the `leap` CLI is installed. For Leapp.app:
+          brew install --cask leapp
+      EOS
+    end
   end
 
   test do

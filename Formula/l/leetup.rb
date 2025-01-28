@@ -1,8 +1,8 @@
 class Leetup < Formula
   desc "Command-line tool to solve Leetcode problems"
   homepage "https://github.com/dragfire/leetup"
-  url "https://github.com/dragfire/leetup/archive/v1.2.4.tar.gz"
-  sha256 "cc5bc54eadff45bec29eb056f8882dbf9bb506837273f17b7a609754eba418b1"
+  url "https://github.com/dragfire/leetup/archive/refs/tags/v1.2.5.tar.gz"
+  sha256 "f7fd0fed6cab7e352bf6ca5e4d0dd5631d90ef4451e27787236ff4ade36de3b8"
   license "MIT"
   head "https://github.com/dragfire/leetup.git", branch: "master"
 
@@ -16,16 +16,17 @@ class Leetup < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2ab846d5ddcfd62b1142bce710a7bd5a5f64729e4a071a13dec57ab4a672d3e5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ed58702a3142e7b96ff722504e774e7b42d0cd06d3094cbaea397c5ad0114ac5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f5dca556fdca6aee7ef500e05e49a69206fb64fd24202277928bf105e8a90f76"
-    sha256 cellar: :any_skip_relocation, ventura:        "b9ec283491c56bee0fd27ed0bb45091e7f643427f00bba1fce4acbcf9c82ccaa"
-    sha256 cellar: :any_skip_relocation, monterey:       "2aaceca02f57d15984b8a9099af8eacaac8ae48f77984c5334fb1f7b92f299e4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c040fbc4186c4c3470a1b3366f45717fbcd69f124cdd382eddc427a721c57a72"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9173c182240851ac7b9bc16aa6a27f3410164645aa613a46ecce9e31e0165bbc"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d1b4514ce4129a82214372e208fcc2e6d6dc746fb60ed69675d69628c7fbdd72"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "8869f57b3f3a3c9de61c30dd2ab987ec81c82b46bcaa9a6426c44ff1ca05c967"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2310aadadf29ce3199edf0b7d749208b282916355fe00d8fb2f39bb645b355f1"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c300dbf7a8021139b8113ca134d001ea57c2438598f7e8957807fba0966c7e15"
+    sha256 cellar: :any_skip_relocation, sonoma:         "1934aa6e87b0d6b10a688cab48469b40387536d8cb57cfd4f6e4fdd976f4f437"
+    sha256 cellar: :any_skip_relocation, ventura:        "9cf0c87808ed0962e2fdb6b1ccb1c4527c1007883912a2b9d1df26d2dedf6569"
+    sha256 cellar: :any_skip_relocation, monterey:       "6d28bd176e651bce4d0eda8cc74f78b8dcc74453e1c165000e6f28b8984d7ca1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3f06e66d4529f7489b4ca0b9bcf9976c376015d6ea635c0c00a09adcd4439dca"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
 
   on_linux do
@@ -37,6 +38,11 @@ class Leetup < Formula
   end
 
   test do
-    assert_match "Easy", shell_output("#{bin}/leetup list 'Two Sum'")
+    assert_match <<~EOS, shell_output("#{bin}/leetup user --logout")
+      User not logged in!
+      User logged out!
+    EOS
+
+    assert_match version.to_s, shell_output("#{bin}/leetup --version")
   end
 end

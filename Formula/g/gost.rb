@@ -1,32 +1,23 @@
 class Gost < Formula
   desc "GO Simple Tunnel - a simple tunnel written in golang"
   homepage "https://github.com/ginuerzh/gost"
+  url "https://github.com/ginuerzh/gost/archive/refs/tags/v2.12.0.tar.gz"
+  sha256 "ed575807b0490411670556d4471338f418c326bb1ffe25f52977735012851765"
   license "MIT"
-  revision 1
   head "https://github.com/ginuerzh/gost.git", branch: "master"
 
-  stable do
-    url "https://github.com/ginuerzh/gost/archive/v2.11.5.tar.gz"
-    sha256 "dab48b785f4d2df6c2f5619a4b9a2ac6e8b708f667a4d89c7d08df67ad7c5ca7"
-
-    # go1.20 build patch, remove in next release
-    patch do
-      url "https://github.com/ginuerzh/gost/commit/0f7376b.patch?full_index=1"
-      sha256 "091eceef591810a383b1082ba2677503f9cb39a971a8098ebaecd3cd02dd18db"
-    end
-  end
-
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b880bb2bace71fb50f816374dd623ad62e893e7abd06101ba88b01f026ba9110"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b880bb2bace71fb50f816374dd623ad62e893e7abd06101ba88b01f026ba9110"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b880bb2bace71fb50f816374dd623ad62e893e7abd06101ba88b01f026ba9110"
-    sha256 cellar: :any_skip_relocation, ventura:        "77320157771741abee963d6a3e1745a80702745c896ddd83b82cbcf6d46d4e8e"
-    sha256 cellar: :any_skip_relocation, monterey:       "77320157771741abee963d6a3e1745a80702745c896ddd83b82cbcf6d46d4e8e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "77320157771741abee963d6a3e1745a80702745c896ddd83b82cbcf6d46d4e8e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "de1f718516d68a836440a2ad09bc48ec150935de28084726bab8e159c2c48860"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "57e454b905ac17f21519f34ed868db709413efb45f53fe37edeb9bd0e9da0259"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "86b48c89f4ea3d4edaaa3cec855981de9ac0fc36cc82f50b166bf6bf688c8997"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "189a833087438d49b52688387ab96ff43aa9728337fc24c236e007691dae1eb4"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e9f65b51d764ccac83750b55a03bb3895cd0c2e32a2e57697fa3323a12499c67"
+    sha256 cellar: :any_skip_relocation, ventura:       "4c956460f08c30254b98a089e1ee60a62ca5721f2525638ed16af81c46e28a8e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "de78cc69979d46baeb0727157ea88dc6b6f3c263258e2d99c32040c5a9abd28c"
   end
 
-  depends_on "go@1.20" => :build
+  depends_on "go" => :build
+
+  conflicts_with "vulsio-gost", because: "both install `gost` binaries"
 
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/gost"
@@ -36,7 +27,7 @@ class Gost < Formula
   test do
     bind_address = "127.0.0.1:#{free_port}"
     fork do
-      exec "#{bin}/gost -L #{bind_address}"
+      exec bin/"gost", "-L", bind_address
     end
     sleep 2
     output = shell_output("curl -I -x #{bind_address} https://github.com")

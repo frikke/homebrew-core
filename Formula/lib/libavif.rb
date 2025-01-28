@@ -1,21 +1,19 @@
 class Libavif < Formula
   desc "Library for encoding and decoding .avif files"
   homepage "https://github.com/AOMediaCodec/libavif"
-  url "https://github.com/AOMediaCodec/libavif/archive/refs/tags/v1.0.1.tar.gz"
-  sha256 "398fe7039ce35db80fe7da8d116035924f2c02ea4a4aa9f4903df6699287599c"
+  url "https://github.com/AOMediaCodec/libavif/archive/refs/tags/v1.1.1.tar.gz"
+  sha256 "914662e16245e062ed73f90112fbb4548241300843a7772d8d441bb6859de45b"
   license "BSD-2-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "0266cde96981b2b619c1966bf77062c269b83cf6b00e3c6a698ebf1103c5f3f8"
-    sha256 cellar: :any,                 arm64_ventura:  "aa693b58c72506486ef50575cc41622694f3defbfc0f22cfe70beb6440fd95e2"
-    sha256 cellar: :any,                 arm64_monterey: "d9365bd3d2af26a58a0b97bd38950f4a3552e2db636e94fe979adc4afe862bb5"
-    sha256 cellar: :any,                 arm64_big_sur:  "3d5d27c66520861b3617a5bbeec94fce564c00b7372f5442003b782202b8b51d"
-    sha256 cellar: :any,                 sonoma:         "6eb61ade3a108c890610fe3451366c4b9772f764eabbfb4b8f6d00a682f5260b"
-    sha256 cellar: :any,                 ventura:        "ddcc5741e21a55901035eac578f559d7082fd16ff9e38c0f3071feb448d928e6"
-    sha256 cellar: :any,                 monterey:       "0f2f58c588305b6e29d99b9e789c59a1c72dfb9f34936f6ecefea7db605db4c3"
-    sha256 cellar: :any,                 big_sur:        "cf9e39eadf86c47bac043ea4ce305bd934384ad466ecc862385c7c81b0a3ccd2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e0306509252db9ce7dedb1801697e4a65f7e8340c668b9c36d8e0ec1f8d17ca1"
+    sha256 cellar: :any,                 arm64_sequoia:  "5641b53ec822784a00609ffb9c9ea9c38cc29c1a3838279dacd0b6572f296a2c"
+    sha256 cellar: :any,                 arm64_sonoma:   "d933afea7d7bce60d38fc1458049972f95f27ce057ea4d8b850dc1cd6dcb6de2"
+    sha256 cellar: :any,                 arm64_ventura:  "7a4eaeb370ff41768a9ba47950903fd55b26a483236bf22f6cdd51ea00bb02f4"
+    sha256 cellar: :any,                 arm64_monterey: "5d3979f1377fb7b749d7447ab90d018a454df227bbfe58e2d9f56e42f4fcd4b4"
+    sha256 cellar: :any,                 sonoma:         "540f311fe23279f796ecdbe153b9f8c0d167d83103420c0ba84a574d4b59dae2"
+    sha256 cellar: :any,                 ventura:        "4e251329d5c5a9063db68af15f49c06bc66300593b02badc4f1eeac23940ea5f"
+    sha256 cellar: :any,                 monterey:       "f7a30236240e855c0fd3925306cb5cc779f405925698146504805be441b34c99"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b20f6d93e81077c5bfc56392436faafdfd25f6fb5934c88f4fcb5f56e4e79b0d"
   end
 
   depends_on "cmake" => :build
@@ -27,13 +25,16 @@ class Libavif < Formula
   uses_from_macos "zlib"
 
   def install
-    system "cmake", "-S", ".", "-B", "build",
-                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
-                    "-DAVIF_CODEC_AOM=ON",
-                    "-DAVIF_BUILD_APPS=ON",
-                    "-DAVIF_BUILD_EXAMPLES=OFF",
-                    "-DAVIF_BUILD_TESTS=OFF",
-                    *std_cmake_args
+    args = %W[
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+      -DAVIF_CODEC_AOM=SYSTEM
+      -DAVIF_BUILD_APPS=ON
+      -DAVIF_BUILD_EXAMPLES=OFF
+      -DAVIF_BUILD_TESTS=OFF
+      -DAVIF_LIBYUV=OFF
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
     pkgshare.install "examples"

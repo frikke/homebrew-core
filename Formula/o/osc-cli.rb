@@ -6,27 +6,24 @@ class OscCli < Formula
   url "https://files.pythonhosted.org/packages/02/cd/f1b796f5e7a301f6a3c0b910be07188cbfd329d2758e036d24ef26b4ee96/osc-sdk-1.11.0.tar.gz"
   sha256 "d3b71b326b0698da1b9a503cd511a992fe578375fd01b30bdec0d63d8328af66"
   license "BSD-3-Clause"
-  revision 1
+  revision 6
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "78267ea2c905d0d85c4bcf95779374dc196d81e42ee761766496a754860f8917"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7019905459fa8dd2a3b14c750fc3a806afc55bf506302ed5b557bc8c013f66cf"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ffb4b4d34054fff08f72568ef8e2b024c85ef744973988efa971efcd7b150b4a"
-    sha256 cellar: :any_skip_relocation, ventura:        "1d90a84dd719d69fb4bba9a4ae69ee413d4d09af26ee2f885c27df5d42df6a39"
-    sha256 cellar: :any_skip_relocation, monterey:       "07515ab538ba8711fa988610638fbde42e021fc372a14745e49fb88e74fdcb95"
-    sha256 cellar: :any_skip_relocation, big_sur:        "7c0f23e5dfd6ab5b536b8ed18dd19f8e23b67d099211e0213ad2445788d749e9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fdef409fa184913748d8565244df52202e432ec1340f49088bc07f727873b8ca"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "46acc0336a9fa29be5457cea8338f0fc7296fa50103b169c6669fb1ff79cfa0c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "46acc0336a9fa29be5457cea8338f0fc7296fa50103b169c6669fb1ff79cfa0c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "46acc0336a9fa29be5457cea8338f0fc7296fa50103b169c6669fb1ff79cfa0c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1e55dd48fb5238a36312d356789c4ab2419231b258c638486065675be404b312"
+    sha256 cellar: :any_skip_relocation, ventura:       "1e55dd48fb5238a36312d356789c4ab2419231b258c638486065675be404b312"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "06688a38b6c308a92561d6d157e48b31eabc43fcca3d4c5f100a2676d32a1b87"
   end
 
-  depends_on "python-certifi"
-  depends_on "python-typing-extensions"
-  depends_on "python@3.11"
-  depends_on "six"
+  depends_on "certifi"
+  depends_on "python@3.13"
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/2a/53/cf0a48de1bdcf6ff6e1c9a023f5f523dfe303e4024f216feac64b6eb7f67/charset-normalizer-3.2.0.tar.gz"
-    sha256 "3bb3d25a8e6c0aedd251753a79ae98a093c7e7b471faa3aa9a93a81431987ace"
+    url "https://files.pythonhosted.org/packages/f2/4f/e1808dc01273379acc506d18f1504eb2d299bd4131743b9fc54d7be4df1e/charset_normalizer-3.4.0.tar.gz"
+    sha256 "223217c3d4f82c3ac5e29032b3f1c2eb0fb591b72161f86d93f5719079dae93e"
   end
 
   resource "defusedxml" do
@@ -35,33 +32,43 @@ class OscCli < Formula
   end
 
   resource "fire" do
-    url "https://files.pythonhosted.org/packages/94/ed/3b9a10605163f48517931083aee8364d4d6d3bb1aa9b75eb0a4a5e9fbfc1/fire-0.5.0.tar.gz"
-    sha256 "a6b0d49e98c8963910021f92bba66f65ab440da2982b78eb1bbf95a0a34aacc6"
+    url "https://files.pythonhosted.org/packages/6b/b6/82c7e601d6d3c3278c40b7bd35e17e82aa227f050aa9f66cb7b7fce29471/fire-0.7.0.tar.gz"
+    sha256 "961550f07936eaf65ad1dc8360f2b2bf8408fad46abbfa4d2a3794f8d2a95cdf"
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz"
-    sha256 "814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"
+    url "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz"
+    sha256 "12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz"
-    sha256 "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
+    url "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz"
+    sha256 "55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"
+  end
+
+  resource "setuptools" do
+    url "https://files.pythonhosted.org/packages/27/b8/f21073fde99492b33ca357876430822e4800cdf522011f18041351dfa74b/setuptools-75.1.0.tar.gz"
+    sha256 "d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538"
   end
 
   resource "termcolor" do
-    url "https://files.pythonhosted.org/packages/b8/85/147a0529b4e80b6b9d021ca8db3a820fcac53ec7374b87073d004aaf444c/termcolor-2.3.0.tar.gz"
-    sha256 "b5b08f68937f138fe92f6c089b99f1e2da0ae56c52b78bf7075fd95420fd9a5a"
+    url "https://files.pythonhosted.org/packages/37/72/88311445fd44c455c7d553e61f95412cf89054308a1aa2434ab835075fc5/termcolor-2.5.0.tar.gz"
+    sha256 "998d8d27da6d48442e8e1f016119076b690d962507531df4890fcd2db2ef8a6f"
+  end
+
+  resource "typing-extensions" do
+    url "https://files.pythonhosted.org/packages/df/db/f35a00659bc03fec321ba8bce9420de607a1d37f8342eee1863174c69557/typing_extensions-4.12.2.tar.gz"
+    sha256 "1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/31/ab/46bec149bbd71a4467a3063ac22f4486ecd2ceb70ae8c70d5d8e4c2a7946/urllib3-2.0.4.tar.gz"
-    sha256 "8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11"
+    url "https://files.pythonhosted.org/packages/ed/63/22ba4ebfe7430b76388e7cd448d5478814d3032121827c12a2cc287e2260/urllib3-2.2.3.tar.gz"
+    sha256 "e7d814a81dad81e6caf2ec9fdedb284ecc9c73076b62654547cc64ccdcae26e9"
   end
 
   resource "xmltodict" do
-    url "https://files.pythonhosted.org/packages/39/0d/40df5be1e684bbaecdb9d1e0e40d5d482465de6b00cbb92b84ee5d243c7f/xmltodict-0.13.0.tar.gz"
-    sha256 "341595a488e3e01a85a9d8911d8912fd922ede5fecc4dce437eb4b6c8d037e56"
+    url "https://files.pythonhosted.org/packages/98/f7/d29b8cdc9d8d075673be0f800013c1161e2fd4234546a140855a1bcc9eb4/xmltodict-0.14.1.tar.gz"
+    sha256 "338c8431e4fc554517651972d62f06958718f6262b04316917008e8fd677a6b0"
   end
 
   def install
@@ -76,7 +83,7 @@ class OscCli < Formula
     assert_match "Missing Access Key for authentication", str
 
     mkdir testpath/".osc"
-    (testpath/".osc/config.json").write <<~EOS
+    (testpath/".osc/config.json").write <<~JSON
       {
         "default": {
           "access_key": "F4K4T706S9XKGEXAMPLE",
@@ -87,7 +94,7 @@ class OscCli < Formula
           "region_name": "eu-west-2"
         }
       }
-    EOS
+    JSON
 
     str = shell_output("#{bin}/osc-cli api ReadVms 2>&1 >/dev/null", 1)
     match = "raise OscApiException(http_response)"

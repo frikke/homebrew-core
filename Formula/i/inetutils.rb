@@ -1,22 +1,24 @@
 class Inetutils < Formula
   desc "GNU utilities for networking"
   homepage "https://www.gnu.org/software/inetutils/"
-  url "https://ftp.gnu.org/gnu/inetutils/inetutils-2.4.tar.xz"
-  mirror "https://ftpmirror.gnu.org/inetutils/inetutils-2.4.tar.xz"
-  sha256 "1789d6b1b1a57dfe2a7ab7b533ee9f5dfd9cbf5b59bb1bb3c2612ed08d0f68b2"
+  url "https://ftp.gnu.org/gnu/inetutils/inetutils-2.5.tar.xz"
+  mirror "https://ftpmirror.gnu.org/inetutils/inetutils-2.5.tar.xz"
+  sha256 "87697d60a31e10b5cb86a9f0651e1ec7bee98320d048c0739431aac3d5764fb6"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "872275661200b6f4372aee795840075b23dd2c4862ded07f4000d706ba37409e"
-    sha256 arm64_monterey: "b9ffd46bc37271e9c1f57a333d39af249ef131fa68a89565bcf06fcf0cb7e4da"
-    sha256 arm64_big_sur:  "02e7db5f94d356b61cf55ba51c85df000ddce5df9fd9925c81d415fa15b6aa5e"
-    sha256 ventura:        "8c34d17dd5c58955e33eb77b68dc06a43e1c8f193bf3f12c314f0fa45efd9404"
-    sha256 monterey:       "538573e4777f6f7ba4d5ab5ec8546b3e614a219dfedcfdb08c968210a4f012de"
-    sha256 big_sur:        "f6e3c7e2ae01a7d3e7801122bf93b525bd353dc995724e25a719d7b6362167bd"
-    sha256 catalina:       "0b8cb0db259708450273e70e7d037a6806137c09ab16a6fc53d4a5093f2aa46a"
-    sha256 x86_64_linux:   "f1dfc69baed24c9608d2f5ecf54a650960780de44fced9a712bb91a4e52e3fac"
+    rebuild 1
+    sha256 arm64_sequoia:  "a6def7fbd9a1c7ef2f4e9c582fc5e40ae572b95d0eaf6dedf5349c08f70179d0"
+    sha256 arm64_sonoma:   "e6afa68602fd3a2789d7488c2080fb88acab6021aadc8e4c8cdb7fb5c1168e39"
+    sha256 arm64_ventura:  "9b554572efb13f9762a17d4abfa721c1e9b4d757a78ac67eb56bfcd777852ba4"
+    sha256 arm64_monterey: "8dd6e104cc9092a2225c205dfa346ad7a9f0134f0608e8f58e454f6c749b6714"
+    sha256 sonoma:         "251dcd9d1fee54a85c35ccc0c29e5ca1f9bbccc7edb71ae714ee6cab51f52e54"
+    sha256 ventura:        "f77f7f7460b637f6d90997cd8b0ab2edf1a94ce62b79d5d167e1f02b0ab9a475"
+    sha256 monterey:       "6f6271408faa0f220506dd46ca5eb1fbf353f77071139c94d84406a10a7c3cfd"
+    sha256 x86_64_linux:   "d76a8cb2d5cf6eb61e23d0cd6fa0527dea4e0649830a5e562d423df4cadcb0ce"
   end
 
+  depends_on "help2man" => :build
   depends_on "libidn2"
 
   uses_from_macos "libxcrypt"
@@ -28,6 +30,7 @@ class Inetutils < Formula
 
   conflicts_with "telnet", because: "both install `telnet` binaries"
   conflicts_with "tnftp", because: "both install `ftp` binaries"
+  conflicts_with "gping", because: "both install `gping` binaries"
 
   def noshadow
     # List of binaries that do not shadow macOS utils
@@ -46,6 +49,9 @@ class Inetutils < Formula
     list << "whois" # whois
     list
   end
+
+  # upstream bug report, https://savannah.gnu.org/bugs/index.php?65093
+  patch :DATA
 
   def install
     system "./configure", *std_configure_args,
@@ -78,7 +84,7 @@ class Inetutils < Formula
       (libexec/"gnubin").install_symlink bin/"g#{cmd}" => cmd
       (libexec/"gnuman"/"man1").install_symlink man1/"g#{cmd}.1" => "#{cmd}.1"
     end
-    libexec.install_symlink "gnuman" => "man"
+    (libexec/"gnubin").install_symlink "../gnuman" => "man"
 
     no_conflict -= linux_conflicts if OS.linux?
     # Symlink binaries that are not shadowing macOS utils or are
@@ -123,3 +129,19 @@ class Inetutils < Formula
     assert_match "Connected to ftp.gnu.org.\n220 GNU FTP server ready", output
   end
 end
+
+__END__
+diff --git a/src/syslogd.c b/src/syslogd.c
+index 918686d..dd8c359 100644
+--- a/src/syslogd.c
++++ b/src/syslogd.c
+@@ -278,7 +278,9 @@ void logerror (const char *);
+ void logmsg (int, const char *, const char *, int);
+ void printline (const char *, const char *);
+ void printsys (const char *);
++#if !__APPLE__
+ char *ttymsg (struct iovec *, int, char *, int);
++#endif
+ void wallmsg (struct filed *, struct iovec *);
+ char **crunch_list (char **oldlist, char *list);
+ char *textpri (int pri);

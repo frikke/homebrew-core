@@ -1,8 +1,8 @@
 class Calceph < Formula
   desc "C library to access the binary planetary ephemeris files"
   homepage "https://www.imcce.fr/inpop/calceph"
-  url "https://www.imcce.fr/content/medias/recherche/equipes/asd/calceph/calceph-3.5.3.tar.gz"
-  sha256 "9dd2ebdec1d1f5bd6f01961d111dbf0a4b24d0c0545572f00c1d236800a25789"
+  url "https://www.imcce.fr/content/medias/recherche/equipes/asd/calceph/calceph-4.0.4.tar.gz"
+  sha256 "20c9f0bd720c5cfe99a7b342babda3ff91428adfec9d55357b380b4a13205d60"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,34 +11,30 @@ class Calceph < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "c26c4cb6eba9c5dc6d5144ec75aa649c64af8d956feb56ad0968168608cb7e24"
-    sha256 cellar: :any,                 arm64_monterey: "c1f882709bc71c3785109466e41e7e2828a79a866190160d781a95fd40a36c38"
-    sha256 cellar: :any,                 arm64_big_sur:  "21265e292c3ba49e39265ce3084bce1afb07f1908911df4d61a80e70c2fadb1d"
-    sha256 cellar: :any,                 ventura:        "2d09dfe20da47d176f40a7ad06e76ee8fa9efc597b57983332e1343e6c331851"
-    sha256 cellar: :any,                 monterey:       "c7935ce0cf39131e1c011d29ba2180a0b86dcbe622e7f00e81e6032737ed01cd"
-    sha256 cellar: :any,                 big_sur:        "543c2da4f31607e18b6a20842d093726240c96ab04dfccb5f1c028810aff8387"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ed60de55e289c40d049b74a19a3a5065adbb2428f25df172e1dea3285bf78f0b"
+    sha256 cellar: :any,                 arm64_sequoia: "8052ae633e2e434f92a58297a7d95b7abf31c6df27a4f150f04acd90c458b24d"
+    sha256 cellar: :any,                 arm64_sonoma:  "bccdf7dd4f4b833f7382eafad36ab00cc3e886f2193013fcf01f8c3edeab93f1"
+    sha256 cellar: :any,                 arm64_ventura: "ed3e3aa4f63ba31eb8b56a313e7695c2bc1a1ec3f76b91de087ba1ba4c89c477"
+    sha256 cellar: :any,                 sonoma:        "71acfca39979f054472b0f287a256e3ef51548f77e6e20410a3c669403a1b63a"
+    sha256 cellar: :any,                 ventura:       "4527dfd754d1f940f46eca0af7000e6cb8f8c801521810288325c5e189eab35b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3cac5e4fa043c89c765556ecde72dfea4199b1f59f814840916c8c97eacc633f"
   end
 
+  depends_on "cmake" => :build
   depends_on "gcc" # for gfortran
 
-  # Fix -flat_namespace being used on Big Sur and later.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-pre-0.4.2.418-big_sur.diff"
-    sha256 "83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
-  end
-
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
-    system "make"
-    system "make", "install"
+    args = %W[
+      -DBUILD_SHARED_LIBS=ON
+      -DENABLE_FORTRAN=ON
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"testcalceph.c").write <<~EOS
+    (testpath/"testcalceph.c").write <<~C
       #include <calceph.h>
       #include <assert.h>
 
@@ -54,7 +50,7 @@ class Calceph < Formula
         assert (errorfound==1);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "testcalceph.c", "-L#{lib}", "-lcalceph", "-o", "testcalceph"
     system "./testcalceph"
   end

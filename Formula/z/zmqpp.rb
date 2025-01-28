@@ -1,11 +1,12 @@
 class Zmqpp < Formula
   desc "High-level C++ binding for zeromq"
   homepage "https://zeromq.github.io/zmqpp/"
-  url "https://github.com/zeromq/zmqpp/archive/4.2.0.tar.gz"
+  url "https://github.com/zeromq/zmqpp/archive/refs/tags/4.2.0.tar.gz"
   sha256 "c1d4587df3562f73849d9e5f8c932ca7dcfc7d8bec31f62d7f35073ef81f4d29"
   license "MPL-2.0"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "9fa8e84d3f7cdd481639d63079b3ff25804d464cdf1107397bcde6fe4950726a"
     sha256 cellar: :any,                 arm64_sonoma:   "574b288b419ea2c184b6720d566a15dd75554bc252379a86cefc173794866a7d"
     sha256 cellar: :any,                 arm64_ventura:  "79259180cd88ddb59497fbb3075a02c19ac854e5a57f1ff33f53c328789b4dd5"
     sha256 cellar: :any,                 arm64_monterey: "ce6be56e7c768bc4c35b43d78a7938b5bf415293ce42e47230a47dc17d05e091"
@@ -36,13 +37,13 @@ class Zmqpp < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <zmqpp/zmqpp.hpp>
       int main() {
         zmqpp::frame frame;
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-L#{lib}", "-lzmqpp", "-o", "test", "-std=c++11"
     system "./test"
   end

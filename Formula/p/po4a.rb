@@ -5,19 +5,19 @@ class Po4a < Formula
 
   desc "Documentation translation maintenance tool"
   homepage "https://po4a.org"
-  url "https://github.com/mquinson/po4a/releases/download/v0.69/po4a-0.69.tar.gz"
-  sha256 "7cd4aff13661665ec2d9df478757ae407683d4ecb5c2627ccf8b46729bcb9496"
+  url "https://github.com/mquinson/po4a/archive/refs/tags/v0.73.tar.gz"
+  sha256 "ad5edc38bf004807843622fddbf67bd5ac604fc16e14c2bfefa7b07718ad21f3"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/mquinson/po4a.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "837f217dfce71d671aaf7fcc547e1d93724e065e05a29d62ab39a7597e7446f4"
-    sha256 cellar: :any,                 arm64_monterey: "b06c39d51e9c012149b4eddee10bdaa3e382132e47c1f8bec007d89ce7bc4498"
-    sha256 cellar: :any,                 arm64_big_sur:  "ba4f0c6a6c9f090f300a62bc873a20c46a2f93e1eb5d2dd9e171c3c31f694e76"
-    sha256 cellar: :any,                 ventura:        "030710ab847594cad08486ccdbbb63b7f4e897c463c90d09e64f742225aace32"
-    sha256 cellar: :any,                 monterey:       "0e7ffba17780c748df3ba0066b290ea1543eaea90517e50739186c2d2b8d8bc4"
-    sha256 cellar: :any,                 big_sur:        "19b5f87241de9a45d175a6b4b0283fffca288649dbb58bc122de9fbf53ba8216"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ff671d887aac7235246b0b919c98e4b2cb2dae6a1aceb4f39df6e706789bb518"
+    sha256 cellar: :any,                 arm64_sequoia: "afb479bc9624626a1f950a4f201fda2d5e959b59f414b0d87b6a6e8cc2baaae4"
+    sha256 cellar: :any,                 arm64_sonoma:  "2d74dc1e677bfaf935771544981f7f44ffdd3b5f661e0df07748e5c71849420a"
+    sha256 cellar: :any,                 arm64_ventura: "7a4016850542e5ab42173906e8ed86d13fe971b7161103ca49abb787fbdad05c"
+    sha256 cellar: :any,                 sonoma:        "aea5106a47029e857b9c5ec0ac0a87e87b4cf7843717251df7b41a0461b84a34"
+    sha256 cellar: :any,                 ventura:       "b0c068aac3d53b27fde2125a35bc474b019e5fc3cee5102d1c2b0b3a32a708e9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c667b5f9d44d0d116b73b0524d100d362aa202a414c69ee6ce06f68ae9ae0f70"
   end
 
   depends_on "docbook-xsl" => :build
@@ -27,18 +27,18 @@ class Po4a < Formula
   uses_from_macos "libxslt"
 
   resource "Locale::gettext" do
-    url "https://cpan.metacpan.org/authors/id/P/PV/PVANDRY/gettext-1.07.tar.gz"
+    url "https://cpan.metacpan.org/authors/id/P/PV/PVANDRY/Locale-gettext-1.07.tar.gz"
     sha256 "909d47954697e7c04218f972915b787bd1244d75e3bd01620bc167d5bbc49c15"
   end
 
   resource "Module::Build" do
-    url "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-0.4232.tar.gz"
-    sha256 "67c82ee245d94ba06decfa25572ab75fdcd26a9009094289d8f45bc54041771b"
+    url "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-0.4234.tar.gz"
+    sha256 "66aeac6127418be5e471ead3744648c766bd01482825c5b66652675f2bc86a8f"
   end
 
   resource "Pod::Parser" do
-    url "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.65.tar.gz"
-    sha256 "3ba7bdec659416a51fe2a7e59f0883e9c6a3b21bc9d001042c1d6a32d401b28a"
+    url "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.67.tar.gz"
+    sha256 "5deccbf55d750ce65588cd211c1a03fa1ef3aaa15d1ac2b8d85383a42c1427ea"
   end
 
   resource "SGMLS" do
@@ -46,7 +46,7 @@ class Po4a < Formula
     sha256 "550c9245291c8df2242f7e88f7921a0f636c7eec92c644418e7d89cfea70b2bd"
   end
 
-  resource "TermReadKey" do
+  resource "Term::ReadKey" do
     url "https://cpan.metacpan.org/authors/id/J/JS/JSTOWE/TermReadKey-2.38.tar.gz"
     sha256 "5a645878dc570ac33661581fbb090ff24ebce17d43ea53fd22e105a856a47290"
   end
@@ -62,23 +62,23 @@ class Po4a < Formula
   end
 
   resource "YAML::Tiny" do
-    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/YAML-Tiny-1.73.tar.gz"
-    sha256 "bc315fa12e8f1e3ee5e2f430d90b708a5dc7e47c867dba8dce3a6b8fbe257744"
+    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/YAML-Tiny-1.74.tar.gz"
+    sha256 "7b38ca9f5d3ce24230a6b8bdc1f47f5b2db348e7f7f9666c26f5955636e33d6c"
   end
 
   resource "ExtUtils::CChecker" do
-    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/ExtUtils-CChecker-0.11.tar.gz"
-    sha256 "117736677e37fc611f5b76374d7f952e1970eb80e1f6ad5150d516e7ae531bf5"
+    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/ExtUtils-CChecker-0.12.tar.gz"
+    sha256 "8b87d145337dec1ee754d30871d0b105c180ad4c92c7dc0c7fadd76cec8c57d3"
   end
 
   resource "XS::Parse::Keyword::Builder" do
-    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/XS-Parse-Keyword-0.31.tar.gz"
-    sha256 "e496168a4fcbcc61065ee64e0e2a657631b5750fd3c22d6361acf4d0a19b7f3d"
+    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/XS-Parse-Keyword-0.42.tar.gz"
+    sha256 "7e498879e7813c9a7ecf4296c74774a32e40131e3a64efcc63c8010c0eb11382"
   end
 
   resource "Syntax::Keyword::Try" do
-    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/Syntax-Keyword-Try-0.28.tar.gz"
-    sha256 "ccad5f9d82a0b016252ed52da0270c80d54dc4289e09e3543d47a50b78fa02c8"
+    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/Syntax-Keyword-Try-0.29.tar.gz"
+    sha256 "cc320719d3608daa9514743a43dac2be99cb8ccd989b1fefa285290cb1d59d8f"
   end
 
   def install
@@ -121,12 +121,12 @@ class Po4a < Formula
   test do
     # LaTeX
 
-    (testpath/"en.tex").write <<~EOS
-      \\documentclass[a4paper]{article}
-      \\begin{document}
+    (testpath/"en.tex").write <<~'TEX'
+      \documentclass[a4paper]{article}
+      \begin{document}
       Hello from Homebrew!
-      \\end{document}
-    EOS
+      \end{document}
+    TEX
 
     system bin/"po4a-updatepo", "-f", "latex", "-m", "en.tex", "-p", "latex.pot"
     assert_match "Hello from Homebrew!", (testpath/"latex.pot").read

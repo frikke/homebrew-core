@@ -1,19 +1,20 @@
 class Minidlna < Formula
   desc "Media server software, compliant with DLNA/UPnP-AV clients"
   homepage "https://sourceforge.net/projects/minidlna/"
-  url "https://downloads.sourceforge.net/project/minidlna/minidlna/1.3.0/minidlna-1.3.0.tar.gz"
-  sha256 "47d9b06b4c48801a4c1112ec23d24782728b5495e95ec2195bbe5c81bc2d3c63"
+  url "https://downloads.sourceforge.net/project/minidlna/minidlna/1.3.3/minidlna-1.3.3.tar.gz"
+  sha256 "39026c6d4a139b9180192d1c37225aa3376fdf4f1a74d7debbdbb693d996afa4"
   license "GPL-2.0-only"
-  revision 6
+  revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "7084ce93804a189f7b06791ab9a8fe25b5c5a94c6e2d8772002a899fe8eb0925"
-    sha256 cellar: :any,                 arm64_monterey: "1edd947d1252977df7f73d95afef4c68937e91454cf8cfd2b7b304fbd1a0c334"
-    sha256 cellar: :any,                 arm64_big_sur:  "36072976cbebd7c14eac5400ec5b5495955e980ec922a72732384b830df19674"
-    sha256 cellar: :any,                 ventura:        "713ac9c912faf4cf0b5d7ba9d84b9fd33703c8712d1d88fdbc9d1148143b3ecc"
-    sha256 cellar: :any,                 monterey:       "0ddb7b01d43497351f8daef3aeed5daad168a6ce58c432d5d930f3a14a3858a4"
-    sha256 cellar: :any,                 big_sur:        "390f161b6057e85f58af6be48c388c3ea72b5f168c15becac79ce121f31763de"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9920adc04f7e7b8d9559d32c86e691a0d33d168bd44e5e736306bf17ed1d9bec"
+    sha256 cellar: :any,                 arm64_sequoia:  "870534ea2c84fb92abc96978f8da8b22f75dc5e681884602cffd4ed4f76fbffa"
+    sha256 cellar: :any,                 arm64_sonoma:   "5cdc4271499e5b8b3e6c7effab75da360de272d956e592c74ceb272012cbedc2"
+    sha256 cellar: :any,                 arm64_ventura:  "cfd00cc9d042aa7c6348edb85ccd3d46e961cf5db7889a983c3db86b7c426350"
+    sha256 cellar: :any,                 arm64_monterey: "4ca9b45f96b3db7f8623ac80b17861b25091e851bd0d3b98ab018c2b70593797"
+    sha256 cellar: :any,                 sonoma:         "0f9c174c508fe889e1e5849b43e779b360186fbc416303037379445fe0d713bd"
+    sha256 cellar: :any,                 ventura:        "c4934d6d2fbc41afce5d1bf4a2f79b9fe9ffeef3dbf2c303c42e71db9bf27794"
+    sha256 cellar: :any,                 monterey:       "321cde081415e6c35efe2c8522808c746578c3c5127f7a08df1bc3986c57ee4c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "257e53c6ef6bd70fc2369d097e0c7e0da5013dc8e9c763a0762ba5df0bc9588a"
   end
 
   head do
@@ -25,7 +26,7 @@ class Minidlna < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "ffmpeg"
+  depends_on "ffmpeg@6" # ffmpeg 7 issue: https://sourceforge.net/p/minidlna/bugs/363/
   depends_on "flac"
   depends_on "jpeg-turbo"
   depends_on "libexif"
@@ -34,7 +35,12 @@ class Minidlna < Formula
   depends_on "libvorbis"
   depends_on "sqlite"
 
-  fails_with gcc: "5" # ffmpeg is compiled with GCC
+  on_macos do
+    depends_on "gettext"
+  end
+
+  # Add missing include: https://sourceforge.net/p/minidlna/bugs/351/
+  patch :DATA
 
   def install
     system "./autogen.sh" if build.head?
@@ -90,6 +96,21 @@ class Minidlna < Formula
     io.expect("debug: Initial file scan completed", 30)
     assert_predicate testpath/"minidlna.pid", :exist?
 
-    assert_match "MiniDLNA #{version}", shell_output("curl localhost:#{port}")
+    # change back to localhost once https://sourceforge.net/p/minidlna/bugs/346/ is addressed
+    assert_match "MiniDLNA #{version}", shell_output("curl 127.0.0.1:#{port}")
   end
 end
+
+__END__
+diff --git a/kqueue.c b/kqueue.c
+index 35b3f2b..cf425cf 100644
+--- a/kqueue.c
++++ b/kqueue.c
+@@ -28,6 +28,7 @@
+
+ #include <sys/types.h>
+ #include <sys/event.h>
++#include <sys/time.h>
+ #include <assert.h>
+ #include <errno.h>
+ #include <stdlib.h>

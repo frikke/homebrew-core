@@ -11,9 +11,12 @@ class Zssh < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "ef79ef8cbe611003a77f4b5e4728dbce1e2916ea6aa1d34054d495d6b35d043c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "b16fd704253185960f793a025ef7fe510186de420f653602946319d94893b302"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "c89cb5197c40525efecccb42fb351668392d9c425742450896e4ecdc46b59587"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "4450134a2610b41d037efaf910d6ccdf2cc6d836887b877337f91bf73d49f44c"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9b567d08589f3ba595994ca4906bfde9fe2651ef246bbd872f332e9cc8993a60"
+    sha256 cellar: :any_skip_relocation, sonoma:         "03cb8f6eea5ed39cc82de6d173e5eff34986fa1821a28e52db61d0c70abb1df1"
     sha256 cellar: :any_skip_relocation, ventura:        "3168f9fb757fefc2c5ab7a5382a6fac4e489963324f9d57da667596769882713"
     sha256 cellar: :any_skip_relocation, monterey:       "9387acd7dec913faa9917b3d27baaff250a412ecd509eba625543d188c6922a9"
     sha256 cellar: :any_skip_relocation, big_sur:        "54bb3ff51405eda0900361c829fad63f988c21e685645fe5c8076c456567bd0b"
@@ -31,14 +34,17 @@ class Zssh < Formula
   depends_on "lrzsz"
 
   on_linux do
-    depends_on "pkg-config" => :build
     depends_on "readline"
   end
 
   def install
-    system "autoreconf", "-fvi"
-    system "./configure", "--disable-debug", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    # Workaround for Xcode 15
+    ENV.append_to_cflags "-Wno-incompatible-function-pointer-types" if DevelopmentTools.clang_build_version >= 1500
+
+    rm_r "lrzsz-0.12.20"
+
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args
     system "make"
 
     bin.install "zssh", "ztelnet"
@@ -47,6 +53,6 @@ class Zssh < Formula
 
   test do
     require "pty"
-    PTY.spawn "#{bin}/zssh -V"
+    PTY.spawn(bin/"zssh", "-V")
   end
 end

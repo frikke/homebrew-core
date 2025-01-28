@@ -1,25 +1,27 @@
 class Fennel < Formula
   desc "Lua Lisp Language"
   homepage "https://fennel-lang.org"
-  url "https://github.com/bakpakin/Fennel/archive/1.3.1.tar.gz"
-  sha256 "12045cbd70088b966e73ac4c54ad63e096fb9b91b9874cb17533c8045595ee74"
+  url "https://github.com/bakpakin/Fennel/archive/refs/tags/1.5.1.tar.gz"
+  sha256 "7456737a2e0fc17717ea2d80083cfcf04524abaa69b1eb79bded86b257398cd0"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "c1d124ad6f12534f3ad4def0e124a99fc89c0e5149df92ead5ca01c4a349ccc7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "e5c53ecb0ddceec975d311bced6ae970a552f6a60880b1331ece1c2ab51076cc"
   end
 
+  depends_on "luajit" => [:build, :test]
   depends_on "lua"
 
   def install
-    system "make"
-    bin.install "fennel"
-
-    lua = Formula["lua"]
-    (share/"lua"/lua.version.major_minor).install "fennel.lua"
+    system "make", "PREFIX=#{prefix}", "install"
+    system "make", "LUA=luajit", "PREFIX=#{prefix}", "install"
+    share.install "man" if OS.mac? # macOS `make` doesn't install the manpages correctly.
   end
 
   test do
     assert_match "hello, world!", shell_output("#{bin}/fennel -e '(print \"hello, world!\")'")
+    system "lua", "-e", "require 'fennel'"
+    system "luajit", "-e", "require 'fennel'"
   end
 end

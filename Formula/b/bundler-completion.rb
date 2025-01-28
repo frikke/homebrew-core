@@ -1,10 +1,10 @@
 class BundlerCompletion < Formula
   desc "Bash completion for Bundler"
   homepage "https://github.com/mernen/completion-ruby"
-  url "https://github.com/mernen/completion-ruby.git",
-      revision: "f3e4345042b0cc48317e45b673dfd3d23904b9a7"
-  version "2"
+  url "https://github.com/mernen/completion-ruby/archive/refs/tags/v1.0.2.tar.gz"
+  sha256 "70b9ae9154076b561f0d7b2b74893258dc00168ded3e8686f14e349f4a324914"
   license "MIT"
+  version_scheme 1
   head "https://github.com/mernen/completion-ruby.git", branch: "main"
 
   livecheck do
@@ -12,7 +12,7 @@ class BundlerCompletion < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "2a933db603ecba2d78dc7bb9c88df00aa45d838e692bc5e6c00ef7d97d983ad6"
+    sha256 cellar: :any_skip_relocation, all: "f08e58b28795cd4563c8c7c868db8760b1a7fd0bb23fbfb75f31c999288df683"
   end
 
   def install

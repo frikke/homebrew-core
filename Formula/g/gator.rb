@@ -1,20 +1,18 @@
 class Gator < Formula
   desc "CLI Utility for Open Policy Agent Gatekeeper"
   homepage "https://open-policy-agent.github.io/gatekeeper/website/docs/gator"
-  url "https://github.com/open-policy-agent/gatekeeper/archive/refs/tags/v3.13.0.tar.gz"
-  sha256 "915cb6b97d5449515dce939679a37a7c011b3495442c7d028f3856324dee0afb"
+  url "https://github.com/open-policy-agent/gatekeeper/archive/refs/tags/v3.18.2.tar.gz"
+  sha256 "a69607832b6662aff8f67cbceb5a94a243a02ba085e5ee462e9a2a4c2eb762cf"
   license "Apache-2.0"
   head "https://github.com/open-policy-agent/gatekeeper.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "519851c955caa3b86dfe89cefa447c65b66b5d771af82fc64f9d345744e34321"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "519851c955caa3b86dfe89cefa447c65b66b5d771af82fc64f9d345744e34321"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "519851c955caa3b86dfe89cefa447c65b66b5d771af82fc64f9d345744e34321"
-    sha256 cellar: :any_skip_relocation, ventura:        "10e39c3b3653c8619351ffc144860707c4e6e0d83f8816c7bb2390c4724c0d51"
-    sha256 cellar: :any_skip_relocation, monterey:       "10e39c3b3653c8619351ffc144860707c4e6e0d83f8816c7bb2390c4724c0d51"
-    sha256 cellar: :any_skip_relocation, big_sur:        "10e39c3b3653c8619351ffc144860707c4e6e0d83f8816c7bb2390c4724c0d51"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0bdd9f1d7fe8cc460de74a47ccc8b0b6a240ccee719c0afd2a9acdea81e99ec0"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c18c3b094a401672a34c76e35a5267b7f883f52019929b854db1e09d139d0047"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c18c3b094a401672a34c76e35a5267b7f883f52019929b854db1e09d139d0047"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c18c3b094a401672a34c76e35a5267b7f883f52019929b854db1e09d139d0047"
+    sha256 cellar: :any_skip_relocation, sonoma:        "d9e5c868f7dc38ee1a1093cc9830d526b9024f94889a702429a2e257d4954339"
+    sha256 cellar: :any_skip_relocation, ventura:       "d9e5c868f7dc38ee1a1093cc9830d526b9024f94889a702429a2e257d4954339"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1dbd7183d077102821d9a48e7860eb781914f87f528fb2eeaaea3a7d718d5132"
   end
 
   depends_on "go" => :build
@@ -24,7 +22,7 @@ class Gator < Formula
       -s -w
       -X github.com/open-policy-agent/gatekeeper/v3/pkg/version.Version=#{version}
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/gator"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/gator"
 
     generate_completions_from_executable(bin/"gator", "completion")
   end
@@ -33,7 +31,7 @@ class Gator < Formula
     assert_match "gator is a suite of authorship tools for Gatekeeper", shell_output("#{bin}/gator -h")
 
     # Create a test manifest file
-    (testpath/"gator-manifest.yaml").write <<~EOS
+    (testpath/"gator-manifest.yaml").write <<~YAML
       apiVersion: networking.k8s.io/v1
       kind: Ingress
       metadata:
@@ -53,9 +51,9 @@ class Gator < Formula
                     name: nginx
                     port:
                       number: 80
-    EOS
+    YAML
     # Create a test constraint template
-    (testpath/"template-and-constraints/gator-constraint-template.yaml").write <<~EOS
+    (testpath/"template-and-constraints/gator-constraint-template.yaml").write <<~YAML
       apiVersion: templates.gatekeeper.sh/v1
       kind: ConstraintTemplate
       metadata:
@@ -89,9 +87,9 @@ class Gator < Formula
                 count(ingress.spec.tls) > 0
                 ingress.metadata.annotations["kubernetes.io/ingress.allow-http"] == "false"
               }
-    EOS
+    YAML
     # Create a test constraint file
-    (testpath/"template-and-constraints/gator-constraint.yaml").write <<~EOS
+    (testpath/"template-and-constraints/gator-constraint.yaml").write <<~YAML
       apiVersion: constraints.gatekeeper.sh/v1beta1
       kind: K8sHttpsOnly
       metadata:
@@ -101,7 +99,7 @@ class Gator < Formula
           kinds:
             - apiGroups: ["extensions", "networking.k8s.io"]
               kinds: ["Ingress"]
-    EOS
+    YAML
 
     assert_empty shell_output("#{bin}/gator test -f gator-manifest.yaml -f template-and-constraints/")
 

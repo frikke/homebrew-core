@@ -1,31 +1,29 @@
 class Libtensorflow < Formula
   desc "C interface for Google's OS library for Machine Intelligence"
   homepage "https://www.tensorflow.org/"
-  url "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.12.0.tar.gz"
-  sha256 "c030cb1905bff1d2446615992aad8d8d85cbe90c4fb625cee458c63bf466bc8e"
+  url "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.18.0.tar.gz"
+  sha256 "d7876f4bb0235cac60eb6316392a7c48676729860da1ab659fb440379ad5186d"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "a02e1473f4da79861359f692b4831183491991e18bdfc669747319187005b7c7"
-    sha256 cellar: :any,                 arm64_monterey: "a02e1473f4da79861359f692b4831183491991e18bdfc669747319187005b7c7"
-    sha256 cellar: :any,                 arm64_big_sur:  "f552152df7b221e03f2e806cb3a4e3acdcab9097a570034871673de10c479d9f"
-    sha256 cellar: :any,                 ventura:        "d0cdf8369fb0f4b39b628e309af5809a95b0f53744b149e3727cf09d2a20d086"
-    sha256 cellar: :any,                 monterey:       "d0cdf8369fb0f4b39b628e309af5809a95b0f53744b149e3727cf09d2a20d086"
-    sha256 cellar: :any,                 big_sur:        "a8664f86c8ebf5d410c5e863786bb3de912618633e1013d5d76813d3482f3888"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5ac69fe06ed91c094845a52233ed225015147c4e1deff218494d1727e5e56b3b"
+    sha256 cellar: :any,                 arm64_sequoia: "9295aa55cc7f99f0021c13230ebcebe9270a7ef1535e576d48b5054087a2ad6f"
+    sha256 cellar: :any,                 arm64_sonoma:  "6abf790f545c5ba17533eb1abe081dbdcdcc27a82911553e1340670a094eb659"
+    sha256 cellar: :any,                 arm64_ventura: "0c852319c52d4794afa128be413c79f939ab7a267572eb6311f5432b0d3d7c67"
+    sha256 cellar: :any,                 sonoma:        "15aa6eda5eb1f9dc710eb775f69be11ca913f728cb7f07560638ef0eebe273b5"
+    sha256 cellar: :any,                 ventura:       "da2cc0d4ab5534253c27924fa2072c8e30bae529d100974d8ff18421d1d55ee1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c50ad77474753dcdee580cb3141fcf6068d6850400ba1ba555d41fcb67ea5fd9"
   end
 
   depends_on "bazelisk" => :build
   depends_on "numpy" => :build
-  depends_on "python@3.11" => :build
+  depends_on "python@3.12" => :build # Python 3.13: https://github.com/tensorflow/tensorflow/issues/78774
 
-  resource "homebrew-test-model" do
-    url "https://github.com/tensorflow/models/raw/v1.13.0/samples/languages/java/training/model/graph.pb"
-    sha256 "147fab50ddc945972818516418942157de5e7053d4b67e7fca0b0ada16733ecb"
+  on_macos do
+    depends_on "gnu-getopt" => :build
   end
 
   def install
-    python3 = "python3.11"
+    python3 = "python3.12"
     optflag = if Hardware::CPU.arm? && OS.mac?
       "-mcpu=apple-m1"
     elsif build.bottle?
@@ -51,6 +49,7 @@ class Libtensorflow < Formula
     ENV["TF_NEED_KAFKA"] = "0"
     ENV["TF_NEED_OPENCL_SYCL"] = "0"
     ENV["TF_NEED_ROCM"] = "0"
+    ENV["TF_NEED_CLANG"] = "0" if OS.linux?
     ENV["TF_DOWNLOAD_CLANG"] = "0"
     ENV["TF_SET_ANDROID_WORKSPACE"] = "0"
     ENV["TF_CONFIGURE_IOS"] = "0"
@@ -72,39 +71,39 @@ class Libtensorflow < Formula
       ]
     end
     targets = %w[
-      tensorflow:libtensorflow.so
-      tensorflow:install_headers
-      tensorflow/tools/benchmark:benchmark_model
-      tensorflow/tools/graph_transforms:summarize_graph
-      tensorflow/tools/graph_transforms:transform_graph
+      //tensorflow/tools/lib_package:libtensorflow
+      //tensorflow/tools/benchmark:benchmark_model
+      //tensorflow/tools/graph_transforms:summarize_graph
+      //tensorflow/tools/graph_transforms:transform_graph
     ]
     system Formula["bazelisk"].opt_bin/"bazelisk", "build", *bazel_args, *targets
 
-    lib.install Dir["bazel-bin/tensorflow/*.so*", "bazel-bin/tensorflow/*.dylib*"]
-    include.install "bazel-bin/tensorflow/include/tensorflow"
     bin.install %w[
       bazel-bin/tensorflow/tools/benchmark/benchmark_model
       bazel-bin/tensorflow/tools/graph_transforms/summarize_graph
       bazel-bin/tensorflow/tools/graph_transforms/transform_graph
     ]
+    system "tar", "-C", prefix, "-xzf", "bazel-bin/tensorflow/tools/lib_package/libtensorflow.tar.gz"
 
-    (lib/"pkgconfig/tensorflow.pc").write <<~EOS
-      Name: tensorflow
-      Description: Tensorflow library
-      Version: #{version}
-      Libs: -L#{lib} -ltensorflow
-      Cflags: -I#{include}
-    EOS
+    ENV.prepend_path "PATH", Formula["gnu-getopt"].opt_prefix/"bin" if OS.mac?
+    system "tensorflow/c/generate-pc.sh", "--prefix", prefix, "--version", version.to_s
+    (lib/"pkgconfig").install "tensorflow.pc"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    resource "homebrew-test-model" do
+      url "https://github.com/tensorflow/models/raw/v1.13.0/samples/languages/java/training/model/graph.pb"
+      sha256 "147fab50ddc945972818516418942157de5e7053d4b67e7fca0b0ada16733ecb"
+    end
+
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <tensorflow/c/c_api.h>
       int main() {
         printf("%s", TF_Version());
       }
-    EOS
+    C
+
     system ENV.cc, "test.c", "-L#{lib}", "-ltensorflow", "-o", "test_tf"
     assert_equal version, shell_output("./test_tf")
 

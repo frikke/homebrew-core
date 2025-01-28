@@ -2,19 +2,20 @@ class Micro < Formula
   desc "Modern and intuitive terminal-based text editor"
   homepage "https://github.com/zyedidia/micro"
   url "https://github.com/zyedidia/micro.git",
-      tag:      "v2.0.12",
-      revision: "c2cebaa3d19fbdd924d411ee393c03e3e7804435"
+      tag:      "v2.0.14",
+      revision: "04c577049ca898f097cd6a2dae69af0b4d4493e1"
   license "MIT"
   head "https://github.com/zyedidia/micro.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "8d1e433780ba9ffc846f7716a0a4c86ad8628121566c84f65b65c8016543ed59"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0f9a34ed1e49c8b08eedc91efb2522884591c15f3205eac670a7c63337ec6c82"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4df3344c1a264887ef1c5bcbbe6096f85724848bd3d3185e6a7d4df5ae2f0856"
-    sha256 cellar: :any_skip_relocation, ventura:        "4489c9ed74e1ce90b875f747c5439ccd1c1c7785592beaea366bb7744d8dd67d"
-    sha256 cellar: :any_skip_relocation, monterey:       "4513082d0b19d003334b82e96811294a02ccd27c4d325566c381f5615dcb1bba"
-    sha256 cellar: :any_skip_relocation, big_sur:        "1149fdfc8d1739156d293616f1cb7618862a335d4573dd6158c2840aaa7d1484"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6131012a517c1ae906ebb5a9011c90e6376626c3bea1b4d23d00c156d051e5bd"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "73b14a51ea6138cc9dd4892ac69c1f1621824315c7d2e40ee8867b39db8e1bcc"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "0c51f1a11fe4f9fa233ce8459e4fc4b0105c9d24f3f0855e50979d35b2a3de0e"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1875a20cb2321214d7cf88b3f98c045d6d1e303b7889544b04a0c7b234217e4d"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "cf26b77b02d965b093ca4dc67710792d8009ede8634a523dbadac3d340b19a6a"
+    sha256 cellar: :any_skip_relocation, sonoma:         "f72a6f86533a0065f6e29964b5f6b88d20528b6cec86411a4cb22fe2aa5a2e89"
+    sha256 cellar: :any_skip_relocation, ventura:        "bf44beaab0f1a685d5bca117b0aa86ce0bfe4edcbd44c12dbcb493fdb5b27c29"
+    sha256 cellar: :any_skip_relocation, monterey:       "05906fffbde05ec39f1f1d2b05c2f73fa43c4f5c5b7bd233fea1a9292a8c9265"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bbb3b288471091c23205f85c2dd964c4c855fb60165f075f5eca4f23ec998a08"
   end
 
   depends_on "go" => :build
@@ -23,7 +24,6 @@ class Micro < Formula
     system "make", "build-tags"
     bin.install "micro"
     man1.install "assets/packaging/micro.1"
-    prefix.install_metafiles
   end
 
   test do

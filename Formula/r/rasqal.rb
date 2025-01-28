@@ -3,6 +3,7 @@ class Rasqal < Formula
   homepage "https://librdf.org/rasqal/"
   url "https://download.librdf.org/source/rasqal-0.9.33.tar.gz"
   sha256 "6924c9ac6570bd241a9669f83b467c728a322470bf34f4b2da4f69492ccfd97c"
+  license any_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later", "Apache-2.0"]
 
   livecheck do
     url :homepage
@@ -10,6 +11,7 @@ class Rasqal < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "de698e3a83cb5fb348934c69dc81af3013e0cb60a4a8a94a53963554eaf8b2b7"
     sha256 cellar: :any,                 arm64_sonoma:   "f1a8b465f57865a1b0fa9ea84f1388f14f778eedb6cd4b4a651a7d2d0bed18af"
     sha256 cellar: :any,                 arm64_ventura:  "92f1cc01dd0623dedfb4b823b7b483e53158436fd1f19f31c743429cf63e9028"
     sha256 cellar: :any,                 arm64_monterey: "df52f08c6ed78c573f5230851d5faf543be79ebdbf6d308f9911739c9c898f53"
@@ -26,7 +28,7 @@ class Rasqal < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "2267d3f39fc7d088095d64bb6cf86f5fcad6c2a72fdd72dde8237cc910b123d1"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "raptor"
 
   # Fix -flat_namespace being used on Big Sur and later.
@@ -36,9 +38,7 @@ class Rasqal < Formula
   end
 
   def install
-    system "./configure", "--prefix=#{prefix}",
-                          "--with-html-dir=#{share}/doc",
-                          "--disable-dependency-tracking"
+    system "./configure", "--with-html-dir=#{share}/doc", *std_configure_args
     system "make", "install"
   end
 end

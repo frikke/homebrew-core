@@ -12,6 +12,7 @@ class Libsvg < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "e0f24ee9236415330cf795a256e7b03af615239c4e81d2a26ada7f2995baf776"
     sha256 cellar: :any,                 arm64_sonoma:   "f2adf0b4734d218b0ebdab5ae4c0eada74f36edb628d6a8a2c41d7ab7b4421ea"
     sha256 cellar: :any,                 arm64_ventura:  "331a886e259749749bbaeed305a1727a8c4ecea79e1eca5949be34d87f0abfa0"
     sha256 cellar: :any,                 arm64_monterey: "9b82d4f937112bd04869cb7089cf8af73a5bcaf9273c0078be79c2bd5aac6510"
@@ -27,7 +28,7 @@ class Libsvg < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "jpeg-turbo"
   depends_on "libpng"
 
@@ -54,7 +55,7 @@ class Libsvg < Formula
       <?xml version="1.0" encoding="utf-8"?>
       <svg xmlns:svg="http://www.w3.org/2000/svg" height="72pt" width="144pt" viewBox="0 -20 144 72"><text font-size="12" text-anchor="left" y="0" x="0" font-family="Times New Roman" fill="green">sample text here</text></svg>
     EOS
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include "svg.h"
 
@@ -123,7 +124,7 @@ class Libsvg < Formula
 
           return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-o", "test",
                    "-I#{include}", "-L#{lib}", "-lsvg",

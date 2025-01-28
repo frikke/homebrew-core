@@ -1,5 +1,3 @@
-require "language/node"
-
 class GenerateJsonSchema < Formula
   desc "Generate a JSON Schema from Sample JSON"
   homepage "https://github.com/Nijikokun/generate-schema"
@@ -9,19 +7,19 @@ class GenerateJsonSchema < Formula
   head "https://github.com/Nijikokun/generate-schema.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "35954058f0fef5823d56b73ae541c63664d6d599b6810812609139050a2c7a3e"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, all: "455469fbc5354030c4c7e62fcaba25fb9610bd32078ced0b95502195f9b6972a"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
-    (testpath/"test.json").write <<~EOS
+    (testpath/"test.json").write <<~JSON
       {
           "id": 2,
           "name": "An ice sculpture",
@@ -37,7 +35,7 @@ class GenerateJsonSchema < Formula
               "longitude": 20.4
           }
       }
-    EOS
+    JSON
     assert_match "schema.org", shell_output("#{bin}/generate-schema test.json", 1)
   end
 end

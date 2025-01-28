@@ -1,44 +1,38 @@
 class Libxxf86vm < Formula
   desc "X.Org: XFree86-VidMode X extension"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libXxf86vm-1.1.5.tar.gz"
-  sha256 "f3f1c29fef8accb0adbd854900c03c6c42f1804f2bc1e4f3ad7b2e1f3b878128"
+  url "https://www.x.org/archive/individual/lib/libXxf86vm-1.1.6.tar.gz"
+  sha256 "d2b4b1ec4eb833efca9981f19ed1078a8a73eed0bb3ca5563b64527ae8021e52"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "f7dfbe0abe88488224d7b504ed832c5ca625358b9a92e4529164bc4a415fc0cc"
-    sha256 cellar: :any,                 arm64_ventura:  "5d9a140e35a74386e87ff2f65d9fb700388c023caab750e40474a1be9b7d5037"
-    sha256 cellar: :any,                 arm64_monterey: "131201608ae04d81b2b40a3a97f88b9c187cd06f283b231032705f6b254acec7"
-    sha256 cellar: :any,                 arm64_big_sur:  "e3022d9b03e5d97db357336d1ea2dbc273ea491664fc06639fcb957c3706d708"
-    sha256 cellar: :any,                 sonoma:         "e3ee005e4a8f648b4e0f737532ade1b011e6ab25fcba43da4aef9d72c32510af"
-    sha256 cellar: :any,                 ventura:        "3c2d5394c0ccec2bec8a03ffd8f51f8d3e9faf949c360986d9ec97afc24ff87c"
-    sha256 cellar: :any,                 monterey:       "09f1d1153b1253ad201168030020a59325387b5a31be5010d04005284693da99"
-    sha256 cellar: :any,                 big_sur:        "be95491ec6ca607b8794b7fd227de7654f6b016156410c61e88b1b956313d2a8"
-    sha256 cellar: :any,                 catalina:       "a12f91c2845e9e56637f40eb6e54bc7a8fbed35e276dd3b1a6cce92adda78504"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "db08eb34714521835fe1a5abf153e1b551329230b951ce7ef9bb2c6ca29be893"
+    sha256 cellar: :any,                 arm64_sequoia: "13c02476485b075f3b74ed0b7e1222f2f9e2abf5b40bfb13aeafde83d3b6a3b9"
+    sha256 cellar: :any,                 arm64_sonoma:  "30952396b1e9b0936a4f5e143122bec37cd0b835e26168e4fa87ea0bbc458ab1"
+    sha256 cellar: :any,                 arm64_ventura: "363d3b25237b106818012a000ebed92fc21a145c5253c97685801128da9a510b"
+    sha256 cellar: :any,                 sonoma:        "0f40e51b6211395733b458f27cb329543cc0c1458217d4bca2bcf2c8b12d1401"
+    sha256 cellar: :any,                 ventura:       "75add9e909d354f98af9dc286327692f470fdfd4b32dcd96ea4455adac6e35a2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0d916bedfca3e0ba33a43ebc5524d0178fcfd3a6eb95f9b793ca66d8b76d60fb"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libx11"
   depends_on "libxext"
   depends_on "xorgproto"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/Xlib.h"
       #include "X11/extensions/xf86vmode.h"
 
@@ -46,7 +40,7 @@ class Libxxf86vm < Formula
         XF86VidModeModeInfo mode;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

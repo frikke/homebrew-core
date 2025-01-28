@@ -1,22 +1,25 @@
 class Hex < Formula
   desc "Futuristic take on hexdump"
   homepage "https://github.com/sitkevij/hex"
-  url "https://github.com/sitkevij/hex/archive/refs/tags/v0.4.2.tar.gz"
-  sha256 "a7cc1ece337fc19e77fbbbca145001bc5d447bde4118eb6de2c99407eb1a3b74"
+  url "https://github.com/sitkevij/hex/archive/refs/tags/v0.6.0.tar.gz"
+  sha256 "7952ee2b6782e49259f82155c3b5287f1be72f15360a88e379c9270bd0d2416c"
   license "MIT"
   head "https://github.com/sitkevij/hex.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "245116da00ee18fb6c48ddbd0083b62e86a41957f2b599b47d51ffec1a5adcd4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d926a35caa10284418a160ec7a6cb5cb44121d2fd03b52d84fe7734196b4524f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "de567e3c63410e409c9d2940c0b95db95a1a7b86ef3b6583a701d0b6dfc4f77e"
-    sha256 cellar: :any_skip_relocation, ventura:        "f91fdf2c20304970c38cd1aec11cbe0e5e416917f9c22a4a19cd7d2d395f0401"
-    sha256 cellar: :any_skip_relocation, monterey:       "3630ae16eab4b22999fd1f4b34bdd69a8de15a63973f82268fb45dddbb5f080e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d4e9bcfc557b0325b96003c1626506f4c1f66ad0a6dda54b9a8868c251a61ba1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "965b7895b352c914b2bf1a8b26bff934adf9eb5d6223a3da309b5b57154e31c0"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "00163db8e16e993aea4f0695efa7742dd69be3b8c95fda5fd173116e6a95dab9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "6ba2edfeca426fad9d11610304e66413568579e8799fcd75233bb78b244c734b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "12c69fa625d5767d73c6db34852bc5e407ea72f0e3323719cc12452be5a96aa2"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "add8f34f654c08ee6bad65a9241ddf888f48671af80ed8802a28aeb0521c0ec1"
+    sha256 cellar: :any_skip_relocation, sonoma:         "a68b4808c49f1efe490dda2257c7a086b49f06568217b69377d26f29579c6382"
+    sha256 cellar: :any_skip_relocation, ventura:        "773540855a62a291de74084ecb0176d9d10b7451c447524c31de2e5916178931"
+    sha256 cellar: :any_skip_relocation, monterey:       "32335343e695d99fe0e99e3f4d10900337d0b3994e0f4e5bb628a7ada5ccb643"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b991de74c7ae7edad37b6c25c583a93de8cfd3cdc938bb00d978de0d80602bf5"
   end
 
   depends_on "rust" => :build
+
+  conflicts_with "helix", because: "both install `hx` binaries"
 
   def install
     system "cargo", "install", *std_cargo_args

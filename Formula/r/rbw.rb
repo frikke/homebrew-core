@@ -1,19 +1,18 @@
 class Rbw < Formula
   desc "Unofficial Bitwarden CLI client"
   homepage "https://github.com/doy/rbw"
-  url "https://github.com/doy/rbw/archive/refs/tags/1.8.3.tar.gz"
-  sha256 "fc04572a7215f89de018621c003c38c0400befd02e16efe8a00677d88ebe3c35"
+  url "https://github.com/doy/rbw/archive/refs/tags/1.13.2.tar.gz"
+  sha256 "afe8887b64c4da6e5f33535d02ad4e1fe75c536a55d63291622b4b339522d138"
   license "MIT"
   head "https://github.com/doy/rbw.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "78fd9b44cb21072e127a576e5c9b63439db314aa3f728bc72962ff0d88cf6b37"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a94805df40043b4ca6ebd656fa56e6cf7ab5bc6b314ca3a10abc969c936e0941"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9553694afb068155c24633827e5d7723df11935e6b0d69c5de63212b69a7e37c"
-    sha256 cellar: :any_skip_relocation, ventura:        "b6b87134a462a889b6935f5c59a262c4d624d0d076e0f6fcf25c467b13b415a8"
-    sha256 cellar: :any_skip_relocation, monterey:       "c7439f1649f77598556647738ff2c366b65901b58a35b212507ce2d413fda90e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d39d862eaee12f64a7c434ec43df2480816e8fa4fcd3ad6a50b1694798cf4ad9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0d98962a383cb80cd37720ddb32cd66013a600cc3d2c1d066d8e0722355631ad"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4530789e51dc8c8dd49ebcc833156206f221b7f2f8128ccbbbf45ad1e04bb88b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "096ca704f5351ff2bcf266995070c381f65042f4348b08b6ec1cbd4fa4211488"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "866f22cdc9c573ecb5a7d394e5b728ca660bc34e1129f3b970eec946015916e3"
+    sha256 cellar: :any_skip_relocation, sonoma:        "0f03798d05ce72ccce6b6ae4591c6bcbcd48afe4a1c9296998666de69b8ab037"
+    sha256 cellar: :any_skip_relocation, ventura:       "e0c9f8f7d9ec109da08fff90c25e4cd5329384bd130c1c7c2222e5153b7e321a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d13b82f0928bc39fefe5e9a4ec5445bf4d8035c5a43853739e0353903609d74d"
   end
 
   depends_on "rust" => :build

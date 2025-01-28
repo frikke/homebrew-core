@@ -1,10 +1,10 @@
 class Openssh < Formula
   desc "OpenBSD freely-licensed SSH connectivity tools"
   homepage "https://www.openssh.com/"
-  url "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.4p1.tar.gz"
-  mirror "https://cloudflare.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.4p1.tar.gz"
-  version "9.4p1"
-  sha256 "3608fd9088db2163ceb3e600c85ab79d0de3d221e59192ea1923e23263866a85"
+  url "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.9p1.tar.gz"
+  mirror "https://cloudflare.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.9p1.tar.gz"
+  version "9.9p1"
+  sha256 "b343fbcdbff87f15b1986e6e15d6d4fc9a7d36066be6b7fb507087ba8f966c02"
   license "SSH-OpenSSH"
 
   livecheck do
@@ -13,23 +13,24 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "e675acf182dd43614b18607563f7625fc462cbe11c9949cb4c3cbd727d5a7392"
-    sha256 arm64_monterey: "44867677c99a7c799aaf5b37a910c369d634fdede95236cc8b0762246dd427f0"
-    sha256 arm64_big_sur:  "55b463f337e63330e3343f5268ab61ddd21c0c2e4ab1c82271384392e0176954"
-    sha256 ventura:        "04c3661daec7445f77010eef55f41e5664750e31d08155ea7a4bcd35b88e6c5f"
-    sha256 monterey:       "8371408b7143e5a490d3de92b1c1881cd8cce44397e516aa85ade4d10413d00d"
-    sha256 big_sur:        "6ad9f6c74f937e504486d292eab15aae3bc7f6ca870ca0e8d389e30dc4ec1a08"
-    sha256 x86_64_linux:   "9fd7279473487cedd14c89a6ae497be5e45de6dff9891d13f0c3e584f2cbb22b"
+    rebuild 1
+    sha256 arm64_sequoia: "d7941094cacc59b5c2ab1d64343751205ef31b7f9517b19bb2a128d6c3583226"
+    sha256 arm64_sonoma:  "6305fa9baff789a76925f68d983a7b402f2db8b2652baab7775a97477975ff53"
+    sha256 arm64_ventura: "f8245cffebafb4f31939f333eb903fcf7db285bcf6c0257e84644384602d827a"
+    sha256 sonoma:        "ab855f72ee7b1443d30256c6098c7f8593a6779c7ae6e9e2e12f6082c7406920"
+    sha256 ventura:       "6c763c4b4f845df7bb4ee967a85108835fc6382920b6461c3487546f4fab60a7"
+    sha256 x86_64_linux:  "84eb498f82816692da68f55d9bbc02bf8d7fb575f40c7efa008b6e9ac0738079"
   end
 
   # Please don't resubmit the keychain patch option. It will never be accepted.
   # https://archive.is/hSB6d#10%25
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "ldns"
   depends_on "libfido2"
   depends_on "openssl@3"
 
+  uses_from_macos "mandoc" => :build
   uses_from_macos "lsof" => :test
   uses_from_macos "krb5"
   uses_from_macos "libedit"
@@ -46,8 +47,8 @@ class Openssh < Formula
 
     # https://github.com/apple-oss-distributions/OpenSSH/blob/main/openssh/sshd.c#L532
     patch do
-      url "https://raw.githubusercontent.com/Homebrew/patches/d8b2d8c2612fd251ac6de17bf0cc5174c3aab94c/openssh/patch-sshd.c-apple-sandbox-named-external.diff"
-      sha256 "3505c58bf1e584c8af92d916fe5f3f1899a6b15cc64a00ddece1dc0874b2f78f"
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/aa6c71920318f97370d74f2303d6aea387fb68e4/openssh/patch-sshd.c-apple-sandbox-named-external.diff"
+      sha256 "3f06fc03bcbbf3e6ba6360ef93edd2301f73efcd8069e516245aea7c4fb21279"
     end
   end
 
@@ -76,7 +77,7 @@ class Openssh < Formula
       end
     end
 
-    args = *std_configure_args + %W[
+    args = %W[
       --sysconfdir=#{etc}/ssh
       --with-ldns
       --with-libedit
@@ -88,7 +89,7 @@ class Openssh < Formula
 
     args << "--with-privsep-path=#{var}/lib/sshd" if OS.linux?
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     ENV.deparallelize
     system "make", "install"
@@ -100,13 +101,22 @@ class Openssh < Formula
 
     buildpath.install resource("com.openssh.sshd.sb")
     (etc/"ssh").install "com.openssh.sshd.sb" => "org.openssh.sshd.sb"
+
+    # Don't hardcode Cellar paths in configuration files
+    inreplace etc/"ssh/sshd_config", prefix, opt_prefix
   end
 
   test do
+    (etc/"ssh").find do |pn|
+      next unless pn.file?
+
+      refute_match HOMEBREW_CELLAR.to_s, pn.read
+    end
+
     assert_match "OpenSSH_", shell_output("#{bin}/ssh -V 2>&1")
 
     port = free_port
-    fork { exec sbin/"sshd", "-D", "-p", port.to_s }
+    spawn sbin/"sshd", "-D", "-p", port.to_s
     sleep 2
     assert_match "sshd", shell_output("lsof -i :#{port}")
   end

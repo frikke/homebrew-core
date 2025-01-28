@@ -1,14 +1,17 @@
 class Mdxmini < Formula
   desc "Plays music in X68000 MDX chiptune format"
   homepage "https://github.com/mistydemeo/mdxmini/"
-  url "https://github.com/mistydemeo/mdxmini/archive/v2.0.0.tar.gz"
+  url "https://github.com/mistydemeo/mdxmini/archive/refs/tags/v2.0.0.tar.gz"
   sha256 "9b623b365e893a769084f7a2effedc9ece453c6e3861c571ba503f045471a0e0"
   license "GPL-2.0-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "8bd1fe419459be3167ff34cc8b6e709a2628f8bb38ea47b629dacb96cdce8b24"
+    sha256 cellar: :any,                 arm64_sonoma:   "90830127c424435586b2a2f30fbd59422993dcdc7b102f69f85f346d3f9d09cb"
     sha256 cellar: :any,                 arm64_ventura:  "01720e2bc4f1207ec29261562b312955d96ceda87dc354ac708b8ff4f1b95565"
     sha256 cellar: :any,                 arm64_monterey: "703bdc526a902d8cb2190cbe385078bc5618952697ce3e6554a3473a9f1ec67c"
     sha256 cellar: :any,                 arm64_big_sur:  "0015ac050eb60388f47d9d8ad4dbc839be6c94c53896d472db1f902710d27504"
+    sha256 cellar: :any,                 sonoma:         "3150134181a1ecf81ac05c0eba85eeae9f89819bdaf85b241c62b8450e6b0e2a"
     sha256 cellar: :any,                 ventura:        "bc43ab7d3a985f855e1e2b266956ba2d50d394c73d55f5265fb8e2511b25c83f"
     sha256 cellar: :any,                 monterey:       "5e384c41501dd14903efefe829b14beb5db30d76bea9f0265aa957ed602fd400"
     sha256 cellar: :any,                 big_sur:        "4516c7fdc7b008d5d1c1447c8dd18c3562edb70619d40c8798933022da471794"
@@ -51,7 +54,7 @@ class Mdxmini < Formula
 
   test do
     resource("test_song").stage testpath
-    (testpath/"mdxtest.c").write <<~EOS
+    (testpath/"mdxtest.c").write <<~C
       #include <stdio.h>
       #include "libmdxmini/mdxmini.h"
 
@@ -63,7 +66,7 @@ class Mdxmini < Formula
           mdx_get_title(&mdx, title);
           printf("%s\\n", title);
       }
-    EOS
+    C
     system ENV.cc, "mdxtest.c", "-L#{lib}", "-L#{Formula["sdl2"].opt_lib}", "-lmdxmini", "-lSDL2", "-o", "mdxtest"
 
     result = shell_output("#{testpath}/mdxtest #{testpath}/pop-00.mdx #{testpath}").chomp

@@ -1,5 +1,4 @@
 [
-  "dafny",
   "hive",
   "mariadb@10.4",
   "mysql@5.7",

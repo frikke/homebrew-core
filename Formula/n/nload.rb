@@ -1,9 +1,9 @@
 class Nload < Formula
   desc "Realtime console network usage monitor"
-  homepage "http://www.roland-riegel.de/nload/"
-  url "http://www.roland-riegel.de/nload/nload-0.7.4.tar.gz"
+  homepage "https://www.roland-riegel.de/nload/"
+  url "https://www.roland-riegel.de/nload/nload-0.7.4.tar.gz"
   sha256 "c1c051e7155e26243d569be5d99c744d8620e65fa8a7e05efcf84d01d9d469e5"
-  license "GPL-2.0"
+  license "GPL-2.0-or-later"
 
   livecheck do
     url :homepage
@@ -12,9 +12,12 @@ class Nload < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "a45171a86a39f2386824b9b9acafcdb1d054b43839513022859eac52693de221"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "06f18bf46c748111bb588cf2f2fbc63c38d255cfae76e33cc3a61fc642228e98"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "9744511493995a64c3af0ec5523840e73d204fb3a5c5ab69678a18f5e4a30ae7"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "a179869cf1ff0fc1d62619d85a23004ca8f5ac9d17a2157fe86fdc717c2fc796"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2c5db3ac98383bf71154283dbca344ef7e4ac355338bdff337936cb4836b8ace"
+    sha256 cellar: :any_skip_relocation, sonoma:         "c3914fbe454faf676b8af160dd9eb7f81935db7b89ec6e8a15d3b9e9bb482899"
     sha256 cellar: :any_skip_relocation, ventura:        "0924f27e44c24642832a73d9f2f1f1d2f4880f38b23fe2e46ecbe3422125af7f"
     sha256 cellar: :any_skip_relocation, monterey:       "fa676ad48d38191b0cfc2a7a5277ec26cbae48ba7a40c06b10bc1760692fdbf1"
     sha256 cellar: :any_skip_relocation, big_sur:        "497154bd3de08b44994d05c69467266bb5ea54e6ddb7c9353bbf63bc77463447"
@@ -49,7 +52,7 @@ class Nload < Formula
   end
 
   test do
-    system "#{bin}/nload", "--help"
+    system bin/"nload", "--help"
   end
 end
 

@@ -11,6 +11,7 @@ class Libbluray < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "82b771563b1348e8121ceb5156d5457207147e8ac851aea9d70d31c058f8a98e"
     sha256 cellar: :any,                 arm64_sonoma:   "385b5460b56cb7c811c661a39509c62436d7a60f388bd960782f23192ade074a"
     sha256 cellar: :any,                 arm64_ventura:  "c51fc3248e75d1cf23f9d3d2856d719e6298b913e4b161f066993b2485a79b66"
     sha256 cellar: :any,                 arm64_monterey: "3369218f1258be668eca6975f82ac25b8a906e984d8a8344e9ed4d93657debfc"
@@ -31,30 +32,30 @@ class Libbluray < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "fontconfig"
   depends_on "freetype"
 
   uses_from_macos "libxml2"
 
   def install
-    args = %W[--prefix=#{prefix} --disable-dependency-tracking --disable-silent-rules --disable-bdjava-jar]
+    args = %w[--disable-silent-rules --disable-bdjava-jar]
 
     system "./bootstrap" if build.head?
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libbluray/bluray.h>
       int main(void) {
         BLURAY *bluray = bd_init();
         bd_close(bluray);
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lbluray", "-o", "test"
     system "./test"

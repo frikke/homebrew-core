@@ -1,20 +1,11 @@
 class Rpm < Formula
   desc "Standard unix software packaging tool"
   homepage "https://rpm.org/"
+  url "https://ftp.osuosl.org/pub/rpm/releases/rpm-4.19.x/rpm-4.19.1.1.tar.bz2"
+  sha256 "874091b80efe66f9de8e3242ae2337162e2d7131e3aa4ac99ac22155e9c521e5"
   license "GPL-2.0-only"
   version_scheme 1
   head "https://github.com/rpm-software-management/rpm.git", branch: "master"
-
-  stable do
-    url "https://ftp.osuosl.org/pub/rpm/releases/rpm-4.18.x/rpm-4.18.1.tar.bz2"
-    sha256 "37f3b42c0966941e2ad3f10fde3639824a6591d07197ba8fd0869ca0779e1f56"
-
-    # Fix an "expected expression" error. Remove on next release.
-    patch do
-      url "https://github.com/rpm-software-management/rpm/commit/b960c0b43a080287a7c13533eeb2d9f288db1414.patch?full_index=1"
-      sha256 "28417a368e4d4a6c722944a8fe325212b3cea96b6d355437c6366606a7ca0d00"
-    end
-  end
 
   # Upstream uses a 90+ patch to indicate prerelease versions (e.g., the
   # tarball for "RPM 4.19 ALPHA" is `rpm-4.18.90.tar.bz2`).
@@ -24,20 +15,30 @@ class Rpm < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura: "2d97d36743ae989839e7ef4c4d3f396c2f7cd5ab7ff87b429510a4bb9b047cf7"
-    sha256 ventura:       "d5085f39aee9be16443d96ba081f46cfb80818dc6f0c3bb5367f6d79b62c51fd"
-    sha256 x86_64_linux:  "f7021265bd0654607b2e50709a8e29f0be08e3da8ca407566b04109fa0d176e8"
+    rebuild 2
+    sha256 arm64_sequoia: "13c5452de71ad6162ef07c7712a9419734da128ea6c1d443abb7756a2a105551"
+    sha256 arm64_sonoma:  "dd2ff5b5bb9efbe1fff85619dd3d221291eb530f7d94558867c981a170bb54e4"
+    sha256 arm64_ventura: "64e55e92671e5947a51e69aaa7e95fad907f8b9790cc8481414e31144a6640c0"
+    sha256 sonoma:        "fda6009a2e5190fd74e8edb9cf8fe46d001d2fcacd71265eeb8c133b351cb3ae"
+    sha256 ventura:       "983e017cd82c4a2ff5b150fa9755c2a948d4e9566eccf216e407f29a568764f1"
+    sha256 x86_64_linux:  "66c98e854bc22abb034a74b2bbb44fcf3332c5a783250a971fc38f43768aa596"
   end
+
+  depends_on "cmake" => :build
+  depends_on "doxygen" => :build
+  depends_on "gawk" => :build
+  depends_on "python@3.13" => [:build, :test]
 
   depends_on "gettext"
   depends_on "libarchive"
   depends_on "libmagic"
   depends_on "lua"
+  # See https://github.com/rpm-software-management/rpm/issues/2222 for details.
   depends_on macos: :ventura
   depends_on "openssl@3"
-  depends_on "pkg-config"
+  depends_on "pkgconf"
   depends_on "popt"
+  depends_on "readline"
   depends_on "sqlite"
   depends_on "xz"
   depends_on "zstd"
@@ -51,6 +52,10 @@ class Rpm < Formula
 
   conflicts_with "rpm2cpio", because: "both install `rpm2cpio` binaries"
 
+  def python3
+    "python3.13"
+  end
+
   def install
     ENV.append "LDFLAGS", "-lomp" if OS.mac?
 
@@ -59,32 +64,32 @@ class Rpm < Formula
 
     # ensure that pkg-config binary is found for dep generators
     inreplace "scripts/pkgconfigdeps.sh",
-              "/usr/bin/pkg-config", Formula["pkg-config"].opt_bin/"pkg-config"
+              "/usr/bin/pkg-config", Formula["pkgconf"].opt_bin/"pkg-config"
 
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules",
-                          "--localstatedir=#{var}",
-                          "--sharedstatedir=#{var}/lib",
-                          "--sysconfdir=#{etc}",
-                          "--with-path-magic=#{HOMEBREW_PREFIX}/share/misc/magic",
-                          "--enable-nls",
-                          "--disable-plugins",
-                          "--with-external-db",
-                          "--with-crypto=openssl",
-                          "--without-apidocs",
-                          "--with-vendor=#{tap.user.downcase}",
-                          # Don't allow superenv shims to be saved into lib/rpm/macros
-                          "__MAKE=/usr/bin/make",
-                          "__GIT=/usr/bin/git",
-                          "__LD=/usr/bin/ld",
-                          # GPG is not a strict dependency, so set stored GPG location to a decent default
-                          "__GPG=#{Formula["gpg"].opt_bin}/gpg"
+    # work around Homebrew's prefix scheme which sets Python3_SITEARCH outside of prefix
+    inreplace "python/CMakeLists.txt", "${Python3_SITEARCH}", prefix/Language::Python.site_packages(python3)
 
-    system "make", "install"
-
-    # NOTE: We need the trailing `/` to avoid leaving it behind.
-    inreplace lib/"rpm/macros", "#{Superenv.shims_path}/", ""
-    inreplace lib/"rpm/brp-remove-la-files", "--null", "-0"
+    # WITH_INTERNAL_OPENPGP and WITH_OPENSSL are deprecated
+    rpaths = [rpath, rpath(source: lib/"rpm")]
+    args = %W[
+      -DCMAKE_INSTALL_RPATH=#{rpaths.join(";")}
+      -DCMAKE_INSTALL_SYSCONFDIR=#{etc}
+      -DCMAKE_INSTALL_SHAREDSTATEDIR=#{var}/lib
+      -DCMAKE_INSTALL_LOCALSTATEDIR=#{var}
+      -DENABLE_NLS=ON
+      -DENABLE_PLUGINS=OFF
+      -DWITH_AUDIT=OFF
+      -DWITH_INTERNAL_OPENPGP=ON
+      -DWITH_OPENSSL=ON
+      -DWITH_SELINUX=OFF
+      -DRPM_VENDOR=#{tap.user}
+      -DENABLE_TESTSUITE=OFF
+      -DWITH_ACL=OFF
+      -DWITH_CAP=OFF
+    ]
+    system "cmake", "-S", ".", "-B", "_build", *args, *std_cmake_args
+    system "cmake", "--build", "_build"
+    system "cmake", "--install", "_build"
   end
 
   def post_install
@@ -101,8 +106,7 @@ class Rpm < Formula
 
     system bin/"rpmdb", "--initdb", "--root=#{testpath}"
     system bin/"rpm", "-vv", "-qa", "--root=#{testpath}"
-    assert_predicate testpath/var/"lib/rpm/rpmdb.sqlite", :exist?,
-                     "Failed to create 'rpmdb.sqlite' file"
+    assert_path_exists testpath/var/"lib/rpm/rpmdb.sqlite", "Failed to create 'rpmdb.sqlite' file"
 
     %w[SPECS BUILD BUILDROOT].each do |dir|
       (testpath/"rpmbuild/#{dir}").mkpath
@@ -135,8 +139,8 @@ class Rpm < Formula
 
     EOS
     system bin/"rpmbuild", "-ba", specfile
-    assert_predicate testpath/"rpmbuild/SRPMS/test-1.0-1.src.rpm", :exist?
-    assert_predicate testpath/"rpmbuild/RPMS/noarch/test-1.0-1.noarch.rpm", :exist?
+    assert_path_exists testpath/"rpmbuild/SRPMS/test-1.0-1.src.rpm"
+    assert_path_exists testpath/"rpmbuild/RPMS/noarch/test-1.0-1.noarch.rpm"
 
     info = shell_output(bin/"rpm --query --package -i #{testpath}/rpmbuild/RPMS/noarch/test-1.0-1.noarch.rpm")
     assert_match "Name        : test", info
@@ -150,5 +154,7 @@ class Rpm < Formula
 
     files = shell_output(bin/"rpm --query --list --package #{testpath}/rpmbuild/RPMS/noarch/test-1.0-1.noarch.rpm")
     assert_match (HOMEBREW_PREFIX/"share/doc/test").to_s, files
+
+    system python3, "-c", "import rpm"
   end
 end

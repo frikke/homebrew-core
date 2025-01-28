@@ -1,19 +1,18 @@
 class Tbls < Formula
   desc "CI-Friendly tool for document a database"
   homepage "https://github.com/k1LoW/tbls"
-  url "https://github.com/k1LoW/tbls/archive/refs/tags/v1.68.2.tar.gz"
-  sha256 "610f2f45e2a9b99177e988523f89674dc7e324326cf1830add126f32426c6062"
+  url "https://github.com/k1LoW/tbls/archive/refs/tags/v1.81.0.tar.gz"
+  sha256 "8616e136efdb1fa97f3804f65037b21c90b469c6a29f51ab3924805cce1522b6"
   license "MIT"
   head "https://github.com/k1LoW/tbls.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c56a8ba10f2a181b74f119ebb0b4507c68bb7fad5ae6dc47d8349aa68bfcd740"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "10be288417048321596555db738a10bddc7ca6c05d57fdd610369a31c5cfee44"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "38121e28cfe6ff074acdba1db4a3618cd11ebea855137c944ea31b5cd7bc42c3"
-    sha256 cellar: :any_skip_relocation, ventura:        "710412942cb3f06090b3e525c2f63c33e2a76802be6c6883a27777b372ec5a14"
-    sha256 cellar: :any_skip_relocation, monterey:       "7b6e6cb45aade8c17b5075bd9475cf9054e64aba3b5fdad4a1f23df25cce8f02"
-    sha256 cellar: :any_skip_relocation, big_sur:        "7d45a12533c7aba7be6d786041953edb32a003a0c7891491ba681cae33259473"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "af8a91007482969b286c63a4b6ff6f192aac57c4ec010680f6541cb2efb0c357"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0fe56b6a3afd10dfb7913dc8230aaabef7a6c9ad204d356f18c1ffec006268a4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e4a154ec7e0d53fb6e5819f470ce29c42e365b2325a8bd676a50c814ca19e6d6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "c3de62e760d4b3042b5b60628854b386a2dcc30ca82e0e0ae6d391c359b4f472"
+    sha256 cellar: :any_skip_relocation, sonoma:        "59b3f4f31696fecbdd5ff4309dfd83b81c4faf8c9abad89287f6a9d3d06c5bce"
+    sha256 cellar: :any_skip_relocation, ventura:       "fcce46bbe7411a661798ae0769f296ee31d511720632f245930ef40478d501b8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7685496d19a4ba02ed2b1ae9010964679666ec1688b20c488b8e30ac4eea120a"
   end
 
   depends_on "go" => :build
@@ -25,13 +24,13 @@ class Tbls < Formula
       -X github.com/k1LoW/tbls.date=#{time.iso8601}
       -X github.com/k1LoW/tbls/version.Version=#{version}
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
 
     generate_completions_from_executable(bin/"tbls", "completion")
   end
 
   test do
-    assert_match "invalid database scheme", shell_output(bin/"tbls doc", 1)
+    assert_match "unsupported driver", shell_output(bin/"tbls doc", 1)
     assert_match version.to_s, shell_output(bin/"tbls version")
   end
 end

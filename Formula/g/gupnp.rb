@@ -3,39 +3,38 @@ class Gupnp < Formula
 
   desc "Framework for creating UPnP devices and control points"
   homepage "https://wiki.gnome.org/Projects/GUPnP"
-  url "https://download.gnome.org/sources/gupnp/1.6/gupnp-1.6.5.tar.xz"
-  sha256 "437dff970142e8407087a89855f717e20d27c9d76e05b4cd517df621c7d888cd"
+  url "https://download.gnome.org/sources/gupnp/1.6/gupnp-1.6.8.tar.xz"
+  sha256 "70a003cebd68577293fb3e6af49ff902203bf8768b2fc5d651ddc1f0fa1e11e9"
   license "LGPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "fef28e8b65542025e4758d4ff4ad85e50dfff492e1421ea2e612211174093cb7"
-    sha256 cellar: :any, arm64_monterey: "eec2372a8db3fb0d68d66e740db85b4589d63814d65eeda74870790825bdc7b2"
-    sha256 cellar: :any, arm64_big_sur:  "637c1f9909de8a9fdb6095ab7e114f973039803523389b218da1f4faee2482e4"
-    sha256 cellar: :any, ventura:        "f4ace8c0c53b34b582a37323df1b4b813e605031ac7a898d2f8ff6388021b4d8"
-    sha256 cellar: :any, monterey:       "adeba1418919f58162de30c1bb6b74ed06a48ecc53363e5254c4054ae608770f"
-    sha256 cellar: :any, big_sur:        "da88d6e7d2da07422fea4cdcc4b2f4475281018ee959bb969b08527644f89258"
-    sha256               x86_64_linux:   "1c9e8e93453993b8560273ba0e1903074ae2a354c37f687e441ad44e486e6113"
+    sha256 cellar: :any, arm64_sequoia: "0d73be784e10b682d081fa15b4779f54cf372468c0ae538d9d1468a135ca460b"
+    sha256 cellar: :any, arm64_sonoma:  "c2e208114785c8a6891e62c0372c90a44879f1f03551cf7ea0948acf39aca197"
+    sha256 cellar: :any, arm64_ventura: "daf4ba3e00e3c0931a340c6dd4259840deeb0ca477d3f055a48ed517ddf14a25"
+    sha256 cellar: :any, sonoma:        "666d7700b2ad4fb6ef4811186eb2b82fce1029e990bb7fecfec1f680c72eb08e"
+    sha256 cellar: :any, ventura:       "d73e698c784354e7dcefedda8057a17d3fe4d5274ffc0ce96cce07b441639a12"
+    sha256               x86_64_linux:  "6f3b4dbadddd74af18147095bf99055d590bfe0ffce1eca0a4cce2aaf261abb1"
   end
 
   depends_on "docbook-xsl" => :build
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "vala" => :build
   depends_on "gettext"
   depends_on "glib"
   depends_on "gssdp"
   depends_on "libsoup"
   depends_on "libxml2"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   def install
     ENV.prepend_path "XDG_DATA_DIRS", HOMEBREW_PREFIX/"share"
     ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
 
-    system "meson", *std_meson_args, "build"
-    system "meson", "compile", "-C", "build", "-v"
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
     rewrite_shebang detected_python_shebang, *bin.children
   end
@@ -45,7 +44,7 @@ class Gupnp < Formula
     gssdp_version = Formula["gssdp"].version.major_minor.to_s
 
     system bin/"gupnp-binding-tool-#{gnupnp_version}", "--help"
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libgupnp/gupnp-control-point.h>
 
       static GMainLoop *main_loop;
@@ -66,7 +65,7 @@ class Gupnp < Formula
 
         return 0;
       }
-    EOS
+    C
 
     libxml2 = if OS.mac?
       "-I#{MacOS.sdk_path}/usr/include/libxml2"

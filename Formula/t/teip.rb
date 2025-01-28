@@ -1,24 +1,26 @@
 class Teip < Formula
   desc 'Masking tape to help commands "do one thing well"'
   homepage "https://github.com/greymd/teip"
-  url "https://github.com/greymd/teip/archive/v2.3.0.tar.gz"
-  sha256 "4c39466613f39d27fa22ae2a6309ac732ea94fdbc8711ecd4149fc1ecdfbaedf"
+  url "https://github.com/greymd/teip/archive/refs/tags/v2.3.2.tar.gz"
+  sha256 "c9e45d9f5fb263a67c42907d05d8a20dd62b910175270a59decc475e66ea6031"
   license "MIT"
   head "https://github.com/greymd/teip.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "76306929a61d06bed2d50e7104f81fd38be5a4256f25b7c5bd4f59df0fc721e7"
-    sha256 cellar: :any,                 arm64_monterey: "862454d4a7446db7996612e4ff3593e1861e8d2851be1c5d57afcde2ca79e229"
-    sha256 cellar: :any,                 arm64_big_sur:  "847c470c7cef50c85c278209412a2bb1694527e0a44011e891ba37401a62ea9e"
-    sha256 cellar: :any,                 ventura:        "c412035b3c7484fd79ca768dd7102d805af464ba0c46774a497544b58ae5baf2"
-    sha256 cellar: :any,                 monterey:       "a3ae1dbbd8a3c7d8f0ea1e5713ce669b7184dfa375ee2466923baccb44882138"
-    sha256 cellar: :any,                 big_sur:        "58d3e48e0feb2b60cf56f522ac1517dc3952f505298a30159211874f431bef62"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "009824a80a45f6f54c8b70bd337358dfdcc636e86651e76a546c873bfbfaa25a"
+    sha256 cellar: :any,                 arm64_sequoia:  "dc593ddc6816e59c32a3c28434566875dd30036937ed24fb6fbaf0b11c813f21"
+    sha256 cellar: :any,                 arm64_sonoma:   "4df0b07d8bd0edaf62e6daac722039dc3dfb1f1e8340439e41c2631cb3eeec4c"
+    sha256 cellar: :any,                 arm64_ventura:  "939622ea9607368b299e1eb0a3c19c01320a0399f8c01fa8502d14794fc1e983"
+    sha256 cellar: :any,                 arm64_monterey: "924342e2ea29ddf0eaa9906e74c6cf03b1356d00091bf24b54788bf61136b7b4"
+    sha256 cellar: :any,                 sonoma:         "3f757977cbafda79df194a8e162bd144236fc7c4bbb7ec3c3adc389130470a3a"
+    sha256 cellar: :any,                 ventura:        "3c20de30934eb61457693d5c6747425220abcba516f541eaed678e5c21cf7278"
+    sha256 cellar: :any,                 monterey:       "700d30d9d917de84ae8f2e517a9d424a279cc3cbad82caaa360a2b78a1133047"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "82477350d16f0ce242352d7d6046fb2a1a2024cd9ba064219012e5c451d9b582"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
   depends_on "oniguruma"
+
   uses_from_macos "llvm" => :build # for libclang
 
   def install
@@ -31,8 +33,23 @@ class Teip < Formula
     bash_completion.install "completion/bash/teip"
   end
 
+  def check_binary_linkage(binary, library)
+    binary.dynamically_linked_libraries.any? do |dll|
+      next false unless dll.start_with?(HOMEBREW_PREFIX.to_s)
+
+      File.realpath(dll) == File.realpath(library)
+    end
+  end
+
   test do
     ENV["TEIP_HIGHLIGHT"] = "<{}>"
     assert_match "<1>23", pipe_output("#{bin}/teip -c 1", "123", 0)
+
+    [
+      Formula["oniguruma"].opt_lib/shared_library("libonig"),
+    ].each do |library|
+      assert check_binary_linkage(bin/"teip", library),
+             "No linkage with #{library.basename}! Cargo is likely using a vendored version."
+    end
   end
 end

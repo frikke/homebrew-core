@@ -3,81 +3,75 @@ class Buku < Formula
 
   desc "Powerful command-line bookmark manager"
   homepage "https://github.com/jarun/buku"
-  url "https://github.com/jarun/buku/archive/v4.8.tar.gz"
-  sha256 "a0b94210e80e9f9f359e5308323837d41781cf8dba497341099d5c59e27fa52c"
+  url "https://github.com/jarun/buku/archive/refs/tags/v4.9.tar.gz"
+  sha256 "1e432270ae78c7852110dcf2c2e215893bcc338299a4998f14a1f6b26e37bfac"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 4
   head "https://github.com/jarun/buku.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "59823a4c46029edc65736d6b1b5d73e87377a85bd1a7d1f06cf7aef84b151bf6"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7eb2bf1d00f67dabc0f395ecbe9aa7fda008cd9ae99425c3ba44f706c87b74dc"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5b513b0b2384c72872abd8308152ee8d8675a4eef675613ef2e1cadc2a253bea"
-    sha256 cellar: :any_skip_relocation, ventura:        "551f3ff697855fab3347c36b11c709ca898067b732abf019815b8e69ad2ad3eb"
-    sha256 cellar: :any_skip_relocation, monterey:       "a20e62b0fcf52e48adbe933f9a04924d032208d3602251e604398337c299bda3"
-    sha256 cellar: :any_skip_relocation, big_sur:        "45dfbc86ceefe3c1b24feda345362dc219dc7a013d032072b35c3d380d190f1d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0a377d56a1028b226c03aa4ae21bf57aee9bba605a9ab8f866585367e1b9cb01"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1e21aab12edfb5ed957b882de61b739cfa96cd2b66475181b882c3c30323fd4b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b623288b44db6297ba1f2d8d513103291d18b43c29f980fe5a571f944864b68d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "2f76d0977a40c829227c09e24d51e7c4d4b47280b686fb2ecd1a441bd4414b40"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3417f96fdd88257c76fa40dd7942959c96121c1414ce8e6d2354ee7c563804c7"
+    sha256 cellar: :any_skip_relocation, ventura:       "682f27f719652fcd1cd08291182dbedc112ac985ed15c94e9ae94e10a21f8b6b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "03eb99f07115d1dca39d1daaea0df354c18f37703ae386880ae1c772219772dd"
   end
 
-  depends_on "cffi"
-  depends_on "pycparser"
-  depends_on "python-certifi"
-  depends_on "python-cryptography"
-  depends_on "python@3.11"
-  depends_on "six"
+  depends_on "certifi"
+  depends_on "cryptography"
+  depends_on "python@3.13"
 
-  uses_from_macos "expect" => :test
   uses_from_macos "libffi"
 
   resource "arrow" do
-    url "https://files.pythonhosted.org/packages/7f/c0/c601ea7811f422700ef809f167683899cdfddec5aa3f83597edf97349962/arrow-1.2.3.tar.gz"
-    sha256 "3934b30ca1b9f292376d9db15b19446088d12ec58629bc3f0da28fd55fb633a1"
+    url "https://files.pythonhosted.org/packages/2e/00/0f6e8fcdb23ea632c866620cc872729ff43ed91d284c866b515c6342b173/arrow-1.3.0.tar.gz"
+    sha256 "d4540617648cb5f895730f1ad8c82a65f2dad0166f57b75f3ca54759c4d67a85"
   end
 
   resource "beautifulsoup4" do
-    url "https://files.pythonhosted.org/packages/af/0b/44c39cf3b18a9280950ad63a579ce395dda4c32193ee9da7ff0aed547094/beautifulsoup4-4.12.2.tar.gz"
-    sha256 "492bbc69dca35d12daac71c4db1bfff0c876c00ef4a2ffacce226d4638eb72da"
+    url "https://files.pythonhosted.org/packages/b3/ca/824b1195773ce6166d388573fc106ce56d4a805bd7427b624e063596ec58/beautifulsoup4-4.12.3.tar.gz"
+    sha256 "74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7781051"
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/59/87/84326af34517fca8c58418d148f2403df25303e02736832403587318e9e8/click-8.1.3.tar.gz"
-    sha256 "7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"
+    url "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz"
+    sha256 "ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a"
   end
 
   resource "dominate" do
-    url "https://files.pythonhosted.org/packages/13/3d/8d22916c12184f0c4930b9cdfb136a130e8d8eacf5942fc9883f2a189f6a/dominate-2.8.0.tar.gz"
-    sha256 "4c90c3befaf88e612b71f4b39af7bcbef8977acfa855cec957225a8fbf504007"
+    url "https://files.pythonhosted.org/packages/fb/f3/1c8088ff19a0fcd9c3234802a0ee47006ea64bd8852f1019194f0e3583ff/dominate-2.9.1.tar.gz"
+    sha256 "558284687d9b8aae1904e3d6051ad132dd4a8c0cf551b37ea4e7e42a31d19dc4"
   end
 
-  resource "Flask" do
+  resource "flask" do
     url "https://files.pythonhosted.org/packages/5f/76/a4d2c4436dda4b0a12c71e075c508ea7988a1066b06a575f6afe4fecc023/Flask-2.2.5.tar.gz"
     sha256 "edee9b0a7ff26621bd5a8c10ff484ae28737a2410d99b0bb9a6850c7fb977aa0"
   end
 
-  resource "Flask-Admin" do
+  resource "flask-admin" do
     url "https://files.pythonhosted.org/packages/be/4d/7cad383a93e3e1dd9378f1fcf05ddc532c6d921fb30c19ce8f8583630f24/Flask-Admin-1.6.1.tar.gz"
     sha256 "24cae2af832b6a611a01d7dc35f42d266c1d6c75a426b869d8cb241b78233369"
   end
 
-  resource "Flask-API" do
+  resource "flask-api" do
     url "https://files.pythonhosted.org/packages/dd/4f/49bd943d2ceeb2e5872a182b1547f7eadc53121e1ceea0f8718f1a97c4cc/Flask-API-3.1.tar.gz"
     sha256 "cb079845f5573eac55c6800a9a142bd7b54fd1227019a21cb2f75dfe5311d44f"
   end
 
-  resource "Flask-Bootstrap" do
+  resource "flask-bootstrap" do
     url "https://files.pythonhosted.org/packages/88/53/958ce7c2aa26280b7fd7f3eecbf13053f1302ee2acb1db58ef32e1c23c2a/Flask-Bootstrap-3.3.7.1.tar.gz"
     sha256 "cb08ed940183f6343a64e465e83b3a3f13c53e1baabb8d72b5da4545ef123ac8"
   end
 
   resource "flask-paginate" do
-    url "https://files.pythonhosted.org/packages/6a/2c/79a20c141c58f0993f3e40e280376618800e3cd5a503cacf7db84e4785dc/flask-paginate-2022.1.8.tar.gz"
-    sha256 "a32996ec07ca004c45b768b0d50829728ab8f3986c0650ef538e42852c7aeba2"
+    url "https://files.pythonhosted.org/packages/5c/d0/aca9153b109f0062eaadb497448f5e596f87cc89474d77347a1d931c8842/flask-paginate-2024.4.12.tar.gz"
+    sha256 "2de04606b061736f0fc8fbe73d9d4d6fc03664638eca70a57728b03b3e2c9577"
   end
 
-  resource "Flask-WTF" do
-    url "https://files.pythonhosted.org/packages/80/55/5114035eb8f6200fbe838a4b9828409ac831408c4591bf7875aed299d5f8/Flask-WTF-1.1.1.tar.gz"
-    sha256 "41c4244e9ae626d63bed42ae4785b90667b885b1535d5a4095e1f63060d12aa9"
+  resource "flask-wtf" do
+    url "https://files.pythonhosted.org/packages/80/9b/f1cd6e41bbf874f3436368f2c7ee3216c1e82d666ff90d1d800e20eb1317/flask_wtf-1.2.2.tar.gz"
+    sha256 "79d2ee1e436cf570bccb7d916533fa18757a2f18c290accffab1b9a0b684666b"
   end
 
   resource "html5lib" do
@@ -86,33 +80,43 @@ class Buku < Formula
   end
 
   resource "itsdangerous" do
-    url "https://files.pythonhosted.org/packages/7f/a1/d3fb83e7a61fa0c0d3d08ad0a94ddbeff3731c05212617dff3a94e097f08/itsdangerous-2.1.2.tar.gz"
-    sha256 "5dbbc68b317e5e42f327f9021763545dc3fc3bfe22e6deb96aaf1fc38874156a"
+    url "https://files.pythonhosted.org/packages/9c/cb/8ac0172223afbccb63986cc25049b154ecfb5e85932587206f42317be31d/itsdangerous-2.2.0.tar.gz"
+    sha256 "e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173"
   end
 
-  resource "Jinja2" do
-    url "https://files.pythonhosted.org/packages/7a/ff/75c28576a1d900e87eb6335b063fab47a8ef3c8b4d88524c4bf78f670cce/Jinja2-3.1.2.tar.gz"
-    sha256 "31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"
+  resource "jinja2" do
+    url "https://files.pythonhosted.org/packages/af/92/b3130cbbf5591acf9ade8708c365f3238046ac7cb8ccba6e81abccb0ccff/jinja2-3.1.5.tar.gz"
+    sha256 "8fefff8dc3034e27bb80d67c671eb8a9bc424c0ef4c0826edbff304cceff43bb"
   end
 
-  resource "MarkupSafe" do
-    url "https://files.pythonhosted.org/packages/6d/7c/59a3248f411813f8ccba92a55feaac4bf360d29e2ff05ee7d8e1ef2d7dbf/MarkupSafe-2.1.3.tar.gz"
-    sha256 "af598ed32d6ae86f1b747b82783958b1a4ab8f617b06fe68795c7f026abbdcad"
+  resource "markupsafe" do
+    url "https://files.pythonhosted.org/packages/b2/97/5d42485e71dfc078108a86d6de8fa46db44a1a9295e89c5d6d4a06e23a62/markupsafe-3.0.2.tar.gz"
+    sha256 "ee55d3edf80167e48ea11a923c7386f4669df67d7994554387f84e7d8b0a2bf0"
   end
 
   resource "python-dateutil" do
-    url "https://files.pythonhosted.org/packages/4c/c4/13b4776ea2d76c115c1d1b84579f3764ee6d57204f6be27119f13a61d0a9/python-dateutil-2.8.2.tar.gz"
-    sha256 "0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"
+    url "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz"
+    sha256 "37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"
+  end
+
+  resource "six" do
+    url "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz"
+    sha256 "ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"
   end
 
   resource "soupsieve" do
-    url "https://files.pythonhosted.org/packages/47/9e/780779233a615777fbdf75a4dee2af7a345f4bf74b42d4a5f836800b9d91/soupsieve-2.4.1.tar.gz"
-    sha256 "89d12b2d5dfcd2c9e8c22326da9d9aa9cb3dfab0a83a024f05704076ee8d35ea"
+    url "https://files.pythonhosted.org/packages/d7/ce/fbaeed4f9fb8b2daa961f90591662df6a86c1abf25c548329a86920aedfb/soupsieve-2.6.tar.gz"
+    sha256 "e2e68417777af359ec65daac1057404a3c8a5455bb8abc36f1a9866ab1a51abb"
+  end
+
+  resource "types-python-dateutil" do
+    url "https://files.pythonhosted.org/packages/a9/60/47d92293d9bc521cd2301e423a358abfac0ad409b3a1606d8fbae1321961/types_python_dateutil-2.9.0.20241206.tar.gz"
+    sha256 "18f493414c26ffba692a72369fea7a154c502646301ebfe3d56a04b3767284cb"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/d6/af/3b4cfedd46b3addab52e84a71ab26518272c23c77116de3c61ead54af903/urllib3-2.0.3.tar.gz"
-    sha256 "bee28b5e56addb8226c96f7f13ac28cb4c301dd5ea8a6ca179c0b9835e032825"
+    url "https://files.pythonhosted.org/packages/e4/e8/6ff5e6bc22095cfc59b6ea711b687e2b7ed4bdb373f7eeec370a97d7392f/urllib3-1.26.20.tar.gz"
+    sha256 "40c2dc0c681e47eb8f90e7e27bf6ff7df2e677421fd46756da1161c39ca70d32"
   end
 
   resource "visitor" do
@@ -125,14 +129,21 @@ class Buku < Formula
     sha256 "b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"
   end
 
-  resource "Werkzeug" do
-    url "https://files.pythonhosted.org/packages/d1/7e/c35cea5749237d40effc50ed1a1c7518d9f2e768fcf30b4e9ea119e74975/Werkzeug-2.3.6.tar.gz"
-    sha256 "98c774df2f91b05550078891dee5f0eb0cb797a522c757a2452b9cee5b202330"
+  resource "werkzeug" do
+    url "https://files.pythonhosted.org/packages/3d/4b/d746f1000782c89d6c97df9df43ba8f4d126038608843d3560ae88d201b5/werkzeug-2.3.8.tar.gz"
+    sha256 "554b257c74bbeb7a0d254160a4f8ffe185243f52a52035060b761ca62d977f03"
   end
 
-  resource "WTForms" do
-    url "https://files.pythonhosted.org/packages/9a/7d/d4aa68f5bfcb91dd61a7faf0e862512ae7b3d531c41f24c217910aec0559/WTForms-3.0.1.tar.gz"
-    sha256 "6b351bbb12dd58af57ffef05bc78425d08d1914e0fd68ee14143b7ade023c5bc"
+  resource "wtforms" do
+    url "https://files.pythonhosted.org/packages/01/e4/633d080897e769ed5712dcfad626e55dbd6cf45db0ff4d9884315c6a82da/wtforms-3.2.1.tar.gz"
+    sha256 "df3e6b70f3192e92623128123ec8dca3067df9cfadd43d59681e210cfb8d4682"
+  end
+
+  # fixed url value passed to update_rec() from CLI
+  # upstream PR fix, https://github.com/jarun/buku/pull/730
+  patch do
+    url "https://github.com/jarun/buku/commit/957f9b850f9c7c3da33a50cd76db7b1dd16a4c17.patch?full_index=1"
+    sha256 "01325da9a4d4d9367d864b7aaad3f01cf1cf76bf196653201bcf0b776b51e60a"
   end
 
   def install
@@ -148,7 +159,7 @@ class Buku < Formula
     ENV["XDG_DATA_HOME"] = "#{testpath}/.local/share"
 
     # Firefox exported bookmarks file
-    (testpath/"bookmarks.html").write <<~EOS
+    (testpath/"bookmarks.html").write <<~HTML
       <!DOCTYPE NETSCAPE-Bookmark-file-1>
       <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
       <TITLE>Bookmarks</TITLE>
@@ -161,7 +172,7 @@ class Buku < Formula
               <DT><A HREF="https://github.com/Homebrew/brew" ADD_DATE="1477369518" LAST_MODIFIED="1477369529">Title unknown</A>
           </DL><p>
       </DL>
-    EOS
+    HTML
 
     system bin/"buku", "--nostdin", "--nc", "--tacit", "--import", "bookmarks.html"
     assert_equal <<~EOS, shell_output("#{bin}/buku --nostdin --nc --print").chomp
@@ -174,28 +185,45 @@ class Buku < Formula
     assert_match "Index 1: updated", shell_output("#{bin}/buku --nostdin --nc --update")
 
     # Test crypto functionality
-    (testpath/"crypto-test").write <<~EOS
+    require "expect"
+    require "pty"
+    timeout = 5
+    PTY.spawn(bin/"buku", "--lock") do |r, w, pid|
       # Lock bookmark database
-      spawn #{bin}/buku --lock
-      expect "Password: "
-      send "password\r"
-      expect "Password: "
-      send "password\r"
-      expect {
-          -re ".*ERROR.*" { exit 1 }
-          "File encrypted"
-      }
-
+      refute_nil r.expect("Password: ", timeout), "Expected password input"
+      w.write "password\r"
+      refute_nil r.expect("Password: ", timeout), "Expected password confirmation input"
+      w.write "password\r"
+      output = ""
+      begin
+        r.each { |line| output += line }
+      rescue Errno::EIO
+        # GNU/Linux raises EIO when read is done on closed pty
+      end
+      refute_match "ERROR", output
+      assert_match "File encrypted", output
+    ensure
+      r.close
+      w.close
+      Process.wait pid
+    end
+    PTY.spawn(bin/"buku", "--unlock") do |r, w, pid|
       # Unlock bookmark database
-      spawn #{bin}/buku --unlock
-      expect "Password: "
-      send "password\r"
-      expect {
-          -re ".*ERROR.*" { exit 1 }
-          "File decrypted"
-      }
-    EOS
-    system "expect", "-f", "crypto-test"
+      refute_nil r.expect("Password: ", timeout), "Expected password input"
+      w.write "password\r"
+      output = ""
+      begin
+        r.each { |line| output += line }
+      rescue Errno::EIO
+        # GNU/Linux raises EIO when read is done on closed pty
+      end
+      refute_match "ERROR", output
+      assert_match "File decrypted", output
+    ensure
+      r.close
+      w.close
+      Process.wait pid
+    end
 
     # Test database content and search
     result = shell_output("#{bin}/buku --np --sany Homebrew")
@@ -208,8 +236,8 @@ class Buku < Formula
 
     port = free_port
     pid = fork do
-      $stdout.reopen("/dev/null")
-      $stderr.reopen("/dev/null")
+      $stdout.reopen(File::NULL)
+      $stderr.reopen(File::NULL)
       exec "#{bin}/bukuserver", "run", "--host", "127.0.0.1", "--port", port.to_s
     end
 

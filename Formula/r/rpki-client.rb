@@ -1,8 +1,8 @@
 class RpkiClient < Formula
   desc "OpenBSD portable rpki-client"
   homepage "https://www.rpki-client.org/"
-  url "https://ftp.openbsd.org/pub/OpenBSD/rpki-client/rpki-client-8.5.tar.gz"
-  sha256 "ab04ad76d5302fccce93b167324b5f08c2384c980f9a046bba934e8358d62c0b"
+  url "https://ftp.openbsd.org/pub/OpenBSD/rpki-client/rpki-client-9.4.tar.gz"
+  sha256 "f3bd2cda5517826b717c574f122ee075eb35866b923b558de6a2720517f0bb6a"
   license "ISC"
 
   livecheck do
@@ -11,17 +11,15 @@ class RpkiClient < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura:  "7331492460379fec1022f135c2f1323730870e292b5a0875cd6e2e77dae4b543"
-    sha256 arm64_monterey: "192904bd8f416f581149263942a88666f4d4634db355c6014e98504f08d4798a"
-    sha256 arm64_big_sur:  "fe358a4ff927933060ce39c6be5738f59b745da7a29568aa01aec10657088fe4"
-    sha256 ventura:        "140b08e18de719c09098cef83a018de78af2ee96ca8507e0a737b37ea1c7f55e"
-    sha256 monterey:       "f73ee1a63276e87d567f366f074b5fe7b8f63c14c6ba18ed3d089f299819c020"
-    sha256 big_sur:        "903cfca33c4b72ee83112aaeca2396f506f428bcd319205d5ec244456cbd322f"
-    sha256 x86_64_linux:   "3fb8dba52f440188524cfb470afe73769e0f8467bf812c3568d573cffb29046e"
+    sha256 arm64_sequoia: "b159435cc16a2e5dc94aef656a44c3fae592ff761af859a9eaf89d97342c2692"
+    sha256 arm64_sonoma:  "d0ce6065e42669a5b317d783029bd4a6a694db9f4d86a49cc2fc5bdd6bc8ecce"
+    sha256 arm64_ventura: "ea84cf4764b4689397031f4ad212699642d5896baece5dc4f89a3006f1c40c03"
+    sha256 sonoma:        "97433f4e2de90132dd86bbe767ad45a93b34f037b77f2a767f9724f16e9c69b0"
+    sha256 ventura:       "a8071143e5de9b7ba1032794a3bfef5580a6c6a2cac24f77d1cd597dedb717bb"
+    sha256 x86_64_linux:  "e96386683cc04c1467d92b92d2f38bc6cf9d1deb1f42c208c557f9a89a57259b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libretls"
   depends_on "openssl@3"
   depends_on "rsync"
@@ -30,11 +28,11 @@ class RpkiClient < Formula
   uses_from_macos "zlib"
 
   def install
-    system "./configure", *std_configure_args,
-                          "--with-rsync=#{Formula["rsync"].opt_bin}/rsync",
+    system "./configure", "--with-rsync=#{Formula["rsync"].opt_bin}/rsync",
                           "--disable-silent-rules",
                           "--sysconfdir=#{etc}",
-                          "--localstatedir=#{var}"
+                          "--localstatedir=#{var}",
+                          *std_configure_args
     system "make", "install"
   end
 

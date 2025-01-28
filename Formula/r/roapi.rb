@@ -1,18 +1,17 @@
 class Roapi < Formula
   desc "Full-fledged APIs for static datasets without writing a single line of code"
   homepage "https://roapi.github.io/docs"
-  url "https://github.com/roapi/roapi/archive/refs/tags/roapi-v0.9.0.tar.gz"
-  sha256 "90dc3c036ba284504f0af023e343603b74a8f9222999fa6968fd2d7782fa6bac"
+  url "https://github.com/roapi/roapi/archive/refs/tags/roapi-v0.12.4.tar.gz"
+  sha256 "93eaccd70b7b21d0d8f349d6ad594761b8c4ecba884c7106cfefa37d86e3649c"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e985295ec049440a4de8847b2572e6aca8be1e31603623b310a47ef333c9216f"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c4e9f75ce10c6e60d8a6101eb1c40781b96a859a026656194c1ba3632f3ef6f6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "98dec57754abe011af47c52623981039c31c49e1d7275214ac9d79252a1d5642"
-    sha256 cellar: :any_skip_relocation, ventura:        "6daf36288d0cc4d48084c819c772286f66152b358dfd6e84d45c675d5ebc380d"
-    sha256 cellar: :any_skip_relocation, monterey:       "56019992e8e75b0493423015d4e86160ff8103c831bbddf43c860199142092e9"
-    sha256 cellar: :any_skip_relocation, big_sur:        "2d2f2d1db30113ff3c3b6bb5e9669c02889293e0e99a6d92a13674f521a73e47"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5cec37d5bebb1ff28144fd339bd1120599c71d9628042500bbc83e038b5122fd"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4b120ba55e3cae8c3b3979b6a4d899dc07fe831cbd1d81ea5bcd06f455e14e10"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1eaf36297f5273f3465dd39b7441e2d4b17048116d2034e2644d642c06c70da3"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "3f27bf73c7209c9f00134bbf49a26a20fef0ae6a2e4c2902519117e6c15b9ff9"
+    sha256 cellar: :any_skip_relocation, sonoma:        "f4f39cfc03ef9f4bfe2bd2c3ab2669039927f3febd15ad78bb9c5fd782cd978b"
+    sha256 cellar: :any_skip_relocation, ventura:       "a09c14307b47d74173190e59281ec75b837c7331a7682e9990ad0f5398930f4d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "83c065cae70543fd020625fda6651e1a2dc3ab1e622db72ebf978d23b986fb57"
   end
 
   depends_on "rust" => :build

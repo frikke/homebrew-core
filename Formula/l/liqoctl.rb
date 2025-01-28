@@ -1,18 +1,19 @@
 class Liqoctl < Formula
   desc "Is a CLI tool to install and manage Liqo-enabled clusters"
   homepage "https://liqo.io"
-  url "https://github.com/liqotech/liqo/archive/refs/tags/v0.9.3.tar.gz"
-  sha256 "50b9b6b9e62c7ac168130c15b6363eb46463e6cf0e1561bd24b015611351effd"
+  url "https://github.com/liqotech/liqo/archive/refs/tags/v0.10.3.tar.gz"
+  sha256 "01c03c7eba34e04a4ba0fc9d0b1f08d9fb2d6b101f5b997bb2d9dbfd8ef993d5"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "8c8aa7b32114cc2ce1d8309596dd99347462b072bab2873e6038a3317bad0a7c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "8c8aa7b32114cc2ce1d8309596dd99347462b072bab2873e6038a3317bad0a7c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8c8aa7b32114cc2ce1d8309596dd99347462b072bab2873e6038a3317bad0a7c"
-    sha256 cellar: :any_skip_relocation, ventura:        "97df6eb38c02bf972979779433bf0bf08649e4421de55f97b5f98310a65f9957"
-    sha256 cellar: :any_skip_relocation, monterey:       "97df6eb38c02bf972979779433bf0bf08649e4421de55f97b5f98310a65f9957"
-    sha256 cellar: :any_skip_relocation, big_sur:        "97df6eb38c02bf972979779433bf0bf08649e4421de55f97b5f98310a65f9957"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ffbf6e047245f598b5af1b4da9c5fbb6f9b0f5ab79668b11ae6af51ab0be6014"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "9220f727704b83e386da21190faeba77b7d77b72f24e8be3432a9908a4693e7a"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d6f826cf9012555b61a5b3d066e24fe911a63973e5c5b2277de51855ebad6f32"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d6f826cf9012555b61a5b3d066e24fe911a63973e5c5b2277de51855ebad6f32"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d6f826cf9012555b61a5b3d066e24fe911a63973e5c5b2277de51855ebad6f32"
+    sha256 cellar: :any_skip_relocation, sonoma:         "4bcead3252b38472731c02ad8bceab56e8c3980d28dc5d6551bbd9812a231ac0"
+    sha256 cellar: :any_skip_relocation, ventura:        "4bcead3252b38472731c02ad8bceab56e8c3980d28dc5d6551bbd9812a231ac0"
+    sha256 cellar: :any_skip_relocation, monterey:       "4bcead3252b38472731c02ad8bceab56e8c3980d28dc5d6551bbd9812a231ac0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "05976ada5aaa96db26b7f5ac331204fd2b10ac9df13ec944a2283fc6192dae0d"
   end
 
   depends_on "go" => :build
@@ -25,7 +26,7 @@ class Liqoctl < Formula
       -X github.com/liqotech/liqo/pkg/liqoctl/version.liqoctlVersion=v#{version}
     ]
 
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/liqoctl"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/liqoctl"
 
     generate_completions_from_executable(bin/"liqoctl", "completion")
   end

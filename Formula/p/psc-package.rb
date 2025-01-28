@@ -1,23 +1,25 @@
 class PscPackage < Formula
   desc "Package manager for PureScript based on package sets"
   homepage "https://psc-package.readthedocs.io"
-  url "https://github.com/purescript/psc-package/archive/v0.6.2.tar.gz"
+  url "https://github.com/purescript/psc-package/archive/refs/tags/v0.6.2.tar.gz"
   sha256 "96c3bf2c65d381c61eff3d16d600eadd71ac821bbe7db02acec1d8b3b6dbecfc"
   license "BSD-3-Clause"
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "cb8fb988ac116590ec36ae48034fb205c2c1799183a477959a4f56edd239fe08"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d690a0db3d5c917fda1164691912d14f71bf21eb74d98070c7860805c0ee1a2c"
-    sha256 cellar: :any_skip_relocation, ventura:        "ed33f7c5b04a5ae8cd2e8b7c270f7ec9d89bdc15caa38d99d3d1cc0f4f2238c0"
-    sha256 cellar: :any_skip_relocation, monterey:       "4bd4095ce0672aaa435d7f09b5f82bbea637f8e75550b0809cfd08e8127eb30b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3a366e22aefb8cf179cf1aca4a4aae93bfac187a9d84324c9ba33e7a00abf7c3"
-    sha256 cellar: :any_skip_relocation, catalina:       "699a7ad7342f3abba90787f0c3b2a2b981ebc2aa33f45015720a48e3c4a7110b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "23deb52781043ee39883a273da33d4df45d55c772814e9ee237f0b6b0d74c9e2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "caa3fd862fbd5b0fee519827956ee81da5cb790c8f4818b63c25e4e3b4647f9d"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "60ce822c848d09c9d477d37c8c3e7667ffae266897f06d538368c5d66746e1f2"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d218b3190d7af58a6dee769d8fc8b0543ac7eed760af9552b871ec9e6c28b918"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0f896fa8803f8405c76b6814302c9a81bc88ad63facccf653f302ca6c7314862"
+    sha256 cellar: :any_skip_relocation, sonoma:         "2745b40b2ca64e1a6e369b79ab2c3141ea04c84538d335be866978c594e2bde6"
+    sha256 cellar: :any_skip_relocation, ventura:        "34a6d89e4900fadd0f3844622d53df285ab26a54fb2b46c61191bd6b1b835c29"
+    sha256 cellar: :any_skip_relocation, monterey:       "c96222df112a5a511469867e560157aab7ffc0fba812261302ac227fc682aebe"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "57150c2dfc8edce29db3b116563bb83d58c573b95cf497381a711f960f804378"
   end
 
   depends_on "cabal-install" => :build
-  depends_on "ghc" => :build
+  depends_on "ghc@9.10" => :build
   depends_on "purescript"
 
   # Apply upstream patch to fix build. Remove with next release.
@@ -30,8 +32,11 @@ class PscPackage < Formula
   patch :DATA
 
   def install
+    # Workaround to build with GHC 9.10 until upstream allows `turtle >= 1.6`
+    args = ["--allow-newer=turtle:text"]
+
     system "cabal", "v2-update"
-    system "cabal", "v2-install", *std_cabal_v2_args
+    system "cabal", "v2-install", *args, *std_cabal_v2_args
   end
 
   test do

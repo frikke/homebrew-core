@@ -1,9 +1,10 @@
 class BdwGc < Formula
   desc "Garbage collector for C and C++"
   homepage "https://www.hboehm.info/gc/"
-  url "https://github.com/ivmai/bdwgc/releases/download/v8.2.4/gc-8.2.4.tar.gz"
-  sha256 "3d0d3cdbe077403d3106bb40f0cbb563413d6efdbb2a7e1cd6886595dec48fc2"
+  url "https://github.com/ivmai/bdwgc/releases/download/v8.2.8/gc-8.2.8.tar.gz"
+  sha256 "7649020621cb26325e1fb5c8742590d92fb48ce5c259b502faf7d9fb5dabb160"
   license "MIT"
+  head "https://github.com/ivmai/bdwgc.git", branch: "master"
 
   livecheck do
     url :stable
@@ -11,46 +12,49 @@ class BdwGc < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "6ffeee2e44d95f98084f2731eb73bc1999c590450a4db638a97809d49cc0b3c2"
-    sha256 cellar: :any,                 arm64_ventura:  "d72bbcd333cb094f8420140377f52d180215cb9da36e6ee2e7844131dd3893e6"
-    sha256 cellar: :any,                 arm64_monterey: "341fca69e636872e81ba36d11455fd0d0a0ab212118bf0c08650965ee4507df7"
-    sha256 cellar: :any,                 arm64_big_sur:  "3d80fe2490ea0f7a74c456c3d48096deb084a354f9be2efe600628307345cf9f"
-    sha256 cellar: :any,                 sonoma:         "d02f93d22decb3760448e03e737b383cb370904f5637e9240f563e8d6ece9d58"
-    sha256 cellar: :any,                 ventura:        "7eb544c73ee1bff67ec56f1a3f980b6baf92a19f1189b0d06b3ea90d69dd7554"
-    sha256 cellar: :any,                 monterey:       "c7767f6818d404d1dd7d15c14b6b7cd14fe51016c601c337b3a73b4ab12655c2"
-    sha256 cellar: :any,                 big_sur:        "82a7fec30efbcc9927471602771d96fa824d413764add2d8c9fb9e1487195ce0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f652d04db5c62c5bb5c6a974886b883ecddbd780ef960070ae1fcdfbab887acf"
+    sha256 cellar: :any,                 arm64_sequoia:  "58c2b5cf58c6ea30fc56a34aacfe36f774bed4cee1dca9808ef58d154a5ec965"
+    sha256 cellar: :any,                 arm64_sonoma:   "26862c04a22c24bbbe25d7fd1a2fa4d499d5a7216101625115be645123ea0445"
+    sha256 cellar: :any,                 arm64_ventura:  "55890248e3f2624e882660e38695e9090a8be1bff6c9a829ef35b0a30a890fee"
+    sha256 cellar: :any,                 arm64_monterey: "013ffdfc107f8ec5d5382af87412bdfd4cb3503e866555fbe3252c3d7dcdcc10"
+    sha256 cellar: :any,                 sonoma:         "54cd5df410fb01fc0f7a9b212b5ef40e8160e360e597b5d20e6e489df306ce37"
+    sha256 cellar: :any,                 ventura:        "71c1beb334094059de83c81be4f1239e4ece22a1f7baf5c98d9682a2243b13bb"
+    sha256 cellar: :any,                 monterey:       "33e2046794356d765327d03b638c8449e38a69055f801542ee4abd2ea6329f49"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f666fdf55ce3b41704f5869120ddfd3e973051d1fc0dc32a80733f20ba15ea0c"
   end
 
-  head do
-    url "https://github.com/ivmai/bdwgc.git", branch: "master"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool"  => :build
-  end
-
-  depends_on "libatomic_ops" => :build
-  depends_on "pkg-config" => :build
-
-  on_linux do
-    depends_on "gcc" => :test
-  end
+  depends_on "cmake" => :build
 
   def install
-    system "./autogen.sh" if build.head?
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--enable-cplusplus",
-                          "--enable-static",
-                          "--enable-large-config"
-    system "make"
-    system "make", "check"
-    system "make", "install"
+    args = %w[
+      -Denable_cplusplus=ON
+      -Denable_large_config=ON
+      -Dwithout_libatomic_ops=OFF
+      -Dwith_libatomic_ops=OFF
+    ]
+
+    system "cmake", "-S", ".", "-B", "build",
+                    "-Dbuild_tests=ON",
+                    "-DBUILD_SHARED_LIBS=ON",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    *args, *std_cmake_args,
+                    "-DBUILD_TESTING=ON" # Pass this *after* `std_cmake_args`
+    system "cmake", "--build", "build"
+    if OS.linux? || Hardware::CPU.arm? || MacOS.version > :monterey
+      # Fails on 12-x86_64.
+      system "ctest", "--test-dir", "build",
+                      "--parallel", ENV.make_jobs,
+                      "--rerun-failed",
+                      "--output-on-failure"
+    end
+    system "cmake", "--install", "build"
+
+    system "cmake", "-S", ".", "-B", "build-static", "-DBUILD_SHARED_LIBS=OFF", *args, *std_cmake_args
+    system "cmake", "--build", "build-static"
+    lib.install buildpath.glob("build-static/*.a")
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <stdio.h>
       #include "gc.h"
@@ -69,7 +73,7 @@ class BdwGc < Formula
         }
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lgc", "-o", "test"
     system "./test"

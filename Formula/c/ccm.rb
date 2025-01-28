@@ -6,33 +6,30 @@ class Ccm < Formula
   url "https://files.pythonhosted.org/packages/f1/12/091e82033d53b3802e1ead6b16045c5ecfb03374f8586a4ae4673a914c1a/ccm-3.1.5.tar.gz"
   sha256 "f07cc0a37116d2ce1b96c0d467f792668aa25835c73beb61639fa50a1954326c"
   license "Apache-2.0"
-  revision 3
+  revision 4
   head "https://github.com/riptano/ccm.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "caa73c15f42b4bbde8b8c8b4a8e63bc73caec21fba17f4691ed872a4ee9772a4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d8f1195eed8bd7612ed15b923ae39ff629a43902e6b954e313d5bc8bb2bc3f56"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fbca70057fa9839396627d7780da959a3d017c435e9017e4a908b1a0832466aa"
-    sha256 cellar: :any_skip_relocation, ventura:        "00666fc11e3498143856e368a3d0b3e78ac6e797402b601962a108254c069b8b"
-    sha256 cellar: :any_skip_relocation, monterey:       "5965d7c0684c03296b7f466a00c1cd9c0c2a5d5639aa97ea6cd9fb571e334123"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a18b40aee5ee0a8870a62ccedf5c8b5c2c55dc41ac907df7ff0843fc6b47fd38"
-    sha256 cellar: :any_skip_relocation, catalina:       "d9f1096165bae0521103449c5c1586f945d628433d3884afaf14d23e56c25e0a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b3e9f1a5872ef6102a0f2be3e44a4badd1fe2f6dbe2ddd49ce59650a80ff93c0"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "e036ab0817d4b65085d1c2cb6c2edf0a9e55b6340b9bbe99d6f90abc16e36e1f"
+    sha256 cellar: :any,                 arm64_sonoma:  "33a2184cc7764d6ee186071d78e743b0c152cb0ac37ec5dcfe77ee3eae97ab01"
+    sha256 cellar: :any,                 arm64_ventura: "a8231ecd1b2f906259979cc35186be52000c4b7786dbb55c8c3cd13c52b5402a"
+    sha256 cellar: :any,                 sonoma:        "528a3299799df8daf15b07e0a0670df132ae046f0f52466defe58e968bc54a11"
+    sha256 cellar: :any,                 ventura:       "9912048114592dbd5fd7be13ab693bd12c6dabe896f2b953802c383c3483e7c6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7cf8010b7799a42307a71b081fdb9afa505ecc13b7ad8fa4fb826f257eafc364"
   end
 
-  depends_on "python@3.11"
-  depends_on "pyyaml"
-  depends_on "six"
+  depends_on "libyaml"
+  depends_on "python@3.13"
 
   resource "cassandra-driver" do
-    url "https://files.pythonhosted.org/packages/af/aa/3d3a6dae349d4f9b69d37e6f3f8b8ef286a06005aa312f0a3dc7af0eb556/cassandra-driver-3.25.0.tar.gz"
-    sha256 "8ad7d7c090eb1cac6110b3bfc1fd2d334ac62f415aac09350ebb8d241b7aa7ee"
+    url "https://files.pythonhosted.org/packages/b2/6f/d25121afaa2ea0741d05d2e9921a7ca9b4ce71634b16a8aaee21bd7af818/cassandra-driver-3.29.2.tar.gz"
+    sha256 "c4310a7d0457f51a63fb019d8ef501588c491141362b53097fbc62fa06559b7c"
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/59/87/84326af34517fca8c58418d148f2403df25303e02736832403587318e9e8/click-8.1.3.tar.gz"
-    sha256 "7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"
+    url "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz"
+    sha256 "ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de"
   end
 
   resource "geomet" do
@@ -40,11 +37,26 @@ class Ccm < Formula
     sha256 "91d754f7c298cbfcabd3befdb69c641c27fe75e808b27aa55028605761d17e95"
   end
 
+  resource "pyyaml" do
+    url "https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz"
+    sha256 "d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"
+  end
+
+  resource "setuptools" do
+    url "https://files.pythonhosted.org/packages/27/b8/f21073fde99492b33ca357876430822e4800cdf522011f18041351dfa74b/setuptools-75.1.0.tar.gz"
+    sha256 "d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538"
+  end
+
+  resource "six" do
+    url "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz"
+    sha256 "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"
+  end
+
   def install
     virtualenv_install_with_resources
   end
 
   test do
-    assert_match "Usage", shell_output("#{bin}/ccm", 1)
+    assert_match "Usage", shell_output(bin/"ccm", 1)
   end
 end

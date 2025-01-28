@@ -4,45 +4,29 @@ class Intltool < Formula
   url "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz"
   sha256 "67c74d94196b153b774ab9f89b2fa6c6ba79352407037c8c14d5aeb334e959cd"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "658891edd309f28bef053c087f8fa2b73445d2ea6b7143159ef47291d75c14b3"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "45adf17254203ae3085e595907a01e02188643a3080c595a0a9f50301ecd8e56"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "45adf17254203ae3085e595907a01e02188643a3080c595a0a9f50301ecd8e56"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "45adf17254203ae3085e595907a01e02188643a3080c595a0a9f50301ecd8e56"
-    sha256 cellar: :any_skip_relocation, sonoma:         "2c763011f6fc50ab1f60eb122db207bcbf64fa4921c1e25ac22a0038e1db5a0c"
-    sha256 cellar: :any_skip_relocation, ventura:        "743ff02675bf6a8b52311d8fb93ceff3ef512487d29940b547992e3e8f6e494e"
-    sha256 cellar: :any_skip_relocation, monterey:       "743ff02675bf6a8b52311d8fb93ceff3ef512487d29940b547992e3e8f6e494e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "743ff02675bf6a8b52311d8fb93ceff3ef512487d29940b547992e3e8f6e494e"
-    sha256 cellar: :any_skip_relocation, catalina:       "743ff02675bf6a8b52311d8fb93ceff3ef512487d29940b547992e3e8f6e494e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3250b9524cf8540d10b5354145fd3541c4c308efaaa091d17f6bd691a552b15b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "7ebd88e28e9fdc4af031759fae5cfc6b4f93489e2aff78924d0a0b41ab4d9ea2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "b725467f89444f309fe6ac39a1e8c93dfde4d58ce9ab1bc8f92a49beb899e1de"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b725467f89444f309fe6ac39a1e8c93dfde4d58ce9ab1bc8f92a49beb899e1de"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b725467f89444f309fe6ac39a1e8c93dfde4d58ce9ab1bc8f92a49beb899e1de"
+    sha256 cellar: :any_skip_relocation, sonoma:         "a15ddf828a10f73b8ecbc8126bc6a5b9c659c94dcc9f8c3f761cda1a40e725cb"
+    sha256 cellar: :any_skip_relocation, ventura:        "a15ddf828a10f73b8ecbc8126bc6a5b9c659c94dcc9f8c3f761cda1a40e725cb"
+    sha256 cellar: :any_skip_relocation, monterey:       "a15ddf828a10f73b8ecbc8126bc6a5b9c659c94dcc9f8c3f761cda1a40e725cb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b3760928e8e228b469f78ad5ebf3468a745b6dedbbeb7b7968b4f4ac7ae40bd5"
   end
+
+  uses_from_macos "perl"
 
   on_linux do
     depends_on "expat"
-    depends_on "perl"
-
-    resource "XML::Parser" do
-      url "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.44.tar.gz"
-      sha256 "1ae9d07ee9c35326b3d9aad56eae71a6730a73a116b9fe9e8a4758b7cc033216"
-    end
+    depends_on "perl-xml-parser"
   end
 
   def install
-    if OS.linux?
-      ENV.prepend_create_path "PERL5LIB", libexec/"lib/perl5"
-      resources.each do |res|
-        res.stage do
-          system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}"
-          system "make", "PERL5LIB=#{ENV["PERL5LIB"]}"
-          system "make", "install"
-        end
-      end
-    end
-
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-silent-rules"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

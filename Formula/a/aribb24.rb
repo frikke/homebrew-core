@@ -6,6 +6,7 @@ class Aribb24 < Formula
   license "LGPL-3.0-only"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "4f5a5fb9f91e28f11bbf33dda14a54b36510cecc834a29f0ba28d980a57760fc"
     sha256 cellar: :any,                 arm64_sonoma:   "00fe805d46c08342ec5d62c3eaddfb272513ce55e5eeba324317f43f0783a6d8"
     sha256 cellar: :any,                 arm64_ventura:  "60ea5e1c7b35cde769b03c6172b4ff78dec340a91f8ae2e1c6b490fdce65c34a"
     sha256 cellar: :any,                 arm64_monterey: "9e6741b85e4276c01c4ee9a9a304f816a2bbc7c848bf3f2607308af48c2464b0"
@@ -21,17 +22,17 @@ class Aribb24 < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libpng"
 
   def install
     system "./bootstrap"
-    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <aribb24/aribb24.h>
       #include <stdlib.h>
       int main() {
@@ -41,7 +42,7 @@ class Aribb24 < Formula
         arib_instance_destroy(ptr);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c", "-I#{include}",
                    "-L#{lib}", "-laribb24"
     system "./test"

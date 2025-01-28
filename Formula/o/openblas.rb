@@ -1,10 +1,15 @@
 class Openblas < Formula
   desc "Optimized BLAS library"
   homepage "https://www.openblas.net/"
-  url "https://github.com/xianyi/OpenBLAS/archive/v0.3.24.tar.gz"
-  sha256 "ceadc5065da97bd92404cac7254da66cc6eb192679cf1002098688978d4d5132"
-  license "BSD-3-Clause"
-  head "https://github.com/xianyi/OpenBLAS.git", branch: "develop"
+  url "https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.29.tar.gz"
+  sha256 "38240eee1b29e2bde47ebb5d61160207dc68668a54cac62c076bb5032013b1eb"
+  # The main license is BSD-3-Clause. Additionally,
+  # 1. OpenBLAS is based on GotoBLAS2 so some code is under original BSD-2-Clause-Views
+  # 2. lapack-netlib/ is a bundled LAPACK so it is BSD-3-Clause-Open-MPI
+  # 3. interface/{gemmt.c,sbgemmt.c} is BSD-2-Clause
+  # 4. relapack/ is MIT but license is omitted as it is not enabled
+  license all_of: ["BSD-3-Clause", "BSD-2-Clause-Views", "BSD-3-Clause-Open-MPI", "BSD-2-Clause"]
+  head "https://github.com/OpenMathLib/OpenBLAS.git", branch: "develop"
 
   livecheck do
     url :stable
@@ -12,14 +17,12 @@ class Openblas < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "14a69b61ba6db7000d23ff92cf4d1939552b8c33ea96945b187496a72afdcddf"
-    sha256 cellar: :any,                 arm64_ventura:  "5a6b8d2e10942011646cc64e19aa4c04444c4f521cccf7526a2f356520aaf3cd"
-    sha256 cellar: :any,                 arm64_monterey: "df4831fa56d2efec2cd36cd71d60293bb1661f7e2eb7c1ddb24c833609973d27"
-    sha256 cellar: :any,                 arm64_big_sur:  "7b7cb96ea76972f420604f8b60f2026f18823d5b0d7f72aa75c8332dc6496101"
-    sha256 cellar: :any,                 ventura:        "70d123d74ef2cf47a313882b1cda4dba35cc16cb0b520cf9ee6415579ae8dbed"
-    sha256 cellar: :any,                 monterey:       "5ad17cd7f820015c4be5aea45051b63de1b8313d7afab842ac0cf5344b8f7f0a"
-    sha256 cellar: :any,                 big_sur:        "8db45e21713c1f461eafb2e5753793edad12491ba12f1cebc7012f9463a1f0a0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "15d267b68507989474e0283a9a6c259fa6de412a698e1b9124f0e2cc1521db77"
+    sha256 cellar: :any,                 arm64_sequoia: "0cef0ab521810fae27b78f5d9f0a2fc42a74d52b568b70b2a5ecc229711c0920"
+    sha256 cellar: :any,                 arm64_sonoma:  "88e8c3f9d4af71ebfcd068cdc95017deda958d2666fb29de1c88f8f77dd8d57d"
+    sha256 cellar: :any,                 arm64_ventura: "3a0e4b4da3526b6e939d51f9ae3d5d3123b3e70a28962384851f04a521475b71"
+    sha256 cellar: :any,                 sonoma:        "56dc157bbb4fae7ac26abe2e481d5fa0cb76062c84d8da88cf3cf1cb17ff4ba0"
+    sha256 cellar: :any,                 ventura:       "15432ddfd653901f19a86b6377458ba442f10112569b2b8cf60e5fe5e7b2c178"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "20cfbd105f1fd674475da44c41fda406ac10a9cf8d1ae521b337ad046e957a29"
   end
 
   keg_only :shadowed_by_macos, "macOS provides BLAS in Accelerate.framework"
@@ -32,14 +35,17 @@ class Openblas < Formula
     ENV.deparallelize # build is parallel by default, but setting -j confuses it
 
     # The build log has many warnings of macOS build version mismatches.
-    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s
+    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s if OS.mac?
     ENV["DYNAMIC_ARCH"] = "1"
     ENV["USE_OPENMP"] = "1"
     # Force a large NUM_THREADS to support larger Macs than the VMs that build the bottles
     ENV["NUM_THREADS"] = "56"
+    # See available targets in TargetList.txt
     ENV["TARGET"] = case Hardware.oldest_cpu
     when :arm_vortex_tempest
       "VORTEX"
+    when :westmere
+      "NEHALEM"
     else
       Hardware.oldest_cpu.upcase.to_s
     end
@@ -57,7 +63,7 @@ class Openblas < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdlib.h>
       #include <math.h>
@@ -77,7 +83,7 @@ class Openblas < Formula
         if (fabs(C[4]-21) > 1.e-5) abort();
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lopenblas",
                    "-o", "test"
     system "./test"

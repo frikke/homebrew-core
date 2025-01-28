@@ -6,6 +6,7 @@ class Libapplewm < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any, arm64_sequoia:  "9aed87eee9abadbc7e94ee746f6b54588d3eacd9fb455b2d94a96c4b7a19425e"
     sha256 cellar: :any, arm64_sonoma:   "a85cafdda17d42585277fa6d22fb7b7d71d030c9ec591d4cbcc528a32ef5410e"
     sha256 cellar: :any, arm64_ventura:  "5292c56db7842b7784fc2d8cb11ca61ea9cfc1ec4c8293c4faeeaf9a8b8de876"
     sha256 cellar: :any, arm64_monterey: "054032d8ea48004ed41b659815c0d934cb386280d7651ea304118395bafdc360"
@@ -17,7 +18,7 @@ class Libapplewm < Formula
     sha256 cellar: :any, catalina:       "c3e392ce25599cfe0929f1cd14a24a4d512697c952f15dea0533c2dbb8755b23"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   depends_on "libx11"
   depends_on "libxext"
@@ -29,13 +30,13 @@ class Libapplewm < Formula
     # https://gitlab.freedesktop.org/xorg/lib/libapplewm/-/commit/be972ebc3a97292e7d2b2350eff55ae12df99a42
     # TODO: Remove in the next release
     inreplace "src/Makefile.in", "-F", "-iframeworkwithsysroot "
-    system "./configure", *std_configure_args, "--with-sysroot=#{MacOS.sdk_path}"
+    system "./configure", "--with-sysroot=#{MacOS.sdk_path}", *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <X11/Xlib.h>
       #include <X11/extensions/applewm.h>
       #include <stdio.h>
@@ -50,7 +51,7 @@ class Libapplewm < Formula
         XAppleWMSetFrontProcess(disp);
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-o", "test",
       "-I#{include}", "-L#{lib}", "-L#{Formula["libx11"].lib}",

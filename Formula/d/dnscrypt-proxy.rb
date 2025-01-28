@@ -1,8 +1,8 @@
 class DnscryptProxy < Formula
   desc "Secure communications between a client and a DNS resolver"
   homepage "https://dnscrypt.info"
-  url "https://github.com/DNSCrypt/dnscrypt-proxy/archive/2.1.5.tar.gz"
-  sha256 "044c4db9a3c7bdcf886ff8f83c4b137d2fd37a65477a92bfe86bf69587ea7355"
+  url "https://github.com/DNSCrypt/dnscrypt-proxy/archive/refs/tags/2.1.7.tar.gz"
+  sha256 "6394cd2d73dedca9317aeee498b6c2520b841cea042d83f398c3355a13c50f7c"
   license "ISC"
   head "https://github.com/DNSCrypt/dnscrypt-proxy.git", branch: "master"
 
@@ -12,13 +12,12 @@ class DnscryptProxy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "288115da2b5dbd3ba90f2d6479dbd1697a6ca13da9bdac901866edd44cea8f99"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "288115da2b5dbd3ba90f2d6479dbd1697a6ca13da9bdac901866edd44cea8f99"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "288115da2b5dbd3ba90f2d6479dbd1697a6ca13da9bdac901866edd44cea8f99"
-    sha256 cellar: :any_skip_relocation, ventura:        "d520dcc7b0c3183221fbda50ed0847ff0a1fd10f2dbde120ce45e8ab4799585f"
-    sha256 cellar: :any_skip_relocation, monterey:       "d520dcc7b0c3183221fbda50ed0847ff0a1fd10f2dbde120ce45e8ab4799585f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d520dcc7b0c3183221fbda50ed0847ff0a1fd10f2dbde120ce45e8ab4799585f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fea5a34cbe6e64ea9163827d9cfbf84b2c415f6f10ecc9dcd1ba6ead3a8a633d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "27fc965f4cc0995d703f6a95079452efab66d465ff5ada7de138ffbe426be4f0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "27fc965f4cc0995d703f6a95079452efab66d465ff5ada7de138ffbe426be4f0"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "27fc965f4cc0995d703f6a95079452efab66d465ff5ada7de138ffbe426be4f0"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a750722e0d3703bab22cc12406469ccd2551120aacf9e6aceafa175c26ed3740"
+    sha256 cellar: :any_skip_relocation, ventura:       "a750722e0d3703bab22cc12406469ccd2551120aacf9e6aceafa175c26ed3740"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c580a268156c31b3c74425018062826afab45e48a254525943bc375c8c078f14"
   end
 
   depends_on "go" => :build
@@ -59,6 +58,7 @@ class DnscryptProxy < Formula
     run [opt_sbin/"dnscrypt-proxy", "-config", etc/"dnscrypt-proxy.toml"]
     keep_alive true
     require_root true
+    process_type :background
   end
 
   test do

@@ -1,8 +1,8 @@
 class Zet < Formula
   desc "CLI utility to find the union, intersection, and set difference of files"
   homepage "https://github.com/yarrow/zet"
-  url "https://github.com/yarrow/zet/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "792a1a1de73bf4145ccaa71f8e6bb34b62e690270a432c4de4d8639e1a741b5b"
+  url "https://github.com/yarrow/zet/archive/refs/tags/v2.0.1.tar.gz"
+  sha256 "a6f431927c16b22516e78a9ec7864d99e2676abae3acb46101df1c287e16f267"
   license any_of: ["Apache-2.0", "MIT"]
 
   livecheck do
@@ -11,15 +11,12 @@ class Zet < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "3802468d07a81cf690e8bfc4c2784f6b4b19bbdf13606a4148b9906eb5f02298"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a977d485854acff1b6b576819a3b9686da637c5bf575354bb018cb714df729ad"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "8eeb54767d8aa63e78d9edc5e89206bdd834deec2493646206f8c443e0a1b125"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a5819d888c2a9660cde2099fd573f14fb0ac22d285c7ee0b02a9a7b64b5cbd5d"
-    sha256 cellar: :any_skip_relocation, sonoma:         "d7898690785d25ec0ce0deda78cc95a730023b89048765374ee4d4f95e86b02c"
-    sha256 cellar: :any_skip_relocation, ventura:        "872a4d30a206f9005d0499433381274d42845e6d0d59d7f7a5011523f1b05be4"
-    sha256 cellar: :any_skip_relocation, monterey:       "a7f6ad7f96700aed729f8cd4ff4dec39d5fec30d8339cce3c6593a623c87db96"
-    sha256 cellar: :any_skip_relocation, big_sur:        "db4fbf1c9b0f2d3353b5f7c871c53af25d20b3f9e5f801349fa37ad2f5ad1c39"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4330a52a92ce81dfc0e26bbeacfd8141e176c09e9a9dd05905d5e84c277197e5"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "43ee895f1a866c5279689ea67039f268f036126cdaa95fce89ef694c67c9d469"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "eaf4041c27353f5278d0b7f232040a91cd8d87e9a6eb0d6dd6417186f3ab121d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1b42203cb1f07a7f436b7c6ba9a98667ca1e55dd65157fe8fb445a3de4b3c9e0"
+    sha256 cellar: :any_skip_relocation, sonoma:        "4f7359f71bb633a4dca674758356c976b74cb8c9b0a78d705c07d33cbd157414"
+    sha256 cellar: :any_skip_relocation, ventura:       "7155960676e9ea9a1e323e80cf7dd1191a63951c097d1339d179873218519677"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "85c0892b0c2723950c55e1df613854ef10c21b708392084176ab0917c8a0ba7c"
   end
 
   depends_on "rust" => :build

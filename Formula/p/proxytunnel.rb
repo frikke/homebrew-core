@@ -1,18 +1,19 @@
 class Proxytunnel < Formula
   desc "Create TCP tunnels through HTTPS proxies"
   homepage "https://github.com/proxytunnel/proxytunnel"
-  url "https://github.com/proxytunnel/proxytunnel/archive/v1.11.tar.gz"
-  sha256 "edc820c9ea48e0a37f231a40f77eb83b9c3f26ebc31bf4e6f8ee3cd090cbebf2"
+  url "https://github.com/proxytunnel/proxytunnel/archive/refs/tags/v1.12.2.tar.gz"
+  sha256 "edb33a74ba49e745b55b790f123366c8336729947225f4b5d816f1f90551ecfe"
   license "GPL-2.0-or-later" => { with: "openvpn-openssl-exception" }
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "07bb36a07ae75f71bfe246d5bb5b1232a8baad865e37c167de15b0aa98002b54"
-    sha256 cellar: :any,                 arm64_monterey: "0f97697c9115a10b5e570f5d81919b7b5fdea36d8ba569d409ae9dfd3187b5a1"
-    sha256 cellar: :any,                 arm64_big_sur:  "d9df09429d4d52fb92cdd3b6ef2072abaacaf6370fb2361139e94e83cf8173c6"
-    sha256 cellar: :any,                 ventura:        "381b822242673289f29312b4f98bf4ff8c7c9a59607b8f4635dc1d452c5b958e"
-    sha256 cellar: :any,                 monterey:       "a1e106e210f10226c6685e600f2938b059ded79b619efebc35846477eaf7745a"
-    sha256 cellar: :any,                 big_sur:        "d713f28c6e1620c749ecc47ac9a711ace29160299a4fcda1dd2a833166eb1658"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8d2bb4d98ac2247f3e659d1ceb9aa4cbcc98a0e523f71181c8917ef290b196aa"
+    sha256 cellar: :any,                 arm64_sequoia:  "a93c7c73d901172f9aaf39d216de727231dee07349d626732278087016970952"
+    sha256 cellar: :any,                 arm64_sonoma:   "cc4ec787e8432e1d2ca660da6a12c6fb3b5c3f7d9a5ba45d9497559ba38b500f"
+    sha256 cellar: :any,                 arm64_ventura:  "4b8fc03744979dac682161da15fa8076b904a5b17582bc81588d61ac460c99ba"
+    sha256 cellar: :any,                 arm64_monterey: "dd2e453c1f4c7066dc12a122453345abe43ea77a8d405c530600ad1fef10b780"
+    sha256 cellar: :any,                 sonoma:         "22e300ce753b252dd49e225f0f6532a2d2b942681b5f83215728c40a09f657bc"
+    sha256 cellar: :any,                 ventura:        "0b0e7b53fa09dedc6fd0d1f57151992da961cc66fde1ccc353399265db0e0233"
+    sha256 cellar: :any,                 monterey:       "ca0729c5efb1753546e44dfa32b2d287ac254e70b74a5e711c545edebc7e2ee4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e85b78dc09d5c849110d32f44b3276babb0649ee5a545ebb69d786de8bba4f6b"
   end
 
   depends_on "asciidoc" => :build
@@ -26,6 +27,6 @@ class Proxytunnel < Formula
   end
 
   test do
-    system "#{bin}/proxytunnel", "--version"
+    system bin/"proxytunnel", "--version"
   end
 end

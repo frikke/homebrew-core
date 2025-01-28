@@ -1,9 +1,9 @@
 class Teleport < Formula
   desc "Modern SSH server for teams managing distributed infrastructure"
-  homepage "https://gravitational.com/teleport"
-  url "https://github.com/gravitational/teleport/archive/refs/tags/v13.3.8.tar.gz"
-  sha256 "1eb2471c144c480abe7effa0e90e921e050ab6964f06ab51381f22c119871967"
-  license "Apache-2.0"
+  homepage "https://goteleport.com/"
+  url "https://github.com/gravitational/teleport/archive/refs/tags/v17.2.1.tar.gz"
+  sha256 "46fd244f799f89badf34850a9455bf202305f255e3178a5a36d4f5424d185b79"
+  license all_of: ["AGPL-3.0-or-later", "Apache-2.0"]
   head "https://github.com/gravitational/teleport.git", branch: "master"
 
   # As of writing, two major versions of `teleport` are being maintained
@@ -18,29 +18,41 @@ class Teleport < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "799b9a5b274f6c32ba3715bf2aeb01b65dd4e211028c6af8444ff01e5830a1a8"
-    sha256 cellar: :any,                 arm64_monterey: "217dd7a482c84c728d531767dad48416c60c9d3ed3a290940a62243ea577ada6"
-    sha256 cellar: :any,                 arm64_big_sur:  "20f25b9b905f4e258aafc8e7e986cdb56bf4a068f41ee68f674159290a92f081"
-    sha256 cellar: :any,                 ventura:        "fcd5f9e7dca700791bd68064d251d03c03ece98a60a6f9568d18b1929dff21c5"
-    sha256 cellar: :any,                 monterey:       "1e2da7c58e5eeb4b88d849fbdd9bd6ebc3363c787fb5251ddfd6a62c525d45d1"
-    sha256 cellar: :any,                 big_sur:        "0e485bfc397c3327911ea6bf86f81483c95d0023cd926646d96ea57bda24cafb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1c9a0de555989c1fa2eebdad24ed0285f11f326b04c5836fed9d510b6f4586f2"
+    sha256 cellar: :any,                 arm64_sequoia: "8da4b9698609a53b5bc62d080c94b0dde6e029f01d98a5387d00be17fad5a2a4"
+    sha256 cellar: :any,                 arm64_sonoma:  "51d77528c504305c45fc99666f3d385cd6e538ad679d6b39ae41ac273dacd4ff"
+    sha256 cellar: :any,                 arm64_ventura: "1407d45f7c7212c1d3fbabbd9a4d7916b9757449a2ebe5ab195b17b705a9ef3e"
+    sha256 cellar: :any,                 sonoma:        "b65bb611e6bbfbff0573ced932d8754a5c0ba615505014d2c350262619462075"
+    sha256 cellar: :any,                 ventura:       "5294480bb608e128d2286ddcae1b7823a87d72c97edee610d26ec0faacad5472"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4510c99c2e1bc121e363a6928570fbb808427299a04e1136691e7677bbf32753"
   end
 
   depends_on "go" => :build
-  depends_on "pkg-config" => :build
-  depends_on "yarn" => :build
+  depends_on "pkgconf" => :build
+  depends_on "pnpm" => :build
+  depends_on "rust" => :build
+  # TODO: try to remove rustup dependancy, see https://github.com/Homebrew/homebrew-core/pull/191633#discussion_r1774378671
+  depends_on "rustup" => :build
+  depends_on "wasm-pack" => :build
   depends_on "libfido2"
   depends_on "node"
   depends_on "openssl@3"
 
-  uses_from_macos "curl" => :test
-  uses_from_macos "netcat" => :test
   uses_from_macos "zip"
 
   conflicts_with "etsh", because: "both install `tsh` binaries"
+  conflicts_with "tctl", because: "both install `tctl` binaries"
+
+  # disable `wasm-opt` for ironrdp pkg release build, upstream pr ref, https://github.com/gravitational/teleport/pull/50178
+  patch do
+    url "https://github.com/gravitational/teleport/commit/994890fb05360b166afd981312345a4cf01bc422.patch?full_index=1"
+    sha256 "9d60180ff69a8a8985773d3b2a107ab910b22040e4cbf6afed11bd2b64fc6996"
+  end
 
   def install
+    ENV.prepend_path "PATH", Formula["rustup"].bin
+    system "rustup", "default", "stable"
+    system "rustup", "set", "profile", "minimal"
+
     ENV.deparallelize { system "make", "full", "FIDO2=dynamic" }
     bin.install Dir["build/*"]
   end
@@ -51,7 +63,7 @@ class Teleport < Formula
     assert_match version.to_s, shell_output("#{bin}/tctl version")
 
     mkdir testpath/"data"
-    (testpath/"config.yml").write <<~EOS
+    (testpath/"config.yml").write <<~YAML
       version: v2
       teleport:
         nodename: testhost
@@ -59,17 +71,14 @@ class Teleport < Formula
         log:
           output: stderr
           severity: WARN
-    EOS
+    YAML
 
-    fork do
-      exec "#{bin}/teleport start --roles=proxy,node,auth --config=#{testpath}/config.yml"
-    end
-
+    spawn bin/"teleport", "start", "--roles=proxy,node,auth", "--config=#{testpath}/config.yml"
     sleep 10
     system "curl", "--insecure", "https://localhost:3080"
 
-    status = shell_output("#{bin}/tctl --config=#{testpath}/config.yml status")
-    assert_match(/Cluster\s*testhost/, status)
-    assert_match(/Version\s*#{version}/, status)
+    status = shell_output("#{bin}/tctl status --config=#{testpath}/config.yml")
+    assert_match(/Cluster:\s*testhost/, status)
+    assert_match(/Version:\s*#{version}/, status)
   end
 end

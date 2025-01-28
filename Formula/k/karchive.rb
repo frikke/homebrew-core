@@ -1,8 +1,8 @@
 class Karchive < Formula
   desc "Reading, creating, and manipulating file archives"
   homepage "https://api.kde.org/frameworks/karchive/html/index.html"
-  url "https://download.kde.org/stable/frameworks/5.110/karchive-5.110.0.tar.xz"
-  sha256 "fcc6583c0be5abbb9744bfad8d3e673a5b0907bd0787f7da338cc3d989040cdf"
+  url "https://download.kde.org/stable/frameworks/6.10/karchive-6.10.0.tar.xz"
+  sha256 "ac5160c19dd110bbdadeba9c5355cbfd3b5c1bd00ce3dbdc4a085776698c8a48"
   license all_of: [
     "BSD-2-Clause",
     "LGPL-2.0-only",
@@ -11,45 +11,32 @@ class Karchive < Formula
   ]
   head "https://invent.kde.org/frameworks/karchive.git", branch: "master"
 
-  # We check the tags from the `head` repository because the latest stable
-  # version doesn't seem to be easily available elsewhere.
   livecheck do
-    url :head
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url "https://download.kde.org/stable/frameworks/"
+    regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "c8cfd4326c06208eef3a1fcf314db99efa1de1f7faac8227d3afc99751d7a346"
-    sha256 cellar: :any,                 arm64_monterey: "6115f3ad581f95853da6768f5a75a9d68bad7dbed60ee7c0fe81b5f71a57c78a"
-    sha256 cellar: :any,                 arm64_big_sur:  "004c3982a135d76df4bb0481ede4be044b91f8dde40870ab09f15d4caed780b7"
-    sha256 cellar: :any,                 ventura:        "60a2dce9780e90b780fa42ad92408473130de62f0096b68c3ecbb8d1a396842a"
-    sha256 cellar: :any,                 monterey:       "134d4824e80776d5779ebd23678b2187d36b43c15d1e8b370b9a51b8002a0b90"
-    sha256 cellar: :any,                 big_sur:        "71564a2eb2b19df30a276cd19a050420c9d85b6835444f8f8d2ecfe6f9097715"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a0b9b877886e30fc936b60c94c3a6fe5f93228c22353bbb868ef17311af54baf"
+    sha256 cellar: :any,                 arm64_sonoma:  "cf9010a947aeebdd4755b9f60baaeefcdef0b17023e74be3f8fac01d49abcb1f"
+    sha256 cellar: :any,                 arm64_ventura: "a36d71b78cec67ed38e4f24d4727f2f40b5f1607a145c215f391337f58b2a2c8"
+    sha256 cellar: :any,                 sonoma:        "3e7239bb794e15e2dac11cfd1d745a5b61f9f1547cba5dc0e81dcfae2689c0ef"
+    sha256 cellar: :any,                 ventura:       "bcf3924c71923c865fbcffe075726885b983c56430e05680c15639ead7cf9512"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4e37808acc0481eb324c2248a7631cc39e8800b80346e521d2d45460709b019a"
   end
 
   depends_on "cmake" => [:build, :test]
   depends_on "doxygen" => :build
   depends_on "extra-cmake-modules" => [:build, :test]
-  depends_on "graphviz" => :build
-
-  depends_on "qt@5"
+  depends_on "pkgconf" => :build
+  depends_on "qt"
   depends_on "xz"
   depends_on "zstd"
 
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
 
-  fails_with gcc: "5"
-
   def install
-    args = std_cmake_args + %w[
-      -S .
-      -B build
-      -DBUILD_QCH=ON
-    ]
-
-    system "cmake", *args
+    system "cmake", "-S", ".", "-B", "build", "-DBUILD_QCH=ON", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
 
@@ -57,30 +44,33 @@ class Karchive < Formula
   end
 
   test do
-    ENV.delete "CPATH"
-    args = std_cmake_args + %W[
-      -DQt5Core_DIR=#{Formula["qt@5"].opt_lib}/cmake/Qt5Core
-      -DQT_MAJOR_VERSION=5
-    ]
-    args << "-DCMAKE_BUILD_RPATH=#{lib}" if OS.linux?
+    cp_r (pkgshare/"examples").children, testpath
 
-    %w[bzip2gzip
-       helloworld
-       tarlocalfiles
-       unzipper].each do |test_name|
-      mkdir test_name.to_s do
-        system "cmake", (pkgshare/"examples/#{test_name}"), *args
-        system "cmake", "--build", "."
-      end
+    examples = %w[
+      bzip2gzip
+      helloworld
+      tarlocalfiles
+      unzipper
+    ]
+
+    examples.each do |example|
+      inreplace testpath/example/"CMakeLists.txt", /^project\(/, <<~CMAKE
+        cmake_minimum_required(VERSION 3.5)
+        \\0
+      CMAKE
+
+      system "cmake", "-S", example, "-B", example, *std_cmake_args
+      system "cmake", "--build", example
     end
 
+    ENV["LC_ALL"] = "en_US.UTF-8"
     assert_match "The whole world inside a hello.", shell_output("helloworld/helloworld 2>&1")
-    assert_predicate testpath/"hello.zip", :exist?
+    assert_path_exists testpath/"hello.zip"
 
     system "unzipper/unzipper", "hello.zip"
-    assert_predicate testpath/"world", :exist?
+    assert_path_exists testpath/"world"
 
     system "tarlocalfiles/tarlocalfiles", "world"
-    assert_predicate testpath/"myFiles.tar.gz", :exist?
+    assert_path_exists testpath/"myFiles.tar.gz"
   end
 end

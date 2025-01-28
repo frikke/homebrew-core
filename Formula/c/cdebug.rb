@@ -1,19 +1,20 @@
 class Cdebug < Formula
   desc "Swiss army knife of container debugging"
   homepage "https://github.com/iximiuz/cdebug"
-  url "https://github.com/iximiuz/cdebug/archive/refs/tags/v0.0.14.tar.gz"
-  sha256 "6133fb7286fba476674b54e2f008c35a4b28f209e3072c3e0a75c69c5deeee81"
+  url "https://github.com/iximiuz/cdebug/archive/refs/tags/v0.0.18.tar.gz"
+  sha256 "c28d6c079177aa8de850e2edcbd284ac08cd3f9d77aac851928e1cc85a77fbcb"
   license "Apache-2.0"
   head "https://github.com/iximiuz/cdebug.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d0356a3e1ee8c7ce5de59c4f24b2a7b17d9126a5284f9677d7fd91c82b4d07e3"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d0356a3e1ee8c7ce5de59c4f24b2a7b17d9126a5284f9677d7fd91c82b4d07e3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d0356a3e1ee8c7ce5de59c4f24b2a7b17d9126a5284f9677d7fd91c82b4d07e3"
-    sha256 cellar: :any_skip_relocation, ventura:        "dea3380567fbf906b88881ae2524d57c71dd712266fa282aab6bbc50bdc96174"
-    sha256 cellar: :any_skip_relocation, monterey:       "8080dc9eacd768e9d5b5a1503b1a1443b2559f5b5ee1cba9a8124c4756f75b40"
-    sha256 cellar: :any_skip_relocation, big_sur:        "535e557d4bf258b532bc57f1e6fd88bdcddc3328050110142c2668a6bcc157eb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b7a853028bc69423f191b40acbe2d59eca2d7d793139fa46dea447ae38962762"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "3cea617c367a9f6d5e3266264ce47fac44590794eb7a61b877f29077056acce5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "7a99dd51424bd5ab2caf6c9cd72ccf714cc47a4de4074011d74f0d037602d8cf"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9905753cb70ea35ccc41d3b699b61d4d2c1048de56f0d0c2e73aaba4a678dd06"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f0825f6e7d64ec4f997804b7df677dfed0614cbdf63e8894629956dbf7e07131"
+    sha256 cellar: :any_skip_relocation, sonoma:         "d8bbecf15e4a887884194ce9d3de0e054c2967cd6b3f6b6604ca7d2979b416f0"
+    sha256 cellar: :any_skip_relocation, ventura:        "44591eccd5959f57814791f5f28b62ab873ecb32bc8cf95ecbe1acf1dfec2374"
+    sha256 cellar: :any_skip_relocation, monterey:       "162efaee908ca5548c0b1cd599171b845a19283be9d7daa8c299c4d81d306ca9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0fb21211a688f48562c5aeb2aa0e58922af7e31ab33486722d2bb58514b64c17"
   end
 
   depends_on "go" => :build
@@ -25,7 +26,7 @@ class Cdebug < Formula
       -X main.version=#{version}
       -X main.date=#{time.iso8601}
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
 
     generate_completions_from_executable(bin/"cdebug", "completion")
   end

@@ -1,9 +1,9 @@
 class ApacheDrill < Formula
   desc "Schema-free SQL Query Engine for Hadoop, NoSQL and Cloud Storage"
   homepage "https://drill.apache.org"
-  url "https://www.apache.org/dyn/closer.lua?path=drill/1.21.1/apache-drill-1.21.1.tar.gz"
-  mirror "https://dlcdn.apache.org/drill/1.21.1/apache-drill-1.21.1.tar.gz"
-  sha256 "eac62c0a9bb1047008fcbffff3ed26c3365b4747eb95b6aa7c7aaa544067fbf9"
+  url "https://www.apache.org/dyn/closer.lua?path=drill/1.21.2/apache-drill-1.21.2.tar.gz"
+  mirror "https://dlcdn.apache.org/drill/1.21.2/apache-drill-1.21.2.tar.gz"
+  sha256 "77e2e7438f1b4605409828eaa86690f1e84b038465778a04585bd8fb21d68e3b"
   license "Apache-2.0"
 
   livecheck do
@@ -12,17 +12,18 @@ class ApacheDrill < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "658a78091b62b685d9456503bee644376838dd67d316aa4dab4fce22b5aec117"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "9645d66cd920bf65041bac079231869addd9e6217450bb6694af1067e06dc723"
   end
 
   depends_on "openjdk@11"
 
   def install
-    rm_f Dir["bin/*.bat"]
+    rm(Dir["bin/*.bat"])
     libexec.install Dir["*"]
     bin.install Dir["#{libexec}/bin/*"]
     bin.env_script_all_files(libexec/"bin", Language::Java.java_home_env("11"))
-    rm_f Dir["#{bin}/*.txt"]
+    rm(Dir["#{bin}/*.txt"])
   end
 
   test do

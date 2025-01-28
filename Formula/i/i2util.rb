@@ -1,44 +1,47 @@
 class I2util < Formula
   desc "Internet2 utility tools"
-  homepage "https://software.internet2.edu/"
-  url "https://software.internet2.edu/sources/I2util/I2util-1.2.tar.gz"
-  sha256 "3b704cdb88e83f7123f3cec0fe3283b0681cc9f80c426c3f761a0eefd1d72c59"
-  revision 1
+  homepage "https://github.com/perfsonar/i2util"
+  url "https://github.com/perfsonar/i2util/archive/refs/tags/v5.1.4.tar.gz"
+  sha256 "912ff463abd70d54eb5307a90afcc33f8fc99ab77280af4f92c54e3aea6c6d50"
+  license "Apache-2.0"
 
   livecheck do
-    # HTTP allows directory listing while HTTPS returns 403
-    url "http://software.internet2.edu/sources/I2util/"
-    regex(/href=.*?I2util[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "17d5e12958f6a8bbb119feb21e88c381862116578af66f4b6b8e6bb6f7ce256f"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b81238983a3407032564f7a7242a8ed42b62ac4193a07d6c62a03e2afdfd6445"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "df33b627a3f7c69eb99d4ebb107a8ffabe49a16341ec845de5de3de7c868806b"
-    sha256 cellar: :any_skip_relocation, ventura:        "2f474b97d35ce2c1eb1814278a4c39f8bc7d9ed32f5e27942646ff5ac486bc7c"
-    sha256 cellar: :any_skip_relocation, monterey:       "d5a60fa5cf61312c0a4b9f9307b94d09cbbe87addad19e9214ac3c2a5bd867f4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9f721b6a003be8ebc978c69619126625075dfdc013eaadc4ffc67192bd62a1a7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "07f9267aa3c7fc30361824939ba10a259cdeb1ea62485cc0410955b5b08ec3e7"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6cc0c4bc1018bff30946b704981b5f4121919962ede12492366c3717777cf6bc"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c5d1c9bdbf91900b34bada6e9156d78591d320a8eaed4919032d5978a2ec7121"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b24f1cef4b07175a76cef6b7fe947f0d79c28da9190f1e1178774f2e0a1e0972"
+    sha256 cellar: :any_skip_relocation, sonoma:        "befe3806ff0f7dfc7b16ad24d053b6d413f9b8707308a785ac5389a72bc138dd"
+    sha256 cellar: :any_skip_relocation, ventura:       "6eb5a9b77aa09934bab46691646a8b9ece5052463808e090475ba5acd4b2af0d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8e6aa9300019b1866dcf826c8c62d5dbcfe47ac41b318db7c32d45af4038c2cb"
   end
 
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--mandir=#{man}"
-    system "make", "install"
+    cd "I2util/I2util" do
+      system "./bootstrap"
+      system "./configure", "--disable-silent-rules", *std_configure_args
+      system "make", "install"
+    end
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <I2util/util.h>
       #include <string.h>
+
       int main() {
         uint8_t buf[2];
         if (!I2HexDecode("beef", buf, sizeof(buf))) return 1;
         if (buf[0] != 190 || buf[1] != 239) return 1;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lI2util", "-o", "test"
     system "./test"
   end

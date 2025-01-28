@@ -1,12 +1,13 @@
 class Woff2 < Formula
   desc "Utilities to create and convert Web Open Font File (WOFF) files"
   homepage "https://github.com/google/woff2"
-  url "https://github.com/google/woff2/archive/v1.0.2.tar.gz"
+  url "https://github.com/google/woff2/archive/refs/tags/v1.0.2.tar.gz"
   sha256 "add272bb09e6384a4833ffca4896350fdb16e0ca22df68c0384773c67a175594"
   license "MIT"
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "f451e27be673ee74d5cdbbb50fa6d818ac48b0800f9daf0c27bb5995c27f8b9b"
     sha256 cellar: :any,                 arm64_sonoma:   "d410b566576b56a9659f6318591722b2c000d788be86e4c65cd28631ecd485a0"
     sha256 cellar: :any,                 arm64_ventura:  "fb62fd8c1f19bf0eabbc4e82ea9db15cb8fd74b158bc137a6e4da08a95c57759"
     sha256 cellar: :any,                 arm64_monterey: "1108c65b488acc65da207d66d8cb1c6964f4bcc23cfd29de4563d783a174d639"
@@ -26,39 +27,40 @@ class Woff2 < Formula
   depends_on "cmake" => :build
   depends_on "brotli"
 
-  resource "roboto_1" do
-    url "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxP.ttf"
-    sha256 "466989fd178ca6ed13641893b7003e5d6ec36e42c2a816dee71f87b775ea097f"
-  end
-
-  resource "roboto_2" do
-    url "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2"
-    sha256 "90a0ad0b48861588a6e33a5905b17e1219ea87ab6f07ccc41e7c2cddf38967a8"
-  end
-
   def install
-    args = std_cmake_args + %W[
+    args = %W[
       -DCMAKE_INSTALL_NAME_DIR=#{opt_lib}
       -DCMAKE_BUILD_WITH_INSTALL_NAME_DIR=ON
     ]
 
-    system "cmake", ".", *args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
-    # make install does not install binaries
-    bin.install "woff2_info", "woff2_decompress", "woff2_compress"
+    # Manually install binaries not handled by `make install`
+    bin.install "build/woff2_info", "build/woff2_decompress", "build/woff2_compress"
   end
 
   test do
+    resource "homebrew-roboto_1" do
+      url "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxP.ttf"
+      sha256 "466989fd178ca6ed13641893b7003e5d6ec36e42c2a816dee71f87b775ea097f"
+    end
+
+    resource "homebrew-roboto_2" do
+      url "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2"
+      sha256 "90a0ad0b48861588a6e33a5905b17e1219ea87ab6f07ccc41e7c2cddf38967a8"
+    end
+
     # Convert a TTF to WOFF2
-    resource("roboto_1").stage testpath
-    system "#{bin}/woff2_compress", "KFOmCnqEu92Fr1Mu4mxP.ttf"
+    resource("homebrew-roboto_1").stage testpath
+    system bin/"woff2_compress", "KFOmCnqEu92Fr1Mu4mxP.ttf"
     output = shell_output("#{bin}/woff2_info KFOmCnqEu92Fr1Mu4mxP.woff2")
     assert_match "WOFF2Header", output
 
     # Convert a WOFF2 to TTF
-    resource("roboto_2").stage testpath
-    system "#{bin}/woff2_decompress", "KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2"
+    resource("homebrew-roboto_2").stage testpath
+    system bin/"woff2_decompress", "KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2"
     output = shell_output("file --brief KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.ttf")
     assert_match(/TrueType font data/i, output)
   end

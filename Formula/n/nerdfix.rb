@@ -1,27 +1,31 @@
 class Nerdfix < Formula
   desc "Find/fix obsolete Nerd Font icons"
   homepage "https://github.com/loichyan/nerdfix"
-  url "https://github.com/loichyan/nerdfix/archive/refs/tags/v0.3.1.tar.gz"
-  sha256 "c1e4264db7de66666c5ddd73b90d7aa32fe5e7afd8a2eb8fe781288e84f93f27"
+  url "https://github.com/loichyan/nerdfix/archive/refs/tags/v0.4.2.tar.gz"
+  sha256 "e56f648db6bfa9a08d4b2adbf3862362ff66010f32c80dc076c0c674b36efd3c"
   license any_of: ["MIT", "Apache-2.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "bb5c87ddeac8dc0f6f3e8af968db9b2063b2d74ec77df0f415b67c2c27898da3"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "adddcea0e3438970fe8966db87e6645e8c5ad637b232eb511653de0800f13d34"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9817e8b6e248e9db23bd10db514522f09b28adc285c7ab3c72f0e4028bec912b"
-    sha256 cellar: :any_skip_relocation, ventura:        "8e4377979365a134dbfe6ceb713986fb920c44ac101a8733a43b74bc6b597688"
-    sha256 cellar: :any_skip_relocation, monterey:       "6af6516e2d93ccafae14ea25399d491ee2bb972a66d17370337f57781da8aa7b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8e97877cb970fac207f9389544f52977ac28cb526b911bb4ba76d6655b6e65a0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a491cd9e012e1075c7f034cb53fd6c8c22c4d9f5baa8e4416b72b0e12b579099"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5acc95bc0c1314b40e2fb0555b97724538609e457d5574e1a5dcf61ac97942de"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "248d5d912540c309ba86f239eca1016f5cac27823a9e258f07be6aef79a39ce5"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "746859b3faa37328b50b548711830edec81ecf0d1a874a7902cc2161bc961438"
+    sha256 cellar: :any_skip_relocation, sonoma:        "0e2875debaaa6b165db6d0a3fbb92a9593ac4eca542dea253da61f99c1581051"
+    sha256 cellar: :any_skip_relocation, ventura:       "cc197b42aa7b59787c5a1cda9471bcc7ed1ec01557bc36500acb46ee3170fca8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c92886e7e4886f45c9d8f21a31389aff08e62bdf5b5bfda780b4e174c64f3656"
   end
 
   depends_on "rust" => :build
 
   def install
     system "cargo", "install", *std_cargo_args
+
+    generate_completions_from_executable(bin/"nerdfix", "completions")
   end
 
   test do
+    assert_match version.to_s, shell_output("#{bin}/nerdfix --version")
+
     touch "test.txt"
     system bin/"nerdfix", "check", "test.txt"
   end

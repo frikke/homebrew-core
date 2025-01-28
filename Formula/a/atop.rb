@@ -1,27 +1,25 @@
 class Atop < Formula
   desc "Advanced system and process monitor for Linux using process events"
   homepage "https://www.atoptool.nl"
-  url "https://github.com/Atoptool/atop/archive/refs/tags/v2.9.0.tar.gz"
-  sha256 "31246dad746330c11bdce2857f1d1fa316adeea6a54ee9eb7d8540d3122a9293"
+  url "https://github.com/Atoptool/atop/archive/refs/tags/v2.11.0.tar.gz"
+  sha256 "f61d01fcae4fd5e2644ed4e210a0cbcfc9bf85cef32b00e342417e3923eda49c"
   license "GPL-2.0-or-later"
   head "https://github.com/Atoptool/atop.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "45195d16c2b7ac329ad9cd6a78564a91f0533224d3239d6f8f79444b570b19b1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "724dc68495d244ecc250ab08de07a9e5b746a59fe5dd22a75c98a9544b589557"
   end
 
+  depends_on "pkgconf" => :build
+  depends_on "glib"
   depends_on :linux
   depends_on "linux-headers@5.15"
   depends_on "ncurses"
   depends_on "zlib"
 
   def install
-    if build.head?
-      inreplace "version.h" do |s|
-        s.sub!(/"$/, "-#{Utils.git_short_head}\"")
-      end
-    end
-    # As this project does not use configrue, we have to configure manually:
+    inreplace "version.h", /"$/, "-#{Utils.git_short_head}\"", global: false if build.head?
+    # As this project does not use configure, we have to configure manually:
     ENV["BINPATH"] = bin.to_s
     ENV["SBINPATH"] = bin.to_s
     ENV["MAN1PATH"] = man1.to_s
@@ -37,8 +35,8 @@ class Atop < Formula
 
   test do
     assert_match "Version:", shell_output("#{bin}/atop -V")
-    system "#{bin}/atop", "1", "1"
-    system "#{bin}/atop", "-w", "atop.raw", "1", "1"
-    system "#{bin}/atop", "-r", "atop.raw", "-PCPU,DSK"
+    system bin/"atop", "1", "1"
+    system bin/"atop", "-w", "atop.raw", "1", "1"
+    system bin/"atop", "-r", "atop.raw", "-PCPU,DSK"
   end
 end

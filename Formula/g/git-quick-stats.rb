@@ -1,12 +1,16 @@
 class GitQuickStats < Formula
   desc "Simple and efficient way to access statistics in git"
   homepage "https://github.com/arzzen/git-quick-stats"
-  url "https://github.com/arzzen/git-quick-stats/archive/2.5.0.tar.gz"
-  sha256 "e6cc4b2a2c981a6f3a19801340217b20b16e137bec264d1c89399612b2a9e58e"
+  url "https://github.com/arzzen/git-quick-stats/archive/refs/tags/2.5.8.tar.gz"
+  sha256 "75a171042472a0415324c9e903e80be24c2ec32d366a3e1f67ca838a33ecad8f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "f41004b9d0cf2df23a3e08d65070745502bb6df33b0f8907412abbe042b7f534"
+    sha256 cellar: :any_skip_relocation, all: "de09916b90af58cd011cf6faa7be119d581f0ea26a8dd16f66e94fe865aa8298"
+  end
+
+  on_macos do
+    depends_on "coreutils"
   end
 
   on_linux do
@@ -19,7 +23,9 @@ class GitQuickStats < Formula
   end
 
   test do
-    system "git", "init"
+    ENV.prepend_path "PATH", Formula["coreutils"].libexec/"gnubin" if OS.mac?
+
+    system "git", "init", "--initial-branch=master"
     assert_match "All branches (sorted by most recent commit)",
       shell_output("#{bin}/git-quick-stats --branches-by-date")
     assert_match(/^Invalid argument/, shell_output("#{bin}/git-quick-stats command", 1))

@@ -1,9 +1,10 @@
 class Qca < Formula
   desc "Qt Cryptographic Architecture (QCA)"
   homepage "https://userbase.kde.org/QCA"
-  url "https://download.kde.org/stable/qca/2.3.7/qca-2.3.7.tar.xz"
-  sha256 "fee2343b54687d5be3e30fb33ce296ee50ac7ae5e23d7ab725f63ffdf7af3f43"
+  url "https://download.kde.org/stable/qca/2.3.9/qca-2.3.9.tar.xz"
+  sha256 "c555d5298cdd7b6bafe2b1f96106f30cfa543a23d459d50c8a91eac33c476e4e"
   license "LGPL-2.1-or-later"
+  revision 2
   head "https://invent.kde.org/libraries/qca.git", branch: "master"
 
   livecheck do
@@ -12,35 +13,52 @@ class Qca < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "f7c386d6484854c37b199fbd2229bf09d7c0feb4292dba7f31be570ea7a17c6e"
-    sha256 cellar: :any,                 arm64_monterey: "a2c25cf1264e6bb33b1aaf8ec8525c58df60f0c003906469f77eda3c56e73518"
-    sha256 cellar: :any,                 arm64_big_sur:  "c7ff822233c00931c5da4c22689269edcc5244fa7bc1ade0d213be11266c10a8"
-    sha256 cellar: :any,                 ventura:        "1894df58bbbef4986d47d50edb3c49d189d9c1c0748b5cb80589e095222b2f26"
-    sha256 cellar: :any,                 monterey:       "dae78d2860c8d11a268ae4f9ebcc62d1fcf7501d5ace5e3a93294539188860bc"
-    sha256 cellar: :any,                 big_sur:        "2e63ba841df444e96470611e7adc7b8e4a88e23a735042780731fddeb5f78762"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cfdcd1c448ce4881ace28b56b9415a229cc597a73e778acabb7f4af061d95939"
+    sha256 cellar: :any,                 arm64_sonoma:  "59858882e2cb72f9c2134af4bd1120da6c4e52dc3189fb53e0425e4a64694036"
+    sha256 cellar: :any,                 arm64_ventura: "bb43e2e10d05e9016d497ed15b75be922e544a22a4a90e55ab690317482903ae"
+    sha256 cellar: :any,                 sonoma:        "9b63a708de5354bc493369a0bbfcbf5f169bd33dea43b069196928779b587fbb"
+    sha256 cellar: :any,                 ventura:       "b92299e9d40cc1b9f8a8f524cbbd505c04fa47139a9fcec7420b05b2d788197c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b1bcb2162440491124f87314b0f06276a51fbbdc4fcc5efc0096409e258c2dfc"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "botan"
+  depends_on "ca-certificates"
   depends_on "gnupg"
   depends_on "libgcrypt"
   depends_on "nss"
   depends_on "openssl@3"
   depends_on "pkcs11-helper"
-  depends_on "qt@5"
+  depends_on "qt"
 
-  fails_with gcc: "5"
+  uses_from_macos "cyrus-sasl"
+
+  on_macos do
+    depends_on "llvm" if DevelopmentTools.clang_build_version <= 1400
+    depends_on "nspr"
+  end
+
+  fails_with :clang do
+    build 1400
+    cause "Requires C++20"
+  end
 
   def install
-    # Make sure we link with OpenSSL 3 and not OpenSSL 1.1.
-    openssl11 = Formula["openssl@1.1"]
-    ENV.remove "CMAKE_PREFIX_PATH", openssl11.opt_prefix
-    ENV.remove ["CMAKE_INCLUDE_PATH", "HOMEBREW_INCLUDE_PATHS"], openssl11.opt_include
-    ENV.remove ["CMAKE_LIBRARY_PATH", "HOMEBREW_LIBRARY_PATHS"], openssl11.opt_lib
+    if OS.mac? && DevelopmentTools.clang_build_version <= 1400
+      ENV.llvm_clang
+      ENV.append "LDFLAGS", "-L#{Formula["llvm"].opt_lib}/c++ -L#{Formula["llvm"].opt_lib} -lunwind"
+    end
 
-    args = %W[-DBUILD_TESTS=OFF -DQCA_PLUGINS_INSTALL_DIR=#{lib}/qt5/plugins]
+    ENV["QC_CERTSTORE_PATH"] = Formula["ca-certificates"].pkgetc/"cert.pem"
+
+    # FIXME: QCA_PLUGINS_INSTALL_DIR should match qt's directory "{share}/qt/plugins";
+    # however, building with that directory results in segmentation faults inside
+    # PluginInstance destructor at `delete _instance`.
+    args = %W[
+      -DBUILD_TESTS=OFF
+      -DBUILD_WITH_QT6=ON
+      -DQCA_PLUGINS_INSTALL_DIR=#{lib}/qt/plugins
+    ]
 
     # Disable some plugins. qca-ossl, qca-cyrus-sasl, qca-logger,
     # qca-softstore are always built.
@@ -59,7 +77,7 @@ class Qca < Formula
   end
 
   test do
-    system bin/"qcatool-qt5", "--noprompt", "--newpass=",
+    system bin/"qcatool-qt6", "--noprompt", "--newpass=",
                               "key", "make", "rsa", "2048", "test.key"
   end
 end

@@ -1,7 +1,7 @@
 class PipesSh < Formula
   desc "Animated pipes terminal screensaver"
   homepage "https://github.com/pipeseroni/pipes.sh"
-  url "https://github.com/pipeseroni/pipes.sh/archive/v1.3.0.tar.gz"
+  url "https://github.com/pipeseroni/pipes.sh/archive/refs/tags/v1.3.0.tar.gz"
   sha256 "532976dd8dc2d98330c45a8bcb6d7dc19e0b0e30bba8872dcce352361655a426"
   license "MIT"
   head "https://github.com/pipeseroni/pipes.sh.git", branch: "master"
@@ -12,8 +12,8 @@ class PipesSh < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "da14dd754188372ac28504c4bf326749df47323c5179e96912ec1e0dd9fa6ad1"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "339995e9ef29b4952bf61b4fe406d71c4c6ad5fc96e3e8f291d98150c6789cb8"
   end
 
   depends_on "bash"

@@ -1,9 +1,9 @@
 class Maven < Formula
   desc "Java-based project management"
   homepage "https://maven.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz"
-  mirror "https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz"
-  sha256 "ff66b70c830a38d331d44f6c25a37b582471def9a161c93902bac7bea3098319"
+  url "https://www.apache.org/dyn/closer.lua?path=maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz"
+  mirror "https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz"
+  sha256 "7a9cdf674fc1703d6382f5f330b3d110ea1b512b51f1652846d9e4e8a588d766"
   license "Apache-2.0"
 
   livecheck do
@@ -12,15 +12,14 @@ class Maven < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "e8085eef66d6f9f1a0fbba4d9aecce516e325667a2b20ab9f089bc6d48c1ba6e"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e8085eef66d6f9f1a0fbba4d9aecce516e325667a2b20ab9f089bc6d48c1ba6e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e8085eef66d6f9f1a0fbba4d9aecce516e325667a2b20ab9f089bc6d48c1ba6e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e8085eef66d6f9f1a0fbba4d9aecce516e325667a2b20ab9f089bc6d48c1ba6e"
-    sha256 cellar: :any_skip_relocation, sonoma:         "1c701e66dc691c7820d6bdcb3465a9713718148c8ffe918af7b5862fd0936d29"
-    sha256 cellar: :any_skip_relocation, ventura:        "1c701e66dc691c7820d6bdcb3465a9713718148c8ffe918af7b5862fd0936d29"
-    sha256 cellar: :any_skip_relocation, monterey:       "1c701e66dc691c7820d6bdcb3465a9713718148c8ffe918af7b5862fd0936d29"
-    sha256 cellar: :any_skip_relocation, big_sur:        "1c701e66dc691c7820d6bdcb3465a9713718148c8ffe918af7b5862fd0936d29"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f361e63a4c77bfce5e6d36a2831cc6c3f5897f6a289aa2f9e9e02a286156b125"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "106bdaaec0342b1656442dd5d1521b3edf69df22576726110bf1d56af0d4bfef"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "106bdaaec0342b1656442dd5d1521b3edf69df22576726110bf1d56af0d4bfef"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "106bdaaec0342b1656442dd5d1521b3edf69df22576726110bf1d56af0d4bfef"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "106bdaaec0342b1656442dd5d1521b3edf69df22576726110bf1d56af0d4bfef"
+    sha256 cellar: :any_skip_relocation, sonoma:         "019b91415dce288368bd462ebbfa009a262f7d9a4eb05f1bf64a4d09c4f65d91"
+    sha256 cellar: :any_skip_relocation, ventura:        "019b91415dce288368bd462ebbfa009a262f7d9a4eb05f1bf64a4d09c4f65d91"
+    sha256 cellar: :any_skip_relocation, monterey:       "019b91415dce288368bd462ebbfa009a262f7d9a4eb05f1bf64a4d09c4f65d91"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "106bdaaec0342b1656442dd5d1521b3edf69df22576726110bf1d56af0d4bfef"
   end
 
   depends_on "openjdk"
@@ -29,7 +28,7 @@ class Maven < Formula
 
   def install
     # Remove windows files
-    rm_f Dir["bin/*.cmd"]
+    rm(Dir["bin/*.cmd"])
 
     # Fix the permissions on the global settings file.
     chmod 0644, "conf/settings.xml"
@@ -49,7 +48,7 @@ class Maven < Formula
   end
 
   test do
-    (testpath/"pom.xml").write <<~EOS
+    (testpath/"pom.xml").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -63,15 +62,17 @@ class Maven < Formula
           <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         </properties>
       </project>
-    EOS
-    (testpath/"src/main/java/org/homebrew/MavenTest.java").write <<~EOS
+    XML
+
+    (testpath/"src/main/java/org/homebrew/MavenTest.java").write <<~JAVA
       package org.homebrew;
       public class MavenTest {
         public static void main(String[] args) {
           System.out.println("Testing Maven with Homebrew!");
         }
       }
-    EOS
-    system "#{bin}/mvn", "compile", "-Duser.home=#{testpath}"
+    JAVA
+
+    system bin/"mvn", "compile", "-Duser.home=#{testpath}"
   end
 end

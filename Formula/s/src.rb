@@ -1,8 +1,8 @@
 class Src < Formula
   desc "Simple revision control: RCS reloaded with a modern UI"
   homepage "http://www.catb.org/~esr/src/"
-  url "http://www.catb.org/~esr/src/src-1.32.tar.gz"
-  sha256 "0920350a63ef5ee3a5f4fcd7f7bfeca0646ad871c1718b80e4f7a939531a3165"
+  url "http://www.catb.org/~esr/src/src-1.41.tar.gz"
+  sha256 "5dc9302b161582149dbc191a0eeee43142b96386a542c870d56ac9fddb995d25"
   license "BSD-2-Clause"
 
   livecheck do
@@ -11,7 +11,7 @@ class Src < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5cbfa8adeb53bfa81b0e81f53cf8f0f10231bc80ba9ffc80ad94432fe4c814fd"
+    sha256 cellar: :any_skip_relocation, all: "56096c026d4c1de4b67f49b8cff61aa96ba2e29265b548b2f31561624b363c22"
   end
 
   head do
@@ -19,8 +19,9 @@ class Src < Formula
     depends_on "asciidoc" => :build
   end
 
-  depends_on "python@3.11"
   depends_on "rcs"
+
+  uses_from_macos "python", since: :catalina
 
   def install
     ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog" if build.head?

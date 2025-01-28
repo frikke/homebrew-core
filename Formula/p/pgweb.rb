@@ -1,18 +1,17 @@
 class Pgweb < Formula
   desc "Web-based PostgreSQL database browser"
   homepage "https://sosedoff.github.io/pgweb/"
-  url "https://github.com/sosedoff/pgweb/archive/v0.14.1.tar.gz"
-  sha256 "e6636ff079c8b01ac2add78c7a05f86d61550a5213155065c892015e6217be01"
+  url "https://github.com/sosedoff/pgweb/archive/refs/tags/v0.16.2.tar.gz"
+  sha256 "4120b03ee5047d8ea5bc9fd05629fb60bbdf5eca6a0e8b157fa4322ed54844ec"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "73093fce59a7f8815216c7ee4305e8de347cd3fb954da693c9e7756e6370e210"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "73093fce59a7f8815216c7ee4305e8de347cd3fb954da693c9e7756e6370e210"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "73093fce59a7f8815216c7ee4305e8de347cd3fb954da693c9e7756e6370e210"
-    sha256 cellar: :any_skip_relocation, ventura:        "959a11dfa202fd1ef99fde030aec2d86e54db11a1f5f871c9a2e65965af604aa"
-    sha256 cellar: :any_skip_relocation, monterey:       "959a11dfa202fd1ef99fde030aec2d86e54db11a1f5f871c9a2e65965af604aa"
-    sha256 cellar: :any_skip_relocation, big_sur:        "959a11dfa202fd1ef99fde030aec2d86e54db11a1f5f871c9a2e65965af604aa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "198b8cd7f8cd609dc113eff8e92f09bd78c3b555095f4a17f27c0496b60aee3a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "797a6578aded844b296169c74045b4735a435451bee8a6dd9bbc27b6a7955fc5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "797a6578aded844b296169c74045b4735a435451bee8a6dd9bbc27b6a7955fc5"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "797a6578aded844b296169c74045b4735a435451bee8a6dd9bbc27b6a7955fc5"
+    sha256 cellar: :any_skip_relocation, sonoma:        "619152d700dfe8d083c8575d8f26dc2b026380d0c2ea8f0b8719cac147e31c08"
+    sha256 cellar: :any_skip_relocation, ventura:       "619152d700dfe8d083c8575d8f26dc2b026380d0c2ea8f0b8719cac147e31c08"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0c65033295bd08ffa0c3cc4d6a30b17ae7b62b957582ef0ae9689b9c5ddae332"
   end
 
   depends_on "go" => :build
@@ -24,7 +23,7 @@ class Pgweb < Formula
       -X github.com/sosedoff/pgweb/pkg/command.GoVersion=#{Formula["go"].version}
     ].join(" ")
 
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
   end
 
   test do

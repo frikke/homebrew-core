@@ -23,7 +23,7 @@ class GoAT117 < Formula
 
   # EOL with Go 1.19 release (2022-08-02)
   # Ref: https://go.dev/doc/devel/release#policy
-  deprecate! date: "2023-02-14", because: :unsupported
+  disable! date: "2024-02-12", because: :unsupported
 
   depends_on "go" => :build
 
@@ -35,7 +35,7 @@ class GoAT117 < Formula
       system "./make.bash", "--no-clean"
     end
 
-    (buildpath/"pkg/obj").rmtree
+    rm_r(buildpath/"pkg/obj")
     libexec.install Dir["*"]
     bin.install_symlink Dir[libexec/"bin/go*"]
 
@@ -43,13 +43,13 @@ class GoAT117 < Formula
 
     # Remove useless files.
     # Breaks patchelf because folder contains weird debug/test files
-    (libexec/"src/debug/elf/testdata").rmtree
+    rm_r(libexec/"src/debug/elf/testdata")
     # Binaries built for an incompatible architecture
-    (libexec/"src/runtime/pprof/testdata").rmtree
+    rm_r(libexec/"src/runtime/pprof/testdata")
   end
 
   test do
-    (testpath/"hello.go").write <<~EOS
+    (testpath/"hello.go").write <<~GO
       package main
 
       import "fmt"
@@ -57,7 +57,7 @@ class GoAT117 < Formula
       func main() {
         fmt.Println("Hello World")
       }
-    EOS
+    GO
     # Run go fmt check for no errors then run the program.
     # This is a a bare minimum of go working as it uses fmt, build, and run.
     system bin/"go", "fmt", "hello.go"

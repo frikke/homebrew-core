@@ -13,6 +13,7 @@ class Unzip < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "a5bd1f2a27a5353a3ce249bdd414b0976a91129be2afd8fe3c0a796b316f4ed2"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "09f467768e0ed9226eebc40f40fd5628c7f9cfa5f314b483751bbf0bf4d05bab"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "9f7f6a03fa3ada4a305f5c9b4016b4e8bbe11d66f559273849d8cacd26524e26"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "1df3fd1e9b3f5fd816f793355797818113e43378c81e6a0a6a8d1b3e52c0dd36"
@@ -31,10 +32,10 @@ class Unzip < Formula
   uses_from_macos "bzip2"
 
   # Upstream is unmaintained so we use the Ubuntu patchset:
-  # https://packages.ubuntu.com/kinetic/unzip
+  # https://packages.ubuntu.com/noble/unzip
   patch do
-    url "http://archive.ubuntu.com/ubuntu/pool/main/u/unzip/unzip_6.0-27ubuntu1.debian.tar.xz"
-    sha256 "9249780437220a5dc81518f2e4c5213b502bf56899c03992572cf9bb5caf724e"
+    url "http://archive.ubuntu.com/ubuntu/pool/main/u/unzip/unzip_6.0-28ubuntu4.1.debian.tar.xz"
+    sha256 "d123c8e6972dbdd17ba1a4920fb57ed2ede9237dbae149dcbf55df829c77baf3"
     apply %w[
       patches/01-manpages-in-section-1-not-in-section-1l.patch
       patches/02-this-is-debian-unzip.patch

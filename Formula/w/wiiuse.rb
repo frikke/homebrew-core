@@ -1,38 +1,42 @@
 class Wiiuse < Formula
   desc "Connect Nintendo Wii Remotes"
   homepage "https://github.com/wiiuse/wiiuse"
-  url "https://github.com/wiiuse/wiiuse/archive/0.15.5.tar.gz"
-  sha256 "d22b66eb13b92513c7736cc5e867fed40b25a0e398a70aa059711fc4f4769363"
-  license "GPL-3.0"
+  url "https://github.com/wiiuse/wiiuse/archive/refs/tags/0.15.6.tar.gz"
+  sha256 "a3babe5eb284606090af706b356f1a0476123598f680094b1799670ec1780a44"
+  license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "b461bed6e6dd3ff0d1cca716383ec8355ce802c29a15eb1a063f7592780f519a"
-    sha256 cellar: :any, arm64_monterey: "ea877bb14b706754856ae4b7a2192bc15c3ff8036ad4953d626dbcbe67a763fb"
-    sha256 cellar: :any, arm64_big_sur:  "10407776ee12bc410143a63ced0de46badb10b4f9bb4af8fdadeb2501bac8f38"
-    sha256 cellar: :any, ventura:        "e401fed16b71c5bee6b5a4b29a469cc4d2b68c8707b8f7d16d13e1846b804eb4"
-    sha256 cellar: :any, monterey:       "1b80ae72844ad7197be6cb903f8a001c88a02d9e235cc6f77c293acf6bd4c78c"
-    sha256 cellar: :any, big_sur:        "3bba847f421a4b946c07adc4dbbf0862e46e6fdf9c8e779e07fa6afd1364394a"
-    sha256 cellar: :any, catalina:       "0a7689f0a9a9ad3fcfe44b35b3467f48c6065345ef8396c178fe0c3fcc22c7ff"
-    sha256 cellar: :any, mojave:         "2cd562e7ccdfa82c47a464b4a501925398ce8381e3489db0d7e773e8e2040002"
-    sha256 cellar: :any, high_sierra:    "40f7508add9a2974c76bd91d9e8fbe62bd2500ae4433de06af5711d340297b96"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "d195756409e861db5fe17343c412d3ba38f06723e59854596fc22f44df843ddd"
+    sha256 cellar: :any,                 arm64_sonoma:   "064957c4b98791d37e374c115eda18ab973c3fb28121e2c21948249b28101def"
+    sha256 cellar: :any,                 arm64_ventura:  "d28f310e6c24c3e2edc8f21831ccedf4a0db4b3460a0efb62ad0824edce82dc0"
+    sha256 cellar: :any,                 arm64_monterey: "0f4fb0dc5bb825e093e2122ec79b3bfcc581977139084a76342fd84313e945f6"
+    sha256 cellar: :any,                 sonoma:         "e8690ae4966a02202b43a7286d566b38ce4b0cc8f41e9be2741035514606f6fe"
+    sha256 cellar: :any,                 ventura:        "76a3830992fa1357910d51d27a55cb0d80380da12d66940260bb33c4580b816a"
+    sha256 cellar: :any,                 monterey:       "1456cece746747961b930550f319b1a2985d15afeadb4be526ae4d4b9260614a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6c4b00c264565984ad37ebc29999601cc7780303f7015ee7575c21d03e5ba7c5"
   end
 
   depends_on "cmake" => :build
 
+  on_linux do
+    depends_on "bluez"
+  end
+
   def install
-    args = std_cmake_args + %w[
+    args = %w[
       -DBUILD_EXAMPLE=NO
       -DBUILD_EXAMPLE_SDL=NO
+      -DBUILD_SHARED_LIBS=ON
     ]
 
-    mkdir "build" do
-      system "cmake", "..", *args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <wiiuse.h>
       int main()
       {
@@ -41,7 +45,7 @@ class Wiiuse < Formula
         wiiuse_cleanup(wiimotes, wiimoteCount);
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-I#{include}", "-L#{lib}", "-l", "wiiuse", "-o", "test"
     system "./test"
   end

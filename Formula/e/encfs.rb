@@ -1,22 +1,21 @@
 class Encfs < Formula
   desc "Encrypted pass-through FUSE file system"
   homepage "https://vgough.github.io/encfs/"
-  url "https://github.com/vgough/encfs/archive/v1.9.5.tar.gz"
+  url "https://github.com/vgough/encfs/archive/refs/tags/v1.9.5.tar.gz"
   sha256 "4709f05395ccbad6c0a5b40a4619d60aafe3473b1a79bafb3aa700b1f756fd63"
   # The code comprising the EncFS library (libencfs) is licensed under the LGPL.
   # The main programs (encfs, encfsctl, etc) are licensed under the GPL.
-  license "GPL-3.0"
-  revision 3
+  license "GPL-3.0-or-later"
+  revision 4
   head "https://github.com/vgough/encfs.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 x86_64_linux: "765ec364935df8b4e7d4845cd287d70cc2eaeb6ef7634c5109fe27f0dc0bb1fd"
+    sha256 x86_64_linux: "1952d5ef71cdd862776574b47add8ae4649b907c6ed734fac41b7357d13250f7"
   end
 
   depends_on "cmake" => :build
   depends_on "gettext" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libfuse@2"
   depends_on :linux # on macOS, requires closed-source macFUSE
   depends_on "openssl@3"

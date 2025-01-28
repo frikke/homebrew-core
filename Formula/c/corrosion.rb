@@ -1,18 +1,17 @@
 class Corrosion < Formula
   desc "Easy Rust and C/C++ Integration"
   homepage "https://github.com/corrosion-rs/corrosion"
-  url "https://github.com/corrosion-rs/corrosion/archive/refs/tags/v0.4.3.tar.gz"
-  sha256 "1eb125f3827fddbac39c3089c18cd8d8934c950e388f83a42062e3240b4db22a"
+  url "https://github.com/corrosion-rs/corrosion/archive/refs/tags/v0.5.1.tar.gz"
+  sha256 "843334a9f0f5efbc225dccfa88031fe0f2ec6fd787ca1e7d55ed27b2c25d9c97"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5eb09c8fb05eb7bd06367f09321fbcc6a890fcbad5f143c89d6bc4f14f9305cb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "417ae759df80e9540cccb8e514cd804d0906664a8f5541577002a57d838e2095"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "838548852ed891842a9daf3399a089bd0ea74d131b5fa8b50e3585f8ebd2649c"
-    sha256 cellar: :any_skip_relocation, ventura:        "beb00f864f7e2d2fcdccad8a7843dadb1b1ec8a1ad5d8e4113ed4bb8093d8637"
-    sha256 cellar: :any_skip_relocation, monterey:       "b8da677d20e1370e06dce1c1d889e08603e667b09dca0240e6f94e9112f5e703"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0228aed590edb0744d33c57fb6f67b0dc14bbcd267b089ad456d1b7256537afa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ac11ac4a60eac5abb51dd6b933afb8518bb2b94e42ab772205cce70016e52765"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "953a4fe57adefdd50058d23c8342bace9029f987dec620b09314fe55cd9a0f60"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "62bcf0fc2e252fbe3ecfba0fc9a32c9d5ab5e9cb9cc8dfbac44ba8492bca831c"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "0a8b7c8d6ab549cf312c74d9e8fe3433dbd830bace4630a64831600dc295c16e"
+    sha256 cellar: :any_skip_relocation, sonoma:        "5cd0014c092f56b48094b870e83bf0179cadb5b9a1ca21b2e7d2ae7cad8b43df"
+    sha256 cellar: :any_skip_relocation, ventura:       "65d4780e454a17d7e3d855ad2c3cb555ecb18a542a7bbe2e91a59190258c79f9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3056f8cce628c70aa0193c328fe8f7c52d3bd4c9519fd3c383cb494338c4e981"
   end
 
   depends_on "cmake" => [:build, :test]
@@ -28,8 +27,10 @@ class Corrosion < Formula
   test do
     cp_r pkgshare/"test/rust2cpp/rust2cpp/.", testpath
     inreplace "CMakeLists.txt", "include(../../test_header.cmake)", "find_package(Corrosion REQUIRED)"
-    system "cmake", "."
-    system "cmake", "--build", "."
-    assert_match "Hello, Cpp! I'm Rust!", shell_output("./cpp-exe")
+
+    system "cmake", "-S", ".", "-B", "build"
+    system "cmake", "--build", "build"
+
+    assert_match "Hello, Cpp! I'm Rust!", shell_output("./build/cpp-exe")
   end
 end

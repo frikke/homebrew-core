@@ -1,22 +1,19 @@
 class Zookeeper < Formula
   desc "Centralized server for distributed coordination of services"
   homepage "https://zookeeper.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=zookeeper/zookeeper-3.9.0/apache-zookeeper-3.9.0.tar.gz"
-  mirror "https://archive.apache.org/dist/zookeeper/zookeeper-3.9.0/apache-zookeeper-3.9.0.tar.gz"
-  sha256 "c7af07e7411c798398bb8cd50f47780d8e014831666c41df6ec6540c143c0da2"
+  url "https://www.apache.org/dyn/closer.lua?path=zookeeper/zookeeper-3.9.3/apache-zookeeper-3.9.3.tar.gz"
+  mirror "https://archive.apache.org/dist/zookeeper/zookeeper-3.9.3/apache-zookeeper-3.9.3.tar.gz"
+  sha256 "8bf0b9f872b3c0a6e64f8bc55ffb44cbff6e2712f6467ee5164ca6847466b31b"
   license "Apache-2.0"
   head "https://gitbox.apache.org/repos/asf/zookeeper.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "c3b2edc1a20682b76718005d154cb218e75411c73e1d663d7399b39bb7ee6482"
-    sha256 cellar: :any,                 arm64_ventura:  "03f61850e9dc211540189fb7032ffed01ae3b9aced202b57572e9029f18b7ea1"
-    sha256 cellar: :any,                 arm64_monterey: "c69a5b479fb0b9405fded32b07023ffcbe6eb951bca5022e81c0a88864fbb9a5"
-    sha256 cellar: :any,                 arm64_big_sur:  "b3cdda0d21900b9212dbe640d62ad1d80a989215a40ac5a6f4966c35ddfc75da"
-    sha256 cellar: :any,                 sonoma:         "6a318b559319384f066821b7b1bce9f7b637d7f9fe4d970bd74e42ed92d38206"
-    sha256 cellar: :any,                 ventura:        "dd31876c516898cd82339ca4f9963344522aebc0c644d340a61196debfe195ff"
-    sha256 cellar: :any,                 monterey:       "55468f376b755b636a5acaa7cc89ddc6d8bf3abeb1e00d9d8489f63e704bbc60"
-    sha256 cellar: :any,                 big_sur:        "706e1dc7834e779951044aeb42c72c1aa2c275eab75135caf21f0b7945644215"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e813bda42ccc21397c766253570511bd66dcf9a66b16f10c5a06e5da931f3618"
+    sha256 cellar: :any,                 arm64_sequoia: "55cdbe85faf89339c7388d17582a1c611acf856dbc61b09386f53a4f94e2250d"
+    sha256 cellar: :any,                 arm64_sonoma:  "877ea34a0512cef5350a11523bffa1ac380306a1bcdfc444a4b09417e56e4b96"
+    sha256 cellar: :any,                 arm64_ventura: "b32a242b6462efee1aeba8315f944328b89b0f027d345c4b19dbb42c7d8e3210"
+    sha256 cellar: :any,                 sonoma:        "43493f6555c4c8028c1f46957092b5b9ee99a1a2beae025d23571bff79a6cf5a"
+    sha256 cellar: :any,                 ventura:       "aca1f280391c77002a8822e6fc1c8434c5680144d7f536aeae5ff17efd52ff00"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "44c4a13aefe7898e15aa63cb9dd001c673ad8e520128e6816599a6b50f97acb8"
   end
 
   depends_on "autoconf" => :build
@@ -24,13 +21,13 @@ class Zookeeper < Formula
   depends_on "cppunit" => :build
   depends_on "libtool" => :build
   depends_on "maven" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   depends_on "openjdk"
   depends_on "openssl@3"
 
   resource "default_logback_xml" do
-    url "https://raw.githubusercontent.com/apache/zookeeper/release-3.9.0/conf/logback.xml"
+    url "https://raw.githubusercontent.com/apache/zookeeper/release-3.9.3/conf/logback.xml"
     sha256 "2fae7f51e4f92e8e3536e5f9ac193cb0f4237d194b982bb00b5c8644389c901f"
   end
 
@@ -41,12 +38,16 @@ class Zookeeper < Formula
   end
 
   def install
+    if build.stable? && version != resource("default_logback_xml").version
+      odie "default_logback_xml resource needs to be updated"
+    end
+
     system "mvn", "install", "-Pfull-build", "-DskipTests"
 
     system "tar", "-xf", "zookeeper-assembly/target/apache-zookeeper-#{version}-bin.tar.gz"
     binpfx = "apache-zookeeper-#{version}-bin"
     libexec.install binpfx+"/bin", binpfx+"/lib", "zookeeper-contrib"
-    rm_f Dir["build-bin/bin/*.cmd"]
+    rm(Dir["build-bin/bin/*.cmd"])
 
     system "tar", "-xf", "zookeeper-assembly/target/apache-zookeeper-#{version}-lib.tar.gz"
     libpfx = "apache-zookeeper-#{version}-lib"

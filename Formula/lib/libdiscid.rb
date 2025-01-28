@@ -1,17 +1,17 @@
 class Libdiscid < Formula
   desc "C library for creating MusicBrainz and freedb disc IDs"
   homepage "https://musicbrainz.org/doc/libdiscid"
-  url "http://ftp.musicbrainz.org/pub/musicbrainz/libdiscid/libdiscid-0.6.4.tar.gz"
-  mirror "https://ftp.osuosl.org/pub/musicbrainz/libdiscid/libdiscid-0.6.4.tar.gz"
+  url "https://ftp.musicbrainz.org/pub/musicbrainz/libdiscid/libdiscid-0.6.4.tar.gz"
   sha256 "dd5e8f1c9aead442e23b749a9cc9336372e62e88ad7079a2b62895b0390cb282"
   license "LGPL-2.1-or-later"
 
   livecheck do
-    url "https://ftp.osuosl.org/pub/musicbrainz/libdiscid/"
+    url "https://ftp.musicbrainz.org/pub/musicbrainz/libdiscid/"
     regex(/href=.*?libdiscid[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "d75c302e47eb78bf4d56bc4e0cde309a944890f1d046b7078a2be9ea6c4f7f10"
     sha256 cellar: :any,                 arm64_sonoma:   "906bf782b5afdaa39be07081bfcf814c58987cd261b18689bb945dcd0bcc30b8"
     sha256 cellar: :any,                 arm64_ventura:  "ab8bab81ac4ed46d45902acfea78260d20e2ce0616d6073ebc8025ff6fa7979b"
     sha256 cellar: :any,                 arm64_monterey: "896b72d31f4c99fa8e1064807501c1588002c2d1d651cf3179ee5052504dea7f"

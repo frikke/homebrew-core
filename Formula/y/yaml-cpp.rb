@@ -6,6 +6,7 @@ class YamlCpp < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "b453cb98bf2c4dc253c3523f587a0af606e5a682bcd7b7bd0f69013e95cfe418"
     sha256 cellar: :any,                 arm64_sonoma:   "778720c980df7e2e5ed7a971eea721ecd6a21069f927279809496164c3248f69"
     sha256 cellar: :any,                 arm64_ventura:  "a257981f293174574400a08830c9edb3fef18a1d27d9c7a8f2a8ec0a6450a15f"
     sha256 cellar: :any,                 arm64_monterey: "5590ca844620d1eec096d947cd88d77acd0cec2094ea6558c56802f2960f3a80"
@@ -20,20 +21,22 @@ class YamlCpp < Formula
   depends_on "cmake" => :build
 
   def install
-    system "cmake", ".", *std_cmake_args, "-DYAML_BUILD_SHARED_LIBS=ON",
-                                          "-DYAML_CPP_BUILD_TESTS=OFF"
-    system "make", "install"
+    args = ["-DYAML_BUILD_SHARED_LIBS=ON", "-DYAML_CPP_BUILD_TESTS=OFF"]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <yaml-cpp/yaml.h>
       int main() {
         YAML::Node node  = YAML::Load("[0, 0, 0]");
         node[0] = 1;
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-std=c++11", "-L#{lib}", "-lyaml-cpp", "-o", "test"
     system "./test"
   end

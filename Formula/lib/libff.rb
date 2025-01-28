@@ -9,6 +9,7 @@ class Libff < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "2dfacbd13db9702a3a458660201374cff23f4c7fd509585410cb0dd937214f28"
     sha256 cellar: :any,                 arm64_sonoma:   "b0d7b1dc5eff5d62a517a534be42b362918f51d64cca55a13579d445fcbaec49"
     sha256 cellar: :any,                 arm64_ventura:  "12665fa3a1821e160992a72a91c67861ffd18fcc10bf255c20188474ec8785ac"
     sha256 cellar: :any,                 arm64_monterey: "3f8fff685a6b4b00cb5dc78dad9927be27c22cfdbde465e1d7f49c08ea6a9d56"
@@ -43,7 +44,7 @@ class Libff < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <libff/algebra/curves/edwards/edwards_pp.hpp>
 
       using namespace libff;
@@ -52,7 +53,7 @@ class Libff < Formula
         edwards_pp::init_public_params();
         return 0;
       }
-    EOS
+    CPP
 
     system ENV.cxx, "-std=c++11", "test.cpp", "-I#{include}", "-L#{lib}", "-lff", "-o", "test"
     system "./test"

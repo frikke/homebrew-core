@@ -6,7 +6,7 @@ class Pit < Formula
 
   # upstream commit to allow PREFIX-ed installs
   stable do
-    url "https://github.com/michaeldv/pit/archive/0.1.0.tar.gz"
+    url "https://github.com/michaeldv/pit/archive/refs/tags/0.1.0.tar.gz"
     sha256 "ddf78b2734c6dd3967ce215291c3f2e48030e0f3033b568eb080a22f041c7a0e"
 
     patch do
@@ -29,9 +29,12 @@ class Pit < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "1c47710f90f70ca700d78780d7a9ecca7edb1c00d131c5b35eca39d22ca50b20"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "4bb4f8b9fcc6c163347d862d0886d998600259a914148dbb56bd1ef720fa96ac"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "bab334d334f9076b84f008dffa276886491a4567dcce911bca2de19f0a4d462e"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "cdb46ba810ed638aa93d076788bbc3a21f0d563aa5175fdccdae7b9c3476608c"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2d3857a0cf9c47d2d53f87109d87a4823fed481398cf2adb6c9f3809b8085985"
+    sha256 cellar: :any_skip_relocation, sonoma:         "c58c911d92fce75efe1c60827d6a3d55df5eb063e579d60e4272883a17bc9b33"
     sha256 cellar: :any_skip_relocation, ventura:        "43d88cf92d08f7169764740b0dcf55d529ad3e88e5297d8eede1b9cbcbca2849"
     sha256 cellar: :any_skip_relocation, monterey:       "cea94d460905b3f03d850b3e15a99d9a2e1d18558be52a8740dfbae36d7b27e4"
     sha256 cellar: :any_skip_relocation, big_sur:        "853489d4ee4f37e97f89415f5a3d1e0c225cb2dace8f61680293bb61ad57dd52"
@@ -55,6 +58,6 @@ class Pit < Formula
   end
 
   test do
-    system "#{bin}/pit", "init"
+    system bin/"pit", "init"
   end
 end

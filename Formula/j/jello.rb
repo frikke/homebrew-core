@@ -8,17 +8,16 @@ class Jello < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f1217174cb1d558540f2b90eef4ce0c329684032514ad18c165287db1da0b7a2"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f1217174cb1d558540f2b90eef4ce0c329684032514ad18c165287db1da0b7a2"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f1217174cb1d558540f2b90eef4ce0c329684032514ad18c165287db1da0b7a2"
-    sha256 cellar: :any_skip_relocation, ventura:        "ab0954cb09156c2c55502e596220e2fdfe887dde5ccbda8c20db768d68d2d4dd"
-    sha256 cellar: :any_skip_relocation, monterey:       "ab0954cb09156c2c55502e596220e2fdfe887dde5ccbda8c20db768d68d2d4dd"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ab0954cb09156c2c55502e596220e2fdfe887dde5ccbda8c20db768d68d2d4dd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5d4021cdccb1bc2a63a5d879d04a1290e11a2ca1e30a5f7f6d04a5a951d46c52"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, all: "43347f90e4a60a965ce88773aad8fc8bebed4a5ee29f20adc7a31d921b5ce507"
   end
 
-  depends_on "pygments"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  resource "pygments" do
+    url "https://files.pythonhosted.org/packages/8e/62/8336eff65bcbc8e4cb5d05b55faf041285951b6e80f33e2bff2024788f31/pygments-2.18.0.tar.gz"
+    sha256 "786ff802f32e91311bff3889f6e9a86e81505fe99f2735bb6d60ae0c5004f199"
+  end
 
   def install
     virtualenv_install_with_resources

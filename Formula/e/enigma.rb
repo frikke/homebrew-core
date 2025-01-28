@@ -4,6 +4,7 @@ class Enigma < Formula
   url "https://github.com/Enigma-Game/Enigma/releases/download/1.30/Enigma-1.30-src.tar.gz"
   sha256 "ae64b91fbc2b10970071d0d78ed5b4ede9ee3868de2e6e9569546fc58437f8af"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,15 +12,12 @@ class Enigma < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "29d4ab1fe62d50bf1ff571784ce4f58bfc52bfdf1dc5c745566a59220ec0dda4"
-    sha256 arm64_monterey: "d03595cec1ddb59025fcecbf6888f4aa111ea3109248dad844afff91da8589cc"
-    sha256 arm64_big_sur:  "5b867b942c96de07f01505e2208cf578f744425346ba180e96ba3d569c4cc15c"
-    sha256 ventura:        "e5e1f7aa32037bc31bd4288b93039efb05f70da1558890f413dd6fa2d0a07c83"
-    sha256 monterey:       "61e64a23581e2e4771fa7a28e7a1da9f70f6d35ffe7f7585a4a40758466e3753"
-    sha256 big_sur:        "679839e6002ae198d8f62c1c1379982630fa2173f41b8cf63b7b48b91c606dac"
-    sha256 catalina:       "78472e57abc53c73a637928f6d58b075f387c7e15e140858e4a3b0c59fa1e2ae"
-    sha256 mojave:         "fab7be7e356416ceeb52dd5a078349ef0a40c7f0a2f703ef43c9c7aeeaa1e239"
-    sha256 x86_64_linux:   "7d28c5a21e674b2cbc1627a807370916695ff7feba86230fd4fce2e6cc3cb939"
+    sha256 arm64_sequoia: "74e171cc98605dac471473d3b109615436da5f01efe97a6bef87863df29228e6"
+    sha256 arm64_sonoma:  "80d1c3b6996e2654de90d74c8b64156f0ab114e9f6a0ca23a9ef8ac2ad4e15b6"
+    sha256 arm64_ventura: "72b381ad60a3599e47c1e0a76b74ab074645c75e21fcf007849eb9b3461604ca"
+    sha256 sonoma:        "9a282238a0694092cd68cebd03651c6f42f19050adf5957b31d07b784b738fc2"
+    sha256 ventura:       "65581f9d70099db6bc6a45d12b1d7ec373bfc50285ffd244d67b06bcd9a82023"
+    sha256 x86_64_linux:  "b853cd4b2c13e10445b12737298e51293e282319bc5f27ceb424e7746a79adc5"
   end
 
   head do
@@ -30,10 +28,10 @@ class Enigma < Formula
   end
 
   depends_on "imagemagick" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "enet"
   depends_on "freetype"
-  depends_on "gettext"
   depends_on "libpng"
   depends_on "sdl2"
   depends_on "sdl2_image"
@@ -41,12 +39,16 @@ class Enigma < Formula
   depends_on "sdl2_ttf"
   depends_on "xerces-c"
 
+  uses_from_macos "curl"
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "gettext"
+  end
+
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--with-system-enet",
-                          "--prefix=#{prefix}"
-    system "make"
+    system "./configure", "--with-system-enet", *std_configure_args
     system "make", "install"
   end
 

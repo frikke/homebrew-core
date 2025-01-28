@@ -1,12 +1,17 @@
 class Libidn2 < Formula
   desc "International domain name library (IDNA2008, Punycode and TR46)"
   homepage "https://www.gnu.org/software/libidn/#libidn2"
-  url "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.4.tar.gz"
-  mirror "https://ftpmirror.gnu.org/libidn/libidn2-2.3.4.tar.gz"
-  mirror "http://ftp.gnu.org/gnu/libidn/libidn2-2.3.4.tar.gz"
-  sha256 "93caba72b4e051d1f8d4f5a076ab63c99b77faee019b72b9783b267986dbb45f"
-  license any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"]
-  revision 1
+  url "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz"
+  mirror "https://ftpmirror.gnu.org/libidn/libidn2-2.3.7.tar.gz"
+  mirror "http://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz"
+  sha256 "4c21a791b610b9519b9d0e12b8097bf2f359b12f8dd92647611a929e6bfd7d64"
+  license all_of: [
+    { any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"] }, # lib
+    { all_of: ["Unicode-TOU", "Unicode-DFS-2016"] }, # matching COPYING.unicode
+    "GPL-3.0-or-later", # bin
+    "LGPL-2.1-or-later", # parts of gnulib
+    "FSFAP-no-warranty-disclaimer", # man3
+  ]
 
   livecheck do
     url :stable
@@ -14,14 +19,14 @@ class Libidn2 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura:  "b044c66cc0f1feea87d229f3f4016c5ff29a0fb0f712d0d5219f05465247b10f"
-    sha256 arm64_monterey: "64f5b404f308f58ea4dbe787559fb802abd9b624dabd9a1703aa241a2a86d0fb"
-    sha256 arm64_big_sur:  "e6c723cf6d603fad95bc7c7110d114d879555c38c2bed239f5a3e977ecc29434"
-    sha256 ventura:        "322028f5aaf50cac890a5eab03e3a21ecef83d76449c7d8f8d769d1c0887a7b7"
-    sha256 monterey:       "5dcfc410f76c7885fffea633054c58c61e8a5dd2a6cfae33c2ea94e27ae0e96b"
-    sha256 big_sur:        "234beba5f85ebd599ede74b4963e2cc5d2595e05b15bbe5bd528c8bc852bdc1d"
-    sha256 x86_64_linux:   "af78945967847cdf33779abbd1142cabb31d6b5d428f367e23bc068f1d240e49"
+    sha256 arm64_sequoia:  "1da206a51b4e3550f75e2c980f7f32ad7c75a3824711c534e4b3a9a21fcbaa1a"
+    sha256 arm64_sonoma:   "670f6ed3768acde8ce10b5dcfc88fef69cea994ff84491b253a5e818cd4f9a1b"
+    sha256 arm64_ventura:  "df4d2b529ac1534d36e44c63aeee6e9be8ee856f3545e75511497de5c60e0e80"
+    sha256 arm64_monterey: "621dbb561aeddc8c0d7e856e990414526c43d9da400d3a2a613d2be3c1ebb41f"
+    sha256 sonoma:         "32aec190642166c2081088f424cd39cc8b820105ce0b3372d0d8835635424b38"
+    sha256 ventura:        "4b4f5eadc82273fb3b0d384466dab53d9fdc7200cbfae1eb5b5bebfe359f4f1e"
+    sha256 monterey:       "a1b41989b1decc3a33e8a64a914680c881f9931e2bd2bdac47a9215a4579d686"
+    sha256 x86_64_linux:   "2d94c867e00156a44644758c62895dd6d13538aff7f638ea598ff70e0e8f6505"
   end
 
   head do
@@ -33,16 +38,19 @@ class Libidn2 < Formula
     depends_on "gettext" => :build
     depends_on "help2man" => :build
     depends_on "libtool" => :build
-    depends_on "ronn" => :build
 
     uses_from_macos "gperf" => :build
+
+    on_macos do
+      depends_on "coreutils" => :build
+    end
 
     on_system :linux, macos: :ventura_or_newer do
       depends_on "texinfo" => :build
     end
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libunistring"
 
   on_macos do
@@ -53,8 +61,11 @@ class Libidn2 < Formula
     args = ["--disable-silent-rules", "--with-packager=Homebrew"]
     args << "--with-libintl-prefix=#{Formula["gettext"].opt_prefix}" if OS.mac?
 
-    system "./bootstrap", "--skip-po" if build.head?
-    system "./configure", *std_configure_args, *args
+    if build.head?
+      ENV.prepend_path "PATH", Formula["coreutils"].libexec/"gnubin" if OS.mac?
+      system "./bootstrap", "--skip-po"
+    end
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 

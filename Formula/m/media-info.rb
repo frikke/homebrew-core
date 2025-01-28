@@ -1,8 +1,8 @@
 class MediaInfo < Formula
   desc "Unified display of technical and tag data for audio/video"
   homepage "https://mediaarea.net/"
-  url "https://mediaarea.net/download/binary/mediainfo/23.09/MediaInfo_CLI_23.09_GNU_FromSource.tar.bz2"
-  sha256 "569c8dc25ecc2c39e2b4ec13ca3d5700db795d6a927d72138cdb3ff22629d1ab"
+  url "https://mediaarea.net/download/binary/mediainfo/24.12/MediaInfo_CLI_24.12_GNU_FromSource.tar.bz2"
+  sha256 "5f7648080287d3e8f80dd8d606e285af81aa6a40dff1936fd528cbb74a0d97ff"
   license "BSD-2-Clause"
   head "https://github.com/MediaArea/MediaInfo.git", branch: "master"
 
@@ -12,16 +12,15 @@ class MediaInfo < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "a5d8ca13a73b6bbdad455957bdca1c89332675bd6f7a79a8a7c499b58ac47a77"
-    sha256 cellar: :any,                 arm64_monterey: "54f216d9d5c17db7667dde8bf7c57bb93a7c74c9dc77e05acad7c8363870d30c"
-    sha256 cellar: :any,                 arm64_big_sur:  "84b2c77f1154f29f43d6655f87d2f583d026e5301c157ca76c8a62f890b3d627"
-    sha256 cellar: :any,                 ventura:        "eceb4ce5d69dc94759305fac9d74e42935210844f3e71ba9aaad0d3b76721854"
-    sha256 cellar: :any,                 monterey:       "67e69a55b80d63a1a07cb6a7ef1a589ca9c7b5f9bc3c0592cd2fea62ef95b846"
-    sha256 cellar: :any,                 big_sur:        "3889ceb7fe47c3d8ff0dc39eeecb0d99f80e7aba0aee028c2275e69d93af9612"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "be26673ed4fc410bbbdf76eccabe5f2c9f87230175ec15dac0bd17da5590e5bc"
+    sha256 cellar: :any,                 arm64_sequoia: "526cee110889dac29d75fa89fa04cffdd0ed3d6ee086142b49074da094a68358"
+    sha256 cellar: :any,                 arm64_sonoma:  "9d377748efc4f79ca0f0422c3ef821692b0dd80ec69c18ed5243dde4ec557ee3"
+    sha256 cellar: :any,                 arm64_ventura: "c00c1c687b54182cc44e1c4673ab88afe6a9a60b229df4713d11454cc48ab3fc"
+    sha256 cellar: :any,                 sonoma:        "c19eaff225939b0865017a75384065f7df599110cadd07d1fcbf43c06fd3f768"
+    sha256 cellar: :any,                 ventura:       "db263df9ab51d08c8521410dad7d52fd205afb00d0129850cb3dc5ece33d376a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5acee3bccbe8ca89c545db210985301c1dbbc81f15dd1023cfd7bdb3110ad104"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libmediainfo"
   depends_on "libzen"
 
@@ -35,6 +34,13 @@ class MediaInfo < Formula
   end
 
   test do
-    pipe_output("#{bin}/mediainfo", test_fixtures("test.mp3"))
+    output = shell_output("#{bin}/mediainfo #{test_fixtures("test.mp3")}")
+    assert_match <<~EOS, output
+      General
+      Complete name                            : #{test_fixtures("test.mp3")}
+      Format                                   : MPEG Audio
+    EOS
+
+    assert_match version.to_s, shell_output("#{bin}/mediainfo --Version")
   end
 end

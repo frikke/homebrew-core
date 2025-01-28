@@ -1,8 +1,8 @@
 class Gtkmm4 < Formula
   desc "C++ interfaces for GTK+ and GNOME"
   homepage "https://www.gtkmm.org/"
-  url "https://download.gnome.org/sources/gtkmm/4.12/gtkmm-4.12.0.tar.xz"
-  sha256 "fbc3e7618123345c0148ef71abb6548d421f52bb224fbda34875b677dc032c92"
+  url "https://download.gnome.org/sources/gtkmm/4.16/gtkmm-4.16.0.tar.xz"
+  sha256 "3b23fd3abf8fb223b00e9983b6010af2db80e38c89ab6994b8b6230aa85d60f9"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,23 +11,29 @@ class Gtkmm4 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "37d40a17b893be49e90c6da9a06307b574c7c277401b11594e6185d01ace9dea"
-    sha256 cellar: :any, arm64_monterey: "b4453b2142a8fee54c58020fef69a5d7570e9e498c7a5870c0b6defbfca5f051"
-    sha256 cellar: :any, arm64_big_sur:  "96663f5e6e435ca299d8b858aa95eabc6369c48ffa4592c78c64e4b1e056aec8"
-    sha256 cellar: :any, ventura:        "05aa2cf79ffe49b870899acc662e1e5bbb274bbea08bfa550667c29dc3f07b6f"
-    sha256 cellar: :any, monterey:       "3a05d156e2fa48314d5f325dd39fcca290b6fb43c5d1f185ddff7c05bb30ab12"
-    sha256 cellar: :any, big_sur:        "6c6b22194fedb5c8a48e002af931a1b33e0d75037929abb96702c8d9bcba3e51"
-    sha256               x86_64_linux:   "bf25d87a1db7d1f3223dbb65924ee3f8dc3cb79a449990cd5e79aa8e599b08db"
+    sha256 cellar: :any, arm64_sequoia:  "bd3991a723f1108bbe0cf033506a3918f15f1b7da5e7791470da2f45eeb572fc"
+    sha256 cellar: :any, arm64_sonoma:   "d92d243a596afaa4fab46c97b1fa9a89c086dbcdfadf39e14fc5898aece8a98f"
+    sha256 cellar: :any, arm64_ventura:  "e3a57fe48dbfd939d9e44878544fb3c83a1572ab75e4d6601f8b4e9568134bb6"
+    sha256 cellar: :any, arm64_monterey: "ec886eb0fdc1180aa44208b97cd9ebb82e6d695636769405b856202bd9a5b6dd"
+    sha256 cellar: :any, sonoma:         "39e1872ac9508ec896fbe3ea8b218fe1da4c267b4e59854c97712052bb64a4d1"
+    sha256 cellar: :any, ventura:        "b97aecb02be2d10378973c2fadf863c5fb317fe6ec00a1eda6b724c696330c78"
+    sha256 cellar: :any, monterey:       "3dbe629e2111f32747c953a323c2370037176c8f2da3f5a1814bdce7bcf4f41a"
+    sha256               x86_64_linux:   "25be1257147ef191213595efd59df59a5cd72d4dd5645e5305d2a82901e7a6d2"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => [:build, :test]
-  depends_on "cairomm"
-  depends_on "gtk4"
-  depends_on "pangomm"
+  depends_on "pkgconf" => [:build, :test]
 
-  fails_with gcc: "5"
+  depends_on "cairo"
+  depends_on "cairomm"
+  depends_on "gdk-pixbuf"
+  depends_on "glib"
+  depends_on "glibmm"
+  depends_on "graphene"
+  depends_on "gtk4"
+  depends_on "libsigc++"
+  depends_on "pangomm"
 
   def install
     system "meson", "setup", "build", *std_meson_args
@@ -36,16 +42,18 @@ class Gtkmm4 < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <gtkmm.h>
+
       class MyLabel : public Gtk::Label {
         MyLabel(Glib::ustring text) : Gtk::Label(text) {}
       };
       int main(int argc, char *argv[]) {
         return 0;
       }
-    EOS
-    flags = shell_output("#{Formula["pkg-config"].opt_bin}/pkg-config --cflags --libs gtkmm-4.0").strip.split
+    CPP
+
+    flags = shell_output("pkgconf --cflags --libs gtkmm-4.0").chomp.split
     system ENV.cxx, "-std=c++17", "test.cpp", "-o", "test", *flags
     system "./test"
   end

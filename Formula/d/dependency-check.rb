@@ -1,23 +1,19 @@
 class DependencyCheck < Formula
   desc "OWASP dependency-check"
   homepage "https://owasp.org/www-project-dependency-check/"
-  url "https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip"
-  sha256 "937a6bf8ced9d8494767082c1f588f26ea379324cb089dabb045321e8b0ab01a"
+  url "https://github.com/jeremylong/DependencyCheck/releases/download/v12.0.1/dependency-check-12.0.1-release.zip"
+  sha256 "f7783e31efc9649e810b0e885cb85f3bc2f8919097af95c4c7fd16c0827cba7e"
   license "Apache-2.0"
-
-  livecheck do
-    url :homepage
-    regex(/href=.*?dependency-check[._-]v?(\d+(?:\.\d+)+)-release\.zip/i)
-  end
+  head "https://github.com/jeremylong/DependencyCheck.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "6110c579c8249b09ff89d9b2f425a43ba41caf762f0fdeb571c26e106f40dd97"
+    sha256 cellar: :any_skip_relocation, all: "2a327dcd1b7993f32a8b11be195fecbb5d7640128623e84a9e63a2d0c6b8f6e4"
   end
 
   depends_on "openjdk"
 
   def install
-    rm_f Dir["bin/*.bat"]
+    rm(Dir["bin/*.bat"])
 
     chmod 0755, "bin/dependency-check.sh"
     libexec.install Dir["*"]
@@ -49,10 +45,9 @@ class DependencyCheck < Formula
       analyzer.dependencybundling.enabled=false
     EOS
     system bin/"dependency-check", "-P", "temp-props.properties", "-f", "XML",
-               "--project", "dc", "-s", libexec, "-d", testpath, "-o", testpath,
-               "--cveUrlBase", "https://jeremylong.github.io/DependencyCheck/hb_nvd/nvdcve-1.1-%d.json.gz",
-               "--cveUrlModified", "https://jeremylong.github.io/DependencyCheck/hb_nvd/nvdcve-1.1-modified.json.gz",
-               "--cveStartYear", Time.now.year, "--cveDownloadWait", "5000", "--disableKnownExploited"
+              "--project", "dc", "-s", libexec, "-d", testpath, "-o", testpath,
+              "--nvdDatafeed", "https://jeremylong.github.io/DependencyCheck/hb_nvd/",
+              "--disableKnownExploited"
     assert_predicate testpath/"dependency-check-report.xml", :exist?
   end
 end

@@ -3,38 +3,35 @@ class Virtualenv < Formula
 
   desc "Tool for creating isolated virtual python environments"
   homepage "https://virtualenv.pypa.io/"
-  url "https://files.pythonhosted.org/packages/d3/50/fa955bbda25c0f01297843be105f9d022f461423e69a6ab487ed6cabf75d/virtualenv-20.24.5.tar.gz"
-  sha256 "e8361967f6da6fbdf1426483bfe9fca8287c242ac0bc30429905721cefbff752"
+  url "https://files.pythonhosted.org/packages/a7/ca/f23dcb02e161a9bba141b1c08aa50e8da6ea25e6d780528f1d385a3efe25/virtualenv-20.29.1.tar.gz"
+  sha256 "b8b8970138d32fb606192cb97f6cd4bb644fa486be9308fb9b63f81091b5dc35"
   license "MIT"
   head "https://github.com/pypa/virtualenv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "084255bb80300bc4d963ce17a530bf24c289bfb0306dbb81ff3af36c0c018ddd"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0ff65ef186573fd2d156f24557f7131a14daa7ede7b58afb2c71ed51a4c71b84"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d0c76b544642b1d4589462344aa3ea9b0bd32d395e067ea724acdcdad22af3f8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "89c902d3103179f1b84d44f3808c909ace8edc70cd20eb5a67f74e4174962543"
-    sha256 cellar: :any_skip_relocation, sonoma:         "6e9e6c9f3f485b2d678d9e408f1c6705d4d72d0bb3bd4a865bcd0c1138be0e65"
-    sha256 cellar: :any_skip_relocation, ventura:        "1d2b98a0690ce11da73a5ae3899ef7b1b7840733c16b693d7d1f014e1daf6e43"
-    sha256 cellar: :any_skip_relocation, monterey:       "469707a1251b5d9b4a0202977af373e6157e424f43deb29a4e40de7b0df4725c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "114b76eeee87b96e008af185a48313715c9299de20603dcab59b3e240d73f352"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b455b0bac69560a68724f797934d176ba9b75e274602a7b2b6588b0c482a16a8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "53bfe76e58460f891211c65632b0dccd9677daacd5d0ce3ebb02b4d4d80efff6"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "53bfe76e58460f891211c65632b0dccd9677daacd5d0ce3ebb02b4d4d80efff6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "53bfe76e58460f891211c65632b0dccd9677daacd5d0ce3ebb02b4d4d80efff6"
+    sha256 cellar: :any_skip_relocation, sonoma:        "7c5267faccd85d1087a98dafe2411197f9f576b431d5717e862608e2f34abbe0"
+    sha256 cellar: :any_skip_relocation, ventura:       "7c5267faccd85d1087a98dafe2411197f9f576b431d5717e862608e2f34abbe0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "17103b335f2c47f798724c7de354ab057f3c89d5c7ed750d94f70be3a69762c5"
   end
 
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
   resource "distlib" do
-    url "https://files.pythonhosted.org/packages/29/34/63be59bdf57b3a8a8dcc252ef45c40f3c018777dc8843d45dd9b869868f0/distlib-0.3.7.tar.gz"
-    sha256 "9dafe54b34a028eafd95039d5e5d4851a13734540f1331060d31c9916e7147a8"
+    url "https://files.pythonhosted.org/packages/0d/dd/1bec4c5ddb504ca60fc29472f3d27e8d4da1257a854e1d96742f15c1d02d/distlib-0.3.9.tar.gz"
+    sha256 "a60f20dea646b8a33f3e7772f74dc0b2d0772d2837ee1342a00645c81edf9403"
   end
 
   resource "filelock" do
-    url "https://files.pythonhosted.org/packages/5a/47/f1f3f5b6da710d5a7178a7f8484d9b86b75ee596fb4fefefb50e8dd2205a/filelock-3.12.3.tar.gz"
-    sha256 "0ecc1dd2ec4672a10c8550a8182f1bd0c0a5088470ecd5a125e45f49472fac3d"
+    url "https://files.pythonhosted.org/packages/9d/db/3ef5bb276dae18d6ec2124224403d1d67bccdbefc17af4cc8f553e341ab1/filelock-3.16.1.tar.gz"
+    sha256 "c249fbfcd5db47e5e2d6d62198e565475ee65e4831e2561c8e313fa7eb961435"
   end
 
   resource "platformdirs" do
-    url "https://files.pythonhosted.org/packages/dc/99/c922839819f5d00d78b3a1057b5ceee3123c69b2216e776ddcb5a4c265ff/platformdirs-3.10.0.tar.gz"
-    sha256 "b45696dab2d7cc691a3226759c0d3b00c47c8b6e293d96f6436f733303f77f6d"
+    url "https://files.pythonhosted.org/packages/13/fc/128cc9cb8f03208bdbf93d3aa862e16d376844a14f9a0ce5cf4507372de4/platformdirs-4.3.6.tar.gz"
+    sha256 "357fb2acbc885b0419afd3ce3ed34564c13c9b95c89360cd9563f73aa5e2b907"
   end
 
   def install
@@ -42,7 +39,7 @@ class Virtualenv < Formula
   end
 
   test do
-    system "#{bin}/virtualenv", "venv_dir"
+    system bin/"virtualenv", "venv_dir"
     assert_match "venv_dir", shell_output("venv_dir/bin/python -c 'import sys; print(sys.prefix)'")
   end
 end

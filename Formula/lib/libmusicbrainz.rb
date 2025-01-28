@@ -6,9 +6,12 @@ class Libmusicbrainz < Formula
   license "LGPL-2.1-or-later"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "ada38db81da84d8fb85cae7dbc30682461a1d198556fdb01d9be05fcbe9059f4"
+    sha256 cellar: :any,                 arm64_sonoma:   "62762e1b184d0c47bb287e151333dafaa526b733ea2c4bd5fbd097d987b84aa4"
     sha256 cellar: :any,                 arm64_ventura:  "f94dae2c20f0394e6500176d823845716fd3696e692527e8106542e7d3a7f392"
     sha256 cellar: :any,                 arm64_monterey: "fc0659a30defd25b9d1eb98acee0c6165d3a25c013a7a5bd4d77247af9096ddc"
     sha256 cellar: :any,                 arm64_big_sur:  "cd8eb4a4a2aaf1d9328c3b84439f16996b5e586d1069edcb28d4dcf8c994a30e"
+    sha256 cellar: :any,                 sonoma:         "2b9d6fc49497521a3518c7520b4a82fc153d6f9ed187747a13c2bc561b8a75e8"
     sha256 cellar: :any,                 ventura:        "4d83f20fe8412445dfe08de416eb711164ea7a1b5495511ce5979d0d2a40c9f7"
     sha256 cellar: :any,                 monterey:       "26b5aa846f4cd2cef477fa4e60b3f735b18eed3451528f2517a8de9ab38d0be1"
     sha256 cellar: :any,                 big_sur:        "a03a79657821636633079121735346d0b50ac66ab13e7a0da695b4f8e8499464"
@@ -21,19 +24,20 @@ class Libmusicbrainz < Formula
   end
 
   depends_on "cmake" => :build
+  depends_on "pkgconf" => :build
   depends_on "neon"
 
   uses_from_macos "libxml2"
 
-  on_linux do
-    depends_on "pkg-config"
+  # Backport fix to build with newer libxml2
+  patch do
+    url "https://github.com/metabrainz/libmusicbrainz/commit/4655b571a70d73d41467091f59c518517c956198.patch?full_index=1"
+    sha256 "ee0c63e56a17156bca13b157744a54aeed6e19b39f65b14f2a5ac4e504358c8e"
   end
 
   def install
-    neon = Formula["neon"]
-    neon_args = %W[-DNEON_LIBRARIES:FILEPATH=#{neon.lib}/#{shared_library("libneon")}
-                   -DNEON_INCLUDE_DIR:PATH=#{neon.include}/neon]
-    system "cmake", ".", *(std_cmake_args + neon_args)
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", ".", *std_cmake_args
+    system "cmake", "--build", "."
+    system "cmake", "--install", "."
   end
 end

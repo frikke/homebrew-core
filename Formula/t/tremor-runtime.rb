@@ -17,8 +17,10 @@ class TremorRuntime < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "df88e4137f9eb13a7f8c26324f7e97031335464d8505448131a8c6f1542352ac"
   end
 
+  deprecate! date: "2024-09-23", because: :does_not_build
+
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
   depends_on "librdkafka"
   depends_on "oniguruma"
@@ -32,11 +34,10 @@ class TremorRuntime < Formula
     depends_on "llvm@15" => :build
   end
 
-  # gcc9+ required for c++20
-  fails_with gcc: "5"
-  fails_with gcc: "6"
-  fails_with gcc: "7"
-  fails_with gcc: "8"
+  fails_with :gcc do
+    version "8"
+    cause "GCC 9+ required for C++20"
+  end
 
   # Fix invalid usage of `macro_export`.
   # Remove on next release.

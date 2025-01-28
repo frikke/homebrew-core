@@ -4,6 +4,7 @@ class Flowgrind < Formula
   url "https://github.com/flowgrind/flowgrind/releases/download/flowgrind-0.8.2/flowgrind-0.8.2.tar.bz2"
   sha256 "432c4d15cb62d5d8d0b3509034bfb42380a02e3f0b75d16b7619a1ede07ac4f1"
   license "GPL-3.0-or-later"
+  revision 3
 
   livecheck do
     url :stable
@@ -12,14 +13,12 @@ class Flowgrind < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "82a2b71ee222c44ffe3f34d8732e6feb29b8ccb4261551c64ee74705bcb4ae5a"
-    sha256 cellar: :any,                 arm64_monterey: "7a6a9d6cf73f3654f250518d52970c29d71d95480d17d85ae6f3b605e3ed9cd8"
-    sha256 cellar: :any,                 arm64_big_sur:  "79be377bc6cfdc96c5f8bb42d97b91b51e81818894e68151496344b21515bce9"
-    sha256 cellar: :any,                 ventura:        "bc919ff7842921cc2def6e3e755f383d847f0632355b14ecfa1bf20e46652a7a"
-    sha256 cellar: :any,                 monterey:       "56cb3352c2793c2e4b74983de804a3d5ceed6fd9ab177c6e2f05a8856e07eb2d"
-    sha256 cellar: :any,                 big_sur:        "148b960d7dea68adf8e076e53af487d83184fd2e71bc225cefb01f253ae282a3"
-    sha256 cellar: :any,                 catalina:       "7c70ce687e46d8445f2e8c440924bdc2f54f8557ec073eaa605b598871b6b1f7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c46119269a79cc4b4432ce84f5fe06c104a3617c59f8cd026a19666d01ed4f36"
+    sha256 cellar: :any,                 arm64_sequoia: "ca6a1f882f1e3d9d886000625a2b3f53f5ce0947f8d1581a9f4ccf1fd3e29b32"
+    sha256 cellar: :any,                 arm64_sonoma:  "7fbd50a235fee0890cfcea2afe0a0ecaf6d95264ebb3bc804b2c0fe19bc47f5a"
+    sha256 cellar: :any,                 arm64_ventura: "4cd194dededa538922c8776c32890c9c85241feca07ff12a4d6ef1c8ae74dbfc"
+    sha256 cellar: :any,                 sonoma:        "3ec8f4b1038691864cf8fa30497efd7ede5191215f6b4812d11cce25e656a99e"
+    sha256 cellar: :any,                 ventura:       "6e14c72f5e1674c8425b1fc2bbaaa31fe4a9abce2c57340c49610d19cc52f5dd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8f3aa5e0fa120f60cb88c95cf2a710fa57e9481efe0b4067a694f96497b004f6"
   end
 
   head do
@@ -41,6 +40,6 @@ class Flowgrind < Formula
   end
 
   test do
-    system "#{bin}/flowgrind", "--version"
+    system bin/"flowgrind", "--version"
   end
 end

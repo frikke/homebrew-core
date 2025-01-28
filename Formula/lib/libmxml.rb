@@ -1,36 +1,30 @@
 class Libmxml < Formula
   desc "Mini-XML library"
   homepage "https://michaelrsweet.github.io/mxml/"
-  url "https://github.com/michaelrsweet/mxml/releases/download/v3.3.1/mxml-3.3.1.tar.gz"
-  sha256 "0c663ed1fe393b5619f80101798202eea43534abd7c8aff389022fd8c1dacc32"
+  url "https://github.com/michaelrsweet/mxml/releases/download/v4.0.4/mxml-4.0.4.tar.gz"
+  sha256 "c8d1728d6ccf71a862a1538bd5e132daa2181bb42fe14b078baa2ec1510c0150"
   license "Apache-2.0"
   head "https://github.com/michaelrsweet/mxml.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "0f89df646562027832ad3b5c2531c452985fa159ed08839f9d6b4a24aed54846"
-    sha256 cellar: :any,                 arm64_ventura:  "69fb9bc4b6c43bed31c3d8b08a4202e2aa6a24abb1c9719e8a2a78feedead088"
-    sha256 cellar: :any,                 arm64_monterey: "9c13d0bd3840b69d130cd1f4741f9936d7b2a90297a9925d1325682c143fb2f6"
-    sha256 cellar: :any,                 arm64_big_sur:  "e5156d05dec405c83a198a997f668a3a92bdd9499220e7feffd46f4f4c1a4e19"
-    sha256 cellar: :any,                 sonoma:         "84d9d15aeebcf6dc29c0b8507eb091f279f4fd4500fd78310bc0b8e3dfd6b86d"
-    sha256 cellar: :any,                 ventura:        "708c1042fb9ca17c2a37a8e6d96499f2a576c364e145d70ea7162247eee0771b"
-    sha256 cellar: :any,                 monterey:       "f9e8125473110fef459d5d815a8e96e673815428eac1067f1e4b9c18d6c3aca9"
-    sha256 cellar: :any,                 big_sur:        "e2d1dab5660d84e5647b01117b907e07b58e5dade826bd6f5859c7538cab2066"
-    sha256 cellar: :any,                 catalina:       "5dd81ae17a13546014ce416999c1422d8ccb5129aa51f99dd0860d4836e24fc2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6b2a90260fc04202328638ea363fc8aa78e322e55f7b0eca1a7ad11d31c285e0"
+    sha256 cellar: :any,                 arm64_sequoia: "82e19bced76d7f6c051d518d66986e09141eb0e469b96c1a07f846a8a76b38ae"
+    sha256 cellar: :any,                 arm64_sonoma:  "f6ae2142da610a2347bab6180d96eeacc4a93316069593bd43b4a042e555fbe2"
+    sha256 cellar: :any,                 arm64_ventura: "f0f7b03ef861dc93ad8460a80d1438e77d1fa257b9383777a4e2adae9dd2f3b3"
+    sha256 cellar: :any,                 sonoma:        "cd8ed5ff1205d43cee4b76a4d1dd344657834556fc20297dce128f3d71917e11"
+    sha256 cellar: :any,                 ventura:       "af8cf17432554379cba89524143512b53c44f4022bf547a7f1d0e6166216939b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6dc29cb18206b980b121c3a114f8c86114a5dcead1b2ae80e0b7eea78c17f0e4"
   end
 
-  depends_on xcode: :build # for docsetutil
+  depends_on "pkgconf" => :test
 
   def install
-    system "./configure", "--disable-debug",
-                          "--enable-shared",
-                          "--prefix=#{prefix}"
+    system "./configure", "--enable-shared", *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <mxml.h>
 
       int main()
@@ -39,18 +33,20 @@ class Libmxml < Formula
         mxml_node_t *tree;
 
         fp = fopen("test.xml", "r");
-        tree = mxmlLoadFile(NULL, fp, MXML_OPAQUE_CALLBACK);
+        tree = mxmlLoadFile(NULL, NULL, fp);
         fclose(fp);
       }
-    EOS
+    C
 
-    (testpath/"test.xml").write <<~EOS
+    (testpath/"test.xml").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <test>
         <text>I'm an XML document.</text>
       </test>
-    EOS
-    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lmxml", "-o", "test"
+    XML
+
+    flags = shell_output("pkgconf --cflags --libs mxml4").chomp.split
+    system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end
 end

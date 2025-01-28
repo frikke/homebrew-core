@@ -1,9 +1,9 @@
 class Spigot < Formula
   desc "Command-line streaming exact real calculator"
   homepage "https://www.chiark.greenend.org.uk/~sgtatham/spigot/"
-  url "https://www.chiark.greenend.org.uk/~sgtatham/spigot/spigot-20220606.eb585f8.tar.gz"
-  version "20220606"
-  sha256 "27234d668fc750f5afe6b62d94d629f079740bb8b7cb11322a6fbbef2b0dec0a"
+  url "https://www.chiark.greenend.org.uk/~sgtatham/spigot/spigot-20240909.f158e08.tar.gz"
+  version "20240909"
+  sha256 "f2b7b8b9b0e0b138dcfd6ac4eb46fa79706b1842522894c45ddfd731d27bf673"
   license "MIT"
 
   livecheck do
@@ -12,14 +12,14 @@ class Spigot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "030a5c0fc3e0bee531208741bd5012b4fa2a5fe5e8fb2f079ffb6c37ac6babd1"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2619cd7ae18bf5e034a5f061fbc8593b1ab5acfb890b5b4dbfe71a216b68e9c0"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c7a514b7ac79c2c391a16ff6bb3534639ffa15306cefc586af1d5906c52c305c"
-    sha256 cellar: :any_skip_relocation, ventura:        "97a406f8f490a381b27db40a24066629ade62f9ab34b8d9ad43fe2663a3590a9"
-    sha256 cellar: :any_skip_relocation, monterey:       "9cd1259b84062a5e0fd8aec409cff82fa6df655667d34375c444e63730a5917d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c3f1a1a5dd3c96d353c3db29ab681b4ea61823563386f9d143da6580edfdb050"
-    sha256 cellar: :any_skip_relocation, catalina:       "8b1776395e9a1fc99a1910212e046381b307ea8f55726695b8c2d7c5a5cf0a36"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5741c9380e849ddefb17be31323a14c0e170d340a58f7c6c469e7637b0adf191"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "f2820ca0f23f9516c1e27c3ea1488558a4912f0eb75dd361917705e02b2096ef"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "eb86f3da309c5adb78f3dd822284df1a561e77056ae252dcfa79e787c8601c3b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9101dda021b8f6fdfdb377750cfc9aeae90a2f050126223201c98a0d5be09732"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4a9002983a479f2f2d328b8dc3ae4f41e9d4ed5813493d77ab5caa3725c77d6c"
+    sha256 cellar: :any_skip_relocation, sonoma:         "65911180b9cca1a6b1febd6e2f35bf68563ef2dfa6095c5b079cec693a82d5b5"
+    sha256 cellar: :any_skip_relocation, ventura:        "7e70ba708f6667e2733026ec5b277f6c585e1ed325632aa3bd0ab091910c142b"
+    sha256 cellar: :any_skip_relocation, monterey:       "2c82b6ea337b197745e2416acb4b2e8e0b236972c1a1ae5f7eaa0f78e67493f7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "29e623ea321b9038b416675b0646e872c34c230ced67a62a527cd0e08470a8b4"
   end
 
   depends_on "cmake" => :build
@@ -31,10 +31,9 @@ class Spigot < Formula
   end
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -65,7 +64,8 @@ class Spigot < Formula
       4120032290498384346434429544700282883947137096322722314705104266951483698
       9368770466478147882866690955248337250379671389711241
     EOS
-    assert_equal shell_output("#{bin}/spigot -d1729 tau").strip,
-                 expected.delete!("\n")
+
+    output = shell_output("#{bin}/spigot -d1729 tau").strip
+    assert_equal expected.delete!("\n"), output
   end
 end

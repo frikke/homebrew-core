@@ -6,6 +6,7 @@ class Libxxf86dga < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "eb23f74c86d0455fea55619165dc67a91596a64f46e2b1575941612eb763319c"
     sha256 cellar: :any,                 arm64_sonoma:   "aabd31abe4a5de30d5c7e5597d1375c90620aacfc65e29973ef08afc2a8cea15"
     sha256 cellar: :any,                 arm64_ventura:  "d28beaab68c473b46d08570b3a351f50ab6c303187383c3cac0342f9d7cf2d56"
     sha256 cellar: :any,                 arm64_monterey: "e9e16c678779cbe12b944e70b64ab466e16ed037e93baf26d50f6132834135e1"
@@ -17,27 +18,25 @@ class Libxxf86dga < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "80432c3b9c22e33647c255fc8669b182d3980df952d6e5f7f1c93e6d31b56285"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "xorgproto" => :build
   depends_on "libx11"
   depends_on "libxext"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/Xlib.h"
       #include "X11/extensions/Xxf86dga.h"
 
@@ -45,7 +44,7 @@ class Libxxf86dga < Formula
         XDGAEvent event;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

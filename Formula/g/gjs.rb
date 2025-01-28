@@ -1,37 +1,41 @@
 class Gjs < Formula
   desc "JavaScript Bindings for GNOME"
   homepage "https://gitlab.gnome.org/GNOME/gjs/wikis/Home"
-  url "https://download.gnome.org/sources/gjs/1.72/gjs-1.72.2.tar.xz"
-  sha256 "ddee379bdc5a7d303a5d894be2b281beb8ac54508604e7d3f20781a869da3977"
+  url "https://download.gnome.org/sources/gjs/1.82/gjs-1.82.1.tar.xz"
+  sha256 "fb39aa5636576de0e5a1171f56a1a5825e2bd1a69972fb120ba78bd109b5693c"
   license all_of: ["LGPL-2.0-or-later", "MIT"]
-  revision 1
   head "https://gitlab.gnome.org/GNOME/gjs.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura:  "5f60562a5307f0696c5e73e38794d7ad80099777d5d958c56a71ab411a224661"
-    sha256 arm64_monterey: "100f273efb5cd89144a4305a1275ac99c7b1026a25e1f65dfcaccdc02cc8a916"
-    sha256 arm64_big_sur:  "d23cd7df4f1bf1b60daf47cba34b9bcc588b6d3a282a686b081bad88c8520759"
-    sha256 ventura:        "c506eaf1f420f4d72397d478c37f1bc786f798e7a511fc748d841ae9f8a2b6ff"
-    sha256 monterey:       "83614a258ebcf824b37dc920f0b99e4cc13064e95fdad0d6e1df84b89bfd5c7a"
-    sha256 big_sur:        "cb47ddff58ba48e4acc754b14a5a0be1d29e0c3c08f9fd619a661171f6739d67"
-    sha256 catalina:       "27c87327610b1b83005d1df7688acabc2dab19a3089c89686602cfab384f0d02"
-    sha256 x86_64_linux:   "877208d1996b9531e7cb347e3dab91769bf76b20b9d8b4ecaf6adf833a95718a"
+    sha256 arm64_sequoia: "41ff4303b958dc47da84f02e9beb26862bdff17a0a19bc7db4ca9277950ae08c"
+    sha256 arm64_sonoma:  "3c8aeb3f5754c79adf62ab2b2b5060e954b5b7fed7480a1cf63980769dfd1a49"
+    sha256 arm64_ventura: "1bf97f04a7c89a514d87dc4e3af9e5313a9d8d5d845cd9280847f3796a0dddcd"
+    sha256 sonoma:        "3aaacc7af5be7d09fd22f818a3305edc5a8396d101980e2abaecc50c48bfb28c"
+    sha256 ventura:       "2620575c227e4b02d8e6ba9beea1670e7ea9775e379ca8ea64600abd02fae50a"
+    sha256 x86_64_linux:  "2d3994ac90659902a716b45f0661e48542708703827580c5c06361459ce23970"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
+
+  depends_on "cairo"
+  depends_on "glib"
   depends_on "gobject-introspection"
+  depends_on "libx11"
   depends_on "readline"
   depends_on "spidermonkey"
 
-  fails_with gcc: "5" # meson ERROR: SpiderMonkey sanity check: DID NOT COMPILE
+  uses_from_macos "libffi"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     # ensure that we don't run the meson post install script
     ENV["DESTDIR"] = "/"
 
-    args = std_meson_args + %w[
+    args = %w[
       -Dprofiler=disabled
       -Dreadline=enabled
       -Dinstalled_tests=false
@@ -40,11 +44,9 @@ class Gjs < Formula
       -Dskip_gtk_tests=true
     ]
 
-    mkdir "build" do
-      system "meson", *args, ".."
-      system "ninja", "-v"
-      system "ninja", "install", "-v"
-    end
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   def post_install
@@ -52,12 +54,12 @@ class Gjs < Formula
   end
 
   test do
-    (testpath/"test.js").write <<~EOS
+    (testpath/"test.js").write <<~JS
       #!/usr/bin/env gjs
       const GLib = imports.gi.GLib;
       if (31 != GLib.Date.get_days_in_month(GLib.DateMonth.JANUARY, 2000))
         imports.system.exit(1)
-    EOS
-    system "#{bin}/gjs", "test.js"
+    JS
+    system bin/"gjs", "test.js"
   end
 end

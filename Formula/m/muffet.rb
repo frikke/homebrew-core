@@ -1,19 +1,18 @@
 class Muffet < Formula
   desc "Fast website link checker in Go"
   homepage "https://github.com/raviqqe/muffet"
-  url "https://github.com/raviqqe/muffet/archive/v2.9.2.tar.gz"
-  sha256 "771c85fe44ad6e89a457e72d399f81146e48d2abb8ac555653bf4cb49941aa42"
+  url "https://github.com/raviqqe/muffet/archive/refs/tags/v2.10.7.tar.gz"
+  sha256 "b278d9aad33f77c4eb48b761592f3220a05c2f692b54ce27245d0e04c5ad095c"
   license "MIT"
   head "https://github.com/raviqqe/muffet.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "57212ba3ad2507992422c0b2e372bd9ab29cd3fabd5a8dae71fa0a34bb49036b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "57212ba3ad2507992422c0b2e372bd9ab29cd3fabd5a8dae71fa0a34bb49036b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "57212ba3ad2507992422c0b2e372bd9ab29cd3fabd5a8dae71fa0a34bb49036b"
-    sha256 cellar: :any_skip_relocation, ventura:        "3eece1269bf5d1090d2b08f4e4a1a97a6cdf70489ae2ef021c5c0a047c2266b6"
-    sha256 cellar: :any_skip_relocation, monterey:       "3eece1269bf5d1090d2b08f4e4a1a97a6cdf70489ae2ef021c5c0a047c2266b6"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3eece1269bf5d1090d2b08f4e4a1a97a6cdf70489ae2ef021c5c0a047c2266b6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d078fe2eeead6460c88e2a4e2dccdf417be18d202ce8a46c036d7fdbb6c16632"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b2065a6c0186ffda9fff18085b5c622e723d49769396d1a01289e1d9e5c4176a"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b2065a6c0186ffda9fff18085b5c622e723d49769396d1a01289e1d9e5c4176a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b2065a6c0186ffda9fff18085b5c622e723d49769396d1a01289e1d9e5c4176a"
+    sha256 cellar: :any_skip_relocation, sonoma:        "5e91e049274c923f00da03d29622b6a1236b601100e2b5b771b33d3281f282c6"
+    sha256 cellar: :any_skip_relocation, ventura:       "5e91e049274c923f00da03d29622b6a1236b601100e2b5b771b33d3281f282c6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8355f387677d8564a9fe4821572f6c99e76fa33f9a9a291796f049eb0b78f59e"
   end
 
   depends_on "go" => :build

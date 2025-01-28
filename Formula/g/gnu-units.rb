@@ -1,20 +1,18 @@
 class GnuUnits < Formula
   desc "GNU unit conversion tool"
   homepage "https://www.gnu.org/software/units/"
-  url "https://ftp.gnu.org/gnu/units/units-2.22.tar.gz"
-  mirror "https://ftpmirror.gnu.org/units/units-2.22.tar.gz"
-  sha256 "5d13e1207721fe7726d906ba1d92dc0eddaa9fc26759ed22e3b8d1a793125848"
+  url "https://ftp.gnu.org/gnu/units/units-2.24.tar.gz"
+  mirror "https://ftpmirror.gnu.org/units/units-2.24.tar.gz"
+  sha256 "1e502c4edfacf20b29284716c72e5ddb51a495a2365d7b03e7960494c4a0c902"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "513874dc0676da8124c51c057b940752ed76663c6d290c11b33fc7767a84b2cb"
-    sha256 arm64_monterey: "642c474a2809e0d9db1d0db76e37f02913da673cfc4fdc337d3b4f4412dd9058"
-    sha256 arm64_big_sur:  "c7a080c4aba8efa918476470972561d4a8e3ead5d808f02fcbf41c50226d5602"
-    sha256 ventura:        "ef142fd61422ad8cb76d4baaeaa71847ebbbf6c54fd351bda9d407d258d4e933"
-    sha256 monterey:       "07de02b9e3aa4e1dae47247a30a29c4e8b09013778d6efd040a0774136996a75"
-    sha256 big_sur:        "ed207519d9523dffa34a8000d8d40f2488a439c29527a07dd0d00a29aa093b3c"
-    sha256 catalina:       "fb2ec95d8a26caf1a11accecc6b93f825ebe07c098b249a876e257a066b7f836"
-    sha256 x86_64_linux:   "86b47abf6076ba0dfbbc413eb6cb6031636d097e276fb8526d3cb62227bfd8ea"
+    sha256 arm64_sequoia: "3e72fb9e4acdec731e168551f9bbfa788ebe467cc0d3f28129a1431560c3aa9d"
+    sha256 arm64_sonoma:  "6ac2aacbfcfb4ea86d625442d2fc37dbfe22ab1746f52176b69c1103ce1e5bf4"
+    sha256 arm64_ventura: "1d94bdf2d4593f992e8ed62654ded6c99152af1200163e1268b4b815f91bc461"
+    sha256 sonoma:        "bf0978be52268beff456873207f32b0f813214297bb54d1f2630b64b35456fe9"
+    sha256 ventura:       "5356e61f7cf6dce7314c20185d1fa01e7a02ec77212ec344ddb2bca1058302a3"
+    sha256 x86_64_linux:  "c19b8b57e51bd23f71f929ad375b6d0defdc4347ff4993ddf5c26ed2088a0b39"
   end
 
   depends_on "readline"
@@ -34,7 +32,7 @@ class GnuUnits < Formula
       (libexec/"gnubin").install_symlink bin/"gunits_cur" => "units_cur"
       (libexec/"gnuman/man1").install_symlink man1/"gunits.1" => "units.1"
     end
-    libexec.install_symlink "gnuman" => "man"
+    (libexec/"gnubin").install_symlink "../gnuman" => "man"
   end
 
   def caveats

@@ -4,11 +4,17 @@ class Libsigrok < Formula
   # libserialport is LGPL3+
   # fw-fx2lafw is GPL-2.0-or-later and LGPL-2.1-or-later"
   license all_of: ["GPL-3.0-or-later", "LGPL-3.0-or-later", "GPL-2.0-or-later", "LGPL-2.1-or-later"]
-  revision 2
+  revision 5
 
   stable do
     url "https://sigrok.org/download/source/libsigrok/libsigrok-0.5.2.tar.gz"
     sha256 "4d341f90b6220d3e8cb251dacf726c41165285612248f2c52d15df4590a1ce3c"
+
+    # build patch to replace `PyEval_CallObject` with `PyObject_CallObject`
+    patch do
+      url "https://github.com/sigrokproject/libsigrok/commit/5bc8174531df86991ba8aa6d12942923925d9e72.patch?full_index=1"
+      sha256 "247bfee9777a39d5dc454a999ce425a061cdc48f4956fdb0cc31ec67a8086ce0"
+    end
 
     resource "libserialport" do
       url "https://sigrok.org/download/source/libserialport/libserialport-0.1.1.tar.gz"
@@ -18,6 +24,20 @@ class Libsigrok < Formula
     resource "fw-fx2lafw" do
       url "https://sigrok.org/download/source/sigrok-firmware-fx2lafw/sigrok-firmware-fx2lafw-0.1.7.tar.gz"
       sha256 "a3f440d6a852a46e2c5d199fc1c8e4dacd006bc04e0d5576298ee55d056ace3b"
+
+      # Backport fixes to build with sdcc>=4.2.3. Remove in the next release of fw-fx2lafw.
+      patch do
+        url "https://sigrok.org/gitweb/?p=sigrok-firmware-fx2lafw.git;a=commitdiff_plain;h=5aab87d358a4585a10ad89277bb88ad139077abd"
+        sha256 "ddf21e9e655c78d93cb58742e1a4dcbe769dfa2d88cfc963f97b6e5794c2fdcf"
+      end
+      patch do
+        url "https://sigrok.org/gitweb/?p=sigrok-firmware-fx2lafw.git;a=commitdiff_plain;h=3e08500d22f87f69941b65cf8b8c1b85f9b41173"
+        sha256 "dd74b58ae0e255bca4558dc6604e32c34c49ddb05281d7edc35495f0c506373a"
+      end
+      patch do
+        url "https://sigrok.org/gitweb/?p=sigrok-firmware-fx2lafw.git;a=commitdiff_plain;h=96b0b476522c3f93a47ff8f479ec08105ba6a2a5"
+        sha256 "b75c7b6a1705e2f8d97d5bdaac01d1ae2476c0b0f1b624d766d722dd12b402db"
+      end
     end
   end
 
@@ -28,13 +48,12 @@ class Libsigrok < Formula
 
   bottle do
     rebuild 1
-    sha256 arm64_ventura:  "5cb796cad112521c090085f87cda4bafb9855e6c581ff2c04ad8fb41563b46a8"
-    sha256 arm64_monterey: "3f681eb6dd9e9de1062b048c29321600badf0665cb0a0436390dd33808820153"
-    sha256 arm64_big_sur:  "55ad23a50b5831d13e0138262166606c4c63419ae04ab3baa96b329a389ae5f1"
-    sha256 ventura:        "9f5afd85a8349cd773e36975ec1ca76d7081b62cbab0329095580dd2cdbb9fa1"
-    sha256 monterey:       "22b1440ef8e3ff0f8a402645a82240e108817be368a9eab22db5ea831c09aae9"
-    sha256 big_sur:        "15259f84462573558321e31f32c7260d5ab4fb7845706193c9c18036b4dea1f7"
-    sha256 x86_64_linux:   "7f959e18410ea27731bbbc844103f8354f03e8a0ae395b3c7aef9c9a0ffccd86"
+    sha256                               arm64_sequoia: "22e5e2db64f98452def0ed20f6896caa15fda7c38c71454adbd6c4261591eb43"
+    sha256                               arm64_sonoma:  "39c5f43f820298f30bb3ff75ea971257f1ce9a4df35be4f2ccd218355f2b7a62"
+    sha256                               arm64_ventura: "7f3024bf6ef54007c043d9be38515c29522cd9952280142d330009da93fd9fcc"
+    sha256                               sonoma:        "d0606b7df886ae65ba3fbf01968682ed5928ad17bbf293e6b905ed2fa097adc2"
+    sha256                               ventura:       "772490f83137bbd47c046691c5dd9af3ac245cc9e49d4e86d9c5db7355ed87f0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d91357303c1b4ff68746181b66eba6944140ff6bf365c1e88cfafd29f9c64076"
   end
 
   head do
@@ -55,7 +74,8 @@ class Libsigrok < Formula
   depends_on "doxygen" => :build
   depends_on "graphviz" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
+  depends_on "python-setuptools" => :build
   depends_on "sdcc" => :build
   depends_on "swig" => :build
   depends_on "glib"
@@ -67,7 +87,12 @@ class Libsigrok < Formula
   depends_on "nettle"
   depends_on "numpy"
   depends_on "pygobject3"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  on_macos do
+    depends_on "gettext"
+    depends_on "libsigc++@2"
+  end
 
   resource "fw-fx2lafw" do
     url "https://sigrok.org/download/binary/sigrok-firmware-fx2lafw/sigrok-firmware-fx2lafw-bin-0.1.7.tar.gz"
@@ -75,7 +100,7 @@ class Libsigrok < Formula
   end
 
   def python3
-    "python3.11"
+    "python3.13"
   end
 
   def install
@@ -137,7 +162,7 @@ class Libsigrok < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libsigrok/libsigrok.h>
 
       int main() {
@@ -150,14 +175,14 @@ class Libsigrok < Formula
         }
         return 0;
       }
-    EOS
-    flags = shell_output("#{Formula["pkg-config"].opt_bin}/pkg-config --cflags --libs libsigrok").strip.split
+    C
+    flags = shell_output("#{Formula["pkgconf"].opt_bin}/pkgconf --cflags --libs libsigrok").strip.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
 
-    system python3, "-c", <<~EOS
+    system python3, "-c", <<~PYTHON
       import sigrok.core as sr
       sr.Context.create()
-    EOS
+    PYTHON
   end
 end

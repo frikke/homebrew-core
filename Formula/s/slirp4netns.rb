@@ -1,17 +1,17 @@
 class Slirp4netns < Formula
   desc "User-mode networking for unprivileged network namespaces"
   homepage "https://github.com/rootless-containers/slirp4netns"
-  url "https://github.com/rootless-containers/slirp4netns/archive/refs/tags/v1.2.2.tar.gz"
-  sha256 "2450afb5730ee86a70f9c3f0d3fbc8981ab8e147246f4e0d354f0226a3a40b36"
+  url "https://github.com/rootless-containers/slirp4netns/archive/refs/tags/v1.3.1.tar.gz"
+  sha256 "a3b7c7b593b279c46d25a48b583371ab762968e98b6a46457d8d52a755852eb9"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "8dfda476c84084c7dd8f1a09582335cddc500053a7d3a6c5880509b7fa95eee2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "492b970210ffe774d43335d5d274d0df3b03697110fdbebcdff3762531a55a33"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   depends_on "bash" => :test
   depends_on "jq" => :test
@@ -42,6 +42,10 @@ class Slirp4netns < Formula
 
     resource("homebrew-test-common").stage (testpath/"test")
     resource("homebrew-test-api-socket").stage (testpath/"test")
+
+    # Reduce output to avoid interleaving of commands and stdout
+    inreplace "test/test-slirp4netns-api-socket.sh", /^set -xe/, "set -e"
+
     # The test secript requires network namespace to run, which is not available on Homebrew CI.
     # So here we check the error messages.
     output = shell_output("bash ./test/test-slirp4netns-api-socket.sh 2>&1", 1)

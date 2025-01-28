@@ -1,31 +1,32 @@
 class Hadoop < Formula
   desc "Framework for distributed processing of large data sets"
   homepage "https://hadoop.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz"
-  mirror "https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz"
-  sha256 "f5195059c0d4102adaa7fff17f7b2a85df906bcb6e19948716319f9978641a04"
+  url "https://www.apache.org/dyn/closer.lua?path=hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz"
+  mirror "https://archive.apache.org/dist/hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz"
+  sha256 "9ad5487833996dfe5514e756f4391029c90529fd22e8d002fd3dd0c14c04ba46"
   license "Apache-2.0"
 
+  livecheck do
+    url "https://hadoop.apache.org/releases.html"
+    regex(/href=.*?hadoop[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "babb72b9ea422ae665945db155016e9fda102ec8fd37af97261faf72805ac7ac"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cddc35ec7bb9fa8f6304588d52b62886ea9cb6ede2bd25368565457423258e2f"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "cddc35ec7bb9fa8f6304588d52b62886ea9cb6ede2bd25368565457423258e2f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cddc35ec7bb9fa8f6304588d52b62886ea9cb6ede2bd25368565457423258e2f"
-    sha256 cellar: :any_skip_relocation, sonoma:         "104b0ece894cfc0b4fac859cbc370117748cbedd21890846bb7ca87a95ee72ec"
-    sha256 cellar: :any_skip_relocation, ventura:        "6191a8773d779d5307e2f3fb7bb0c0d6f797638a8f87f07e849a0a61be3a726d"
-    sha256 cellar: :any_skip_relocation, monterey:       "6191a8773d779d5307e2f3fb7bb0c0d6f797638a8f87f07e849a0a61be3a726d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "6191a8773d779d5307e2f3fb7bb0c0d6f797638a8f87f07e849a0a61be3a726d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cddc35ec7bb9fa8f6304588d52b62886ea9cb6ede2bd25368565457423258e2f"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f85402488931c97be6c4c8eb13b1c802a417aa79cef03b59a6b294a51c34f261"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f85402488931c97be6c4c8eb13b1c802a417aa79cef03b59a6b294a51c34f261"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f85402488931c97be6c4c8eb13b1c802a417aa79cef03b59a6b294a51c34f261"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a778cfa6e5a611c84fc5ff42e00ad5d568ef7328c41c74a69455b008efcd5221"
+    sha256 cellar: :any_skip_relocation, ventura:       "a778cfa6e5a611c84fc5ff42e00ad5d568ef7328c41c74a69455b008efcd5221"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f85402488931c97be6c4c8eb13b1c802a417aa79cef03b59a6b294a51c34f261"
   end
 
   # WARNING: Check https://cwiki.apache.org/confluence/display/HADOOP/Hadoop+Java+Versions before updating JDK version
   depends_on "openjdk@11"
 
-  conflicts_with "corepack", because: "both install `yarn` binaries"
   conflicts_with "yarn", because: "both install `yarn` binaries"
 
   def install
-    rm_f Dir["bin/*.cmd", "sbin/*.cmd", "libexec/*.cmd", "etc/hadoop/*.cmd"]
+    rm(Dir["bin/*.cmd", "sbin/*.cmd", "libexec/*.cmd", "etc/hadoop/*.cmd"])
     rm ["bin/container-executor", "bin/oom-listener", "bin/test-container-executor"]
     libexec.install %w[bin sbin libexec share etc]
 
@@ -71,7 +72,7 @@ class Hadoop < Formula
       "CLASSPATH" => classpaths.join(":"),
     }, Formula["openjdk@11"].opt_bin/"java", "org.apache.hadoop.yarn.server.resourcemanager.ResourceManager",
                                              "-Dyarn.resourcemanager.webapp.address=127.0.0.1:#{port}")
-    sleep 8
+    sleep 15
 
     Process.getpgid pid
     system "curl", "http://127.0.0.1:#{port}"

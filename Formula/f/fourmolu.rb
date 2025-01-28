@@ -1,19 +1,18 @@
 class Fourmolu < Formula
   desc "Formatter for Haskell source code"
   homepage "https://github.com/fourmolu/fourmolu"
-  url "https://github.com/fourmolu/fourmolu/archive/v0.14.0.0.tar.gz"
-  sha256 "0faa85b5c3e62908164c2e0ecc749bcebda2841b8ca9db9ba16b696f210389e7"
+  url "https://github.com/fourmolu/fourmolu/archive/refs/tags/v0.18.0.0.tar.gz"
+  sha256 "9aa651611f15091261e1de9322ff7726954711172cec17bf61b179d3cbd70c1b"
   license "BSD-3-Clause"
   head "https://github.com/fourmolu/fourmolu.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b007c891a71b98a8252066face2dfa31c7c381549b6e4c35783a7f4d1c5ae908"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "20ed8f934e6c361dceb426a4a6b2382644a83e54474933c9b143b5c93636edf3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "abbb00f2ab04ecf68f055d16931ceab5bf3b0c1beb63d4d63a3cb418c301dd88"
-    sha256 cellar: :any_skip_relocation, ventura:        "5b6fac6bb3b70e1e8f4d48dee54895060cda6378f5f4255758259ab509db34ed"
-    sha256 cellar: :any_skip_relocation, monterey:       "3506285d5addd8138aee27e0232690eb063b027addb42c819b72e1ac3d483c68"
-    sha256 cellar: :any_skip_relocation, big_sur:        "39e3c3b0394806eec9409bd5435bb8967990ea77b9aeb0136e95de47badeebfd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ace9b9f28a3d9ae8b2b17139288e0a33a30e6c9aca5c8a88aa50cd4636b98bbf"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a2d9ce758465785f3ca94fa81e0eb51ce18d0cc967608fa08178d1a2f6f4e61c"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0c49416e68dda86b5f12e99c9df0dab041273dd80ac37665d1b8d452189cc6dc"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e9441f01027d37ddf2e858a4de858b581c4c5dfc4b2d725b54d6bdc662c38d6f"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e781261155de2f1e7380503ff6e11113df11fa570538e653e5c40d8ecb14ccf5"
+    sha256 cellar: :any_skip_relocation, ventura:       "4a5f366a75f763b629a4544fa762cabeac3dae37194ab25987e782bd23eb797e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "47cee8a9a89a790eddb07bdf4aebe741240a25ac37fed400dbd7c69f94510dec"
   end
 
   depends_on "cabal-install" => :build
@@ -25,7 +24,7 @@ class Fourmolu < Formula
   end
 
   test do
-    (testpath/"test.hs").write <<~EOS
+    (testpath/"test.hs").write <<~HASKELL
       foo =
         f1
         p1
@@ -39,8 +38,8 @@ class Fourmolu < Formula
       foo'' =
         f3 p1 p2
         p3
-    EOS
-    expected = <<~EOS
+    HASKELL
+    expected = <<~HASKELL
       foo =
           f1
               p1
@@ -58,7 +57,7 @@ class Fourmolu < Formula
               p1
               p2
               p3
-    EOS
+    HASKELL
     assert_equal expected, shell_output("#{bin}/fourmolu test.hs")
   end
 end

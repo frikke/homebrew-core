@@ -1,20 +1,25 @@
 class ZlibNg < Formula
   desc "Zlib replacement with optimizations for next generation systems"
   homepage "https://github.com/zlib-ng/zlib-ng"
-  url "https://github.com/zlib-ng/zlib-ng/archive/2.1.3.tar.gz"
-  sha256 "d20e55f89d71991c59f1c5ad1ef944815e5850526c0d9cd8e504eaed5b24491a"
+  url "https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.3.tar.gz"
+  sha256 "f2fb245c35082fe9ea7a22b332730f63cf1d42f04d84fe48294207d033cba4dd"
   license "Zlib"
 
+  # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
+  # labeled as "pre-release" on GitHub before the version is released, so it's
+  # necessary to use the `GithubLatest` strategy.
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "633530ebb2b3d759914ce772d25f8712a259738a3c5cd90d3b6cdb197559fb31"
-    sha256 cellar: :any,                 arm64_ventura:  "1691dcb7645027203f4b7672b052d8e98643aaefe88f8db7aa0eb5f754f93fac"
-    sha256 cellar: :any,                 arm64_monterey: "3afe91b0f21d26f6e3c6fbfbd103c2f57d12aa4991524c08a2c1a4f5f9881808"
-    sha256 cellar: :any,                 arm64_big_sur:  "2f7c641b699727baaaf4b3e08c09cc9efee625b496336906ff838f4fcd34dab6"
-    sha256 cellar: :any,                 sonoma:         "53fd72cd2468f412c3ba0523a9009372ddf0a777e76342984c16371b290bffc1"
-    sha256 cellar: :any,                 ventura:        "54996b18079af43be761755d9da2573846b96d191b812f04dcfa76ebebd2b99f"
-    sha256 cellar: :any,                 monterey:       "2904452a7eac011cddd53b53bba8ff30047ff3f025e9317a3a3c653bc868d754"
-    sha256 cellar: :any,                 big_sur:        "5ff6114f11e3c7a8a11e8f74c4422c400d7818719318d6ada4b3d349153b7488"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "310d3e2b84bd80be2db4a8c339442a1d92e474bdf1e59baec2865ba01719aa32"
+    sha256 cellar: :any,                 arm64_sequoia: "8a6407ff6ed8f11bdc38455def3dd19e0072ead6c4b7dd946a9c794369743952"
+    sha256 cellar: :any,                 arm64_sonoma:  "02f492874924adb106c91d846a90b3960c5b4b9c15320773ebea7cf492f01743"
+    sha256 cellar: :any,                 arm64_ventura: "f7da1ac1536239ff9e75637e41443f7f151dd5874d45f387ec37c6551ab0b370"
+    sha256 cellar: :any,                 sonoma:        "3af29abb3a9911cf6572bfc8dd6cd4e23c7bc6b7b5777bb1be87db15bf270e82"
+    sha256 cellar: :any,                 ventura:       "83d66831f2775ee792e9398e2ed6dae9c4d0c46d8c1e29c3b2955fcf434f218b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0527249cbdc21f2521169d09bb968a41a4bed937deac3b3ef6e9b09108110f59"
   end
 
   # https://zlib.net/zlib_how.html
@@ -31,7 +36,7 @@ class ZlibNg < Formula
   test do
     # Test uses an example of code for zlib and overwrites its API with zlib-ng API
     testpath.install resource("homebrew-test_artifact")
-    inreplace "zpipe.c", "#include \"zlib.h\"", <<~EOS
+    inreplace "zpipe.c", "#include \"zlib.h\"", <<~C
       #include "zlib-ng.h"
       #define inflate     zng_inflate
       #define inflateInit zng_inflateInit
@@ -40,7 +45,7 @@ class ZlibNg < Formula
       #define deflateEnd  zng_deflateEnd
       #define deflateInit zng_deflateInit
       #define z_stream    zng_stream
-    EOS
+    C
 
     system ENV.cc, "zpipe.c", "-I#{include}", "-L#{lib}", "-lz-ng", "-o", "zpipe"
 

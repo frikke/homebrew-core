@@ -1,24 +1,25 @@
 class Podsync < Formula
   desc "Turn YouTube or Vimeo channels, users, or playlists into podcast feeds"
   homepage "https://github.com/mxpv/podsync"
-  url "https://github.com/mxpv/podsync/archive/refs/tags/v2.6.1.tar.gz"
-  sha256 "e9d1653c4b8424b8f02dc1812c2848cfc930f400e996979464228cad0e16ec9b"
+  url "https://github.com/mxpv/podsync/archive/refs/tags/v2.7.0.tar.gz"
+  sha256 "9852b5ef187f31f281c7968c644202770fb8f6f1b8bf5c91d811d486cac54a34"
   license "MIT"
   head "https://github.com/mxpv/podsync.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0a819193e880f0f54cc926c324090b6aac012bced27e47c6835fde49065c6323"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6c739b189bc243d5b1622a720066048bed929054b795dabd1867b115874c6c4d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ac8333f73a2759b122a74d7b975a0afc50116913aef8726c3967a982325368ec"
-    sha256 cellar: :any_skip_relocation, ventura:        "b1465d7d2e3d055a8b3f1aceb2f1d6ff5cbcd0a82f49cc9cbb5b52a99ad12baa"
-    sha256 cellar: :any_skip_relocation, monterey:       "5710b2f920b20e94d6322751dafaaf459535a9b0e7b806e9df974b7b484e1045"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ff9eb8b1d9bde58246be6dd3b71c3c442814d348f4ebd55a01ea3a5ebbf737f8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f364100244c9a0360063b065cd0f0868ba0ab914ae4176b00d1aa4b6641a0d02"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "20be398a640998d4759372f56a4fd365e79eea1ca785366bd863700915177ca8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "2e01a9ac695520eec8a398618bc9b5eab8577e3bcbeee146e9c3f8f5ffdaaebe"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d1eda2a20fd3c5697c4cce16248960e105b36603e6e5d838156bd5f9b47e3784"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8d61e7e03d5b60ea673f3065870229d9359eb2b6ac0ed5e4ea98a6da86ed0547"
+    sha256 cellar: :any_skip_relocation, sonoma:         "602bba68f7ecc9dcfa776a522c80a64bf63df21efbf2a794f377789887d1efbe"
+    sha256 cellar: :any_skip_relocation, ventura:        "5a0792de081350d678e627f2a6557e0c82bfd4d1a02588ea9d88c8dc062159f3"
+    sha256 cellar: :any_skip_relocation, monterey:       "b68c090c3038e2b6497030fa3f9412aad1aaa22deee3fed78d1d0c5af1b7a7db"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "21dd15567642059e94a37909abcb9492bb2e7c524e00f33f6f4a1a5b7acb1279"
   end
 
   depends_on "go" => :build
   depends_on "ffmpeg"
-  depends_on "youtube-dl"
+  depends_on "yt-dlp"
 
   def install
     system "make", "build"
@@ -28,7 +29,7 @@ class Podsync < Formula
   test do
     port = free_port
 
-    (testpath/"config.toml").write <<~EOS
+    (testpath/"config.toml").write <<~TOML
       [server]
       port = #{port}
 
@@ -42,7 +43,7 @@ class Podsync < Formula
       [feeds]
         [feeds.ID1]
         url = "https://www.youtube.com/channel/UCxC5Ls6DwqV0e-CYcAKkExQ"
-    EOS
+    TOML
 
     pid = fork do
       exec bin/"podsync"

@@ -1,34 +1,30 @@
 class Notcurses < Formula
   desc "Blingful character graphics/TUI library"
   homepage "https://nick-black.com/dankwiki/index.php/Notcurses"
-  url "https://github.com/dankamongmen/notcurses/archive/v3.0.9.tar.gz"
-  sha256 "e5cc02aea82814b843cdf34dedd716e6e1e9ca440cf0f899853ca95e241bd734"
+  url "https://github.com/dankamongmen/notcurses/archive/refs/tags/v3.0.13.tar.gz"
+  sha256 "cf6342e50c02b830869bd28d8c953d22316b942b671e833c0f36899502084b35"
   license "Apache-2.0"
-  revision 2
 
   bottle do
-    sha256 arm64_ventura:  "e79bcc299bdeb6c17b69be034d770a76a2d0ec223382a53a45e7e112a06d4102"
-    sha256 arm64_monterey: "e3f401e6e601fb82df8a65c05e13e285f026d2b298448e4ee172938229fa34b6"
-    sha256 arm64_big_sur:  "b710c750bb84039f678d31edbe404b127604ee90233e153f921535ffce6b088a"
-    sha256 ventura:        "578b1284c0ea2a18e83091ec220396ec7850035ad7144b68295c02236b75b740"
-    sha256 monterey:       "1634302f1130997990d65d7d9b95fda1bc5c7c00f2e476a51515387b4c113b77"
-    sha256 big_sur:        "48b5c695a7af99908369b2aeae0489b9f4aaf4ec9cb03eddec86d912e05f011f"
-    sha256 x86_64_linux:   "4fcab7c51b5746f29ff6e2ff1e33940e04a8c58006a1543ed0bec6acb2c13708"
+    sha256 arm64_sequoia: "1545c6acf227d75acb8eac61fe1e9560a3af3dfe341d82b20696a65eeb555a05"
+    sha256 arm64_sonoma:  "a63ab6d9910e361595832480785cc157e7b7f0ecd86051eb61b063f3fcb3c301"
+    sha256 arm64_ventura: "4a04db71fd48279d7da206b54a1cd7eb4a0c7999effa37f68facb33addf4d725"
+    sha256 sonoma:        "3b8e20008a62da4cc03b8d0905c88d9f0ab4e26bf21e76cd8207707e5aaef259"
+    sha256 ventura:       "5a2f7147f2a7c98c61ab5085d1050df216e30fb17258141a197ef6b64fa21cd4"
+    sha256 x86_64_linux:  "eb34f639ffe338807ae9d20ccebc4fad5948594daec483dfb97377038e15db83"
   end
 
   depends_on "cmake" => :build
   depends_on "doctest" => :build
   depends_on "pandoc" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "ffmpeg"
   depends_on "libdeflate"
   depends_on "libunistring"
   depends_on "ncurses"
 
-  fails_with gcc: "5"
-
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "-S", ".", "-B", "build", "-DCMAKE_INSTALL_RPATH=#{rpath}", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
@@ -37,6 +33,6 @@ class Notcurses < Formula
     # current homebrew CI runs with TERM=dumb. given that Notcurses explicitly
     # does not support dumb terminals (i.e. those lacking the "cup" terminfo
     # capability), we expect a failure here. all output will go to stderr.
-    assert_empty shell_output("#{bin}/notcurses-info", 1)
+    assert_empty shell_output(bin/"notcurses-info", 1)
   end
 end

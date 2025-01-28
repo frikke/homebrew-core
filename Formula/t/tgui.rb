@@ -1,19 +1,24 @@
 class Tgui < Formula
   desc "GUI library for use with sfml"
   homepage "https://tgui.eu"
-  url "https://github.com/texus/TGUI/archive/v0.9.5.tar.gz"
-  sha256 "819865bf13661050161bce1e1ad68530a1f234becd3358c96d8701ea4e76bcc1"
+  url "https://github.com/texus/TGUI/archive/refs/tags/v1.7.0.tar.gz"
+  sha256 "7d40359770e2f8e534a57332c99fd56c72cf79a8b59642676e01394fe05cb1fa"
   license "Zlib"
   revision 1
 
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "b760089e9901e780346faeda6d680ebc3d752f54a6a46d4c782872f08ce5c9fb"
-    sha256 cellar: :any,                 arm64_monterey: "8a2456389f6a9a9ca380736525d059ac91aa46eb2d4fc15484a25347a9df6c6f"
-    sha256 cellar: :any,                 arm64_big_sur:  "895ca27d73fbefeb0a8aa3549544a5ffd37bf12b3e644614674621201b40f321"
-    sha256 cellar: :any,                 ventura:        "2c405311a5faf7e09c44220a4d597f51814fd94473a19eacb686d8a45fc55afb"
-    sha256 cellar: :any,                 monterey:       "d283a951bca2b60726ea2b3eaf6e4ee7be0454f577402c1db8b86d6624a0bd8d"
-    sha256 cellar: :any,                 big_sur:        "a0576cdb65a60167ae19063c933983e7fae19bb1f98307f5e790fe885dfbe429"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f36bca7449191ceb14c4ff91f34e34712ed8d9128eb0fe40abaa0d3bea69e944"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "080aa369e3989af0d6356474269a0fbf23a87dca6004225a830b3d1ed35fd0d7"
+    sha256 cellar: :any,                 arm64_sonoma:  "220cd61b22a0bc34084d3a0e0e3b37ee0e8e7b4cefe0c9cd2a3b6477d22b52eb"
+    sha256 cellar: :any,                 arm64_ventura: "0ac91f25c61424cbac1b04aaea23a0180dbc0b2e276695271479e0af17323ac6"
+    sha256 cellar: :any,                 sonoma:        "7f092bf4268f8503af9673cab2ebfaf3e36178dc4c630b06da9201eeaec9f551"
+    sha256 cellar: :any,                 ventura:       "c92b6d820ea57fd04dad69efbd9d4a7a082cd8c0ae0e0a389e72540e6be2a667"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "29d9dfeb5710e057b851722005b8caf9752b04904115bde7044f51a8881bb706"
   end
 
   depends_on "cmake" => :build
@@ -22,6 +27,7 @@ class Tgui < Formula
   def install
     args = %W[
       -DTGUI_MISC_INSTALL_PREFIX=#{pkgshare}
+      -DTGUI_BACKEND=SFML_GRAPHICS
       -DTGUI_BUILD_FRAMEWORK=FALSE
       -DTGUI_BUILD_EXAMPLES=TRUE
       -DTGUI_BUILD_GUI_BUILDER=TRUE
@@ -35,19 +41,30 @@ class Tgui < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <TGUI/TGUI.hpp>
+      #include <TGUI/Backend/SFML-Graphics.hpp>
       int main()
       {
-        sf::Text text;
-        text.setString("Hello World");
+        sf::RenderWindow window{sf::VideoMode{{800, 600}}, "TGUI example (SFML-Graphics)"};
+        tgui::Gui gui{window};
+        if (!window.isOpen())
+          return 1;
+        const auto event = window.pollEvent();
+        window.close();
         return 0;
       }
-    EOS
-    system ENV.cxx, "test.cpp", "-std=c++17", "-I#{include}",
+    CPP
+
+    system ENV.cxx, "test.cpp", "-std=c++17", "-I#{include}", "-I#{Formula["sfml"].opt_include}",
       "-L#{lib}", "-L#{Formula["sfml"].opt_lib}",
       "-ltgui", "-lsfml-graphics", "-lsfml-system", "-lsfml-window",
       "-o", "test"
-    system "./test"
+
+    if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+      assert_match "Failed to open X11 display", shell_output("./test 2>&1", 134)
+    else
+      system "./test"
+    end
   end
 end

@@ -1,49 +1,49 @@
 class Gfold < Formula
   desc "Help keep track of your Git repositories, written in Rust"
   homepage "https://github.com/nickgerace/gfold"
-  # TODO: check if we can use unversioned `libgit2` at version bump.
-  # See comments below for details.
-  url "https://github.com/nickgerace/gfold/archive/refs/tags/4.4.0.tar.gz"
-  sha256 "d1f8c5a578bc20751a8584c73d4df3092364b0616226656d71dbf954edd481c3"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/nickgerace/gfold.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "2c3202011e9ed676192d573292428cc2f96b6b93d8584b32f5c9902afc91835c"
-    sha256 cellar: :any,                 arm64_monterey: "6bf31918b5130dd9b20c50e1aa0d1ce30eb4e7360d24246568edf1d1ce327d0f"
-    sha256 cellar: :any,                 arm64_big_sur:  "b8575070e071d18fb85d33996f652dd41332efe4de74c39bff9eb31d613cd3a6"
-    sha256 cellar: :any,                 ventura:        "e331f58eb2250adeefc2a2c725963e27c7fb4cd18089141c02f5863bcb27d767"
-    sha256 cellar: :any,                 monterey:       "7c85c66db643ee79188c3ba810f0995750f366bd6fb2252a2df2297dab666bc4"
-    sha256 cellar: :any,                 big_sur:        "a187356fa10c4af5116a9ceebae7f1bc09bef032b7b5c1c2eaebfab3bccfe8be"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f9607d24633b3b73369142d66ca0dba4c10c41f41e2f30cf5153e5e329c1e3ba"
+  stable do
+    url "https://github.com/nickgerace/gfold/archive/refs/tags/4.6.0.tar.gz"
+    sha256 "f965daa340349b04bd9d29b5013dcb3006d2f5333cdbae1f1e3901a685e7bf7d"
+
+    # libgit2 1.9 build patch
+    patch do
+      url "https://github.com/nickgerace/gfold/commit/9dd050617adefa5776d6056892b3ca7c5fda8b2d.patch?full_index=1"
+      sha256 "bbb38a7419c82e5b33fe261dd1790d7d87a03d4930e801d0421287530dcf978d"
+    end
   end
 
-  depends_on "pkg-config" => :build
+  bottle do
+    sha256 cellar: :any,                 arm64_sequoia: "c8fb05b44e4e1463813e968cd143c5e75058a3bc68a21be4d6000a70181ab721"
+    sha256 cellar: :any,                 arm64_sonoma:  "e5a04e5a6969aa68a5d91e9205a93910a84317d5570a41e1115f26a23bdf62e8"
+    sha256 cellar: :any,                 arm64_ventura: "71d2cf8716fc3e10d1fce289ae2f10c7c533775a27f1e0eace914d525fcf7a4d"
+    sha256 cellar: :any,                 sonoma:        "cd2484f7a149a5cac2708ae97de755e25f85f776bde43b3fc77bf88480bb2c38"
+    sha256 cellar: :any,                 ventura:       "f2cd2b75deb9e7194a9c6e7b0f1cc2e83095d629fe257e0f9f2f8b5e1430effb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ec6098aad7b88db6c94eb6773a5c2a1e67d08e60d44736ab5af143ca8734f6f8"
+  end
+
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
-  # To check for `libgit2` version:
-  # 1. Search for `libgit2-sys` version at https://github.com/nickgerace/gfold/blob/#{version}/Cargo.lock
-  # 2. If the version suffix of `libgit2-sys` is newer than +1.6.*, then:
-  #    - Migrate to the corresponding `libgit2` formula.
-  #    - Change the `LIBGIT2_SYS_USE_PKG_CONFIG` env var below to `LIBGIT2_NO_VENDOR`.
-  #      See: https://github.com/rust-lang/git2-rs/commit/59a81cac9ada22b5ea6ca2841f5bd1229f1dd659.
-  depends_on "libgit2@1.6"
+  depends_on "libgit2"
 
   uses_from_macos "zlib"
 
   conflicts_with "coreutils", because: "both install `gfold` binaries"
 
   def install
-    ENV["LIBGIT2_SYS_USE_PKG_CONFIG"] = "1"
+    ENV["LIBGIT2_NO_VENDOR"] = "1"
 
-    system "cargo", "install", *std_cargo_args(path: "bin/gfold")
+    system "cargo", "install", *std_cargo_args
   end
 
   test do
     mkdir "test" do
       system "git", "config", "--global", "init.defaultBranch", "master"
       system "git", "init"
-      (Pathname.pwd/"README").write "Testing"
+      Pathname("README").write "Testing"
       system "git", "add", "README"
       system "git", "commit", "-m", "init"
     end
@@ -55,7 +55,7 @@ class Gfold < Formula
     linkage_with_libgit2 = (bin/"gfold").dynamically_linked_libraries.any? do |dll|
       next false unless dll.start_with?(HOMEBREW_PREFIX.to_s)
 
-      File.realpath(dll) == (Formula["libgit2@1.6"].opt_lib/shared_library("libgit2")).realpath.to_s
+      File.realpath(dll) == (Formula["libgit2"].opt_lib/shared_library("libgit2")).realpath.to_s
     end
 
     assert linkage_with_libgit2, "No linkage with libgit2! Cargo is likely using a vendored version."

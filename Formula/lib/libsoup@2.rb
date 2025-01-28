@@ -7,14 +7,15 @@ class LibsoupAT2 < Formula
   revision 1
 
   bottle do
-    sha256 arm64_ventura:  "28703a1f52485e8606ff0e34b22bcaf09aa743f84b62c937f8e2dc6bb2a3e2e9"
-    sha256 arm64_monterey: "c83d1b06c461f1052dca33dbb4611de3255629a01f6841cea10c879b33de062a"
-    sha256 arm64_big_sur:  "1beb7bcd38a32eb0392edf2c4512282dd70545a00522abceb18f27e8c4ad0ca1"
-    sha256 ventura:        "c75a526b2a7e38e78e1610f943e5057c3f74ee047405005a75e263e502fcc08e"
-    sha256 monterey:       "c45af2b51eefcef87380bd327d068113d862d8ea3468798143229e4a6ffaf066"
-    sha256 big_sur:        "c5b6becbd8d56922f462b27d995abdfb3c0e0bf40a5f90ad2dbaf8fbcf342f60"
-    sha256 catalina:       "a197f1b5e2b63ac86c26398cd4a01c60e5ff6c467fcfd4e64462c5c7d37186e2"
-    sha256 x86_64_linux:   "de39b19dac0d2b9ef080286d5402ab4d8d950d21765b19ebc4888276843c9009"
+    rebuild 1
+    sha256 arm64_sequoia:  "70298df345576271d6db06032e4497bf1fd769af3e33cc67687196469c61b8ef"
+    sha256 arm64_sonoma:   "9d50f2ce85396610a34a8b73c2f90f065a61958f5b5aa5f31df1a5e6d1c6b901"
+    sha256 arm64_ventura:  "b6b1f722faecc11f7f0f7d59da96b6582815179e2998e06c9d7d9a9b6221b8bc"
+    sha256 arm64_monterey: "c9a5a1b8cdbad59ea9bb297e382dd1165a3ada3d8145f4da3cec8183c34be647"
+    sha256 sonoma:         "df99ce0eca58f54c20982f095d6b0d51904dbfe21451e92637ba8b506c81cc4a"
+    sha256 ventura:        "9ff691ca203a1692efc87a66bb3f162eb88680a931085accbb65e223209e4704"
+    sha256 monterey:       "83efcf8f54f047a9ba3dd3acf032ef4cdbabce4574feac8105e6ae3822878021"
+    sha256 x86_64_linux:   "416f1242c8f4e786d4e3fb673a40926b9c5543bf50420bf9dbf24cae569743f2"
   end
 
   keg_only :versioned_formula
@@ -22,16 +23,27 @@ class LibsoupAT2 < Formula
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => [:build, :test]
+  depends_on "python@3.13" => :build
   depends_on "vala" => :build
+
+  depends_on "glib"
   depends_on "glib-networking"
   depends_on "gnutls"
   depends_on "libpsl"
+  depends_on "sqlite"
 
   uses_from_macos "krb5"
   uses_from_macos "libxml2"
-  uses_from_macos "sqlite"
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "gettext"
+  end
+
+  on_linux do
+    depends_on "brotli"
+  end
 
   def install
     system "meson", "setup", "build", *std_meson_args
@@ -41,7 +53,7 @@ class LibsoupAT2 < Formula
 
   test do
     # if this test start failing, the problem might very well be in glib-networking instead of libsoup
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libsoup/soup.h>
 
       int main(int argc, char *argv[]) {
@@ -53,24 +65,10 @@ class LibsoupAT2 < Formula
         g_object_unref(session);
         return 0;
       }
-    EOS
-    ENV.libxml2
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    flags = %W[
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/libsoup-2.4
-      -D_REENTRANT
-      -L#{gettext.opt_lib}
-      -L#{glib.opt_lib}
-      -L#{lib}
-      -lgio-2.0
-      -lglib-2.0
-      -lgobject-2.0
-      -lsoup-2.4
-    ]
+    C
+
+    ENV.prepend_path "PKG_CONFIG_PATH", lib/"pkgconfig"
+    flags = shell_output("pkgconf --cflags --libs libsoup-2.4").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

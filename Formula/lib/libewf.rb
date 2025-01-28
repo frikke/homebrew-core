@@ -2,22 +2,26 @@ class Libewf < Formula
   desc "Library for support of the Expert Witness Compression Format"
   homepage "https://github.com/libyal/libewf"
   # The main libewf repository is currently "experimental".
-  # See discussions in this issue, https://github.com/libyal/libewf/issues/127
-  url "https://github.com/libyal/libewf-legacy/releases/download/20140813/libewf-20140813.tar.gz"
-  sha256 "dbfdf1bbea5944b014c2311cce4615d92b2b6b91c8401eef8640de9f3e75845b"
+  # See discussions in this issue: https://github.com/libyal/libewf/issues/127
+  url "https://github.com/libyal/libewf-legacy/releases/download/20140816/libewf-20140816.tar.gz"
+  sha256 "6b2d078fb3861679ba83942fea51e9e6029c37ec2ea0c37f5744256d6f7025a9"
   license "LGPL-3.0-or-later"
-  revision 1
+
+  livecheck do
+    url :stable
+    regex(/^(?:libewf[._-])?v?(\d+(?:\.\d+)*)$/i)
+    strategy :github_latest
+  end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "38d67042ef18e590383d3ee4c63f11fbfeadd5114e2d030b9d3a0b85cca3d941"
-    sha256 cellar: :any,                 arm64_ventura:  "8def2a9a27530366a68cd979fca3d18113d5910d783440826849da7029e1567e"
-    sha256 cellar: :any,                 arm64_monterey: "9651ec9988df7c9f8e262de3b3c66e509b4e73615b35b704b460296b114a20b5"
-    sha256 cellar: :any,                 arm64_big_sur:  "136dd66a148431c3cb2aa1a0ddd8873815246c71ebcb1f166a2a1f9b7e07c3c0"
-    sha256 cellar: :any,                 sonoma:         "65bd468e929e4bc733685394c97522aa663e4852d8f00af2523bbd9ae5632b33"
-    sha256 cellar: :any,                 ventura:        "5d3521a54bfd559f3d72f8f0103d99ff4ba924c926cc47581ef94c68f972a4f0"
-    sha256 cellar: :any,                 monterey:       "dc0e9f340c83d755a5f8011af324da26e023910f8f8febd9649f4d08f8570c57"
-    sha256 cellar: :any,                 big_sur:        "89db32a46a3c5f233aaf2770bdc9458cff5a1389fd613a93c5f9f49959e0564c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2843f7499b6e04783446e8bb65cd09d5908c01d979d025d85692fc9ea958877a"
+    sha256 cellar: :any,                 arm64_sequoia:  "cc1ee22a4c919dcbcc09d7b8e6c63c212648cbb47d709271390a5b0ffab316f9"
+    sha256 cellar: :any,                 arm64_sonoma:   "f921e6618b878d66acb4b02db137244115b0e721dd935ae5b151b681000ea86c"
+    sha256 cellar: :any,                 arm64_ventura:  "0c994929653ecf3f7a487f17231db932301058a5883b0e6076dea4ba4b8468bd"
+    sha256 cellar: :any,                 arm64_monterey: "9b990ae7f7866c4f3600f0ab65f88782812a2bc47e83d0a869081ca87e594746"
+    sha256 cellar: :any,                 sonoma:         "85fbf4280d4b14162dbee0956d5fc13e61bd018d183e920fff921d157dff06ee"
+    sha256 cellar: :any,                 ventura:        "d67b1dbed6b0bb1b20eeb6d294451821bd19deb21b79d1ba8cdaf94d4eb34913"
+    sha256 cellar: :any,                 monterey:       "e63d530c15de2669b9957557fe72585795f783fa66684b492dc9c6c0e75d4f06"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b3ebd71fc7c67743ebcfa1cb95debe60db4d085ca3235b0c6cebec9836b13dba"
   end
 
   head do
@@ -28,7 +32,7 @@ class Libewf < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "openssl@3"
 
   uses_from_macos "bzip2"
@@ -40,14 +44,12 @@ class Libewf < Formula
       system "./autogen.sh"
     end
 
-    args = %W[
-      --disable-dependency-tracking
+    args = %w[
       --disable-silent-rules
-      --prefix=#{prefix}
       --with-libfuse=no
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 

@@ -1,10 +1,9 @@
 class Mupen64plus < Formula
   desc "Cross-platform plugin-based N64 emulator"
   homepage "https://www.mupen64plus.org/"
-  url "https://github.com/mupen64plus/mupen64plus-core/releases/download/2.5/mupen64plus-bundle-src-2.5.tar.gz"
-  sha256 "9c75b9d826f2d24666175f723a97369b3a6ee159b307f7cc876bbb4facdbba66"
+  url "https://github.com/mupen64plus/mupen64plus-core/releases/download/2.6.0/mupen64plus-bundle-src-2.6.0.tar.gz"
+  sha256 "297e17180cd76a7b8ea809d1a1be2c98ed5c7352dc716965a80deb598b21e131"
   license "GPL-2.0-or-later"
-  revision 5
 
   livecheck do
     url :stable
@@ -12,89 +11,63 @@ class Mupen64plus < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 ventura:      "01f78075888dd30e0afdbeddfd2f88c850ff9bb2b1d3b74a229be82983e1a8d0"
-    sha256 cellar: :any,                 monterey:     "a60342d95f8e8636dce8a13eb726c699794ca05e128c9fe851be589773bbe0bb"
-    sha256 cellar: :any,                 big_sur:      "688ec0ca8dbeb03395ce9d5059149acd26675274a58f881af48555a264cef8cf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "9c422712d19f6e8e3a366a9b02e192dda239fc895089184ab884683b3c228aae"
+    sha256 arm64_sequoia: "fa76319a48aa3bc5d5997f8c5108156a8501c110bc7e02a3a69d86065cd28264"
+    sha256 arm64_sonoma:  "5005db0835711d42c5d6c457795e4b6374e974568f380fb381d440266dbdd5b1"
+    sha256 arm64_ventura: "5a9308e8d1a6356bbef3f5f6009fb06c1d190d59fd3e85565c4f9e1123cf3ff1"
+    sha256 sonoma:        "26e73f4712a1bf42221a86efe322010a2f9b521f58c9b24611881522967b790f"
+    sha256 ventura:       "788e3150ef2a190f730edd401a47c46b548f978994fdcd5497f2ed7ec1db433c"
+    sha256 x86_64_linux:  "6b1e569e22ff2c8f5ef5b343f93a684b6a866e12df7b5e1dd615b79c4e361b75"
   end
 
-  depends_on "pkg-config" => :build
-  depends_on arch: :x86_64
-  depends_on "boost"
+  depends_on "pkgconf" => :build
   depends_on "freetype"
   depends_on "libpng"
   depends_on "sdl2"
 
+  uses_from_macos "zlib"
+
   on_linux do
     depends_on "mesa"
-    depends_on "mesa-glu"
+    depends_on "vulkan-loader"
   end
 
-  resource "rom" do
-    url "https://github.com/mupen64plus/mupen64plus-rom/raw/76ef14c876ed036284154444c7bdc29d19381acc/m64p_test_rom.v64"
-    sha256 "b5fe9d650a67091c97838386f5102ad94c79232240f9c5bcc72334097d76224c"
+  on_intel do
+    depends_on "nasm" => :build
+  end
+
+  # Backport fix to avoid macOS app bundle path
+  patch do
+    url "https://github.com/mupen64plus/mupen64plus-ui-console/commit/1cab2e6dfe46d5fbc4c23e1e7fbb4502a4e57981.patch?full_index=1"
+    sha256 "a6e80f36b65406d31f3611f88e695e5c079db52b6f68daa8eb01307f5447194c"
+    directory "source/mupen64plus-ui-console"
   end
 
   def install
     # Prevent different C++ standard library warning
-    inreplace Dir["source/mupen64plus-**/projects/unix/Makefile"],
-              /(-mmacosx-version-min)=\d+\.\d+/,
-              "\\1=#{MacOS.version}"
-
-    # Fix build with Xcode 9 using upstream commit:
-    # https://github.com/mupen64plus/mupen64plus-video-glide64mk2/commit/5ac11270
-    # Remove in next version
-    inreplace "source/mupen64plus-video-glide64mk2/src/Glide64/3dmath.cpp",
-              "__builtin_ia32_storeups", "_mm_storeu_ps"
-
-    if OS.linux?
-      ENV.append "CFLAGS", "-fcommon"
-      ENV.append "CFLAGS", "-fpie"
+    if OS.mac?
+      inreplace Dir["source/mupen64plus-*/projects/unix/Makefile"],
+                /(-mmacosx-version-min)=\d+\.\d+/,
+                "\\1=#{MacOS.version}"
     end
 
-    args = ["install", "PREFIX=#{prefix}"]
-    args << if OS.mac?
-      "INSTALL_STRIP_FLAG=-S"
-    else
-      "USE_GLES=1"
-    end
+    args = ["PREFIX=#{prefix}", "SHAREDIR=#{pkgshare}", "NO_SRC=1", "NO_SPEEX=1", "V=1"]
+    args << "USE_GLES=1" if OS.linux?
 
-    cd "source/mupen64plus-core/projects/unix" do
-      system "make", *args
-    end
-
-    cd "source/mupen64plus-audio-sdl/projects/unix" do
-      system "make", *args, "NO_SRC=1", "NO_SPEEX=1"
-    end
-
-    cd "source/mupen64plus-input-sdl/projects/unix" do
-      system "make", *args
-    end
-
-    cd "source/mupen64plus-rsp-hle/projects/unix" do
-      system "make", *args
-    end
-
-    cd "source/mupen64plus-video-glide64mk2/projects/unix" do
-      system "make", *args
-    end
-
-    cd "source/mupen64plus-video-rice/projects/unix" do
-      system "make", *args
-    end
-
-    cd "source/mupen64plus-ui-console/projects/unix" do
-      system "make", *args, "PIE=1"
-    end
+    system "./m64p_build.sh", *args
+    system "./m64p_install.sh", *args
   end
 
   test do
     # Disable test in Linux CI because it hangs because a display is not available.
     return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
 
+    resource "rom" do
+      url "https://github.com/mupen64plus/mupen64plus-rom/raw/76ef14c876ed036284154444c7bdc29d19381acc/m64p_test_rom.v64"
+      sha256 "b5fe9d650a67091c97838386f5102ad94c79232240f9c5bcc72334097d76224c"
+    end
+
     resource("rom").stage do
-      system bin/"mupen64plus", "--testshots", "1",
-             "m64p_test_rom.v64"
+      system bin/"mupen64plus", "--testshots", "1", "m64p_test_rom.v64"
     end
   end
 end

@@ -1,26 +1,20 @@
 class Otf2bdf < Formula
   desc "OpenType to BDF font converter"
-  homepage "http://sofia.nmsu.edu/~mleisher/Software/otf2bdf/"
-  url "http://sofia.nmsu.edu/~mleisher/Software/otf2bdf/otf2bdf-3.1.tbz2"
+  homepage "https://github.com/jirutka/otf2bdf"
+  url "https://slackware.uk/~urchlay/src/otf2bdf-3.1.tbz2"
   sha256 "3d63892e81187d5192edb96c0dc6efca2e59577f00e461c28503006681aa5a83"
-
-  livecheck do
-    url :homepage
-    regex(/href=.*?otf2bdf[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
+  license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_ventura:  "ad6e3edd7a5580a686f85804bace10257aac6fca2d986cdeac6a6a7ecc85a16d"
-    sha256 cellar: :any,                 arm64_monterey: "24958a27ec3ab7c33c3a23e5617a2eee5ebf78d80df0fc0efb5da8fe4dee04b1"
-    sha256 cellar: :any,                 arm64_big_sur:  "077dfdbef2ee5d04e9101f64cfe6da40631d8ea685e2fd6dfe052bfd0374bcf0"
-    sha256 cellar: :any,                 ventura:        "253ccb814956456b58a293c71e9ab44d1bf225b14de70e2d64cf718a91f62fde"
-    sha256 cellar: :any,                 monterey:       "9be65daed2aacb60a961236e47cb496c4afac542ce3b48fe6ff16653d8bc9454"
-    sha256 cellar: :any,                 big_sur:        "3feac6fe8b055277c8b4174415f5974fc082019ab1b82c8c582fbf9f8de581d0"
-    sha256 cellar: :any,                 catalina:       "200d4f317f5fda0c3c4a350ba773322af4a29af56a65f9e3de11b406ab517522"
-    sha256 cellar: :any,                 mojave:         "76e89f43b017f0bc2f90c3d49e70d75ac9da5260b9567d1078449f1b80af60bf"
-    sha256 cellar: :any,                 high_sierra:    "208ef317e3c51e88818c4f59ca0333a76d6efeed97b04affe66c3cd6b601bada"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "474eb191656b41d2707754f98de17c2a5691a8917981ee52155de962dc314395"
+    rebuild 2
+    sha256 cellar: :any,                 arm64_sequoia:  "5e44f2e2e203dd4d581516ddc4e6819fb99a8029356414019c63b7698910c3a2"
+    sha256 cellar: :any,                 arm64_sonoma:   "d870da25b4ff6680200b767f9bd5c2d94bb4be4413498a4a80ea52d2af87aea1"
+    sha256 cellar: :any,                 arm64_ventura:  "1ad51b1db3e7b521fb3608e43e27c495aae5438f03913f133b7ab14a85cd1ce6"
+    sha256 cellar: :any,                 arm64_monterey: "6886123b0c45985af7cba20da8c3dad5b7781087f2ef1c7202eecb2d598c898f"
+    sha256 cellar: :any,                 sonoma:         "1d140fa94e091509910ca6713ab82a97f7af120833ccc2e3978068be815f6fee"
+    sha256 cellar: :any,                 ventura:        "edfb01b76f2db5887a66bdc3ecdc42081a03a4645a76fe6c15f626a7c6925129"
+    sha256 cellar: :any,                 monterey:       "dafee8b4a63fb155ed161200df6c15e64ba054863cfcfc3171038b795bfc2ea1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "06814ebf37e5b3387409a79c416d52ab43c3a67d32ea1bea076d471bb0c84142"
   end
 
   depends_on "freetype"
@@ -33,7 +27,7 @@ class Otf2bdf < Formula
   end
 
   resource "mkinstalldirs" do
-    url "http://sofia.nmsu.edu/~mleisher/Software/otf2bdf/mkinstalldirs"
+    url "https://raw.githubusercontent.com/jirutka/otf2bdf/master/mkinstalldirs"
     sha256 "e7b13759bd5caac0976facbd1672312fe624dd172bbfd989ffcc5918ab21bfc1"
   end
 

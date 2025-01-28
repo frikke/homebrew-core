@@ -1,34 +1,38 @@
 class Gtranslator < Formula
   desc "GNOME gettext PO file editor"
   homepage "https://wiki.gnome.org/Design/Apps/Translator"
-  url "https://download.gnome.org/sources/gtranslator/42/gtranslator-42.0.tar.xz"
-  sha256 "2a67bcbfe643061b0696d89a10847d50bf35905ff3361b9871357d3e3422f13b"
+  url "https://download.gnome.org/sources/gtranslator/47/gtranslator-47.1.tar.xz"
+  sha256 "c91c0264b9a99e3091ef911f731a8ff6d09a84a2bcd75e5651971da6bbea6222"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_ventura:  "eff3164e795130ffbfb819d020f10d12c7c26433645d41258f9168b179a5e0fa"
-    sha256 arm64_monterey: "c9dad313a4b72b1a06828305fd3c7be3cdc9ed990faac40dc8325245d19d1a23"
-    sha256 arm64_big_sur:  "7dc1c16652e097e44e7e02f3ad95c361b208426517898de58160a98b8a1361a4"
-    sha256 ventura:        "d1b51162cd3762bf620685a287603026937831e492896ccbfb99485a9516e031"
-    sha256 monterey:       "6f82d622765a3269c0b0bca386ee425375b369f20d1eaa2bc5b9fdbe19951998"
-    sha256 big_sur:        "c4b68d96cb52329c1ae13d146ce5d76ed47a8d92be5ae33022af2194e14f353a"
-    sha256 x86_64_linux:   "bbd7b7cc4d3466f46bac926ae3ca16ab81cbeadd13baafdd7dfe550d530e67cc"
+    sha256 arm64_sequoia: "9528d2d0c63f9fc72e116c529635b9a1062c378de167317f533eeb19f26b3ec9"
+    sha256 arm64_sonoma:  "dbbbb590aa84894918b7d13179f95c4a5e3048df1707ef285011dc070e09aeeb"
+    sha256 arm64_ventura: "44f9fae1b4fcc02e8cd7cb1c81162e14a7122a17046e14f719f11faebbc01983"
+    sha256 sonoma:        "a7bee03217bdf2fec854a4ac33c6fdb7dc2a73c230f880aa51c162e6f0a25487"
+    sha256 ventura:       "b9ced5aee8dfac8bdeaddb5be0e3221660298cbb622dc8739a5112c3fe9f696c"
+    sha256 x86_64_linux:  "0c4b171ded4cde9d2cd935af1d7e8993cd28d9a929b11d8bbbca29ba45b87c35"
   end
 
+  depends_on "desktop-file-utils" => :build # for update-desktop-database
   depends_on "itstool" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "adwaita-icon-theme"
+  depends_on "cairo"
   depends_on "gettext"
   depends_on "glib"
   depends_on "gspell"
-  depends_on "gtk+3"
-  depends_on "gtksourceview4"
+  depends_on "gtk4"
+  depends_on "gtksourceview5"
   depends_on "json-glib"
+  depends_on "libadwaita"
   depends_on "libgda"
-  depends_on "libhandy"
   depends_on "libsoup"
+  depends_on "libspelling"
+  depends_on "pango"
 
   uses_from_macos "libxml2"
 
@@ -47,6 +51,6 @@ class Gtranslator < Formula
   end
 
   test do
-    system "#{bin}/gtranslator", "-h"
+    system bin/"gtranslator", "-h"
   end
 end

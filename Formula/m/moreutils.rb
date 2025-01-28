@@ -1,24 +1,26 @@
 class Moreutils < Formula
   desc "Collection of tools that nobody wrote when UNIX was young"
   homepage "https://joeyh.name/code/moreutils/"
-  url "https://git.joeyh.name/git/moreutils.git",
-      tag:      "0.67",
-      revision: "ee8e013cd5398c5fb34fb19a24db0f3b6185bac3"
+  url "https://git.joeyh.name/index.cgi/moreutils.git/snapshot/moreutils-0.70.tar.gz"
+  sha256 "f2bf46d410ba567cc8d01507e94916994e48742722e690dc498fab59f5250132"
   license all_of: [
     "GPL-2.0-or-later",
     { any_of: ["GPL-2.0-only", "Artistic-2.0"] },
   ]
   head "https://git.joeyh.name/git/moreutils.git", branch: "master"
 
+  livecheck do
+    url :head
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d2d7aea31dd1470da60cf4c7382407338c8bbc9806765a8eeb22084fb86541df"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "97487d8fcda41988e9b03a87770260953fc05e2282e069a35fc5742e804ed0ec"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c8ddb7455bee7e0dfc6b870a36c4cc2eb6462058d69f19d104c9522386a49ef4"
-    sha256 cellar: :any_skip_relocation, ventura:        "3b2c236961b8496b18456e54fa3561ca227532c6f855f2f95d86bc69dc2c30a4"
-    sha256 cellar: :any_skip_relocation, monterey:       "4bbca70595aa3ebf16c1297b00725a95d32220e5b849db8b024b724a953e923a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "89bba0318b0d38d10e799a4d8a39b2b1e32bcab22cb416f73aff938c765b8d3e"
-    sha256 cellar: :any_skip_relocation, catalina:       "6436bbcfa0d40fe6977f76e212665c89120a920c1e6b2661ea8fbb675ab2e4e8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "585a1be3b05cb1a625571aaa5ecf67333cbd2c329152e0526b6dee4510015a76"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4d054e5d66851413c272c39e156a48467f39959e89c84f91c1de41cd690c6b78"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "fe0990b48df79c064ba76b72360019bea03328e6fcbd99a866ab9d6a1a37e95f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "52bc03dcf5828555287e4f2ddd22da821a332a07f73118449dfd7fb9b86bf2dc"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e26e5d2933b3012c95929c26c6d7298a1820370f9b15e2c05fa10ca4e8b020f5"
+    sha256 cellar: :any_skip_relocation, ventura:       "42dc76da4d89f2bea57718ad8ccba438651099ee27881b5a8e34c9052777947f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "06d1c740d7401fec23a230bcd5f113e8d10c00c0d80f8b12861acc5d64b79b3a"
   end
 
   depends_on "docbook-xsl" => :build
@@ -39,8 +41,8 @@ class Moreutils < Formula
   end
 
   resource "IPC::Run" do
-    url "https://cpan.metacpan.org/authors/id/T/TO/TODDR/IPC-Run-20200505.0.tar.gz"
-    sha256 "816ebf217fa0df99c583d73c0acc6ced78ac773787c664c75cbf140bb7e4c901"
+    url "https://cpan.metacpan.org/authors/id/T/TO/TODDR/IPC-Run-20231003.0.tar.gz"
+    sha256 "eb25bbdf5913d291797ef1bfe998f15130b455d3ed02aacde6856f0b25e4fe57"
   end
 
   def install

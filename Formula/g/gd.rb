@@ -7,6 +7,7 @@ class Gd < Formula
   revision 6
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "c4e22a92d28f3b8a49c10e29cf04f5a9b4b4932691ec4326021bc149ac0dae4c"
     sha256 cellar: :any,                 arm64_sonoma:   "e278f6f79e6ac00c5f0f14bc8980197c89426eab2ba90d8fc1e82da777fb8378"
     sha256 cellar: :any,                 arm64_ventura:  "3f868f36cc47f91ea2a896c4b6ea62fab9b3ef94d7765f34234b277ee46788af"
     sha256 cellar: :any,                 arm64_monterey: "98906db0b5efdd3a46296035df0ec9a99ebfbf5d6c6d76d7af5e2862152a6c97"
@@ -56,7 +57,7 @@ class Gd < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "gd.h"
       #include <stdio.h>
 
@@ -75,7 +76,7 @@ class Gd < Formula
         fclose(pngout);
         gdImageDestroy(im);
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lgd", "-o", "test"
     system "./test"
     assert_path_exists "#{testpath}/test.png"

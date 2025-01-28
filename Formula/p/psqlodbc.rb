@@ -1,37 +1,36 @@
 class Psqlodbc < Formula
   desc "Official PostgreSQL ODBC driver"
   homepage "https://odbc.postgresql.org"
-  url "https://ftp.postgresql.org/pub/odbc/versions/src/psqlodbc-16.00.0000.tar.gz"
-  sha256 "afd892f89d2ecee8d3f3b2314f1bd5bf2d02201872c6e3431e5c31096eca4c8b"
+  url "https://github.com/postgresql-interfaces/psqlodbc/archive/refs/tags/REL-17_00_0004.tar.gz"
+  sha256 "6d15bc4f49a0c9e0d263ff30b042d4d49ef4ead745c2dd1f0d0d9c3d2a98b4fc"
   license "LGPL-2.0-or-later"
+  head "https://github.com/postgresql-interfaces/psqlodbc.git", branch: "main"
 
   livecheck do
-    url "https://ftp.postgresql.org/pub/odbc/versions/src/"
-    regex(/href=.*?psqlodbc[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :stable
+    regex(/^REL[._-]?v?(\d+(?:[._]\d+)+)$/i)
+    strategy :git do |tags, regex|
+      tags.filter_map { |tag| tag[regex, 1]&.tr("_", ".") }
+    end
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "f53fb9326250d633c23dfef023e69ef0597895cfbc86c8cf81848c7e9a4bfab6"
-    sha256 cellar: :any,                 arm64_monterey: "28bd7e3f2aadef2bf3aca658ca50a2737269a6291244e6ad67b67a1b94467370"
-    sha256 cellar: :any,                 arm64_big_sur:  "bc0dc67fbd70f40764022d62130bcb4ac56b03e54536379111861865869eccd8"
-    sha256 cellar: :any,                 ventura:        "ef187668cb23144e4417b24223d1d11c36003b50f1f39d2f36cb27e7e4c6878f"
-    sha256 cellar: :any,                 monterey:       "2de23c7e1ca3c02345187d4d626d23822ccbb3c2010057c0419628ab710c4e85"
-    sha256 cellar: :any,                 big_sur:        "1e12c7ad493668714db01072007993ce3bd7d68959ed00eb42b5959a838dc2d1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5e7abbebf5c82fff0fd95e55c2af66c164ee7562dffef391c2a96e9a1a371c0c"
+    sha256 cellar: :any,                 arm64_sequoia: "9e49dfa5be7d586220140bb26762cf8c05a65dba887e3a09c1500bd7fb5b186b"
+    sha256 cellar: :any,                 arm64_sonoma:  "bed65e967f687e24a56f233b8def6503ba7a6edcae118b978e429e515a466ccb"
+    sha256 cellar: :any,                 arm64_ventura: "5476eb923b4ebdd7377596ee553139a6f059730b2f0e1917cea60e3bc62ecb1d"
+    sha256 cellar: :any,                 sonoma:        "b34391bdbb4a636e9837e209ba178d1660de9ced2d63d033de3f57f39808ebda"
+    sha256 cellar: :any,                 ventura:       "b57bbc3a6e580f83e695067836a9eff58fd033ef55b6970cb8c31672429e81b1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "15dfa1958197323d476238ea26efa630f85955c78eca68eb7b0a54a682660034"
   end
 
-  head do
-    url "https://git.postgresql.org/git/psqlodbc.git", branch: "master"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "libpq"
   depends_on "unixodbc"
 
   def install
-    system "./bootstrap" if build.head?
+    system "./bootstrap"
     system "./configure", "--prefix=#{prefix}",
                           "--with-unixodbc=#{Formula["unixodbc"].opt_prefix}"
     system "make"

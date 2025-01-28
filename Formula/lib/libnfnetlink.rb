@@ -11,7 +11,8 @@ class Libnfnetlink < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "302c0c8f5d1b84aa7482b918d2b70a9c88eb0e794163342317b208feff242993"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "927f6b62c2f87ff79d92d07e52bb312d3fb24731e694cc804179730b08f15eae"
   end
 
   depends_on :linux
@@ -25,13 +26,13 @@ class Libnfnetlink < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libnfnetlink/libnfnetlink.h>
 
       int main() {
         int i = NFNL_BUFFSIZE;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lnfnetlink", "-o", "test"
   end

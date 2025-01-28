@@ -1,12 +1,13 @@
 class Zimg < Formula
   desc "Scaling, colorspace conversion, and dithering library"
   homepage "https://github.com/sekrit-twc/zimg"
-  url "https://github.com/sekrit-twc/zimg/archive/release-3.0.5.tar.gz"
+  url "https://github.com/sekrit-twc/zimg/archive/refs/tags/release-3.0.5.tar.gz"
   sha256 "a9a0226bf85e0d83c41a8ebe4e3e690e1348682f6a2a7838f1b8cbff1b799bcf"
   license "WTFPL"
   head "https://github.com/sekrit-twc/zimg.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "16b38c35a093542456e5c026cb464df27ebe509eb857696cbfbb6146708e5cd1"
     sha256 cellar: :any,                 arm64_sonoma:   "1a08f06a0a7fc2a23266a03e8afd63759f99f3a0041d1503fafc5ce9410df8dc"
     sha256 cellar: :any,                 arm64_ventura:  "cc82dc203d39c81808f2afacf64b5b5048859de941fff9e8caea599b8db83a3f"
     sha256 cellar: :any,                 arm64_monterey: "2bbd044c345af191083c75e1e67b48f31ded8bc4869e19de25d6bd19d3a214ed"
@@ -29,7 +30,7 @@ class Zimg < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <zimg.h>
 
@@ -40,7 +41,7 @@ class Zimg < Formula
         assert(ZIMG_MATRIX_UNSPECIFIED == format.matrix_coefficients);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lzimg", "-o", "test"
     system "./test"
   end

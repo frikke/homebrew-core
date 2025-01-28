@@ -2,19 +2,18 @@ class Kubevela < Formula
   desc "Application Platform based on Kubernetes and Open Application Model"
   homepage "https://kubevela.io"
   url "https://github.com/kubevela/kubevela.git",
-      tag:      "v1.9.6",
-      revision: "9c57c098783fabeb76428cf88720a5a02ca641ee"
+      tag:      "v1.9.13",
+      revision: "d56da069eb5ee06d9716810e828d6370b93b70ba"
   license "Apache-2.0"
   head "https://github.com/kubevela/kubevela.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7adcbae6b18d0dcb9abce91a57a10d33be955b4919e196277a0bc3dab8773b84"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7adcbae6b18d0dcb9abce91a57a10d33be955b4919e196277a0bc3dab8773b84"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7adcbae6b18d0dcb9abce91a57a10d33be955b4919e196277a0bc3dab8773b84"
-    sha256 cellar: :any_skip_relocation, ventura:        "0834d5ab79bb68aca261203bf540b45a48f6fc0b1a067aa8b1853b69967aba6b"
-    sha256 cellar: :any_skip_relocation, monterey:       "0834d5ab79bb68aca261203bf540b45a48f6fc0b1a067aa8b1853b69967aba6b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0834d5ab79bb68aca261203bf540b45a48f6fc0b1a067aa8b1853b69967aba6b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a7917062765f69288cc00959046b8eccc208f7bc37a8bf797d9bb31d8fc5140e"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fe1e54b93fe1283c9055ad8eeec23c03ae97e875551203c8e38b0e2667eda8c2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "fe1e54b93fe1283c9055ad8eeec23c03ae97e875551203c8e38b0e2667eda8c2"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "fe1e54b93fe1283c9055ad8eeec23c03ae97e875551203c8e38b0e2667eda8c2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "248c969a99ec3799628cf1a8213db0213199114c08cac51d5d6a91615812f876"
+    sha256 cellar: :any_skip_relocation, ventura:       "248c969a99ec3799628cf1a8213db0213199114c08cac51d5d6a91615812f876"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5bf136e25f6812d38c07f3c8db51e5c80e0290d3df3adaf601c3423ff79664ad"
   end
 
   depends_on "go" => :build
@@ -27,9 +26,9 @@ class Kubevela < Formula
       -X github.com/oam-dev/kubevela/version.GitRevision=#{Utils.git_head}
     ]
 
-    system "go", "build", *std_go_args(output: bin/"vela", ldflags: ldflags), "./references/cmd/cli"
+    system "go", "build", *std_go_args(output: bin/"vela", ldflags:), "./references/cmd/cli"
 
-    generate_completions_from_executable(bin/"vela", "completion", shells: [:bash, :zsh], base_name: "vela")
+    generate_completions_from_executable(bin/"vela", "completion", shells: [:bash, :zsh])
   end
 
   test do
@@ -37,7 +36,7 @@ class Kubevela < Formula
     status_output = shell_output("#{bin}/vela up 2>&1", 1)
     assert_match "error: either app name or file should be set", status_output
 
-    (testpath/"kube-config").write <<~EOS
+    (testpath/"kube-config").write <<~YAML
       apiVersion: v1
       clusters:
       - cluster:
@@ -56,7 +55,7 @@ class Kubevela < Formula
       - name: test
         user:
           token: test
-    EOS
+    YAML
 
     ENV["KUBECONFIG"] = testpath/"kube-config"
     version_output = shell_output("#{bin}/vela version 2>&1")

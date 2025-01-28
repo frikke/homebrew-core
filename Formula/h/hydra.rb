@@ -1,27 +1,27 @@
 class Hydra < Formula
   desc "Network logon cracker which supports many services"
   homepage "https://github.com/vanhauser-thc/thc-hydra"
-  url "https://github.com/vanhauser-thc/thc-hydra/archive/v9.5.tar.gz"
+  url "https://github.com/vanhauser-thc/thc-hydra/archive/refs/tags/v9.5.tar.gz"
   sha256 "9dd193b011fdb3c52a17b0da61a38a4148ffcad731557696819d4721d1bee76b"
   license "AGPL-3.0-only"
-  revision 2
+  revision 5
   head "https://github.com/vanhauser-thc/thc-hydra.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4dd1a40a47a6d21db024a3fa9c9c538c46f2e6a19b7db8b7443977b87b8baf76"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "e1d8c51d8f1768fa1b4f88b90cbdc792f59387e59562a1a9d057a2a4bcba0541"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a5b0056b050593dc17211890362fa09c1bd52d889fd142736b7b4c1114bb5e05"
-    sha256 cellar: :any_skip_relocation, ventura:        "fdd37885440ef848dfc7030e67c281262b5b5b5e4139372f40a91f894b28f256"
-    sha256 cellar: :any_skip_relocation, monterey:       "073cd2c90a68bdeb9c2108e84bdb18dc1caf8c2b924f7466d868288edc6ef929"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4d411dcdc73070bdc6c01b458ba694717b8a9970a21ddcc75d4ab7c87611015c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c8b19d859564f0dc079b0e81717f6d747028b0837b2cb277dd0df9d017836b0d"
+    sha256 cellar: :any,                 arm64_sequoia: "4f52a4dd8c6ee9b1819f64a688cd7f2677873250a515b2269acac1758bafc1c8"
+    sha256 cellar: :any,                 arm64_sonoma:  "3ecca5dbd9fc6e4770e0c302cb183b65b9eb107ed4a49bea7991905e7635cdaa"
+    sha256 cellar: :any,                 arm64_ventura: "ddfa012421a719f0299339726f34303ac70cfc84bb8be9f60faee15c9c670ac2"
+    sha256 cellar: :any,                 sonoma:        "8e7d6db10c76332a98db7be88357089ad50d984fa057382f1513aaed157f1bfd"
+    sha256 cellar: :any,                 ventura:       "0cf381bd263ece00b7174f9cf025055616688e77774bf9c9bf7a298a0876a33d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b289ab00cf96e4b7a327102991a0d1787756dcdca1af594828c05ecc4e86e075"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libssh"
-  depends_on "mysql-client"
+  depends_on "mariadb-connector-c"
   depends_on "openssl@3"
   depends_on "pcre2"
+
   uses_from_macos "ncurses"
 
   conflicts_with "ory-hydra", because: "both install `hydra` binaries"
@@ -36,8 +36,8 @@ class Hydra < Formula
       s.gsub!(/^CRYPTO_PATH=""$/, "CRYPTO_PATH=#{Formula["openssl@3"].opt_lib}")
       s.gsub!(/^SSH_PATH=""$/, "SSH_PATH=#{Formula["libssh"].opt_lib}")
       s.gsub!(/^SSH_IPATH=""$/, "SSH_IPATH=#{Formula["libssh"].opt_include}")
-      s.gsub!(/^MYSQL_PATH=""$/, "MYSQL_PATH=#{Formula["mysql-client"].opt_lib}")
-      s.gsub!(/^MYSQL_IPATH=""$/, "MYSQL_IPATH=#{Formula["mysql-client"].opt_include}/mysql")
+      s.gsub!(/^MYSQL_PATH=""$/, "MYSQL_PATH=#{Formula["mariadb-connector-c"].opt_lib}")
+      s.gsub!(/^MYSQL_IPATH=""$/, "MYSQL_IPATH=#{Formula["mariadb-connector-c"].opt_include}/mariadb")
       s.gsub!(/^PCRE_PATH=""$/, "PCRE_PATH=#{Formula["pcre2"].opt_lib}")
       s.gsub!(/^PCRE_IPATH=""$/, "PCRE_IPATH=#{Formula["pcre2"].opt_include}")
       if OS.mac?
@@ -71,6 +71,6 @@ class Hydra < Formula
   end
 
   test do
-    assert_match(/ mysql .* ssh /, shell_output("#{bin}/hydra", 255))
+    assert_match(/ mysql .* ssh /, shell_output(bin/"hydra", 255))
   end
 end

@@ -1,33 +1,24 @@
 class Youtubedr < Formula
   desc "Download Youtube Video in Golang"
   homepage "https://github.com/kkdai/youtube"
-  url "https://github.com/kkdai/youtube/archive/refs/tags/v2.9.0.tar.gz"
-  sha256 "f8d60ac8ea16f2fd0e58c12d4502b1b1c5ad46325912cc29fe2031aa897b53a2"
+  url "https://github.com/kkdai/youtube/archive/refs/tags/v2.10.2.tar.gz"
+  sha256 "7c8f8875fbf47110782e4ebd24dd70e3bb277cf25a7802d89fe4ca00d684e1d1"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "11f394bda025b75cd4c13ee8346cfc925e4d2f6592d08435b0978b4f749bec90"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "11f394bda025b75cd4c13ee8346cfc925e4d2f6592d08435b0978b4f749bec90"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "11f394bda025b75cd4c13ee8346cfc925e4d2f6592d08435b0978b4f749bec90"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "11f394bda025b75cd4c13ee8346cfc925e4d2f6592d08435b0978b4f749bec90"
-    sha256 cellar: :any_skip_relocation, sonoma:         "a767486215393900a1d8fb126b39f54526e17aa3f56b62965fb4b2e76f500903"
-    sha256 cellar: :any_skip_relocation, ventura:        "a767486215393900a1d8fb126b39f54526e17aa3f56b62965fb4b2e76f500903"
-    sha256 cellar: :any_skip_relocation, monterey:       "a767486215393900a1d8fb126b39f54526e17aa3f56b62965fb4b2e76f500903"
-    sha256 cellar: :any_skip_relocation, big_sur:        "a767486215393900a1d8fb126b39f54526e17aa3f56b62965fb4b2e76f500903"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "09d72233693a679dec340d1ec3ac307041b8a8505d69601a32ebe3805c7eccbd"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0715f7a73fc51198b85a9e07f3f04112608742f2deb8100d776174257a91528b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0715f7a73fc51198b85a9e07f3f04112608742f2deb8100d776174257a91528b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "0715f7a73fc51198b85a9e07f3f04112608742f2deb8100d776174257a91528b"
+    sha256 cellar: :any_skip_relocation, sonoma:        "ff185b46ae18551197253d6048642a263abb84934c6f3e2ce946f553905d5f0c"
+    sha256 cellar: :any_skip_relocation, ventura:       "ff185b46ae18551197253d6048642a263abb84934c6f3e2ce946f553905d5f0c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8541d6b07a6e62ad4af72d8dfe1b936937ae49597014824e7c3dc7cd10e675d6"
   end
 
   depends_on "go" => :build
 
   def install
-    ldflags = %W[
-      -s -w
-      -X main.version=#{version}
-      -X main.date=#{time.iso8601}
-    ].join(" ")
-
-    ENV["CGO_ENABLED"] = "0"
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/youtubedr"
+    ldflags = "-s -w -X main.version=#{version} -X main.date=#{time.iso8601}"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/youtubedr"
 
     generate_completions_from_executable(bin/"youtubedr", "completion")
   end
@@ -35,6 +26,9 @@ class Youtubedr < Formula
   test do
     version_output = pipe_output("#{bin}/youtubedr version").split("\n")
     assert_match(/Version:\s+#{version}/, version_output[0])
+
+    # Fails in Linux CI with "can't bypass age restriction: login required"
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
 
     info_output = pipe_output("#{bin}/youtubedr info https://www.youtube.com/watch?v=pOtd1cbOP7k").split("\n")
     assert_match "Title:       History of homebrew-core", info_output[0]

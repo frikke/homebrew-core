@@ -1,30 +1,35 @@
 class Staq < Formula
   desc "Full-stack quantum processing toolkit"
   homepage "https://github.com/softwareQinc/staq"
-  url "https://github.com/softwareQinc/staq/archive/v3.2.3.tar.gz"
-  sha256 "048bba1c2d78bc6b641ee9ba71788cb66847e78e8b47ca54effea49e76c4565d"
+  url "https://github.com/softwareQinc/staq/archive/refs/tags/v3.5.tar.gz"
+  sha256 "838402b6ca541200740cc3ab989b3026f3b001ebf3e1ce7d89ae7f09a0e33195"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "dc455153c9bb1e2c1ab2735549595c8038bc81c1dc199d3954ccd6b17c033eaa"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "50531c8d02ad552eac013e4db68af439ba8c96e5bd030454bb5dc72cfadc9c22"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fade095b71096ad7edf92cf8db82669c798ccd6ce782602f56d0ca354ba1af59"
-    sha256 cellar: :any_skip_relocation, ventura:        "eee004d9964a81988665a1fecb3083f74309c293a38fd0fe1bda36343f6492bd"
-    sha256 cellar: :any_skip_relocation, monterey:       "ced86c03bc0db24e1f0b9d22812898010ba9154929f85ccf8dcb14ae2e77d901"
-    sha256 cellar: :any_skip_relocation, big_sur:        "34c82144382e8dc438a39e64941ae14dee0e41926d6c69fb254144f33deeec7d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ab6e829fdde807b9861154c871864e9ed53578bb82f911f35c5e64e3c9e4e66c"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "4a78fb5391ce391ef6df17138cd12b2cdb940b6826ad87f31ae4c28e879d1f87"
+    sha256 cellar: :any,                 arm64_sonoma:  "ab344e9a41f34a721802904a1f216f9e386c7b4b90036f5058a1d62d5c969ced"
+    sha256 cellar: :any,                 arm64_ventura: "64702f48420ef83e1d3d6286b332a785db0cc0860ae9d1ba553171155df563bf"
+    sha256 cellar: :any,                 sonoma:        "0e2d26ec6e834188613c7c9005c871922ecc6b5e9c92c9da7195b3121f663df3"
+    sha256 cellar: :any,                 ventura:       "ba4e7fab6b78e93d8fe4bec9dac21bff7cb88f33101d6d69cf17f8671677a42f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "78b7917bca6fd1e92003d7fd4fd308eae7d764f65eecb6cd8a8c41e0a1bfe9f7"
   end
 
   depends_on "cmake" => :build
+  depends_on "gmp"
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DINSTALL_SOURCES=ON",
+                    "-DFETCHCONTENT_SOURCE_DIR_GOOGLETEST=/dev/null", # skip unused FetchContent
+                    "-DPython3_EXECUTABLE=/dev/null", # skip macOS /usr/bin/python3
+                    *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"input.qasm").write <<~EOS
+    (testpath/"input.qasm").write <<~QASM
       OPENQASM 2.0;
       include "qelib1.inc";
 
@@ -33,14 +38,14 @@ class Staq < Formula
       h q[0];
       h q[0];
       measure q->c;
-    EOS
-    assert_equal <<~EOS, shell_output("#{bin}/staq -O3 ./input.qasm").chomp
+    QASM
+    assert_equal <<~QASM, shell_output("#{bin}/staq -O3 ./input.qasm").chomp
       OPENQASM 2.0;
       include "qelib1.inc";
 
       qreg q[1];
       creg c[1];
       measure q[0] -> c[0];
-    EOS
+    QASM
   end
 end

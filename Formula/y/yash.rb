@@ -1,20 +1,19 @@
 class Yash < Formula
   desc "Yet another shell: a POSIX-compliant command-line shell"
-  homepage "https://yash.osdn.jp/"
-  url "https://github.com/magicant/yash/releases/download/2.55/yash-2.55.tar.xz"
-  sha256 "97cd809d5e216b3c4afae42379f1bd4f5082b7c16d51e282d60a5014fbc9e1f6"
+  homepage "https://magicant.github.io/yash/"
+  url "https://github.com/magicant/yash/releases/download/2.57/yash-2.57.tar.xz"
+  sha256 "f5ff3334dcfa0fdde3882f5df002623f46a0a4f2b2335e7d91715520d8fb1dab"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 arm64_sonoma:   "524ef1b97f45dd4d25518f51ac0dfd32f39adf057b48f80868d11965bb55b840"
-    sha256 arm64_ventura:  "90ea066abb125d0fdc4a43c1bb3a89bd6fd5ec90646d30ef39536d87f1d2d0aa"
-    sha256 arm64_monterey: "dd0878a1d53e361e3427f7c5217802fa4bf76f589916bab12e43a50c67799e53"
-    sha256 arm64_big_sur:  "5ecb266117d7cd02c3b7564e5a0f60909fb4e22a560c760e82c7b2a7a863fef5"
-    sha256 sonoma:         "ba11e9afe34b30ee9141dc242cf573df336dcd22658c414e5be151b3ab49f024"
-    sha256 ventura:        "00342c70f4a2c8ef6391b0e575623f23ed79691a19e0d30a625043c35a6fe1d6"
-    sha256 monterey:       "a5418053156577c6d4d9d284470d9e0b8e597bbf143ad3f693230366601a1978"
-    sha256 big_sur:        "c95be4b8c2ed56ad7cdcba185fa1dccef85309d03c2aa803fbda3ea551c87574"
-    sha256 x86_64_linux:   "749b97b141717d11a41a45982d766c1ff1053afb91a438ccbcccafcd239b1aac"
+    sha256 arm64_sequoia:  "db3ca81751898d9821d110a1d3e0069c750a3da74472a1cdfcbba2e3abc56090"
+    sha256 arm64_sonoma:   "e608448371edb07002359684015ab5118824c29ec7c70168af84a2886b17ddb2"
+    sha256 arm64_ventura:  "936e90709d1a3ee4ef8398a82ddfbb4bcf1997b30e64d186eced9d70121e62ab"
+    sha256 arm64_monterey: "2982cbe9943e5b225cb1eb5af875ab06acd63980c3301a32d73e02f42f6d97ad"
+    sha256 sonoma:         "76b9fff147765d87cdf0d89ea72c99cb35889a3c5fdc87bb9646404deb0872a2"
+    sha256 ventura:        "58ea4fe91d0154ed774b0d1a8b55ea7edbf40b9702a210a53b6356105ec8f3ca"
+    sha256 monterey:       "ef4a1ec88d9193984ce980a171266475fbd137bdf907159d43a327079869f743"
+    sha256 x86_64_linux:   "75d73cb78840a2efec9a399da2ed5569ad01d0b731bf359339f3416bb90bd096"
   end
 
   head do
@@ -23,7 +22,11 @@ class Yash < Formula
     depends_on "asciidoc" => :build
   end
 
-  depends_on "gettext"
+  uses_from_macos "ncurses"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     ENV["XML_CATALOG_FILES"] = etc/"xml/catalog" if build.head?

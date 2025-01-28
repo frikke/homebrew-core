@@ -1,31 +1,29 @@
 class Helix < Formula
   desc "Post-modern modal text editor"
   homepage "https://helix-editor.com"
-  url "https://github.com/helix-editor/helix/releases/download/23.05/helix-23.05-source.tar.xz"
-  sha256 "c1ca69facde99d708175c686ce5bf3585e119e372c83e1c3dc1d562c7a8e3d87"
+  url "https://github.com/helix-editor/helix/releases/download/25.01.1/helix-25.01.1-source.tar.xz"
+  sha256 "12508c4f5b9ae6342299bd40d281cd9582d3b51487bffe798f3889cb8f931609"
   license "MPL-2.0"
   head "https://github.com/helix-editor/helix.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "bd40b4751765df4dbae46c4a014d033b5a5428aaeac13fe277a569516cbb82de"
-    sha256 cellar: :any,                 arm64_monterey: "8d304cac9406203074f151b77df1a72e985f1e4e6573f2d1ab94706a90e3fac2"
-    sha256 cellar: :any,                 arm64_big_sur:  "11b879bf0dcf0ccbcf6a4377ba949ec70bc9f149465282abfa1750ea947cdaaf"
-    sha256 cellar: :any,                 ventura:        "ee131ad851144fdacfb48848a9c8a9370d4da586962ef9ba24dde74adf77261f"
-    sha256 cellar: :any,                 monterey:       "330c56170f9af4fb38cd20925198ac92a430eb980db2ac6a14d6851e9cce7e4c"
-    sha256 cellar: :any,                 big_sur:        "7bd477b8d2827682263498884db7855474609b744eac00df48f8d5b2483605ea"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e7afb2304044a713719d335ccc870e5dd311118a229da312c4122b362a8e42bb"
+    sha256 cellar: :any,                 arm64_sequoia: "cca895da8d7984d1dc974a69c1cac38111fab2b7c32d5f0bc66e919dbd2bd4a6"
+    sha256 cellar: :any,                 arm64_sonoma:  "b2e86d4e5e3a822615d9173afa64d0de2be5d97fe2fddc7dc7d18a974344bd75"
+    sha256 cellar: :any,                 arm64_ventura: "f5f20d49f3a8c130001741624e440fd9f80335a5d64ef331ae2ef80da48f8fd8"
+    sha256 cellar: :any,                 sonoma:        "3bb3161910930c9f2316b6478a166432b22abd664a72fc5f493e74d705f4ac5e"
+    sha256 cellar: :any,                 ventura:       "42358aa662d5ebf73dd8150e83822b6c347b2f73a7f612bf36100240c3364761"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5d890c7a8eec62f5c3864bb272bfdedb09bea2c1b9523f34545db607b353ee88"
   end
 
   depends_on "rust" => :build
 
-  fails_with gcc: "5" # For C++17
+  conflicts_with "hex", because: "both install `hx` binaries"
 
   def install
-    system "cargo", "install", "-vv", *std_cargo_args(root: libexec, path: "helix-term")
+    ENV["HELIX_DEFAULT_RUNTIME"] = libexec/"runtime"
+    system "cargo", "install", "-vv", *std_cargo_args(path: "helix-term")
     rm_r "runtime/grammars/sources/"
     libexec.install "runtime"
-
-    (bin/"hx").write_env_script(libexec/"bin/hx", HELIX_RUNTIME: libexec/"runtime")
 
     bash_completion.install "contrib/completion/hx.bash" => "hx"
     fish_completion.install "contrib/completion/hx.fish"
@@ -33,7 +31,7 @@ class Helix < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/hx -V")
+    assert_match "post-modern text editor", shell_output("#{bin}/hx --help")
     assert_match "✓", shell_output("#{bin}/hx --health")
   end
 end

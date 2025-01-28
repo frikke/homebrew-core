@@ -1,8 +1,8 @@
 class GitGui < Formula
   desc "Tcl/Tk UI for the git revision control system"
   homepage "https://git-scm.com"
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.42.0.tar.xz"
-  sha256 "3278210e9fd2994b8484dd7e3ddd9ea8b940ef52170cdb606daa94d887c93b0d"
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.48.1.tar.xz"
+  sha256 "1c5d545f5dc1eb51e95d2c50d98fdf88b1a36ba1fa30e9ae5d5385c6024f82ad"
   license "GPL-2.0-only"
   head "https://github.com/git/git.git", branch: "master"
 
@@ -11,19 +11,10 @@ class GitGui < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "55880412859840e3f59f32378da121b0a9f6152f1e9d9dc9411bd086b4b67fde"
+    sha256 cellar: :any_skip_relocation, all: "9c4fc0d527b5e26bc53ab370310e72cfbc9b4841542946fe276f880ec13cba15"
   end
 
-  depends_on "tcl-tk"
-
-  # Patch to fix Homebrew/homebrew-core#68798.
-  # Remove when the following PR has been merged
-  # and included in a release:
-  # https://github.com/git/git/pull/944
-  patch do
-    url "https://github.com/git/git/commit/1db62e44b7ec93b6654271ef34065b31496cd02e.patch?full_index=1"
-    sha256 "0c7816ee9c8ddd7aa38aa29541c9138997650713bce67bdef501b1de0b50f539"
-  end
+  depends_on "tcl-tk@8"
 
   def install
     # build verbosely
@@ -33,7 +24,7 @@ class GitGui < Formula
     # the git makefiles don't install a .app for git-gui
     # We also tell git to use the homebrew-installed wish binary from tcl-tk.
     # See https://github.com/Homebrew/homebrew-core/issues/36390
-    tcl_bin = Formula["tcl-tk"].opt_bin
+    tcl_bin = Formula["tcl-tk@8"].opt_bin
     args = %W[
       TKFRAMEWORK=/dev/null
       prefix=#{prefix}

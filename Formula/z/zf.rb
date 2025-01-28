@@ -1,28 +1,24 @@
 class Zf < Formula
   desc "Command-line fuzzy finder that prioritizes matches on filenames"
   homepage "https://github.com/natecraddock/zf"
-  # zf requires git submodules for dependencies until the Zig package manager is able
-  # to resolve pure Zig dependencies, likely in Zig version 0.11.0
-  url "https://github.com/natecraddock/zf.git",
-      tag:      "0.8.0",
-      revision: "fb66faf9258ebad06ac06c8d2a597b869b72069b"
+  url "https://github.com/natecraddock/zf/archive/refs/tags/0.10.2.tar.gz"
+  sha256 "b8e41f942c7033536fd64f9edea467a7ff4f45d52885d585f0adafb7803ac0ed"
   license "MIT"
   head "https://github.com/natecraddock/zf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6dbab2a5e6182fc671cbbae1d066df3b5f08c4cb40c8ebde65fe9043e5d1dcf0"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "56d5a4a874a0bd082b3455fe06a16b0d4343b770a3701b248f211c24cb1d42a5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "aada6ce9c5e8d78dae76bd08d02a7aef5ca1ac22685c5fd65c29077dd7d87912"
-    sha256 cellar: :any_skip_relocation, ventura:        "1c47cd203b641575113c6ab10b33608eb3b9495ff168d5a3253eced802760a4c"
-    sha256 cellar: :any_skip_relocation, monterey:       "63035c6f21e1b357d347d0d3d92a790d4e66028911a3ee3b78192212eaea2fdf"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ca285ce67e75edd1630b9db30d24ad2954a0749deda7a399114a5413a9d0bbb0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0c26ef59e4187e32882b959a121453eb82b2aff3935a7f8961d642e5e027ef0a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ca18e30ed084337c77376f0af8b97d3f10bc3ccb20660f7d74c15644fbcae1e7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7b45f360b6662b147c5adc50425ef87afac800c9aa2bdeab1f2f395614ab34b9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "63025c662d67807c0f75b4df08c26b5af01c2e602d5438e2a08289b7ce8bb350"
+    sha256 cellar: :any_skip_relocation, sonoma:        "468b27e2ac00706f31f56fb7ca8fe5aebd31ffa282aae0b21eb8ec487a77561b"
+    sha256 cellar: :any_skip_relocation, ventura:       "d9c75c28e02b4c7cede59bcb1137c62cfd34801b9a06d11855f96f0080829756"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a9bfaef19e583a5409511f21a9853c0c37d5ea0067782cce94a92ea791200c4b"
   end
 
   depends_on "zig" => :build
 
   def install
-    system "zig", "build", "-Drelease-fast=true"
+    system "zig", "build", "-Doptimize=ReleaseSafe"
 
     bin.install "zig-out/bin/zf"
     man1.install "doc/zf.1"

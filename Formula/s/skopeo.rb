@@ -1,23 +1,22 @@
 class Skopeo < Formula
   desc "Work with remote images registries"
   homepage "https://github.com/containers/skopeo"
-  url "https://github.com/containers/skopeo/archive/v1.13.3.tar.gz"
-  sha256 "0b788fc5725ac79327f7c29797821a2bafc1c3c87bbfcb2998c2a1be949e314d"
+  url "https://github.com/containers/skopeo/archive/refs/tags/v1.17.0.tar.gz"
+  sha256 "e548c044c7b644ba455f482df387ec90aceea432b9c61a0bab0ec8534970eb69"
   license "Apache-2.0"
 
   bottle do
-    sha256 arm64_ventura:  "1d994ad95fee2d772fc6d898ccc73a95dc36d89d2d006e74b59ef1975b20915a"
-    sha256 arm64_monterey: "f959986de44422fe153764522a42280f2379dfe4a86304feb47cfc0fbe6421cc"
-    sha256 arm64_big_sur:  "357eb35c2fced7a532d99989d4199b541db81004a13575801a57d52d7aa3ef54"
-    sha256 ventura:        "303dc9bd484c043e2f99a53c99f8d6d16c0dca970ad58022e8790c75d9a1ac9b"
-    sha256 monterey:       "7e9822bfc2cb9ba894b742818ea5a88e6ea2dae65541122a053226ab8678cd39"
-    sha256 big_sur:        "aace59677bbb4b09e547735ec09feeeaafcfd6961d4fa8ce369b07c855c087e1"
-    sha256 x86_64_linux:   "343ba543ce69fe7e5eb40dd00f8e91466da4a3fe63dec8bdf50d9be739ec55ca"
+    sha256 arm64_sequoia: "7e941ad32d87482f61ddecbc6796e2ef99bbd9d34a3a50398dcde72d1400d0cd"
+    sha256 arm64_sonoma:  "9559e1f43d66b5c1c24fabf1ccc7b179a96964f665a2bb6d70c0e6531614e51c"
+    sha256 arm64_ventura: "1ce91a6cac483d23c0fef98e731c8c4f71d46c21caa2a031f10fb89f9b6ef75b"
+    sha256 sonoma:        "b4a0df0aaa27c9fdb61c66fffb540bb13084564b5e9b320d76c2466c93e359fd"
+    sha256 ventura:       "1300e636939157e5541fd05b2a8f6ee6f1c0d824e51951e3b2bdc86efaf118c9"
+    sha256 x86_64_linux:  "6c2715212a92c1b8bf905d82a90ecfb95846e379956aff28047b45fe841c908a"
   end
 
   depends_on "go" => :build
   depends_on "go-md2man" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gpgme"
 
   on_linux do
@@ -33,7 +32,7 @@ class Skopeo < Formula
       "containers_image_ostree_stub",
       Utils.safe_popen_read("hack/btrfs_tag.sh").chomp,
       Utils.safe_popen_read("hack/btrfs_installed_tag.sh").chomp,
-      Utils.safe_popen_read("hack/libdm_tag.sh").chomp,
+      Utils.safe_popen_read("hack/libsubid_tag.sh").chomp,
     ].uniq.join(" ")
 
     ldflag_prefix = "github.com/containers/image/v5"
@@ -45,7 +44,7 @@ class Skopeo < Formula
       -X #{ldflag_prefix}/pkg/sysregistriesv2.systemRegistriesConfPath=#{etc}/containers/registries.conf
     ]
 
-    system "go", "build", "-tags", buildtags, *std_go_args(ldflags: ldflags), "./cmd/skopeo"
+    system "go", "build", "-tags", buildtags, *std_go_args(ldflags:), "./cmd/skopeo"
     system "make", "PREFIX=#{prefix}", "GOMD2MAN=go-md2man", "install-docs"
 
     (etc/"containers").install "default-policy.json" => "policy.json"

@@ -1,26 +1,25 @@
-require "language/node"
-
 class Gitmoji < Formula
   desc "Interactive command-line tool for using emoji in commit messages"
   homepage "https://gitmoji.dev"
-  url "https://registry.npmjs.org/gitmoji-cli/-/gitmoji-cli-8.5.0.tgz"
-  sha256 "fa82ec64096f8251f79e89e5a702892a6794df4fc4db70a4425b7cf096be464d"
+  url "https://registry.npmjs.org/gitmoji-cli/-/gitmoji-cli-9.5.0.tgz"
+  sha256 "b9c89644fac844f521afcdc2b31e57da7ac7e123df92d16c4fdf79190622a5b4"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "dc86635f368e5959a671b3f45da64d8c2e2f86095eb6cc814137aa6b52af89aa"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "dc86635f368e5959a671b3f45da64d8c2e2f86095eb6cc814137aa6b52af89aa"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dc86635f368e5959a671b3f45da64d8c2e2f86095eb6cc814137aa6b52af89aa"
-    sha256 cellar: :any_skip_relocation, ventura:        "5fbb300743e5f6d4526629ffc678537a1ba0691a9c9eda0e095a1b243b3b2e2c"
-    sha256 cellar: :any_skip_relocation, monterey:       "5fbb300743e5f6d4526629ffc678537a1ba0691a9c9eda0e095a1b243b3b2e2c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5fbb300743e5f6d4526629ffc678537a1ba0691a9c9eda0e095a1b243b3b2e2c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dc86635f368e5959a671b3f45da64d8c2e2f86095eb6cc814137aa6b52af89aa"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "bbfbb3f96888616a56eaa944a5a1b2da387071659545aa8cca870797ed8f1fbc"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
+    files = ["global-directory/index.d.ts", "npm-run-path/node_modules/path-key/index.d.ts",
+             "path-key/index.d.ts", "xdg-basedir/index.d.ts", "xdg-basedir/index.js",
+             "npm-run-path/index.d.ts", "global-directory/index.js", "@pnpm/npm-conf/lib/defaults.js"]
+    files.each do |file|
+      inreplace libexec/"lib/node_modules/gitmoji-cli/node_modules/#{file}", "/usr/local", "@@HOMEBREW_PREFIX@@"
+    end
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 

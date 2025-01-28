@@ -9,6 +9,7 @@ class Glew < Formula
 
   bottle do
     rebuild 2
+    sha256 cellar: :any,                 arm64_sequoia:  "4ac8264612c4af3b6864eed07564e14ddf81c25a050aa2bc91953966d12e73e4"
     sha256 cellar: :any,                 arm64_sonoma:   "05aa1fad57b8dd0d68045a54b66ad9d61c494584560a55512a2123d22849e467"
     sha256 cellar: :any,                 arm64_ventura:  "33b1499e0219c3980310dee9e6b115af3ef0324723af7c3a0ff9a68ac7b3e841"
     sha256 cellar: :any,                 arm64_monterey: "a116faecf407ee2a00cb775a3b668fe0f5753ceecd73678d20b3656e6c56d163"
@@ -25,18 +26,22 @@ class Glew < Formula
 
   on_linux do
     depends_on "freeglut" => :test
+    depends_on "libx11"
+    depends_on "mesa"
     depends_on "mesa-glu"
   end
 
   def install
-    system "cmake", "-S", "./build/cmake", "-B", "_build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "-S", "./build/cmake", "-B", "_build",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    *std_cmake_args(find_framework: "FIRST")
     system "cmake", "--build", "_build"
     system "cmake", "--install", "_build"
     doc.install Dir["doc/*"]
   end
 
   test do
-    (testpath/"CMakeLists.txt").write <<~EOS
+    (testpath/"CMakeLists.txt").write <<~CMAKE
       project(test_glew)
 
       set(CMAKE_CXX_STANDARD 11)
@@ -46,16 +51,16 @@ class Glew < Formula
 
       add_executable(${PROJECT_NAME} main.cpp)
       target_link_libraries(${PROJECT_NAME} PUBLIC OpenGL::GL GLEW::GLEW)
-    EOS
+    CMAKE
 
-    (testpath/"main.cpp").write <<~EOS
+    (testpath/"main.cpp").write <<~CPP
       #include <GL/glew.h>
 
       int main()
       {
         return 0;
       }
-    EOS
+    CPP
 
     system "cmake", ".", "-Wno-dev"
     system "make"
@@ -65,7 +70,7 @@ class Glew < Formula
     else
       "GL"
     end
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <GL/glew.h>
       #include <#{glut}/glut.h>
 
@@ -78,7 +83,7 @@ class Glew < Formula
         }
         return 0;
       }
-    EOS
+    C
     flags = %W[-L#{lib} -lGLEW]
     if OS.mac?
       flags << "-framework" << "GLUT"

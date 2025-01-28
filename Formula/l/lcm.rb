@@ -1,8 +1,8 @@
 class Lcm < Formula
   desc "Libraries and tools for message passing and data marshalling"
   homepage "https://lcm-proj.github.io/"
-  url "https://github.com/lcm-proj/lcm/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "590a7d996daa3d33a7f3094e4054c35799a3d7a4780d732be78971323e730eeb"
+  url "https://github.com/lcm-proj/lcm/archive/refs/tags/v1.5.1.tar.gz"
+  sha256 "40ba0b7fb7c9ad06d05e06b4787d743cf11be30eb4f1a03abf4a92641c5b1203"
   license "LGPL-2.1-or-later"
   head "https://github.com/lcm-proj/lcm.git", branch: "master"
 
@@ -12,21 +12,24 @@ class Lcm < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "cc44fb36fd52595d8ab65e7e9267de9419fb80c041cf29e74913ca26a3cd86f8"
-    sha256 cellar: :any,                 arm64_monterey: "6ba463959fd49363524127fcee429ffe119a691c8413f9e42df797ef0d717f18"
-    sha256 cellar: :any,                 arm64_big_sur:  "f75a796ff74405bfff348ae1064d6ac0f5678ecbfddfc26b02ff673ce7dbc327"
-    sha256 cellar: :any,                 ventura:        "865f99f4c08dde897d55f520fa8aa7d3a9df84240c9281399cb2d7519452c6b5"
-    sha256 cellar: :any,                 monterey:       "dcf73c2d73c974c3df43107b82ba8eea223e3cfa1bcf10529966137f4b135b1a"
-    sha256 cellar: :any,                 big_sur:        "d2140ed962ef6ce8136e72d19fdaf2b4604616b673886b10f0895441e5ed3a7f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eee0f6f8f16a72525db3c926aeb9bf1860df1a5d031c9aed396bfda055c05114"
+    sha256 cellar: :any,                 arm64_sequoia: "2244b5fa7c8e7c9fad69837d8c87e21b6b934bdb35d730cd29388add2258c388"
+    sha256 cellar: :any,                 arm64_sonoma:  "ae864e359da145328a10f94d4c231a86f4b199d9727d43c15699bdb2024a56a1"
+    sha256 cellar: :any,                 arm64_ventura: "1cd041a8337c350c38de47ce7c2ac015a1819b2a1efb090f6563f42a729fa7fb"
+    sha256 cellar: :any,                 sonoma:        "c442066258d99654dfcc78ba143cb04d5fc74ef1306a14be1d70baafba7ba6bb"
+    sha256 cellar: :any,                 ventura:       "b07445d9724d1e720b4fb24983df5adbbab9fff80cc0621f97aa1429485e8dbb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c2140c559088413340306e19ad843419a48fa5e5747269a25ed975c2945b4340"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "glib"
   depends_on "lua"
   depends_on "openjdk"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
+
+  def python3
+    which("python3.13")
+  end
 
   def install
     # Adding RPATH in #{lib}/lua/X.Y/lcm.so and some #{bin}/*.
@@ -35,7 +38,7 @@ class Lcm < Formula
       -DLCM_ENABLE_EXAMPLES=OFF
       -DLCM_ENABLE_TESTS=OFF
       -DLCM_JAVA_TARGET_VERSION=8
-      -DPYTHON_EXECUTABLE=#{which("python3.11")}
+      -DPYTHON_EXECUTABLE=#{python3}
     ]
 
     # `lcm-lua/lualcm_lcm.c:577:9: error: ‘subscription’ may be used uninitialized`

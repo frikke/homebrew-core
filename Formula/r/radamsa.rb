@@ -1,51 +1,43 @@
 class Radamsa < Formula
   desc "Test case generator for robustness testing (a.k.a. a \"fuzzer\")"
   homepage "https://gitlab.com/akihe/radamsa"
-  url "https://gitlab.com/akihe/radamsa/-/archive/v0.6/radamsa-v0.6.tar.gz"
-  sha256 "a68f11da7a559fceb695a7af7035384ecd2982d666c7c95ce74c849405450b5e"
+  url "https://gitlab.com/akihe/radamsa/-/archive/v0.7/radamsa-v0.7.tar.gz"
+  sha256 "d9a6981be276cd8dfc02a701829631c5a882451f32c202b73664068d56f622a2"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "dd11fada93d54e4f8f72ac47c20ea26e8298f64bc930a290e897ac671940b80d"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d86d86fab9f28b1dd1b2a7b98fe0a224f1b5e059f58c978be4a0ea5a146083ef"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5ee7ab43bc7155d05030cffef87111083e9d5b55b96d51c1ea54fc76fc9ce8fc"
-    sha256 cellar: :any_skip_relocation, ventura:        "03cb4d8460f06c11572b3d5fe9862029081b8a5be996304702e8380d8ced58e6"
-    sha256 cellar: :any_skip_relocation, monterey:       "68e110b46fd84cab81f57ce9d465e142e090067690f56808d11cbc31420b1eac"
-    sha256 cellar: :any_skip_relocation, big_sur:        "925d63ed4fd304e24832bfff8acc6ae75d3549ad6f893292a4865ab7cd77c499"
-    sha256 cellar: :any_skip_relocation, catalina:       "97fe42099e0b4278519ee560af5a38dd0cb5055e7542cd892d4c4f96d93960c5"
-    sha256 cellar: :any_skip_relocation, mojave:         "a4d9d9e07ff76b8bb51333a04d645ea0213663dc635bdea890b1cffb7f2e6543"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "82d2231dcb25adb55f62690bd34d2b4b8978a3d22b956c0f0f2e20640d31c7a0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a5a4c3e8c05fa322cea64074eb8ea2783d40d9394818aba84ea1f5845cec9cc1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "68a800cd47ad72dcaf605c67d01e86fab1af8c40b678f06317489887d3d1eeb3"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4868ee9e0dcbe6da781d40d6a513e2185ba0b8e09a125eca2dbb36c8e5cb4ab3"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "568e7f3b24edb8d8aca56b0835eea5fcd32dff97d2c2a2985362329bf8555169"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2535c22f7a6faf37a7b7ffb7eab908de0a0d265e4f887718a65ef7b7d9d015f0"
+    sha256 cellar: :any_skip_relocation, ventura:       "1463cedbf5969dc913d6878fab2a860d9aefd4d9a80f960ee8383086c6d17806"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c32fe0dcf5a76ce7251b8caebf2ecdd09427990a52c88adfd993efeae138fe41"
   end
 
-  resource "owl" do
-    url "https://gitlab.com/owl-lisp/owl/uploads/0d0730b500976348d1e66b4a1756cdc3/ol-0.1.19.c.gz"
-    sha256 "86917b9145cf3745ee8294c81fb822d17106698aa1d021916dfb2e0b8cfbb54d"
+  # https://gitlab.com/akihe/radamsa/-/blob/v#{version}/Makefile?ref_type=tags#L7
+  resource "ol.c" do
+    url "https://haltp.org/files/ol-0.2.2.c.gz"
+    version "0.2.2"
+    sha256 "fca85dae36910108598d8a4a244df7a8c2719e7803ac46d270762ece4aefc55c"
+
+    livecheck do
+      url "https://gitlab.com/akihe/radamsa/-/raw/v#{LATEST_VERSION}/Makefile?ref_type=tags"
+      regex(/OWLURL=.*?ol[._-]v?(\d+(?:\.\d+)+)\.c/i)
+    end
   end
 
   def install
-    resource("owl").stage do
-      buildpath.install "ol.c"
-    end
-
-    system "make"
-    man1.install "doc/radamsa.1"
-    prefix.install Dir["*"]
-  end
-
-  def caveats
-    <<~EOS
-      The Radamsa binary has been installed.
-      The Lisp source code has been copied to:
-        #{prefix}/rad
-
-      Tests can be run with:
-        $ make .seal-of-quality
-
-    EOS
+    resource("ol.c").stage { buildpath.install Dir["*"].first => "ol.c" }
+    system "make", "install", "PREFIX=#{prefix}"
+    # Manually replace the manpage which is not reproducible
+    rm(man1/"radamsa.1.gz")
+    man1.install Utils::Gzip.compress("doc/radamsa.1")
   end
 
   test do
-    system bin/"radamsa", "-V"
+    assert_match "Radamsa is a general purpose fuzzer.", shell_output("#{bin}/radamsa --about")
+    assert_match "drop a byte", shell_output("#{bin}/radamsa --list")
+    assert_match version.to_s, shell_output("#{bin}/radamsa --version")
   end
 end

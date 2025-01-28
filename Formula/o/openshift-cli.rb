@@ -1,8 +1,9 @@
 class OpenshiftCli < Formula
   desc "OpenShift command-line interface tools"
   homepage "https://www.openshift.com/"
-  url "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.13.11/openshift-client-src.tar.gz"
-  sha256 "6b6ac6109dbbc8240a343d4a07661cf98ae008305bf432b58ca6b9c00c5a83d5"
+  url "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.17.12/openshift-client-src.tar.gz"
+  # This project employs synchronized versioning so the sha256 may not change on version bumps
+  sha256 "0695fcf3e514f6dcc5b86222ed067942f5e604ce27eff15a12f4a9713481a051"
   license "Apache-2.0"
   head "https://github.com/openshift/oc.git", shallow: false, branch: "master"
 
@@ -12,15 +13,12 @@ class OpenshiftCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "cbce47e73aa416d2d843cf6a71787deb26aa064f542f3cac27997ce6a2e12361"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "70a529e0637157470eb99b8938732b274bbc65ef0be7391535800c4bfe6be92f"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3e82ae1dfeec1e3839a841433b8c3e6b7763cb7a7138bfc5f4c5c47a755b7f03"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fe90cbd777c21daf262efcec323486c0fad41bb3d44078e2dc59c7ce82e99aed"
-    sha256 cellar: :any_skip_relocation, sonoma:         "67e9275c9a85b3a9c1409b029b036a1c5e005dafab5b85c0c0dc59a4122047df"
-    sha256 cellar: :any_skip_relocation, ventura:        "bd690f0ddd8770d1ff2c9810bbda29261a797e46ea84dc7a6859761499785a48"
-    sha256 cellar: :any_skip_relocation, monterey:       "328bdba88f6519532bd5bdb9974aa488fe9bf9b440e9aec2fecfda81516ea388"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b106f8b67b8a9c6f1ca295cf80045b9eaa7d107005ea7a61aeb130049ecfd246"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "151b500d3b003aab60b82450c5c35ae90e1588f2c382058ee50057a6add10c04"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d4a1a67277001b8993d809b6db9a3f19e28bfc8d2cbcba9a9540ed90afc18e48"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5de5cec7fc763570e9587c349f6912b566901f1fbb735569b8211e4ea218f4d9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "6a81e803b1dc48c2733e3b4d662ef5309c359a0183c1a4014f5f2a5063a480e8"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1461ac3c7e440f84a5606185714b316815370c9d00de38dc54ccff32310942d6"
+    sha256 cellar: :any_skip_relocation, ventura:       "b21aaa4cd45cb049d09de64c8112a467ee0a51962f1b9e34c8fb40f373ef0843"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c0dfc41e6fc74dfc282d0af7990347614f13c2f7032ff55706f50fc4f27bff32"
   end
 
   depends_on "go" => :build
@@ -36,7 +34,7 @@ class OpenshiftCli < Formula
 
     system "make", "cross-build-#{os}-#{arch}", "OS_GIT_VERSION=#{version}", "SOURCE_GIT_COMMIT=#{revision}", "SHELL=/bin/bash"
     bin.install "_output/bin/#{os}_#{arch}/oc"
-    generate_completions_from_executable(bin/"oc", "completion", base_name: "oc")
+    generate_completions_from_executable(bin/"oc", "completion")
   end
 
   test do
@@ -47,21 +45,18 @@ class OpenshiftCli < Formula
     # Ensure that we had a clean build tree
     assert_equal "clean", version_json["clientVersion"]["gitTreeState"]
 
-    if stable?
-      # Verify the built artifact matches the formula
-      assert_match version_json["clientVersion"]["gitVersion"], "v#{version}"
+    # Verify the built artifact matches the formula
+    assert_match version_json["clientVersion"]["gitVersion"], "v#{version}"
 
-      # Get remote release details
-      release_raw = shell_output("#{bin}/oc adm release info #{version} --output=json")
-      release_json = JSON.parse(release_raw)
+    # Get remote release details
+    release_raw = shell_output("#{bin}/oc adm release info #{version} --output=json")
+    release_json = JSON.parse(release_raw)
 
-      # Verify the formula matches the release data for the version
-      assert_match version_json["clientVersion"]["gitCommit"],
-        release_json["references"]["spec"]["tags"].find { |tag|
-          tag["name"]=="cli"
-        } ["annotations"]["io.openshift.build.commit.id"]
-
-    end
+    # Verify the formula matches the release data for the version
+    assert_match version_json["clientVersion"]["gitCommit"],
+      release_json["references"]["spec"]["tags"].find { |tag|
+        tag["name"]=="cli"
+      } ["annotations"]["io.openshift.build.commit.id"]
 
     # Test that we can generate and write a kubeconfig
     (testpath/"kubeconfig").write ""

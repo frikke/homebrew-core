@@ -1,29 +1,30 @@
 class Jr < Formula
   desc "CLI program that helps you to create quality random data for your applications"
   homepage "https://jrnd.io/"
-  url "https://github.com/ugol/jr/archive/refs/tags/v0.3.3.tar.gz"
-  sha256 "fa60365c0ca7b5ff70ef357ff362c7da069aa07a5daa8303f0af04ae75d04f67"
+  url "https://github.com/jrnd-io/jr/archive/refs/tags/v0.3.9.tar.gz"
+  sha256 "82d8e554724cdba39fa5f976f56422b9eb119644ec9de5a3e12a670eefb67bdc"
   license "MIT"
-  head "https://github.com/ugol/jr.git", branch: "main"
+  head "https://github.com/jrnd-io/jr.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1b0b3ccbca4be464ee548c37717ea4afc431912021d94ebc9b9f17646fe509c9"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a9993a1b688e50cda4d1240ba5aa16948aab8da1bf74b9ab35be1aa52b367dff"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "868667b63f0950733c93d580213595268f8b71d7ed28234b5e4da7640ecb079d"
-    sha256 cellar: :any_skip_relocation, ventura:        "5c508bac1e29ddba1a81cd73614a2e0becc38c57793ea30da8e64deef5ff939c"
-    sha256 cellar: :any_skip_relocation, monterey:       "c3860cefd59332623af358c33c7df7bc046d05193ed21a591d76b65d21a5f9f5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e5443a9872d74d90c1e01247db4b8affe71400d104e9eeef49fb08a9ff823784"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4c3a34221d741ad3c9561b520056343f5718a8e511af55260cc7444277ffaa3b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "ede79e8ba3c27bb0ac90e9818db7f18bdbe48d84195ed9b6f81930013e2c9564"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "8caec91e5e875f6d4afc1cdc07fee8258594ac4d4e5f4827585735dd9b259d2e"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2a96de687b0e3d6c49772ca0cf573afdc00fb0abd18fc6524b5f7ef03efff936"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "725f7752c78b6c3c923c69f8483b83f82b1ba5bdcb9945212e5f5f69213733c5"
+    sha256 cellar: :any_skip_relocation, sonoma:         "dedd73305310549a6f1856239ffc9c51da3530ca3c07467798d8a9bdc70fb190"
+    sha256 cellar: :any_skip_relocation, ventura:        "7e1f341676b064107654969708cf8a99c9ee75a050b5d36b58fbfcfe10e75fb6"
+    sha256 cellar: :any_skip_relocation, monterey:       "db3da339cd6feab3abdba0b0d694d989ffa2b67f751fe6430bf2bbe4ef08f883"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "556c4cbe64419b781749b6e4cd8413b35c17e9e15d7ca8d7f054d121ee6a1be5"
   end
 
   depends_on "go" => :build
 
   def install
-    system "make", "all"
+    ENV.deparallelize { system "make", "all" }
     libexec.install Dir["build/*"]
     pkgetc.install "config/jrconfig.json"
     pkgetc.install "templates"
-    (bin/"jr").write_env_script libexec/"jr", JR_HOME: pkgetc
+    (bin/"jr").write_env_script libexec/"jr", JR_SYSTEM_DIR: pkgetc
   end
 
   test do

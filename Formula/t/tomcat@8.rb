@@ -1,17 +1,13 @@
 class TomcatAT8 < Formula
   desc "Implementation of Java Servlet and JavaServer Pages"
   homepage "https://tomcat.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=tomcat/tomcat-8/v8.5.93/bin/apache-tomcat-8.5.93.tar.gz"
-  mirror "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.93/bin/apache-tomcat-8.5.93.tar.gz"
-  sha256 "b614aca36596f61273dfdf4cce623d078624ff335f734363c295ee27543f7de6"
+  url "https://www.apache.org/dyn/closer.lua?path=tomcat/tomcat-8/v8.5.100/bin/apache-tomcat-8.5.100.tar.gz"
+  mirror "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.100/bin/apache-tomcat-8.5.100.tar.gz"
+  sha256 "163abe51289dd09dc375791888d6f2d5508c06050548dc4fc7700251f4bebaca"
   license "Apache-2.0"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "7fbdef33f7d784b94a45d67a1512fdc224302eb7e35e34578fd5398ed62ae3bb"
+    sha256 cellar: :any_skip_relocation, all: "8704ee4ff0be3b0acdadf62c2fd3fd8aaf12944b49f2a2621886b8f935ed397c"
   end
 
   keg_only :versioned_formula
@@ -23,7 +19,7 @@ class TomcatAT8 < Formula
 
   def install
     # Remove Windows scripts
-    rm_rf Dir["bin/*.bat"]
+    rm_r(Dir["bin/*.bat"])
 
     # Install files
     prefix.install %w[NOTICE LICENSE RELEASE-NOTES RUNNING.txt]

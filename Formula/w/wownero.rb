@@ -2,11 +2,10 @@ class Wownero < Formula
   desc "Official wallet and node software for the Wownero cryptocurrency"
   homepage "https://wownero.org"
   # TODO: Check if we can use unversioned `protobuf` at version bump
-  url "https://git.wownero.com/wownero/wownero.git",
-      tag:      "v0.11.0.3",
-      revision: "e921c3b8a35bc497ef92c4735e778e918b4c4f99"
+  url "https://codeberg.org/wownero/wownero.git",
+      tag:      "v0.11.3.0",
+      revision: "3e302be710f4e6b4f58642989c8e47711362fa56"
   license "BSD-3-Clause"
-  revision 3
 
   # The `strategy` code below can be removed if/when this software exceeds
   # version 10.0.0. Until then, it's used to omit a malformed tag that would
@@ -25,19 +24,20 @@ class Wownero < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "e9c6d64810d53ccd2fa82a0f641fc4fbf594ce632b18186801083493bf6be222"
-    sha256 cellar: :any,                 arm64_monterey: "d53bd08ebda04811356689c342d35fc0344f0906a540d83a43f9b41df447e971"
-    sha256 cellar: :any,                 arm64_big_sur:  "7af4e0940aaa43a7d70d3a8cb1970f744f71acdf67e8c7de8e9db913c682adff"
-    sha256 cellar: :any,                 ventura:        "16d4dc784619f6a70f0a017abe08d321a9555218ee4c6330589d6cb6f18d9234"
-    sha256 cellar: :any,                 monterey:       "e8337a5e74fceca5739b0579aac2c1829dca2ed5379bf50d2e2ec7a3eb7897bb"
-    sha256 cellar: :any,                 big_sur:        "bd746ee84a9474879ea9cb224c150d000e7802c5837e1a7ef0d4193d20ca75c0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5e700986a65ce429419bcdf44fa0339a2b2f01182c9138915df5b7e50dec44a0"
+    sha256 cellar: :any,                 arm64_sequoia: "e853a94c2180d3369de8bb4f5d04cf7ffea7736b3d1d53f17c69b7bfc3275982"
+    sha256 cellar: :any,                 arm64_sonoma:  "89cc4a6b275adf3f8e97f36e8cbfa545bf7b892f6e0f26575e47f936cc816fa9"
+    sha256 cellar: :any,                 arm64_ventura: "a7573258aa7a6c1aa62858fabdd590b4546d57e3c1c569ba5355361d7e9d7a47"
+    sha256 cellar: :any,                 sonoma:        "6f1149d4459630ab60f67a3d84a75e73d933b2dd2885ec215e2dbf05a37fbecf"
+    sha256 cellar: :any,                 ventura:       "b31910c666b6bba034ed47c3a6100f6b42ab5e15ab9f5213e4b831ffc2883d1d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b579603a0d8d4e8f796ef7efb40e6ff5ceab8272bb585b95914991cc2538f720"
   end
+
+  disable! date: "2025-05-11", because: "needs to use unmaintained `boost@1.85` and `protobuf@21`"
 
   depends_on "cmake" => :build
   depends_on "miniupnpc" => :build
-  depends_on "pkg-config" => :build
-  depends_on "boost"
+  depends_on "pkgconf" => :build
+  depends_on "boost@1.85"
   depends_on "hidapi"
   depends_on "libsodium"
   depends_on "libusb"

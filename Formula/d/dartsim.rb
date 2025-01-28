@@ -1,23 +1,22 @@
 class Dartsim < Formula
   desc "Dynamic Animation and Robotics Toolkit"
   homepage "https://dartsim.github.io/"
-  url "https://github.com/dartsim/dart/archive/v6.13.0.tar.gz"
-  sha256 "4da3ff8cee056252a558b05625a5ff29b21e71f2995e6d7f789abbf6261895f7"
+  url "https://github.com/dartsim/dart/archive/refs/tags/v6.15.0.tar.gz"
+  sha256 "bbf954e283f464f6d0a8a5ab43ce92fd49ced357ccdd986c7cb4c29152df8692"
   license "BSD-2-Clause"
-  revision 3
 
   bottle do
-    sha256                               arm64_ventura:  "68675cf8db94036f1759ac9ad3019b6a0fe394c523c9260a7bd13d9b402aacf8"
-    sha256                               arm64_monterey: "b3e480184cb8fb5b46ffac522b873b6b422fa69656ef1a1ca55cdbec332227e3"
-    sha256                               arm64_big_sur:  "09b51aeae04c3893ed2e4c1b87df87a43db8c4549f47818eaa35ad59cc0dfd7f"
-    sha256                               ventura:        "7a790bf5d140b1b02cdd6e7992679fb44fdbe74c821f44cfc0d6aff958108460"
-    sha256                               monterey:       "aafcc389c3beae33d95c8dc13e6998036c3796fea8560ef7d4a0d7cfd4f7e845"
-    sha256                               big_sur:        "b4730cb15e677393a1305f5a60b1d170b7a26de1aeb55039cbbe348dcbac60da"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e9441cfaecbf9bcb2ed95c7d2f68d594cd81236fb07ac921c624a664cd58014a"
+    sha256                               arm64_sequoia: "e535ad930fe32671752d6857924a7027a23b05c226d095adb2d3d090ebd6c40a"
+    sha256                               arm64_sonoma:  "2cfcce63b8f5efa854cf20e196a686b7d87efca67e17b436c2fac235b38a0ba9"
+    sha256                               arm64_ventura: "3c65ad8471fb493c412874b423fbd039ceda631dd6ab823b49c4e002e7ed20a6"
+    sha256                               sonoma:        "b62650e04e8d7938d63435472dc998ee188f5c0bd9e42d9cb0e77a1fe02e2c46"
+    sha256                               ventura:       "082d4233b947f2f43ef6232a62b531eea36c1e5484aca42d145ef5a74ac9373b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7f8f7901d2a25186e278030991f26c028aa3b62fe8cdefee42398b2480319774"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "assimp"
   depends_on "bullet"
   depends_on "eigen"
@@ -27,6 +26,7 @@ class Dartsim < Formula
   depends_on "ipopt"
   depends_on "libccd"
   depends_on "nlopt"
+  depends_on "octomap"
   depends_on "ode"
   depends_on "open-scene-graph"
   depends_on "spdlog"
@@ -35,11 +35,16 @@ class Dartsim < Formula
 
   uses_from_macos "python" => :build
 
-  fails_with gcc: "5"
+  on_linux do
+    depends_on "mesa"
+  end
 
   def install
-    ENV.cxx11
-    args = std_cmake_args
+    args = %W[
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+      -DDART_BUILD_DARTPY=OFF
+      -DDART_ENABLE_SIMD=OFF
+    ]
 
     if OS.mac?
       # Force to link to system GLUT (see: https://cmake.org/Bug/view.php?id=16045)
@@ -47,28 +52,26 @@ class Dartsim < Formula
       args << "-DGLUT_glut_LIBRARY=#{glut_lib}"
     end
 
-    mkdir "build" do
-      system "cmake", "..", *args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
     # Clean up the build file garbage that has been installed.
     rm_r Dir["#{share}/doc/dart/**/CMakeFiles/"]
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <dart/dart.hpp>
       int main() {
         auto world = std::make_shared<dart::simulation::World>();
         assert(world != nullptr);
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "test.cpp", "-I#{Formula["eigen"].include}/eigen3",
                     "-I#{include}", "-L#{lib}", "-ldart",
                     "-L#{Formula["assimp"].opt_lib}", "-lassimp",
-                    "-L#{Formula["boost"].opt_lib}", "-lboost_system",
                     "-L#{Formula["libccd"].opt_lib}", "-lccd",
                     "-L#{Formula["fcl"].opt_lib}", "-lfcl",
                     "-std=c++17", "-o", "test"

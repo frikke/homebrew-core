@@ -1,8 +1,8 @@
 class Lbdb < Formula
   desc "Little brother's database for the mutt mail reader"
   homepage "https://www.spinnaker.de/lbdb/"
-  url "https://www.spinnaker.de/lbdb/download/lbdb-0.52.1.tar.gz"
-  sha256 "186b263056bc979d399d1d7f29664e84dd7a4282ffbe4378cb567e55318d7929"
+  url "https://www.spinnaker.de/lbdb/download/lbdb-0.56.tar.gz"
+  sha256 "baa6a23b61394d792b7b221e1961d9ba5710614c9324e8f59b35c126c2b4e74e"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,23 +11,25 @@ class Lbdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "26d0fcf12fc5b34e47e3db5a46f9831ced0fb27aca85ba5027569a400f420535"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c248dcc59fa3b06d9e06b99b28890b6cc0abb0befc3bbfffbcb37ab1adfe340f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "878500511fdf5242a88d2f5e5b93eb8a53e55af14563eef61aacf1cbf133e89a"
-    sha256 cellar: :any_skip_relocation, ventura:        "e9c3c09538c18af545e116b1669ca8d8bde510a5e8870a76731630b1cc67a7b1"
-    sha256 cellar: :any_skip_relocation, monterey:       "9330d60cc8d13e3cb3cbacf0be304fd72ee8a91ceaa85e05415be82882606fcf"
-    sha256 cellar: :any_skip_relocation, big_sur:        "76c658923b409f0398bde5d1cacdee3964f8620651f1d039788c782d5205e7d6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "89941ede433bacad1a798d2d5e16962df39cb8ce184485c19e755b56feb4e6a4"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5fa1d425e1b6b4496d75679fefc7d0d0967ebc9c4654e495603c04950dd262ad"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bf0613f346c74e4ac7f78c08297114d87b5b583f541768e8765a9ffffd55c3e1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b613432087627ec2139888a3a2c7e024fd88fefee630e61e54a6048b8434ca22"
+    sha256 cellar: :any_skip_relocation, sonoma:        "799de569aa9a50d882d5bb452351bc7fba0eb60f874024166a9696da6bd6ae40"
+    sha256 cellar: :any_skip_relocation, ventura:       "e0f4a17ce22453b7aa2187bc18563bdc00aa05b65648523d5e9e944ce9c28f60"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f780ddee05060ddb5b7c9263c2a89d9ce686995f021df5b9eb610445c2709975"
   end
 
   depends_on "abook"
+  depends_on "khard"
 
   def install
-    system "./configure", "--prefix=#{prefix}", "--libdir=#{lib}/lbdb"
+    system "./configure", "--libexecdir=#{lib}/lbdb", *std_configure_args
     system "make", "install"
   end
 
   test do
     assert_match version.major_minor.to_s, shell_output("#{bin}/lbdbq -v")
+    assert_path_exists lib/"lbdb/m_abook", "m_abook module is missing!"
+    assert_path_exists lib/"lbdb/m_khard", "m_khard module is missing!"
   end
 end

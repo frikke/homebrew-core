@@ -7,6 +7,7 @@ class Lcdproc < Formula
   revision 2
 
   bottle do
+    sha256 sonoma:       "16efc1c9a35bf0563aa2c66a8f653c56e1ef4694956533c31acc722af6834f86"
     sha256 ventura:      "ff2675dfa714a9de7e8d5a9f40c214cf5547c85c402337e7376a54631f43020a"
     sha256 monterey:     "90bb0544163a3966aac4de0dffaff4a9cc59cb05e08c314a28829fcf8df8e38b"
     sha256 big_sur:      "937564e19f5e45fd49b02e83577a4e217abf89ca3884958b3f9e80b2132fa8df"
@@ -14,7 +15,7 @@ class Lcdproc < Formula
     sha256 x86_64_linux: "d869dec7aa2e03b2c6bc21a281ac56537d5a596e0a87442fc79fda035f000282"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on arch: :x86_64
   depends_on "libftdi"
   depends_on "libusb"
@@ -23,10 +24,12 @@ class Lcdproc < Formula
   uses_from_macos "ncurses"
 
   def install
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules",
+    ENV.append_to_cflags "-fcommon" if ENV.compiler.to_s.start_with?("gcc")
+
+    system "./configure", "--disable-silent-rules",
                           "--enable-drivers=all",
-                          "--enable-libftdi=yes"
+                          "--enable-libftdi=yes",
+                          *std_configure_args
     system "make", "install"
   end
 

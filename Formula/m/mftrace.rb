@@ -12,14 +12,13 @@ class Mftrace < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "fcc7091b7e3aab969e797cbb583d8d8349856433c9452c818c1cc338b53537d9"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c9b7d41129a1f83e1c9e84ad20e706ebd3d93e6c7b9801bd90e866d0e07d8234"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "24bae79ec700220fea014de05a63df51c061ecf8817e737c24a00c1fd2b3f6ea"
-    sha256 cellar: :any_skip_relocation, ventura:        "dc53be3197cdb6ee63607d4d9d3e94220953e85ba05c5e698156087382d557de"
-    sha256 cellar: :any_skip_relocation, monterey:       "bae6d024e848e8f7c7a18f8b6d86359f652b7715daa1a11bcdcb6c4e03b5e0b7"
-    sha256 cellar: :any_skip_relocation, big_sur:        "57483c84e1722e4ec6e606c24336a615bd8710c3735bbb1c32e3a3afa64b3b22"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "45f198472e3e64f2ce72fc9425338c791110ac33f1cecde0c77f584b0373fd7e"
+    rebuild 4
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "097fa4cc166f51d4033415a651817207d3a5734ef50237969b84f5a8fc6ddfb4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9415613e99216e1174b5e962761cef44084c8e9ef41208673b31e44d55879828"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e639eb620cac19e786da74b7a387f742f23837823bb2dee341e42a5b6df751d2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "69753e27a76317dfa0c872ac7a7a90e8c0849c39fae13a1cc677a1b1ded7c26f"
+    sha256 cellar: :any_skip_relocation, ventura:       "406e8d33e1825be811ad65d5b77d9f9538011238b3811b9cda2f40bdf50a3b80"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "138d79020d6a8942911908b01c237b00dc0847d9d8e4a506818db60e54aef44c"
   end
 
   head do
@@ -29,7 +28,7 @@ class Mftrace < Formula
 
   depends_on "fontforge"
   depends_on "potrace"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
   depends_on "t1utils"
 
   # Fixed in https://github.com/hanwen/mftrace/pull/14
@@ -39,7 +38,7 @@ class Mftrace < Formula
   end
 
   def install
-    ENV["PYTHON"] = which("python3.11")
+    ENV["PYTHON"] = which("python3.13")
     buildpath.install resource("manpage") if build.stable?
     system "./autogen.sh" if build.head?
     system "./configure", *std_configure_args

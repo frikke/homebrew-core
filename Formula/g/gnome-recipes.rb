@@ -5,23 +5,28 @@ class GnomeRecipes < Formula
   url "https://gitlab.gnome.org/GNOME/recipes.git",
       tag:      "2.0.4",
       revision: "d5e9733c49ea4f99e72c065c05ee1a35ef65e67d"
+  license "GPL-3.0-or-later"
+  revision 2
 
   bottle do
-    rebuild 1
-    sha256 arm64_ventura: "7428b63c0372196f449fca8bd2c39eaa5fe8ee9c40b1d5ad7e54af040ccc495e"
-    sha256 arm64_big_sur: "a2feeebf2f5d464b1f888d59d30e713be65bb4f19def590684b5eeeaa11efe94"
-    sha256 ventura:       "87af4fbd41d71170dfd659353c2caab957c9a3c36d84a0b4c6f79694c4bab07d"
-    sha256 monterey:      "8a9ff369bae0b3acbbf48ee50e7ac5a8ec5a1340aeb5b81a6cf5edc3fb5f571c"
-    sha256 big_sur:       "105a21c96546f36b1b419dd4c75fd2e7b8104734292133fd21f1380b426043d2"
-    sha256 catalina:      "854c2d0ce62d52830785e13faec7626e0c08769d9b9e618158d622acb20b1097"
-    sha256 x86_64_linux:  "ffedc8920bea9198ab547302ded99b2591f52d3f38f11e7cb00b29aa80e386eb"
+    sha256 arm64_sequoia: "aeca025b7378f47ce41dc347deb424d0944de6e7da3408c6e775570ec25a321c"
+    sha256 arm64_sonoma:  "b65f11b25c9f58fa146f4a60b1c8ac1f1f807ffb48c91234b73736ae9d8d3ad6"
+    sha256 arm64_ventura: "839f681efb2bc6d86d2c399a1bb4236f852a177f0c1899b65580a5ef55511acb"
+    sha256 sonoma:        "056abd76e963efbe48a5459b8a0a6c7d97b51efaacdd4ae7ec401c1c433e1f58"
+    sha256 ventura:       "cbb8cda97c299ad0c43bc5536923992ce0aee73ce2757956c17d477e588de34c"
+    sha256 x86_64_linux:  "0cbf9ab64b5ab37f4ea338f445b5f53d50ee6cd5cf91d66da1bdd348a3982775"
   end
 
+  depends_on "gettext" => :build
   depends_on "itstool" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "adwaita-icon-theme"
+  depends_on "cairo"
+  depends_on "gdk-pixbuf"
+  depends_on "glib"
   depends_on "gnome-autoar"
   depends_on "gspell"
   depends_on "gtk+3"
@@ -31,6 +36,14 @@ class GnomeRecipes < Formula
   depends_on "librest" # for goa
   depends_on "libsoup@2" # libsoup 3 issue: https://gitlab.gnome.org/GNOME/recipes/-/issues/155
   depends_on "libxml2"
+  depends_on "pango"
+
+  on_macos do
+    depends_on "at-spi2-core"
+    depends_on "enchant"
+    depends_on "gettext"
+    depends_on "harfbuzz"
+  end
 
   resource "goa" do
     url "https://download.gnome.org/sources/gnome-online-accounts/3.43/gnome-online-accounts-3.43.1.tar.xz"
@@ -44,11 +57,9 @@ class GnomeRecipes < Formula
 
   def install
     resource("goa").stage do
-      system "./configure", "--disable-debug",
-                            "--disable-dependency-tracking",
-                            "--disable-silent-rules",
-                            "--prefix=#{libexec}",
-                            "--disable-backend"
+      system "./configure", "--disable-silent-rules",
+                            "--disable-backend",
+                            *std_configure_args(prefix: libexec)
       system "make", "install"
     end
 
@@ -65,11 +76,9 @@ class GnomeRecipes < Formula
     # stop meson_post_install.py from doing what needs to be done in the post_install step
     ENV["DESTDIR"] = ""
     ENV.delete "PYTHONPATH"
-    mkdir "build" do
-      system "meson", *std_meson_args, ".."
-      system "ninja"
-      system "ninja", "install"
-    end
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   def post_install
@@ -78,6 +87,6 @@ class GnomeRecipes < Formula
   end
 
   test do
-    system "#{bin}/gnome-recipes", "--help"
+    system bin/"gnome-recipes", "--help"
   end
 end

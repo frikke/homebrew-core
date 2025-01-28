@@ -4,7 +4,7 @@ class SpatialiteGui < Formula
   url "https://www.gaia-gis.it/gaia-sins/spatialite-gui-sources/spatialite_gui-2.1.0-beta1.tar.gz"
   sha256 "ba48d96df18cebc3ff23f69797207ae1582cce62f4596b69bae300ca3c23db33"
   license "GPL-3.0-or-later"
-  revision 3
+  revision 7
 
   livecheck do
     url "https://www.gaia-gis.it/gaia-sins/spatialite-gui-sources/"
@@ -12,16 +12,17 @@ class SpatialiteGui < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c536a53e5bee1a2971e50aa51eba04bbbcfc71f5ce490c06c84801eec1c822be"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "0b7434afc44f7b02180d57580736ceb108f87d3c178f4719e2333e1c24c1988a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5d3120e5b4bdd9e8a56834e2c06d304d6ccd740084e63f16fc81f384d0e1aa05"
-    sha256 cellar: :any_skip_relocation, ventura:        "fb28b10d6fcc6d2ae140e635dfb5055d6428b34a08a3f3a5b585441773dbe00a"
-    sha256 cellar: :any_skip_relocation, monterey:       "06a2e3f898aec3797366f6ba02120434b6e97469e6331484e7edf257036110d5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8ca6204b4ed2605f6172eb35c206cce06171042b321ab09237d383924a4e8739"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ef5b135c6e6a396b28dd0516613d517615077cd9dd2bbe8477f82b9e4eb390ba"
+    sha256 cellar: :any,                 arm64_sequoia:  "d4416d61f3cd5dae9afe7dd777c13856d91d807789be63c78ccd70cabd219b2c"
+    sha256 cellar: :any,                 arm64_sonoma:   "239373bbb041e0934be1ce33589a1a2837de52b6a7f2287126ecc0027e837b74"
+    sha256 cellar: :any,                 arm64_ventura:  "772be15226097ff551dac7f90fe4c351248e73a3816bfcfdfd03aa2d2537bd40"
+    sha256 cellar: :any,                 arm64_monterey: "4ec7aac0c4c1533201f3080fda7e537ea85d6be82ee5f526309eea53b1652b36"
+    sha256 cellar: :any,                 sonoma:         "680af7919f7223a71654414c55aa279ef585a47edbef54c723ea0093a97e9632"
+    sha256 cellar: :any,                 ventura:        "4b743a902950f06c27bcdf54e4b17e429c3a71e9e36dd4f9c295ce653c34eb35"
+    sha256 cellar: :any,                 monterey:       "085c99ebea2436fdc3830fe7367e2e8837380b6f8e7e5fb2a396b06106d88f99"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "01964fdfdcd4ea1dea29d24210777887be81dd46ffed07a341c86a5ca932c409"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "freexl"
   depends_on "geos"
   depends_on "libpq"
@@ -30,6 +31,7 @@ class SpatialiteGui < Formula
   depends_on "libspatialite"
   depends_on "libtiff"
   depends_on "libxlsxwriter"
+  depends_on "libxml2"
   depends_on "lz4"
   depends_on "minizip"
   depends_on "openjpeg"
@@ -42,7 +44,6 @@ class SpatialiteGui < Formula
   depends_on "zstd"
 
   uses_from_macos "curl"
-  uses_from_macos "libxml2"
   uses_from_macos "zlib"
 
   def install

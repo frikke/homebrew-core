@@ -1,8 +1,8 @@
 class Msgpack < Formula
   desc "Library for a binary-based efficient data interchange format"
   homepage "https://msgpack.org/"
-  url "https://github.com/msgpack/msgpack-c/releases/download/c-6.0.0/msgpack-c-6.0.0.tar.gz"
-  sha256 "3654f5e2c652dc52e0a993e270bb57d5702b262703f03771c152bba51602aeba"
+  url "https://github.com/msgpack/msgpack-c/releases/download/c-6.1.0/msgpack-c-6.1.0.tar.gz"
+  sha256 "674119f1a85b5f2ecc4c7d5c2859edf50c0b05e0c10aa0df85eefa2c8c14b796"
   license "BSL-1.0"
   head "https://github.com/msgpack/msgpack-c.git", branch: "c_master"
 
@@ -12,15 +12,14 @@ class Msgpack < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "fdb7af2f6aadfd3bd0ddad1ffa04f916aa5b4503380eb929922565a3a5c28e94"
-    sha256 cellar: :any,                 arm64_ventura:  "e41b85a88da3012d8a7819799333410558cca1ef59663fda84718be0856002e6"
-    sha256 cellar: :any,                 arm64_monterey: "1d14abff9537f4d85dee74c10ce6f73fafa8e8719c5be05bfda9a836cbe732ad"
-    sha256 cellar: :any,                 arm64_big_sur:  "f3842a4dd94cf91e0259f5cf95e325314c664fe5b68b0a15d1a45739096b62e9"
-    sha256 cellar: :any,                 sonoma:         "993bc7864b3c7053285bf5aa62b5d29269c2e9c1fdf0846831787557025a126b"
-    sha256 cellar: :any,                 ventura:        "7abad795d8f0b89d7927db89147ba2a5273e04cdfdcda30d9bc402fef4352ce6"
-    sha256 cellar: :any,                 monterey:       "7b02d0690b3ca73cacf020eb6de303370b7d6def89b9769f0bd18222722e4903"
-    sha256 cellar: :any,                 big_sur:        "e422e0f9f84e2fa558e75e5145abcba59ef61c72dacdf757eb185694a58c08a7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d3dfeade8b72c260d4745892f254ceb72535502293f6ddd04d04f19cb7affa35"
+    sha256 cellar: :any,                 arm64_sequoia:  "fef7b080476f8c2ea5d3478775fb8ba7861cb2c5b25a5c06a575eabf303d6085"
+    sha256 cellar: :any,                 arm64_sonoma:   "7a4291f35809d557ff65bdec687fc12468b557d8c27499fad634b84fc27c6a65"
+    sha256 cellar: :any,                 arm64_ventura:  "9798f9eb15c335c663271387feedb42a24953c8a869d657e1b3d58868fb97177"
+    sha256 cellar: :any,                 arm64_monterey: "eb59d97db589ebe5afa0c0ae7f8ac4f07ae39433c323e6d90532301ff19a6c69"
+    sha256 cellar: :any,                 sonoma:         "f8a10c653f0e071f725866c790eebef4161f4c172315388aefdada07682c46bd"
+    sha256 cellar: :any,                 ventura:        "c7e8c2eddc2b55a71e6e6a6a3f63c90cb66369727b990cc553470b7b91ceb599"
+    sha256 cellar: :any,                 monterey:       "0c0c337dad512678ec60426c448aded9965daef3b4ee89eec9f98faad1789012"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "95d7d9a41f1c13c5ce0e1a2ec77f119a3b55e2ad88f0f98d3e5a04d323896171"
   end
 
   depends_on "cmake" => :build
@@ -45,7 +44,7 @@ class Msgpack < Formula
                  "Upstream has bumped `SOVERSION`! The workaround in the `install` method can be removed"
 
     # Reference: https://github.com/msgpack/msgpack-c/blob/c_master/QUICKSTART-C.md
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <msgpack.h>
       #include <stdio.h>
 
@@ -75,7 +74,7 @@ class Msgpack < Formula
              puts("");
          }
       }
-    EOS
+    C
 
     system ENV.cc, "-o", "test", "test.c", "-L#{lib}", "-lmsgpack-c"
     assert_equal "1\n2\n3\n", `./test`

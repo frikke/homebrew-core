@@ -1,19 +1,18 @@
 class SqlMigrate < Formula
   desc "SQL schema migration tool for Go"
   homepage "https://github.com/rubenv/sql-migrate"
-  url "https://github.com/rubenv/sql-migrate/archive/refs/tags/v1.5.2.tar.gz"
-  sha256 "5171e69fbb8cfd276afc3b8ac1be965cffcaa8fdc86d886d0a990b4b28bd50ad"
+  url "https://github.com/rubenv/sql-migrate/archive/refs/tags/v1.7.1.tar.gz"
+  sha256 "faac192e9321ce3fe2d4641a72c9ddaf6ff7c46afcbdeaa641a0027638875b3b"
   license "MIT"
   head "https://github.com/rubenv/sql-migrate.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "923aa3b54e55c95e68e4ff691541377b41dfa1a008cecb9eebe589e8677bcb37"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a66dd7a7fb6162e8a649ef631d19fd95eb6bac65e575b62656d5fb18cbbdc845"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a3acd534137ee20e0108d79f8e5da34986b55ca27f737120fa9a6952839a0d1c"
-    sha256 cellar: :any_skip_relocation, ventura:        "56f56743d5603f13a92780181d2146619543d102e0949a70a78ff02394ccf3f8"
-    sha256 cellar: :any_skip_relocation, monterey:       "bf214b55a09571a24af0f991c092339051b136e913f4db00bedb78d450d57ab4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9c07ec32217769ba854ec576646371de2ec5e4468152c6f3e4cd88cea33a151f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ce78a4d019dd8661e74abbd7b4e433360458c954db80e595e6ec8909f83104ea"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d426f59baf20c63e9370b0b6de8f264a0090e4f32d7d7cf82baaa6c5d99100f2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bb2982f036b1486b4f8fdd9a5df83eb346fd7b9363aa0cb1e72f951886074b2a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "29bcb1522528328b56fbb468cff59dda9d752e15c381e8008d22d59e65f3ffcc"
+    sha256 cellar: :any_skip_relocation, sonoma:        "2140ae10ad7bb5075063ae42e977b6702873af2e7a1b680789cbf3b40f5d81e6"
+    sha256 cellar: :any_skip_relocation, ventura:       "21a74d44776d61378afc1a74476095e170c3638f51c8d0039813323ef8dd3f0c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "151ef9df720a00cb96e49de3b31ff270716aad67eb52ad39446eec325e5b6eac"
   end
 
   depends_on "go" => :build
@@ -26,12 +25,12 @@ class SqlMigrate < Formula
     ENV["TZ"] = "UTC"
 
     test_config = testpath/"dbconfig.yml"
-    test_config.write <<~EOS
+    test_config.write <<~YAML
       development:
         dialect: sqlite3
         datasource: test.db
         dir: migrations/sqlite3
-    EOS
+    YAML
 
     mkdir testpath/"migrations/sqlite3"
     system bin/"sql-migrate", "new", "brewtest"

@@ -7,9 +7,12 @@ class Libopusenc < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "9c857d079a3c385ac89d89869fa2ed74d6115a3b86d87149bd9d4d5796da3141"
+    sha256 cellar: :any,                 arm64_sonoma:   "c96d078c67fa9ad9ae0398e4c7979c6506c4438ed426d224c8480a5cddd1d919"
     sha256 cellar: :any,                 arm64_ventura:  "2d9e6657c2d76d193da5cd687e5c95e4c13702cd9f5c08945b7a316b63786112"
     sha256 cellar: :any,                 arm64_monterey: "5b28442f84fbd88cfd6cacf35ad6df119cc1dcfb89851c7b81bd77f07402a70c"
     sha256 cellar: :any,                 arm64_big_sur:  "f8d28846ea6d21358ef7768f94241a0f94327d4edcdd5223be2da96c2f0d6841"
+    sha256 cellar: :any,                 sonoma:         "340d398550ddcfdf633eb19d78a9f044e810ca5bcf0789fe66caec6a1c546269"
     sha256 cellar: :any,                 ventura:        "5b2a64d3c64ec7e14f7a9f2adbe46dddf4f3ad51876dea2c28010e6f4e4e55f1"
     sha256 cellar: :any,                 monterey:       "636d36637bb7e7cc098dfe6ba078fb4fb1fbc5fce4bd93ea6a7c08ad4c49d2f4"
     sha256 cellar: :any,                 big_sur:        "48157970f8bebbd7ad54d099531397cb3d81797e7715ed5523865d7d1b19df8b"
@@ -27,19 +30,17 @@ class Libopusenc < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "opus"
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <opusenc.h>
       #include <assert.h>
       #include <stdint.h>
@@ -67,7 +68,7 @@ class Libopusenc < Formula
 
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-o", "test", "-Wall",
                    "-I#{Formula["opus"].opt_include}/opus",
                    "-I#{include}/opus",

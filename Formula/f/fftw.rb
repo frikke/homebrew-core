@@ -12,9 +12,12 @@ class Fftw < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "d506a2d2ca1b49fdfe64bf2ffca4fca70f7e86d4e1006979dabcde37fc359c9b"
+    sha256 cellar: :any,                 arm64_sonoma:   "0bb0537238a59cc4677738091ec67b65e7bd12fafe3072e091e20a1143232322"
     sha256 cellar: :any,                 arm64_ventura:  "f118b9b10a302aaa0a937b9c3004a1610a522f365022ab12e90e7ee929823ff4"
     sha256 cellar: :any,                 arm64_monterey: "ac39928c08c6cec08f61b31c37ea69be21f6020c5c50bbdc66751fc1907ee600"
     sha256 cellar: :any,                 arm64_big_sur:  "de50d4cd3e5de39ccbc168a8eb8555f9e36609198c9e4f91c1d1da122674d066"
+    sha256 cellar: :any,                 sonoma:         "3a0edb94f8ab04e42f953dc408ff0e7dcee211771091dcb6db93f9cfca79ae0a"
     sha256 cellar: :any,                 ventura:        "31e8c75b13d33a17164163f3c5f5bb6605e26b2328a617696b0fae5aa08e8ad4"
     sha256 cellar: :any,                 monterey:       "dc7a704928be8c4724db42be3161aebf3f0d3b8e0f79e893bc1b294aed4ca770"
     sha256 cellar: :any,                 big_sur:        "bd3ae1b553913b3b627bd1af592d84da4c6a93e45dde5af4df7c393564b0f174"
@@ -73,7 +76,7 @@ class Fftw < Formula
   test do
     # Adapted from the sample usage provided in the documentation:
     # https://www.fftw.org/fftw3_doc/Complex-One_002dDimensional-DFTs.html
-    (testpath/"fftw.c").write <<~EOS
+    (testpath/"fftw.c").write <<~C
       #include <fftw3.h>
       int main(int argc, char* *argv)
       {
@@ -88,7 +91,7 @@ class Fftw < Formula
           fftw_free(in); fftw_free(out);
           return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "-o", "fftw", "fftw.c", "-L#{lib}", "-lfftw3"
     system "./fftw"

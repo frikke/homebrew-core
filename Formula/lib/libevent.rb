@@ -1,7 +1,7 @@
 class Libevent < Formula
   desc "Asynchronous event library"
   homepage "https://libevent.org/"
-  url "https://github.com/libevent/libevent/archive/release-2.1.12-stable.tar.gz"
+  url "https://github.com/libevent/libevent/archive/refs/tags/release-2.1.12-stable.tar.gz"
   sha256 "7180a979aaa7000e1264da484f712d403fcf7679b1e9212c4e3d09f5c93efc24"
   license "BSD-3-Clause"
   revision 1
@@ -12,6 +12,7 @@ class Libevent < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "65fc7c61fec0f5ae0c5dfc8fc7e3b6b0507d3f1c7c308a332802541f00334963"
     sha256 cellar: :any,                 arm64_sonoma:   "38a3eb3510a7e0cd4096e4592d0095c562eb1bbad572d951f1923009a14ad702"
     sha256 cellar: :any,                 arm64_ventura:  "a75d453a7fe2aba1eaba334621b7bd9f0ff6f9e1f04aa400565f68711a9f6db4"
     sha256 cellar: :any,                 arm64_monterey: "a24d682548fb7cb11c127932240cced5d6fdb16feaaa6dc2ab3a7f0833e5df2e"
@@ -26,20 +27,18 @@ class Libevent < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "openssl@3"
 
   def install
     system "./autogen.sh"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-debug-mode",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-debug-mode", *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <event2/event.h>
 
       int main()
@@ -49,7 +48,7 @@ class Libevent < Formula
         event_base_free(base);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-levent", "-o", "test"
     system "./test"
   end

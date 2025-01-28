@@ -1,37 +1,32 @@
 class SstpClient < Formula
-  desc "SSTP (Microsofts Remote Access Solution for PPP over SSL) client"
-  homepage "https://sstp-client.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/sstp-client/sstp-client/sstp-client-1.0.18.tar.gz"
-  sha256 "d879f4f35ab7eae87486edc48b50f99a9af65f5eb6fb4427993ca578bb0e0dc8"
+  desc "SSTP (Microsoft's Remote Access Solution for PPP over SSL) client"
+  homepage "https://gitlab.com/sstp-project/sstp-client"
+  url "https://gitlab.com/sstp-project/sstp-client/-/releases/1.0.20/downloads/dist-gzip/sstp-client-1.0.20.tar.gz"
+  sha256 "6c84b6cdcc21ebea6daeb8c5356dcdfd8681f4981a734f8485ed0b31fc30aadd"
   license "GPL-2.0-or-later"
-  revision 1
   version_scheme 1
-
-  livecheck do
-    url :stable
-    regex(%r{url=.*?/sstp-client[._-]v?(\d+(?:\.\d+)+)\.t}i)
-  end
+  head "https://gitlab.com/sstp-project/sstp-client.git", branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "4150a77157b10963596842ea5c257b70363cfaba28ac3bfff1f9f6074a47ed9a"
-    sha256 arm64_monterey: "6ff8857979b82f4b97457f03a665043bb224e5ad592367146598f66cac391f04"
-    sha256 arm64_big_sur:  "1fe3ed11b72387045483883c2924d15b5a25729edec8dc80a3ddab008d8d4887"
-    sha256 ventura:        "132b0a1692c51b79a389c0795fcc228fe980a095dcb5d5679fd0b5e106f3951c"
-    sha256 monterey:       "53b5a095eae90346d602fd869d866e51ae802996e5e709d48155546896e53ff6"
-    sha256 big_sur:        "32ac6352f38629719436d17b75fc28e03d8ddbb9f27710034858da21cc1bd4cd"
-    sha256 x86_64_linux:   "5f415ec7085cc1b3a82a5a5746ca5e27417b003753ed7bde514e6ccef9631404"
+    sha256 arm64_sequoia:  "ff9e147017fa32a2f65c2ec46fdca292e7e92f3bb7cd6bdfa5d8ef77b34acf82"
+    sha256 arm64_sonoma:   "4c4f9aa5820641e408e0106b9db844be89615c289b52ca07c5e421b157a1a4c6"
+    sha256 arm64_ventura:  "26446c059cd275fc49d4f4475757f2a700ecef734fef50e99d55e352f4c04c93"
+    sha256 arm64_monterey: "c6d91a90c2988a96b4be0ea9ce0120944471c0164ea8052fb45356710fbbf8bd"
+    sha256 sonoma:         "184766c884ccf2bd80dd683a219ceb022038474b7a620e2c3ce496625c1302ed"
+    sha256 ventura:        "d1cf3956def117437343e10197b14bcbc03fd6a2dc96278b5036f2153085dc09"
+    sha256 monterey:       "015cfdcec2002f2c9ec54e06d070e86c28222f776ef651625f255ff5238e0a5c"
+    sha256 x86_64_linux:   "30078ed4805a4e3b52753c60ad87590d21a8a5289b31fde3d27be0116f179b2b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libevent"
   depends_on "openssl@3"
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
+    system "./configure", "--disable-silent-rules",
                           "--disable-ppp-plugin",
-                          "--prefix=#{prefix}",
-                          "--with-runtime-dir=#{var}/run/sstpc"
+                          "--with-runtime-dir=#{var}/run/sstpc",
+                          *std_configure_args
     system "make", "install"
 
     # Create a directory needed by sstpc for privilege separation

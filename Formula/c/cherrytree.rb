@@ -1,9 +1,11 @@
 class Cherrytree < Formula
   desc "Hierarchical note taking application featuring rich text and syntax highlighting"
   homepage "https://www.giuspen.com/cherrytree/"
-  url "https://www.giuspen.com/software/cherrytree_1.0.1.tar.xz"
-  sha256 "818f72d7693d7f103b59f1a5540d42f42249e51ced3bdbbb62ad9171efc298a0"
+  url "https://www.giuspen.com/software/cherrytree_1.2.0.tar.xz"
+  sha256 "b9d9c9a0d7853e846657ceccdf74730f79190e19af296eeb955e5f4b54425ec2"
   license "GPL-3.0-or-later"
+  revision 1
+  head "https://github.com/giuspen/cherrytree.git", branch: "master"
 
   livecheck do
     url :homepage
@@ -11,44 +13,61 @@ class Cherrytree < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "1aa6a145acf9def62811b615d99f3f1954a59d063395b38b455d441f7c365f19"
-    sha256 arm64_monterey: "e8116a8fea771896bdd54bca136a07de8b218747ddc0d164ebc7374b98ca9eb2"
-    sha256 arm64_big_sur:  "aec760c486c82a3d01e06d6c052d93f31cfa45f341691ecfe7f0fd8fc579d7d7"
-    sha256 ventura:        "639647d04e95503e7df4a4fdd47fcb445682f1f4b3ee1bfc1c92b7530e836d7e"
-    sha256 monterey:       "08c1f07e33327ed077603b862307d12174913d6df6b1d73b218d0ebeee385c66"
-    sha256 big_sur:        "ed4a43956d8db3849fc26eb63505b4dfb1a0da8078021716989691aa98cd1e4b"
-    sha256 x86_64_linux:   "3323512c7026c6eabd66dae220443e6180d7af388c853a7fdcfb3c3be914c055"
+    sha256 arm64_sequoia: "f3876c40c8ce23942721414871f91de6f5923c4d291e09bdcb3bbd8b6dac50d0"
+    sha256 arm64_sonoma:  "e7beb83cd769765c49866dec5157d3d91abe89dd76aa5a70b4537e7ce17907f1"
+    sha256 arm64_ventura: "8fe04de9ad5a41b54eac69ad39d204ee4369c6f15dd80c3d1e595d1c68d1091b"
+    sha256 sonoma:        "af90c242b21ca2bf9859deecdd461f97d1617170948804564378849acd588ead"
+    sha256 ventura:       "fced9c8a668436bea65ecae91d794d0c8850c1045dac00801299c9b840df8322"
+    sha256 x86_64_linux:  "bab50a450df78f7839faa8b08bce999163d4eee8fbf905f3f05afd77e98f1d71"
   end
 
   depends_on "cmake" => :build
-  depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "gettext" => :build
+  depends_on "pkgconf" => :build
   depends_on "adwaita-icon-theme"
+  depends_on "atkmm@2.28"
+  depends_on "cairo"
+  depends_on "cairomm@1.14"
   depends_on "fmt"
+  depends_on "fribidi"
+  depends_on "glib"
+  depends_on "glibmm@2.66"
   depends_on "gspell"
-  depends_on "gtksourceviewmm3"
+  depends_on "gtk+3"
+  depends_on "gtkmm3"
+  depends_on "gtksourceview4"
+  depends_on "libsigc++@2"
   depends_on "libxml++"
+  depends_on "pango"
+  depends_on "pangomm@2.46"
   depends_on "spdlog"
   depends_on "sqlite" # try to change to uses_from_macos after python is not a dependency
   depends_on "uchardet"
   depends_on "vte3"
 
+  uses_from_macos "python" => :build
   uses_from_macos "curl"
+  uses_from_macos "libxml2"
 
-  fails_with gcc: "5" # Needs std::optional
+  on_macos do
+    depends_on "at-spi2-core"
+    depends_on "enchant"
+    depends_on "gdk-pixbuf"
+    depends_on "gettext"
+    depends_on "harfbuzz"
+  end
 
   def install
-    system "cmake", ".", "-DBUILD_TESTING=''", "-GNinja", *std_cmake_args
-    system "ninja"
-    system "ninja", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
     # (cherrytree:46081): Gtk-WARNING **: 17:33:48.386: cannot open display
     return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
 
-    (testpath/"homebrew.ctd").write <<~EOS
+    (testpath/"homebrew.ctd").write <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <cherrytree>
         <bookmarks list=""/>
@@ -68,8 +87,9 @@ class Cherrytree < Formula
           <rich_text>print('hello world')</rich_text>
         </node>
       </cherrytree>
-    EOS
-    system "#{bin}/cherrytree", testpath/"homebrew.ctd", "--export_to_txt_dir", testpath, "--export_single_file"
+    XML
+
+    system bin/"cherrytree", testpath/"homebrew.ctd", "--export_to_txt_dir", testpath, "--export_single_file"
     assert_predicate testpath/"homebrew.ctd.txt", :exist?
     assert_match "rich text", (testpath/"homebrew.ctd.txt").read
     assert_match "this is a simple command line test for homebrew", (testpath/"homebrew.ctd.txt").read

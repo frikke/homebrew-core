@@ -1,26 +1,25 @@
 class Zchunk < Formula
   desc "Compressed file format for efficient deltas"
   homepage "https://github.com/zchunk/zchunk"
-  url "https://github.com/zchunk/zchunk/archive/refs/tags/1.3.1.tar.gz"
-  sha256 "33ba1d6f5c83dbce75f8114ddbef1aa558938381fbaac0fa068eaf30c6ed2c60"
+  url "https://github.com/zchunk/zchunk/archive/refs/tags/1.5.1.tar.gz"
+  sha256 "2c187055e2206e62cef4559845e7c2ec6ec5a07ce1e0a6044e4342e0c5d7771d"
   license "BSD-2-Clause"
   head "https://github.com/zchunk/zchunk.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_sonoma:   "4522530606d6489124a11cd505c044fc5e490ae9c80d271667094894a8970ac5"
-    sha256 cellar: :any, arm64_ventura:  "2bd78de00a11ccce4f9a7e5bbac6babe8d4556213477c72078b925ab83a4651c"
-    sha256 cellar: :any, arm64_monterey: "5a0f82b054986fbb09937d2add7b8a8f78039cfae0e8ac925310f20a2e428163"
-    sha256 cellar: :any, arm64_big_sur:  "47d1c93a89b2737ac1d73f159e6f50103f1ef57fa0ef04982d6652722bf75da4"
-    sha256 cellar: :any, sonoma:         "61f794ed0844f775bb90976e6217a922571d9d7a26ac03461f929b6a2f01eb9b"
-    sha256 cellar: :any, ventura:        "1dbb83b90c897d8468fbf18eec524fa3d3161f949ba9709bb4cde3ba60bb4b66"
-    sha256 cellar: :any, monterey:       "279ff295e6c53d56b77f97bafb210b087cd4e3959f679241f19bba4b099a8376"
-    sha256 cellar: :any, big_sur:        "92e0f9d5692f7bb7f73fff900d7624ff777c51a06e7cc1d0b73d1f20dbd06a19"
-    sha256               x86_64_linux:   "b3dc877550a9e975f1d082c0e3e2949feae5939fddad77273f7f8c4df12ce08e"
+    sha256 cellar: :any, arm64_sequoia:  "550f804db96f40d3d97fd722bfd9dae58e97d1edc056ada722dbb94a6a4b6f67"
+    sha256 cellar: :any, arm64_sonoma:   "716e3b4a5e310ef2c2e28981287ad44c34ffb65d8017c266a94e2b2740158263"
+    sha256 cellar: :any, arm64_ventura:  "02c1e7311098a207e3c5acdaf951c1f0f79d732190bd26697384de3d297c7a17"
+    sha256 cellar: :any, arm64_monterey: "54b3a061081d1d37df726b7453e24a6e68d7916afc752fa3ef251a2233aa96ea"
+    sha256 cellar: :any, sonoma:         "07d03afa6c20b2f462ff04f2de17da192bd1be0970cee9606e40b6b735e11894"
+    sha256 cellar: :any, ventura:        "9573ef44975ddcd9cd08a67183a3e244303386fad0af7111467dd00f46d5ca5b"
+    sha256 cellar: :any, monterey:       "8cc7d00b71b7972981f2360d819c07e6e8da894c5995035ebd77073b911562c6"
+    sha256               x86_64_linux:   "65da8bdeab902d65867eda5a3fbda3b6a490827c111872589520e97349b810ee"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "openssl@3"
   depends_on "zstd"
 

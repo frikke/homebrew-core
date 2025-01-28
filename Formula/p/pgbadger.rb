@@ -1,19 +1,18 @@
 class Pgbadger < Formula
   desc "Log analyzer for PostgreSQL"
   homepage "https://pgbadger.darold.net/"
-  url "https://github.com/darold/pgbadger/archive/refs/tags/v12.2.tar.gz"
-  sha256 "86677cb11d0fbcd80ed984c253318cf4b5f2e9ae11211c4b40606cf4536fb4b3"
+  url "https://github.com/darold/pgbadger/archive/refs/tags/v13.0.tar.gz"
+  sha256 "4cfaa24e6e7623e3f54e4a9dc35cc8030f7d2486931dc018d677d73181ba3626"
   license "PostgreSQL"
   head "https://github.com/darold/pgbadger.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "43fdc11961083b2fe26404ec3cf1db0f385bed9d7790c507309d9102fd65cbae"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "43fdc11961083b2fe26404ec3cf1db0f385bed9d7790c507309d9102fd65cbae"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2ef944f78b90a0325f1ab62b6754e28bb5178ad6eae0daaf5d3c028265419b44"
-    sha256 cellar: :any_skip_relocation, ventura:        "1d9a26125895ff45d1f63e31cd90d0b92fb598c92fdf3b3d38ab7dfc7e95f4c9"
-    sha256 cellar: :any_skip_relocation, monterey:       "1d9a26125895ff45d1f63e31cd90d0b92fb598c92fdf3b3d38ab7dfc7e95f4c9"
-    sha256 cellar: :any_skip_relocation, big_sur:        "deb782255ba028c3ce3909bbf492f891cac710b248364473a9230fc9752fa345"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "21b8b6e6d51f3154cb2ade19831c0317b5d274b5c0506b8a875e8cef9864fb04"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "94aa1fdd34d44e52c4b8a61de9aa2d4f93e31108c00086c6fad2bd89e8203096"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "94aa1fdd34d44e52c4b8a61de9aa2d4f93e31108c00086c6fad2bd89e8203096"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "777f851682d287a083d4e77c240fc8675070df16bfeb868750d249213d3168eb"
+    sha256 cellar: :any_skip_relocation, sonoma:        "c858ea71c3dc74d999c1d64f5e5225963dabf18136444bf8f4ffd4a1d9c1584b"
+    sha256 cellar: :any_skip_relocation, ventura:       "2963fb8da4935daae96d8a17a7abb70b4a1c5173c5d25b5593029d600a092fcc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "997a32aa91ebc0335121777abc59b8701f132ec87611be733d0f36d8d241500e"
   end
 
   def install

@@ -1,35 +1,43 @@
 class Libxaw < Formula
   desc "X.Org: X Athena Widget Set"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libXaw-1.0.15.tar.xz"
-  sha256 "ab35f70fde9fb02cc71b342f654846a74328b74cb3a0703c02d20eddb212754a"
+  url "https://www.x.org/archive/individual/lib/libXaw-1.0.16.tar.xz"
+  sha256 "731d572b54c708f81e197a6afa8016918e2e06dfd3025e066ca642a5b8c39c8f"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 arm64_sonoma:   "1eb007237abefeeabfb2b323354f9957397246e68844e809adfee5c7dce09dda"
-    sha256 arm64_ventura:  "2f50b6cc646acb42a872a5a38a10593260707745d1bf6676d8b5faafb090fef1"
-    sha256 arm64_monterey: "d1c2869ccf78f6ab5dc970d342a22c91cc0f69c9afb44ced6c32aff15452bbdf"
-    sha256 arm64_big_sur:  "602e6f3f98d4bfb01422314291a118b8aed7bae9eafbe174151d3e28dc243d8b"
-    sha256 sonoma:         "a5824411f19db20ce488278b0e720849273b1d205a8c810e1b45beb981097d1f"
-    sha256 ventura:        "3082797341c7d9eab63f938c99c1453de273564ef74f5344a10caaa8bb3616c1"
-    sha256 monterey:       "a2a933c8ff1e3067523d84605b2a718e87d134356fdbadab94d8c3ff7670299c"
-    sha256 big_sur:        "ab588cbedfc53ac1194850d79d03e4f064f3cb5fe05789a65042fec7ce844cac"
-    sha256 x86_64_linux:   "ffa6f160d4cb2245d012676893e5c61396d72fb7d2233f9864a8bbdb3175564e"
+    sha256 arm64_sequoia:  "fffcdd2fd7d440a43218e33fe5e4de0c4fca96641deb2c832abaca62b04e3b2f"
+    sha256 arm64_sonoma:   "3682eac9ae16a794bcea9e0bb4b52a76caf44ca4894f93f1a5fcb2971cf83c04"
+    sha256 arm64_ventura:  "822beca8cfc5df449c8c2616f41074357e5a10a9fe8d294912687cd2decd9094"
+    sha256 arm64_monterey: "8575520c38a7b08e174384ec3ee3bbba96718ccd607065b92ae145cdc3b40251"
+    sha256 sonoma:         "8500c636998ace11a0cf584ed9a45fc6c4ee5c505f04f2279c223a8214e4dfef"
+    sha256 ventura:        "97953eebb88716cfbc585f5bd4cf80d299beca4aa19b62eaa1fdc1c43ea810b7"
+    sha256 monterey:       "27c02e2745a3e97ddf364ca4a41191a65ea63a038f1c971a3c367b1a7b2d6c17"
+    sha256 x86_64_linux:   "b848eb55c4b41ebc2923e5f0dd8a3fcd0fcf7ec6700347f6469ff88b958857da"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libx11"
   depends_on "libxext"
   depends_on "libxmu"
   depends_on "libxpm"
   depends_on "libxt"
 
+  # Backport fix for improved linking on macOS
+  patch do
+    on_macos do
+      url "https://gitlab.freedesktop.org/xorg/lib/libxaw/-/commit/cce2abf00fa2c9a695f1d0e5c931c70c1ba579cf.diff"
+      sha256 "64bfebc3fcb788582abbf2589514e64b3fa62457089c77e644177f1c0a80c10f"
+    end
+  end
+
   def install
     args = %W[
       --sysconfdir=#{etc}
       --localstatedir=#{var}
       --disable-silent-rules
-      --enable-specs=no
+      --disable-specs
     ]
 
     system "./configure", *args, *std_configure_args
@@ -38,14 +46,14 @@ class Libxaw < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/Xaw/Text.h"
 
       int main(int argc, char* argv[]) {
         XawTextScrollMode mode;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

@@ -1,18 +1,19 @@
 class Walk < Formula
   desc "Terminal navigator"
   homepage "https://github.com/antonmedv/walk"
-  url "https://github.com/antonmedv/walk/archive/refs/tags/v1.6.2.tar.gz"
-  sha256 "b6ba7a5e3873a25944e0f18c8a3ebbfdc0e8681756517905c75972c824315970"
+  url "https://github.com/antonmedv/walk/archive/refs/tags/v1.10.0.tar.gz"
+  sha256 "76e8db66942af53447f5ab3f0aaec49b539a68714130e46c83a01fff9c00438f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5578755af5859148ad9c163aa88bd3c7215f71cfd938f2b2bfadbd0d21d40248"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5578755af5859148ad9c163aa88bd3c7215f71cfd938f2b2bfadbd0d21d40248"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5578755af5859148ad9c163aa88bd3c7215f71cfd938f2b2bfadbd0d21d40248"
-    sha256 cellar: :any_skip_relocation, ventura:        "5747b2a9e5f9147a4a00e05d07c1121b065603d46ed739dfa735fee2437522bf"
-    sha256 cellar: :any_skip_relocation, monterey:       "5747b2a9e5f9147a4a00e05d07c1121b065603d46ed739dfa735fee2437522bf"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5747b2a9e5f9147a4a00e05d07c1121b065603d46ed739dfa735fee2437522bf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c0156820bc8b40bfa01252bf681616ae860db3cdb0eb53976b9546baf146db3e"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "02e5c4a1735ed885a6872fc4ccf6e3564034db333d89308cfe9fa7dfff5f33a4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "26feea01c5cb38433c8ce7315d8468801884c8b8e9b6f73831601520c3416356"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "26feea01c5cb38433c8ce7315d8468801884c8b8e9b6f73831601520c3416356"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "26feea01c5cb38433c8ce7315d8468801884c8b8e9b6f73831601520c3416356"
+    sha256 cellar: :any_skip_relocation, sonoma:         "bcd42a74a23b00ffd108f9ca708e4e7d11c5536cc11fc70bd9bce11f63362968"
+    sha256 cellar: :any_skip_relocation, ventura:        "bcd42a74a23b00ffd108f9ca708e4e7d11c5536cc11fc70bd9bce11f63362968"
+    sha256 cellar: :any_skip_relocation, monterey:       "bcd42a74a23b00ffd108f9ca708e4e7d11c5536cc11fc70bd9bce11f63362968"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "00f8f77276754f9af5dbd89bb76e295f60cded9536ba391ae0e5718c7fbd9669"
   end
 
   depends_on "go" => :build

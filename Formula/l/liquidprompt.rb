@@ -1,20 +1,13 @@
 class Liquidprompt < Formula
   desc "Adaptive prompt for bash and zsh shells"
-  homepage "https://github.com/nojhan/liquidprompt"
-  url "https://github.com/nojhan/liquidprompt/archive/v2.1.2.tar.gz"
-  sha256 "f752f46595519befd1ad83eaa3605cfc05babd485250a0b46916d8eacabf4f26"
+  homepage "https://liquidprompt.readthedocs.io/en/stable/"
+  url "https://github.com/liquidprompt/liquidprompt/archive/refs/tags/v2.2.1.tar.gz"
+  sha256 "56e9ee1c057638795eea31c7d91a81b8e0c4afd5b57c7dc3a5e3df98fd89b483"
   license "AGPL-3.0-or-later"
-  head "https://github.com/nojhan/liquidprompt.git", branch: "master"
+  head "https://github.com/liquidprompt/liquidprompt.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f0fedfbfa90aeb2eb693a83409f6b3a4bf4b51052143b61a90fd37f543baeeb5"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f0fedfbfa90aeb2eb693a83409f6b3a4bf4b51052143b61a90fd37f543baeeb5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f0fedfbfa90aeb2eb693a83409f6b3a4bf4b51052143b61a90fd37f543baeeb5"
-    sha256 cellar: :any_skip_relocation, ventura:        "f0fedfbfa90aeb2eb693a83409f6b3a4bf4b51052143b61a90fd37f543baeeb5"
-    sha256 cellar: :any_skip_relocation, monterey:       "f0fedfbfa90aeb2eb693a83409f6b3a4bf4b51052143b61a90fd37f543baeeb5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "f0fedfbfa90aeb2eb693a83409f6b3a4bf4b51052143b61a90fd37f543baeeb5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7b8c4b3ad9ab0683c644d021b66cfaea74661cede9fcbb188d555bb65825903e"
+    sha256 cellar: :any_skip_relocation, all: "6d5297bbb97be2159592d2a5442626ce46f9057b06c31007ea89fea658a132ac"
   end
 
   def install

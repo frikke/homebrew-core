@@ -1,6 +1,10 @@
 name: Create replacement pull request
 run-name: "Replace PR #${{ inputs.pull_request }}"
 
+defaults:
+  run:
+    shell: bash -xeuo pipefail {0}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.inputs.pull_request }}-${{ github.event.inputs.upload }}
   cancel-in-progress: ${{ !fromJson(github.event.inputs.upload) }}
@@ -10,6 +14,7 @@ on:
     inputs:
       pull_request:
         description: Pull request number
+        type: number
         required: true
       autosquash:
         description: "Squash pull request commits according to Homebrew style? (default: true)"
@@ -53,9 +58,8 @@ jobs:
       contents: read
       pull-requests: write # for `post-comment`, `gh api`, `gh pr edit`
       repository-projects: write # for `gh pr edit`
-    defaults:
-      run:
-        shell: bash
+      attestations: write # for actions/attest-build-provenance
+      id-token: write # for actions/attest-build-provenance
     steps:
       - name: Post comment once started
         uses: Homebrew/actions/post-comment@master
@@ -83,7 +87,7 @@ jobs:
             gh api \
               --header 'Accept: application/vnd.github+json' \
               --header 'X-GitHub-Api-Version: 2022-11-28' \
-              "repos/{owner}/{repo}/pulls/$PR/reviews"
+              "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews"
           )"
 
           reviewers="$(jq --compact-output '[.[].user.login]' <<< "$review_data")"
@@ -94,7 +98,7 @@ jobs:
             gh api \
               --header 'Accept: application/vnd.github+json' \
               --header 'X-GitHub-Api-Version: 2022-11-28' \
-              "repos/{owner}/{repo}/pulls/$PR" \
+              "repos/$GITHUB_REPOSITORY/pulls/$PR" \
               --jq '(.mergeable_state == "clean") and (.draft | not)'
           )"
 
@@ -123,7 +127,7 @@ jobs:
         working-directory: ${{steps.set-up-homebrew.outputs.repository-path}}
         env:
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        run: gh pr checkout "$PR"
+        run: gh pr checkout "$PR" --repo "$GITHUB_REPOSITORY"
 
       - name: Checkout replacement PR branch
         working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
@@ -150,28 +154,58 @@ jobs:
         with:
           signing_key: ${{ secrets.BREWTESTBOT_GPG_SIGNING_SUBKEY }}
 
-      - name: Pull PR${{ inputs.upload && ' and upload bottles to GitHub Packages' || '' }}
+      - name: Pull PR
+        id: pr-pull
         working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
         env:
-          BREWTESTBOT_NAME_EMAIL: "${{ steps.git-user-config.outputs.name }} <${{ steps.git-user-config.outputs.email }}>"
-          HOMEBREW_GPG_PASSPHRASE: ${{ secrets.BREWTESTBOT_GPG_SIGNING_SUBKEY_PASSPHRASE }}
+          BREWTESTBOT_NAME_EMAIL: "BrewTestBot <1589480+BrewTestBot@users.noreply.github.com>"
+          HOMEBREW_GPG_PASSPHRASE: ${{ inputs.autosquash && secrets.BREWTESTBOT_GPG_SIGNING_SUBKEY_PASSPHRASE }}
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_CORE_PUBLIC_REPO_EMAIL_TOKEN }}
-          HOMEBREW_GITHUB_PACKAGES_USER: brewtestbot
-          HOMEBREW_GITHUB_PACKAGES_TOKEN: ${{ secrets.HOMEBREW_CORE_GITHUB_PACKAGES_TOKEN }}
           MESSAGE: ${{ inputs.message }}
+          AUTOSQUASH_FLAG: ${{ inputs.autosquash && '--autosquash' || '' }}
+          CLEAN_FLAG: ${{ inputs.autosquash && '' || '--clean' }}
+          NO_CHERRY_PICK_FLAG: ${{ inputs.autosquash && '' || '--no-cherry-pick' }}
         run: |
           # Don't quote arguments that might be empty; this causes errors.
           brew pr-pull \
+            --no-upload \
             --debug \
             --branch-okay \
             --workflows=tests.yml \
             --committer="$BREWTESTBOT_NAME_EMAIL" \
             --root-url="https://ghcr.io/v2/homebrew/core" \
-            ${{ inputs.autosquash && '--autosquash' || '--clean --no-cherry-pick' }} \
-            ${{ !inputs.upload && '--no-upload' || '' }} \
-            ${{ inputs.warn_on_upload_failure && '--warn-on-upload-failure' || '' }} \
-            ${{ inputs.message && '--message="$MESSAGE"' || '' }} \
+            --retain-bottle-dir \
+            ${AUTOSQUASH_FLAG:+"${AUTOSQUASH_FLAG}"} \
+            ${CLEAN_FLAG:+"--clean"} \
+            ${NO_CHERRY_PICK_FLAG:+"--no-cherry-pick"} \
+            ${MESSAGE:+"--message=${MESSAGE}"} \
             "$PR"
+
+      - name: Generate build provenance
+        uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
+        with:
+          subject-path: '${{steps.pr-pull.outputs.bottle_path}}/*.tar.gz'
+        if: inputs.upload
+
+      - name: Upload bottles to GitHub Packages
+        id: pr-upload
+        if: inputs.upload
+        working-directory: ${{steps.pr-pull.outputs.bottle_path}}
+        env:
+          BREWTESTBOT_NAME_EMAIL: "BrewTestBot <1589480+BrewTestBot@users.noreply.github.com>"
+          HOMEBREW_GPG_PASSPHRASE: ${{ secrets.BREWTESTBOT_GPG_SIGNING_SUBKEY_PASSPHRASE }}
+          HOMEBREW_GITHUB_PACKAGES_USER: brewtestbot
+          HOMEBREW_GITHUB_PACKAGES_TOKEN: ${{secrets.HOMEBREW_CORE_GITHUB_PACKAGES_TOKEN}}
+          WARN_ON_UPLOAD_FAILURE_FLAG: ${{inputs.warn_on_upload_failure && '--warn-on-upload-failure' || ''}}
+        run: |
+          # Don't quote arguments that might be empty; this causes errors when `brew`
+          # interprets them as empty arguments when we want `brew` to ignore them instead.
+          brew pr-upload \
+            --debug \
+            --committer="$BREWTESTBOT_NAME_EMAIL" \
+            --root-url="https://ghcr.io/v2/homebrew/core" \
+            ${WARN_ON_UPLOAD_FAILURE_FLAG:+"${WARN_ON_UPLOAD_FAILURE_FLAG}"}
+
 
       - name: Push commits
         uses: Homebrew/actions/git-try-push@master
@@ -200,15 +234,17 @@ jobs:
           Closes #$PR
           MESSAGE
 
+          original_title="$(gh pr view "$PR" --json title --jq '.title' --repo "$GITHUB_REPOSITORY")"
           gh pr create \
             --base "$GITHUB_REF" \
-            --title "Replacement for #$PR"\
+            --title "$original_title (replacement for #$PR)" \
             --body-file body.txt \
             --head "$REPLACEMENT_BRANCH" \
             --reviewer "$REVIEWERS" \
-            --label "$LABELS"
+            --label "$LABELS" \
+            --repo "$GITHUB_REPOSITORY"
 
-          pull_number="$(gh pr list --head "$REPLACEMENT_BRANCH" --limit 1 --json number --jq '.[].number')"
+          pull_number="$(gh pr list --head "$REPLACEMENT_BRANCH" --limit 1 --json number --jq '.[].number' --repo "$GITHUB_REPOSITORY")"
           echo "pull_number=$pull_number" >> "$GITHUB_OUTPUT"
 
       - name: Approve replacement PR if applicable
@@ -219,7 +255,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPLACEMENT_PR: ${{ steps.create-pr.outputs.pull_number }}
-        run: gh pr review --approve "$REPLACEMENT_PR"
+        run: gh pr review --approve "$REPLACEMENT_PR" --repo "$GITHUB_REPOSITORY"
 
       - name: Enable automerge for replacement PR if applicable
         if: inputs.upload
@@ -232,17 +268,18 @@ jobs:
             --auto \
             --merge \
             --delete-branch \
-            --match-head-commit "$(git rev-parse HEAD)"
+            --match-head-commit "$(git rev-parse HEAD)" \
+            --repo "$GITHUB_REPOSITORY"
 
       - name: Label replaced PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr edit --add-label automerge-skip --add-label superseded "$PR"
+        run: gh pr edit --add-label automerge-skip --add-label superseded "$PR" --repo "$GITHUB_REPOSITORY"
 
       - name: Mark replaced PR as draft
         env: # We need a PAT here. https://github.com/github/docs/issues/8925#issuecomment-970255180
           GH_TOKEN: ${{ secrets.HOMEBREW_GITHUB_PUBLIC_REPO_TOKEN  }}
-        run: gh pr ready --undo "$PR"
+        run: gh pr ready --undo "$PR" --repo "$GITHUB_REPOSITORY"
 
       - name: Post comment on success
         uses: Homebrew/actions/post-comment@master
@@ -259,6 +296,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue: ${{ env.PR }}
-          body: ":warning: @${{ github.actor }} replacement PR creation [failed](${{ env.RUN_URL }}). CC @carlocab"
-          bot_body: ":warning: Replacement PR creation [failed](${{ env.RUN_URL }}). CC @carlocab"
+          body: ":warning: @${{ github.actor }} replacement PR creation [failed](${{ env.RUN_URL }})."
+          bot_body: ":warning: Replacement PR creation [failed](${{ env.RUN_URL }})."
           bot: github-actions[bot]

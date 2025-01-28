@@ -1,8 +1,8 @@
 class Just < Formula
   desc "Handy way to save and run project-specific commands"
   homepage "https://github.com/casey/just"
-  url "https://github.com/casey/just/archive/1.14.0.tar.gz"
-  sha256 "021d4dee59ddfd86ab87b9c9423b9a8126932c844da9765a35eb1ccb8f6cf4ce"
+  url "https://github.com/casey/just/archive/refs/tags/1.39.0.tar.gz"
+  sha256 "8a900072d7f909bc91030df5896168752bb9108967dbb7149d2cfb11fdeb087a"
   license "CC0-1.0"
   head "https://github.com/casey/just.git", branch: "master"
 
@@ -12,13 +12,12 @@ class Just < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1d7b2cd7fb280dbe9bdfb365b0eba775fbe467d51760a247130ddc2f23ef382e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "085625e36867272e81b8870907a063babaa9c14c3fdfd04e4584e7c808363c14"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e91a75faf9d618a388d0f7245f92edd72d3c7654682a40f4f57bbd396ebacf5f"
-    sha256 cellar: :any_skip_relocation, ventura:        "cf499f26cdb67badc7bbc6e562d7adbfad300b29a64d1eb76febca245a26d8cf"
-    sha256 cellar: :any_skip_relocation, monterey:       "5d2116df04de9e9f00b4754c4f60152991bc81ae0b3acd61c369348e08d72b55"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e33d9aa36f7e32a029cc5ab371b48be1250c2dab0c76f1823f6f2ad3b52714b3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cec55b92f82be562549c029523a8e8e758c9d823adb96e0a04f80bb3e8e0932d"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "15d0c73b969a73eaaa22c25abdc1f05dfa1f28c0721067f978368c4b5936ecc4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3a98401c5b5d28909bf243c3a01c557355ea4b2d916aae0ec7930550067c63e1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1bc92b85a213de51d153c9927f273c3183eb3d0bd769a9a29847650e9a3b14ed"
+    sha256 cellar: :any_skip_relocation, sonoma:        "7445a51dd6706374e495b9df33b0a46cc6110f88e0d38596d235473946dc46fc"
+    sha256 cellar: :any_skip_relocation, ventura:       "e718fbb333eefa72e475ffe1e94eef0fc95ebc24062cd4b18bc8f71b5a78da0c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fc44f3b4f0ada03ed8263c4a4e62c7fb7e0e4b1410791ab8bbac4967257a2462"
   end
 
   depends_on "rust" => :build
@@ -26,10 +25,8 @@ class Just < Formula
   def install
     system "cargo", "install", *std_cargo_args
 
-    man1.install "man/just.1"
-    bash_completion.install "completions/just.bash" => "just"
-    fish_completion.install "completions/just.fish"
-    zsh_completion.install "completions/just.zsh" => "_just"
+    generate_completions_from_executable(bin/"just", "--completions")
+    (man1/"just.1").write Utils.safe_popen_read(bin/"just", "--man")
   end
 
   test do
@@ -39,5 +36,7 @@ class Just < Formula
     EOS
     system bin/"just"
     assert_predicate testpath/"it-worked", :exist?
+
+    assert_match version.to_s, shell_output("#{bin}/just --version")
   end
 end

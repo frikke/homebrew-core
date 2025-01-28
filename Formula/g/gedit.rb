@@ -1,45 +1,55 @@
 class Gedit < Formula
   desc "GNOME text editor"
-  homepage "https://wiki.gnome.org/Apps/Gedit"
-  url "https://download.gnome.org/sources/gedit/46/gedit-46.1.tar.xz"
-  sha256 "a1a6e37f041765dff7227a1f5578b6f49faaf016b1e17e869caf5bfb94c6aa4e"
+  homepage "https://gedit-technology.github.io/apps/gedit/"
+  url "https://download.gnome.org/sources/gedit/48/gedit-48.1.tar.xz"
+  sha256 "971e7ac26bc0a3a3ded27a7563772415687db0e5a092b4547e5b10a55858b30a"
   license "GPL-2.0-or-later"
 
+  # gedit doesn't seem to follow the typical GNOME version scheme, so we
+  # provide a regex to disable the `Gnome` strategy's version filtering.
+  livecheck do
+    url :stable
+    regex(/gedit[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    sha256 arm64_ventura:  "c5c423f03f3223640738588e8b039ffba1a7aa693ee624c3351faa5befeee5e4"
-    sha256 arm64_monterey: "94eb96a3893d9ff2594a62d0121ee2e7da81c089612fab86fbb0889b2a3857c9"
-    sha256 arm64_big_sur:  "4c9bd81c2ac45b00625beab8471105e7e8c1b861f8749a30e1a7c3033697a7e2"
-    sha256 ventura:        "0e3029e4939dabcce383c8a3d69dee70863c2508d6af010da83e4e61af717132"
-    sha256 monterey:       "f3c17e4bfcf524a88662f4adab87a00b4b9ba7a5802623f7261a523dbd76eb28"
-    sha256 big_sur:        "aefd5b227129370ddb1d90bc92c6df4908980984fdec991a2f461edb6dbccb4d"
-    sha256 x86_64_linux:   "ccb491551263d3e43dc064c02141b0095ebf615e78374445f59df7a2eecd8a3e"
+    sha256 arm64_sequoia: "c56219ceeca6186e1eda6f84cc0632daef82e2e7d549c9a43458a312244d55c7"
+    sha256 arm64_sonoma:  "4643660abd81faf4742a8f8908859608f880418e2c5123273cbfb9473bb8ff1a"
+    sha256 arm64_ventura: "27f852e41786564f958ab4881401dc415d496db5aa1fbb90fe218103b644b353"
+    sha256 sonoma:        "2af39526ede2a28be4a955939e78f4e19ac0653beaddadf24aa191ce5483f056"
+    sha256 ventura:       "72178fa14372fc15c1b3ea09ec379791cc4f92836a74fc3446e20a1b38174e59"
+    sha256 x86_64_linux:  "98a23f2abe91a44750e1174dd7d27ec9ac8ce4bca331b571562ef477b7605817"
   end
 
   depends_on "desktop-file-utils" => :build # for update-desktop-database
   depends_on "docbook-xsl" => :build
+  depends_on "gettext" => :build
   depends_on "gtk-doc" => :build
   depends_on "itstool" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => [:build, :test]
-  depends_on "vala" => :build
+  depends_on "pkgconf" => [:build, :test]
+
   depends_on "adwaita-icon-theme"
-  depends_on "atk"
   depends_on "cairo"
   depends_on "gdk-pixbuf"
-  depends_on "gettext"
   depends_on "glib"
   depends_on "gobject-introspection"
   depends_on "gsettings-desktop-schemas"
   depends_on "gspell"
   depends_on "gtk+3"
   depends_on "libgedit-amtk"
+  depends_on "libgedit-gfls"
   depends_on "libgedit-gtksourceview"
-  depends_on "libpeas"
-  depends_on "libsoup"
+  depends_on "libgedit-tepl"
+  depends_on "libpeas@1"
   depends_on "libxml2"
   depends_on "pango"
-  depends_on "tepl"
+
+  on_macos do
+    depends_on "gettext"
+    depends_on "gtk-mac-integration"
+  end
 
   def install
     ENV["DESTDIR"] = "/"
@@ -58,19 +68,21 @@ class Gedit < Formula
 
   test do
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["icu4c"].opt_lib/"pkgconfig" if OS.mac?
+    ENV.prepend_path "PKG_CONFIG_PATH", Formula["libpeas@1"].opt_lib/"pkgconfig"
 
     # main executable test
     system bin/"gedit", "--version"
     # API test
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gedit/gedit-debug.h>
 
       int main(int argc, char *argv[]) {
         gedit_debug_init();
         return 0;
       }
-    EOS
-    flags = shell_output("pkg-config --cflags --libs gedit").chomp.split
+    C
+
+    flags = shell_output("pkgconf --cflags --libs gedit").chomp.split
     flags << "-Wl,-rpath,#{lib}/gedit" if OS.linux?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"

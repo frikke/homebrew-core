@@ -6,6 +6,7 @@ class XcbUtil < Formula
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "f23b606bbe08c4b9fc5ce87f19db91cec6fc152298157af1632cb109f669a83b"
     sha256 cellar: :any,                 arm64_sonoma:   "f29e26409668f49cdebd9f07f926deb60775d4d937ad688ea1676b138e2ac3ec"
     sha256 cellar: :any,                 arm64_ventura:  "9ccd3441ee24d90d2f4d8d62cf74d6d8bb0879b60d7b56b325b72ae0854459ee"
     sha256 cellar: :any,                 arm64_monterey: "215d383f16158649c221e28f4c4d3c1ceac50c38ec36acad63dcb95a8ae76373"
@@ -17,19 +18,17 @@ class XcbUtil < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "2808f955e6ac8cb3d1262e4a01b589c5148b125eec6c57a6ccf02902cf01b182"
   end
 
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "libxcb"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end

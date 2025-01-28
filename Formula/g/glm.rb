@@ -1,8 +1,8 @@
 class Glm < Formula
   desc "C++ mathematics library for graphics software"
   homepage "https://glm.g-truc.net/"
-  url "https://github.com/g-truc/glm/releases/download/0.9.9.8/glm-0.9.9.8.zip"
-  sha256 "37e2a3d62ea3322e43593c34bae29f57e3e251ea89f4067506c94043769ade4c"
+  url "https://github.com/g-truc/glm/archive/refs/tags/1.0.1.tar.gz"
+  sha256 "9f3174561fd26904b23f0db5e560971cbf9b3cbda0b280f04d5c379d03bf234c"
   # GLM is licensed under The Happy Bunny License or MIT License
   license "MIT"
   head "https://github.com/g-truc/glm.git", branch: "master"
@@ -13,28 +13,29 @@ class Glm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "530954e416065df681a2828b4df2b1c5f1cedc02a4473627ea305927f0c56635"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "43539a6af68c678e1d8aef0489f4eff77bf05dda37954c3e727c64bc3c14fa26"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f3fb20151677b15dfe14e1213ffb9339c497e6168dfc00415c2b89bf91d35c79"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4835a0d6b85dd518d3b47830bbae5f45521f4588bd02d3f690f792a6960b9492"
-    sha256 cellar: :any_skip_relocation, sonoma:         "4f47eadac98f421b50dc7097ee18f25f865d50d4c1c53d474e11972bdf92454b"
-    sha256 cellar: :any_skip_relocation, ventura:        "336127e65536ea9d1823084ec8b336b65618a2e7eda8da4d2d88a29f3646170f"
-    sha256 cellar: :any_skip_relocation, monterey:       "b5c3ab27388c4c90f518af0889da3a0a65174d370b7efdd74d52411ce5725e75"
-    sha256 cellar: :any_skip_relocation, big_sur:        "0533418aa7813363241f157a547604acc2c097790a6ddaff2967ede127e8225b"
-    sha256 cellar: :any_skip_relocation, catalina:       "9b661be1f704c2e946dbd4d4f96d58ae82427824ef88d7dd9f0f0cfc3fae2233"
-    sha256 cellar: :any_skip_relocation, mojave:         "7210910c6f106de4c22874f3977b1457cea3db6bb03269ea6831ffae861bb80e"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "ea41bb7f8f195c22d6f7834c57684412d752e2c72ff795b9056dd90aaebf9d84"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b5c2dbbad2a1f3c87f7dada3710c9404ec33953f84d6793fba3fc39dd2f683a4"
+    sha256 cellar: :any,                 arm64_sequoia:  "6609c947e9ae4ec7c62ddd7ad0d2d64b65283675b57e6f5ab9a19194a607170a"
+    sha256 cellar: :any,                 arm64_sonoma:   "6ca85b0488bb2907b912c68c5720934164d86afe6b038cd9467a78f06122f75d"
+    sha256 cellar: :any,                 arm64_ventura:  "ccf69c567c8790a7c1efb53aa3b940f27f0bfcef50c31b486208c85eb77e37ad"
+    sha256 cellar: :any,                 arm64_monterey: "7aea1476f18c285480341c410a24955a05cceee4f664a720bc3457d2dfac2f0b"
+    sha256 cellar: :any,                 sonoma:         "f5d0210c66b9780f30ce6429c1f05bd29f60c6ccf93e16ad12aca20ac9af1079"
+    sha256 cellar: :any,                 ventura:        "17c95c99013f142a9e48e3c557705c74d19e9de27b730c9f49a295183fe9d3cd"
+    sha256 cellar: :any,                 monterey:       "27404b50e8c5ea47840a934e470a170e9846d4e20a60906e3545eb026c144345"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c4bb112c557b415df7d766a89422d73e6f6d10071c7e5750a54f5152f1603074"
   end
 
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make"
-    end
+    args = %w[
+      -DGLM_BUILD_TESTS=OFF
+      -DBUILD_SHARED_LIBS=ON
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
     include.install "glm"
     lib.install "cmake"
     (lib/"pkgconfig/glm.pc").write <<~EOS
@@ -55,7 +56,7 @@ class Glm < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <glm/vec2.hpp>// glm::vec2
       int main()
       {
@@ -70,7 +71,7 @@ class Glm < Formula
         };
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-I#{include}", testpath/"test.cpp", "-o", "test"
     system "./test"
   end

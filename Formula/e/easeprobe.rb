@@ -1,20 +1,20 @@
 class Easeprobe < Formula
   desc "Simple, standalone, and lightWeight tool that can do health/status checking"
   homepage "https://github.com/megaease/easeprobe"
-  url "https://github.com/megaease/easeprobe.git",
-      tag:      "v2.1.1",
-      revision: "5b3a33c0eacafeffde0d38f9a65a0218468d5fb0"
+  url "https://github.com/megaease/easeprobe/archive/refs/tags/v2.2.1.tar.gz"
+  sha256 "d5ec2f1929549eefa1ca721aa26e0af8b8b1842eb810056fb06c4ba115951f3c"
   license "Apache-2.0"
   head "https://github.com/megaease/easeprobe.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "106f298416f1ea5f8ca9ec63dfa9c5f144f952eca9ed28f34ba7637dab45ee87"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "106f298416f1ea5f8ca9ec63dfa9c5f144f952eca9ed28f34ba7637dab45ee87"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "106f298416f1ea5f8ca9ec63dfa9c5f144f952eca9ed28f34ba7637dab45ee87"
-    sha256 cellar: :any_skip_relocation, ventura:        "91d8a4013fb1a8fb3b4d72cb3c4aecd8815d1c2ae72c7ed1425516f583bad9f4"
-    sha256 cellar: :any_skip_relocation, monterey:       "91d8a4013fb1a8fb3b4d72cb3c4aecd8815d1c2ae72c7ed1425516f583bad9f4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "91d8a4013fb1a8fb3b4d72cb3c4aecd8815d1c2ae72c7ed1425516f583bad9f4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fdad5aef27db513302c0364efce30fcfea5cca73a7247414d8f74cc00cb24431"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "c1194062c717a8f4ac3324a2fd1734e2c72065a0c74b396525d517863e713efd"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d05402e176f5744a8c7c53541ad45b2c80544d58db27dc253e49c1353047679e"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d05402e176f5744a8c7c53541ad45b2c80544d58db27dc253e49c1353047679e"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d05402e176f5744a8c7c53541ad45b2c80544d58db27dc253e49c1353047679e"
+    sha256 cellar: :any_skip_relocation, sonoma:         "6f1903fcc06d21bfe7a57f1f0d8b92c59be1963076b0bb2a4b31a53660b6cc8d"
+    sha256 cellar: :any_skip_relocation, ventura:        "6f1903fcc06d21bfe7a57f1f0d8b92c59be1963076b0bb2a4b31a53660b6cc8d"
+    sha256 cellar: :any_skip_relocation, monterey:       "6f1903fcc06d21bfe7a57f1f0d8b92c59be1963076b0bb2a4b31a53660b6cc8d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "51d897ef882abeece060be98d4cfd601ce1b7936c9c744c8414d4f277410c67f"
   end
 
   depends_on "go" => :build
@@ -23,14 +23,14 @@ class Easeprobe < Formula
     ldflags = %W[
       -s -w
       -X github.com/megaease/easeprobe/pkg/version.RELEASE=#{version}
-      -X github.com/megaease/easeprobe/pkg/version.COMMIT=#{Utils.git_head}
+      -X github.com/megaease/easeprobe/pkg/version.COMMIT=#{tap.user}
       -X github.com/megaease/easeprobe/pkg/version.REPO=megaease/easeprobe
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/easeprobe"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/easeprobe"
   end
 
   test do
-    (testpath/"config.yml").write <<~EOS.chomp
+    (testpath/"config.yml").write <<~YAML.chomp
       http:
         - name: "brew.sh"
           url: "https://brew.sh"
@@ -38,7 +38,7 @@ class Easeprobe < Formula
         log:
           - name: "logfile"
             file: #{testpath}/easeprobe.log
-    EOS
+    YAML
 
     easeprobe_stdout = (testpath/"easeprobe.log")
 

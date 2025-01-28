@@ -6,27 +6,29 @@ class ProcyonDecompiler < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ee55d23c048aa221e0f2c76eaa0ac264f83b0ac6ebf7388479878cc387fad122"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "6d383fdfc3e0cd6e98271bc33299c2553943305e40c4cc48b127ab4157dff604"
   end
 
-  depends_on "openjdk"
+  depends_on "openjdk@21"
 
   def install
     libexec.install "procyon-decompiler-#{version}.jar"
-    bin.write_jar_script libexec/"procyon-decompiler-#{version}.jar", "procyon-decompiler"
+    bin.write_jar_script libexec/"procyon-decompiler-#{version}.jar", "procyon-decompiler", java_version: "21"
   end
 
   test do
-    fixture = <<~EOS
+    fixture = <<~JAVA
       class T
       {
           public static void main(final String[] array) {
               System.out.println("Hello World!");
           }
       }
-    EOS
+    JAVA
+
     (testpath/"T.java").write fixture
-    system "#{Formula["openjdk"].bin}/javac", "T.java"
-    assert_match fixture, pipe_output([bin/"procyon-decompiler", "T.class"])
+    system Formula["openjdk@21"].bin/"javac", "T.java"
+    assert_match fixture, shell_output("#{bin}/procyon-decompiler T.class")
   end
 end

@@ -5,7 +5,7 @@ class RustcCompletion < Formula
   head "https://github.com/roshan/rust-bash-completion.git", branch: "master"
 
   stable do
-    url "https://github.com/roshan/rust-bash-completion/archive/0.12.1.tar.gz"
+    url "https://github.com/roshan/rust-bash-completion/archive/refs/tags/0.12.1.tar.gz"
     sha256 "562f84ccab40f2b3e7ef47e2e6d9b6615070a0e7330d64ea5368b6ad75455012"
 
     # upstream commit to fix an undefined command when sourcing the file directly
@@ -16,7 +16,8 @@ class RustcCompletion < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "c4f9d8b0d48e56ed56ccf9a3124dda1868afc003326defce3e9d6ededc7b4468"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "25c56cce81d2dbed3850ae8bcfc984a605ce5e734bacb82aefece825e896b9db"
   end
 
   def install

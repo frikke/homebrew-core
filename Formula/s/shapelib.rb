@@ -1,8 +1,8 @@
 class Shapelib < Formula
   desc "Library for reading and writing ArcView Shapefiles"
   homepage "http://shapelib.maptools.org/"
-  url "https://download.osgeo.org/shapelib/shapelib-1.5.0.tar.gz"
-  sha256 "1fc0a480982caef9e7b9423070b47750ba34cd0ba82668f2e638fab1d07adae1"
+  url "https://download.osgeo.org/shapelib/shapelib-1.6.1.tar.gz"
+  sha256 "5da90a60e25440f108f4e8e95732bfa83ede13c8e0c2bcf80ae41006cc8ebc20"
   license any_of: ["LGPL-2.0-or-later", "MIT"]
 
   livecheck do
@@ -11,17 +11,14 @@ class Shapelib < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "1c693a38da6fa7633ca03d6e2cf5e7bb5d32cf9d606bb1a4592bdccacc3b2456"
-    sha256 cellar: :any,                 arm64_monterey: "26b130368d9849bc2931523dcf1ea7985a88d52acc2709ce570f3503f2ebad44"
-    sha256 cellar: :any,                 arm64_big_sur:  "3f95046988d245291a4fb9973051b5c006500ba3ab0bf2842ae330c18936bdca"
-    sha256 cellar: :any,                 ventura:        "07d4c243a8c75a0a26c7f6ec87476d49cb9876e7dc963254181c75c3d54ff2d9"
-    sha256 cellar: :any,                 monterey:       "6a14fe3a6e76220a19e356c3b3c9bd64be88e7fe69a013d088c9ef78f31a83b2"
-    sha256 cellar: :any,                 big_sur:        "dfae7491c46ca8ed8b587dd6dfa885b4ec6db8520095b1f1ae44becd28ca76d2"
-    sha256 cellar: :any,                 catalina:       "9800e87eaeeca3eca0d59c3bca555c0211df96f021735251964981ac2b16bd90"
-    sha256 cellar: :any,                 mojave:         "90f9b9b0ccadf93be027e515be356d0b92f4dfb33979f11df9fc7570c3249d0e"
-    sha256 cellar: :any,                 high_sierra:    "f1242aaf566b272f69331d16441171b12d0b4cef8396b56e0a8246fe7618ca68"
-    sha256 cellar: :any,                 sierra:         "0add799fff38395de6300f1b18102270bd269b5dc37714e7cac1873849b2ced7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "673654f2eff65bcd6e03e420cd507b6b45ec5e8dd3419e86c78928b51fe05fe2"
+    sha256 cellar: :any,                 arm64_sequoia:  "fb49cfcd0596b179c7b2a0e8b455b846db356aa2166919cf811507768d7065cf"
+    sha256 cellar: :any,                 arm64_sonoma:   "3b896b17d9691d399ea9f0d7350eef3c43b4c03b0616e2dc5bb4f17060e51b3a"
+    sha256 cellar: :any,                 arm64_ventura:  "b3cc3ed80a625c61930c2ae5f8629556fe9b34a2b36568c6c887b3e0de3a561f"
+    sha256 cellar: :any,                 arm64_monterey: "cefd09ed4bc3d75842d93c83d30a3746a145e80c19f0ff736f52fae534b8d6ac"
+    sha256 cellar: :any,                 sonoma:         "fcd168887712a91344618537d20c0579ff2907b9d887017b07aca2b921526306"
+    sha256 cellar: :any,                 ventura:        "87e9ad2a1b66cb3c589db6f95f83ba7605363e8441a1f64b7453d99f8511fe2c"
+    sha256 cellar: :any,                 monterey:       "f4ccafad07023f98b85e7477224151f098a792404c52e84d2c5150998cd1e020"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "10c1872d151e320089896c49d5234ba25355d660d0e4b440a1e1ea989f99c8f3"
   end
 
   depends_on "cmake" => :build
@@ -29,7 +26,7 @@ class Shapelib < Formula
   def install
     # shapelib's CMake scripts interpret `CMAKE_INSTALL_LIBDIR=lib` as relative
     # to the current directory, i.e. `CMAKE_INSTALL_LIBDIR:PATH=$(pwd)/lib`
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args(install_libdir: lib)
+    system "cmake", "-S", ".", "-B", "build", "-DCMAKE_INSTALL_RPATH=#{rpath}", *std_cmake_args(install_libdir: lib)
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end

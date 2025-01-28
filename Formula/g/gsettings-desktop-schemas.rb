@@ -1,30 +1,25 @@
 class GsettingsDesktopSchemas < Formula
   desc "GSettings schemas for desktop components"
   homepage "https://download.gnome.org/sources/gsettings-desktop-schemas/"
-  url "https://download.gnome.org/sources/gsettings-desktop-schemas/44/gsettings-desktop-schemas-44.0.tar.xz"
-  sha256 "eb2de45cad905994849e642a623adeb75d41b21b0626d40d2a07b8ea281fec0e"
+  url "https://download.gnome.org/sources/gsettings-desktop-schemas/47/gsettings-desktop-schemas-47.1.tar.xz"
+  sha256 "a60204d9c9c0a1b264d6d0d134a38340ba5fc6076a34b84da945d8bfcc7a2815"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "3c6e882e4f2aeb0470979b834f9db469702eeabf659bee99e42ef67d993ed421"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "34378cb4fbe92b9bbfdad8b568a851a604701e6de75a9e844183253103a97dd8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "34378cb4fbe92b9bbfdad8b568a851a604701e6de75a9e844183253103a97dd8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "34378cb4fbe92b9bbfdad8b568a851a604701e6de75a9e844183253103a97dd8"
-    sha256 cellar: :any_skip_relocation, sonoma:         "3c6e882e4f2aeb0470979b834f9db469702eeabf659bee99e42ef67d993ed421"
-    sha256 cellar: :any_skip_relocation, ventura:        "34378cb4fbe92b9bbfdad8b568a851a604701e6de75a9e844183253103a97dd8"
-    sha256 cellar: :any_skip_relocation, monterey:       "34378cb4fbe92b9bbfdad8b568a851a604701e6de75a9e844183253103a97dd8"
-    sha256 cellar: :any_skip_relocation, big_sur:        "34378cb4fbe92b9bbfdad8b568a851a604701e6de75a9e844183253103a97dd8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2523f822bacf9adf85f948fd40244e1685f3fd795522278a92b0f48e85df5b00"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e42eec92d68e461084cf34eed8eb1a306213860d6ed4ebabecb9a34aa489fb5d"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e42eec92d68e461084cf34eed8eb1a306213860d6ed4ebabecb9a34aa489fb5d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e42eec92d68e461084cf34eed8eb1a306213860d6ed4ebabecb9a34aa489fb5d"
+    sha256 cellar: :any_skip_relocation, sonoma:        "e42eec92d68e461084cf34eed8eb1a306213860d6ed4ebabecb9a34aa489fb5d"
+    sha256 cellar: :any_skip_relocation, ventura:       "e42eec92d68e461084cf34eed8eb1a306213860d6ed4ebabecb9a34aa489fb5d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4c4804607789ff762c44c3fcc63afea62ed99dcc60782fbd17c5e50e5b5dc714"
   end
 
+  depends_on "gettext" => :build
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => :build
   depends_on "glib"
-
-  uses_from_macos "expat"
 
   def install
     ENV["DESTDIR"] = "/"
@@ -39,13 +34,13 @@ class GsettingsDesktopSchemas < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gdesktop-enums.h>
 
       int main(int argc, char *argv[]) {
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-I#{HOMEBREW_PREFIX}/include/gsettings-desktop-schemas", "test.c", "-o", "test"
     system "./test"
   end

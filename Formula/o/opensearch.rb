@@ -1,18 +1,17 @@
 class Opensearch < Formula
   desc "Open source distributed and RESTful search engine"
   homepage "https://github.com/opensearch-project/OpenSearch"
-  url "https://github.com/opensearch-project/OpenSearch/archive/2.9.0.tar.gz"
-  sha256 "c8883ee8859ec3351dc49969c135cd05aa3a9b7dd7fd051ecd401cd00975dbdd"
+  url "https://github.com/opensearch-project/OpenSearch/archive/refs/tags/2.18.0.tar.gz"
+  sha256 "bc17283263784b7aa92e1e8ccdf98d3fd325e017b9a0d69b259194aab2ce7dee"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d928f05ecd5b594a2d23f1e385094ecd432e3eac2a243768af3061e634dafa24"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ab495f7254e956c509e75aab8dff26485a5c948229b0b72622f037784fe132d3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9f140f3cd71be08e81630c8d2c87885dab1d70b60dfa1e115b6b27e3eebb8857"
-    sha256 cellar: :any_skip_relocation, ventura:        "16f6c725e8e78a05c0c179c537594c88ffe159f04bf87eede740b1d15d2d5d63"
-    sha256 cellar: :any_skip_relocation, monterey:       "d2ee07a3950e5a24438895ab9b6ccb010d88c17a3825d610389b2b51c11b60c2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8825c99fa8216ce9b69e4ca9d22a2b8f807191fb976337ec8465d3d3e31d28a4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7da1d471e2569c8e2d69fda31e11f5e6e2f67cd42c62ad5512fdd2c3deaf7ea4"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "23cd08da6e2b18eb13f115a1e8ddea8cf02613a9ca82a04977f0d09033126a1b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "89272d2b0704762a2af0ea402f5b82e2ac185483afe3993bd3398f8bdff53023"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "55c754c3427e113d356822c4a4b45ff97ea5771daea0e17e1e1a771e3c215cb2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "d1c511c44ede2aef7f8a30c2144deb0eb449693b422c7128df53c30af28bd7ca"
+    sha256 cellar: :any_skip_relocation, ventura:       "50326ad36fc28fff5a327c3f4604ae604a2b00e9574114970adeccae82bf8f07"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4985b7a0fd45609f70ef27295fc1f6126ca1d5a63f50e055d7bc4a2c3b54fce1"
   end
 
   depends_on "gradle" => :build
@@ -103,6 +102,6 @@ class Opensearch < Formula
     output = shell_output("curl -s -XGET localhost:#{port}/")
     assert_equal "opensearch", JSON.parse(output)["version"]["distribution"]
 
-    system "#{bin}/opensearch-plugin", "list"
+    system bin/"opensearch-plugin", "list"
   end
 end

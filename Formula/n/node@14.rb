@@ -7,9 +7,11 @@ class NodeAT14 < Formula
   revision 1
 
   bottle do
+    sha256 cellar: :any,                 arm64_sonoma:   "1148f4bf7fc8f4a6cda00b7dace952ff0c9d22ddb117a3a0f1bafbbc97bac1a6"
     sha256 cellar: :any,                 arm64_ventura:  "375c56e159dae0a184d80538f902025b58f04264e9d95e461801383ab6b7b815"
     sha256 cellar: :any,                 arm64_monterey: "b795f035c842b8c1650606233931d489dbf9263cc9ddd42f2ef1bf462ec76ff8"
     sha256 cellar: :any,                 arm64_big_sur:  "c4518d76463598df942c8c38d46a2d7b712ae3aafcdbbd834333ba8fd71f6766"
+    sha256 cellar: :any,                 sonoma:         "98e729af3aa9db45c721b6b7785267288ac05489d62e5a4b28fc701045cc5aa6"
     sha256 cellar: :any,                 ventura:        "ffac9ca4317a5e848f983670d79d79cc928359747e407e505a3e4d8dbcbe6c68"
     sha256 cellar: :any,                 monterey:       "4f487720c73e34e8a90bd68e0ddce2f6353e87f8a766bf4f51e85fe6b63fabac"
     sha256 cellar: :any,                 big_sur:        "96cb95fa7924ca1ccea5c58417764b932d479cc419a5f6dbdce24a82ac94823f"
@@ -19,15 +21,16 @@ class NodeAT14 < Formula
   keg_only :versioned_formula
 
   # https://nodejs.org/en/about/releases/
-  deprecate! date: "2023-04-30", because: :unsupported
+  disable! date: "2024-02-20", because: :unsupported
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   # Build support for Python 3.11 was not backported.
   # Ref: https://github.com/nodejs/node/pull/45231
   depends_on "python@3.10" => :build
   depends_on "brotli"
   depends_on "c-ares"
-  depends_on "icu4c"
+  # Re-add an ICU4C dependency if extracting formula
+  # TODO: depends_on "icu4c"
   depends_on "libnghttp2"
   depends_on "libuv"
   depends_on "openssl@1.1"
@@ -78,7 +81,7 @@ class NodeAT14 < Formula
     end
 
     term_size_vendor_dir = lib/"node_modules/npm/node_modules/term-size/vendor"
-    term_size_vendor_dir.rmtree # remove pre-built binaries
+    rm_r(term_size_vendor_dir) # remove pre-built binaries
 
     if OS.mac?
       macos_dir = term_size_vendor_dir/"macos"
@@ -111,8 +114,8 @@ class NodeAT14 < Formula
     assert_predicate bin/"npm", :exist?, "npm must exist"
     assert_predicate bin/"npm", :executable?, "npm must be executable"
     npm_args = ["-ddd", "--cache=#{HOMEBREW_CACHE}/npm_cache", "--build-from-source"]
-    system "#{bin}/npm", *npm_args, "install", "npm@latest"
-    system "#{bin}/npm", *npm_args, "install", "ref-napi"
+    system bin/"npm", *npm_args, "install", "npm@latest"
+    system bin/"npm", *npm_args, "install", "ref-napi"
     assert_predicate bin/"npx", :exist?, "npx must exist"
     assert_predicate bin/"npx", :executable?, "npx must be executable"
     assert_match "< hello >", shell_output("#{bin}/npx cowsay hello")

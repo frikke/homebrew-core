@@ -1,26 +1,25 @@
 class Dlib < Formula
   desc "C++ library for machine learning"
   homepage "http://dlib.net/"
-  url "http://dlib.net/files/dlib-19.24.tar.bz2"
-  sha256 "28fdd1490c4d0bb73bd65dad64782dd55c23ea00647f5654d2227b7d30b784c4"
+  url "https://github.com/davisking/dlib/archive/refs/tags/v19.24.6.tar.gz"
+  sha256 "22513c353ec9c153300c394050c96ca9d088e02966ac0f639e989e50318c82d6"
   license "BSL-1.0"
-  revision 1
   head "https://github.com/davisking/dlib.git", branch: "master"
 
   livecheck do
-    url :homepage
-    regex(/href=.*?dlib[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "72d97fda7f1615c971e268477e67f8ca5969fa2a98a368fbd0d28bc762991864"
-    sha256 cellar: :any,                 arm64_monterey: "20350a3f0a638a1a5b6466c4809c7beea386545b35a98de7181bc66e2d3a0e3d"
-    sha256 cellar: :any,                 arm64_big_sur:  "2546c7c03817f1181c406a1e6167c2a66a0a87b224567b7a7feb7c4111736e39"
-    sha256 cellar: :any,                 ventura:        "86647e13b66b5aa7285c47144c30ca79075583a97805c1409e11366ae4592ab7"
-    sha256 cellar: :any,                 monterey:       "3be4dd9f52d3d4aa041c1909159466b57f4ccbbb32404f3a07325d37d0fd8144"
-    sha256 cellar: :any,                 big_sur:        "2d16a7080c79a77d00003641420e051dd08a69f6b1f2233af47afd76de567909"
-    sha256 cellar: :any,                 catalina:       "d52920f7bb619e287c2eb05e902ca4041d6dc08344e48d75b6ad7575e0d27774"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4d95e3ef4dce0839979479f9d75e24a6776f74d04f7f3a6f0ec9b365e7e81392"
+    sha256 cellar: :any,                 arm64_sequoia:  "81ea4ab8b5ebdc18921b8b4dac89c043a16d3eb49055c6d8e98cb8cdccca5041"
+    sha256 cellar: :any,                 arm64_sonoma:   "d19cac41cc5094b91fe62eda9bb6aec0b1c07d44ab9a13f85615f05d864b8df5"
+    sha256 cellar: :any,                 arm64_ventura:  "19cd0cbae5086be45a52545ba0c902349a48bec3584b096544af783febf28fcd"
+    sha256 cellar: :any,                 arm64_monterey: "d36c2a0183d5ac011c6e1f4d2e001ec2cabebef683665d067b79eb3bddeabdc2"
+    sha256 cellar: :any,                 sonoma:         "57cf219d4134fe9c33e0742e10ba85b75d1cc9bc56c4b8e184658899ba726db3"
+    sha256 cellar: :any,                 ventura:        "0ef2313efb429a44df22d991a675b1ea8e160228df93236c84777c915b6b26ab"
+    sha256 cellar: :any,                 monterey:       "c0cf0849334b7dac93a78c7614072fc780263fb58765deb87e036ee399d2d043"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "08a170e4b2d2b3623710824c31c0673c82d75ace2b8f1a542532a31fc6b746f1"
   end
 
   depends_on "cmake" => :build
@@ -29,37 +28,36 @@ class Dlib < Formula
   depends_on "openblas"
 
   def install
-    ENV.cxx11
-
-    args = std_cmake_args + %W[
+    args = %W[
       -DDLIB_USE_BLAS=ON
       -DDLIB_USE_LAPACK=ON
       -Dcblas_lib=#{Formula["openblas"].opt_lib/shared_library("libopenblas")}
       -Dlapack_lib=#{Formula["openblas"].opt_lib/shared_library("libopenblas")}
       -DDLIB_NO_GUI_SUPPORT=ON
+      -DDLIB_LINK_WITH_SQLITE3=OFF
       -DBUILD_SHARED_LIBS=ON
     ]
 
     if Hardware::CPU.intel?
       args << "-DUSE_SSE2_INSTRUCTIONS=ON"
-      args << "-DUSE_SSE4_INSTRUCTIONS=ON" if MacOS.version.requires_sse4?
+      args << "-DUSE_SSE4_INSTRUCTIONS=ON" if OS.mac? && MacOS.version.requires_sse4?
     end
 
-    system "cmake", "-S", "dlib", "-B", "build", *args
+    system "cmake", "-S", "dlib", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <dlib/logger.h>
       dlib::logger dlog("example");
       int main() {
         dlog.set_level(dlib::LALL);
         dlog << dlib::LINFO << "The answer is " << 42;
       }
-    EOS
-    system ENV.cxx, "-pthread", "-std=c++11", "test.cpp", "-o", "test", "-I#{include}",
+    CPP
+    system ENV.cxx, "-pthread", "-std=c++14", "test.cpp", "-o", "test", "-I#{include}",
                     "-L#{lib}", "-ldlib"
     assert_match(/INFO.*example: The answer is 42/, shell_output("./test"))
   end

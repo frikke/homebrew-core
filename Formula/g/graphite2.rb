@@ -7,6 +7,7 @@ class Graphite2 < Formula
   head "https://github.com/silnrsi/graphite.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "150b286ab4cfc8696fcd3fa4e7fa24c9825f024ef991899850b850e6f334100f"
     sha256 cellar: :any,                 arm64_sonoma:   "4cdee055db9958e12662c53661fab627057d3553974d15b289e2955b439f4a9d"
     sha256 cellar: :any,                 arm64_ventura:  "3ec770419ed60d211670f73bf078512824151b460c5c37740ee8b83e3dbb8357"
     sha256 cellar: :any,                 arm64_monterey: "2254ea02844280605c79ab735ce1c5eb4a943fe897c3119611de54169130a88e"
@@ -27,17 +28,18 @@ class Graphite2 < Formula
     depends_on "freetype" => :build
   end
 
-  resource "testfont" do
-    url "https://scripts.sil.org/pub/woff/fonts/Simple-Graphite-Font.ttf"
-    sha256 "7e573896bbb40088b3a8490f83d6828fb0fd0920ac4ccdfdd7edb804e852186a"
-  end
-
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
+    resource "testfont" do
+      url "https://scripts.sil.org/pub/woff/fonts/Simple-Graphite-Font.ttf"
+      sha256 "7e573896bbb40088b3a8490f83d6828fb0fd0920ac4ccdfdd7edb804e852186a"
+    end
+
     resource("testfont").stage do
       shape = shell_output("#{bin}/gr2fonttest Simple-Graphite-Font.ttf 'abcde'")
       assert_match(/67.*36.*37.*38.*71/m, shape)

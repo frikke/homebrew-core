@@ -13,9 +13,12 @@ class Ppl < Formula
   end
 
   bottle do
+    sha256 arm64_sequoia:  "527d1a14323856ce82d73c94a18da7b53363c5f9064de4f70dda5a5aa1c84ee6"
+    sha256 arm64_sonoma:   "72645288d73cc251a6310649cbd8782c07438ce56d1a66fe190ceea5e7a10782"
     sha256 arm64_ventura:  "7b34ee3fa741ad47e0ec32a5fac0dffddea220097ea7938618586d1b1016f9ba"
     sha256 arm64_monterey: "3b7d7b75d9c40347d165192e5189725d94129dc5f95d848cc86251f493ccef91"
     sha256 arm64_big_sur:  "f607e5d5ebefa0cb480bc84b1ba6e4eb1f2f07e7d7a00ae1f4c71958b5c82323"
+    sha256 sonoma:         "a67e256076ad9de40aa134fe1ea3ae194fc1ef12454f0e637d74c4a037037722"
     sha256 ventura:        "c37e9a48bbaa4eee1c8c25b3e04cb6886da8bc19f684316dd93c7c121ba262c1"
     sha256 monterey:       "f75956df3abc16149ff87a0df7347973863331d8cadad40fef8dc3b760bfd6cf"
     sha256 big_sur:        "ceae5dd7024558587efdf935a870154a38e0cbf7e4882ba507cb3cebf574bed3"
@@ -53,7 +56,7 @@ class Ppl < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <ppl_c.h>
       #ifndef PPL_VERSION_MAJOR
       #error "No PPL header"
@@ -62,7 +65,7 @@ class Ppl < Formula
         ppl_initialize();
         return ppl_finalize();
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lppl_c", "-lppl", "-o", "test"
     system "./test"
   end

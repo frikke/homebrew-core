@@ -1,8 +1,8 @@
 class UserspaceRcu < Formula
   desc "Library for userspace RCU (read-copy-update)"
   homepage "https://liburcu.org"
-  url "https://lttng.org/files/urcu/userspace-rcu-0.14.0.tar.bz2"
-  sha256 "ca43bf261d4d392cff20dfae440836603bf009fce24fdc9b2697d837a2239d4f"
+  url "https://lttng.org/files/urcu/userspace-rcu-0.15.0.tar.bz2"
+  sha256 "4f2d839af67905ad396d6d53ba5649b66113d90840dcbc89941e0da64bccd38c"
   license all_of: ["LGPL-2.1-or-later", "MIT"]
 
   livecheck do
@@ -11,35 +11,21 @@ class UserspaceRcu < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "416b50750d8377a585a4888f505e555bfdbe289ae4178991494d538ff2f1be5f"
-    sha256 cellar: :any,                 arm64_monterey: "bdab779474bf1feb9209b8c3e722598a91c08b202d8ab2ce3e1331fc02e6e31f"
-    sha256 cellar: :any,                 arm64_big_sur:  "af68e283caa6bd03ecddf38dcb02ce6f4e544395b0f080d0591887a791d1e569"
-    sha256 cellar: :any,                 ventura:        "e604608f8a7f56421731aa3b91fbf33588156dfb3cef1e15c62d3e38f3e862c9"
-    sha256 cellar: :any,                 monterey:       "c5ace1a972369e7a61c51d1e5f6a9aeb7a0cb5a7f9d28ade2ce1918d8c7e50c8"
-    sha256 cellar: :any,                 big_sur:        "8771fdf50786cff24c9d40659100580e1aba5b0503c0204a07733dd46f5707a4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e23f5d09163f5263dacfa83825ab64bc2a1fdd6fbd629d084a2d5722bb032257"
-  end
-
-  # Fix -flat_namespace being used on Big Sur and later.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
-    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    sha256 cellar: :any,                 arm64_sequoia: "48c80450dcb49256802a0ec7aa2f656063609f5e9947e9e29d7e6762285b7e2d"
+    sha256 cellar: :any,                 arm64_sonoma:  "2b9c19f79a0cfbe87e66b0f40e1c6266e3d74ec9d44d175b4c310fee18adf518"
+    sha256 cellar: :any,                 arm64_ventura: "8f06964739d90a0a55af30129325d8fc5d495780437d3abee8811301ca6512f4"
+    sha256 cellar: :any,                 sonoma:        "d597a5a653226c897a1c104171784243b798522d5652135b1a2ca066cbebb482"
+    sha256 cellar: :any,                 ventura:       "d69f603c04036cd652afbfd7dfff65160d5f7726da2321307b21eda275e3c2c8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "914c5c838d6239e7db848b098b66b65271a311d1be1c312d4d40b691e2d336dc"
   end
 
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --disable-silent-rules
-      --prefix=#{prefix}
-    ]
-
-    system "./configure", *args
-    system "make"
+    system "./configure", "--disable-silent-rules", *std_configure_args.reject { |s| s["disable-debug"] }
     system "make", "install"
   end
 
   test do
-    cp_r "#{doc}/examples", testpath
+    cp_r doc/"examples", testpath
     system "make", "CFLAGS=-pthread", "-C", "examples"
   end
 end

@@ -1,8 +1,8 @@
 class Fnm < Formula
   desc "Fast and simple Node.js version manager"
   homepage "https://github.com/Schniz/fnm"
-  url "https://github.com/Schniz/fnm/archive/v1.35.1.tar.gz"
-  sha256 "df0f010f20e6072a8a52365f195cc94c35ebaf486cc285948e10eabf768d17ba"
+  url "https://github.com/Schniz/fnm/archive/refs/tags/v1.38.1.tar.gz"
+  sha256 "c24e4c26183a4d88a33e343902ed2d45da23e78c66b2a696a7420eb86deddda9"
   license "GPL-3.0-only"
   head "https://github.com/Schniz/fnm.git", branch: "master"
 
@@ -12,13 +12,12 @@ class Fnm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0fbb22cacea5d3c7cb42475dd7e43201a5d116d50fdb43e95385eb1b68885eeb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5350206d2303e2d245677faad2703e15693d21215287291c07723544a0c61eab"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ba67a51982008afc40abec26132c44d7fcd954a3412a129aa1cb6a92489fa448"
-    sha256 cellar: :any_skip_relocation, ventura:        "fd850b0d6e3bd8e97ed402d375727d593b59cc44a90131a2229ed1c3e0110296"
-    sha256 cellar: :any_skip_relocation, monterey:       "88a723fa5287e9b1dc257234c7097988039a9283a166d9e9ef54ee25a5c7680f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9afda928770a16c931ef8d3dbacf31add4c2e02d194f5793fc75827a911684ce"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "147002d566459f7ec65e3b887b96de216d00d77772313e693cd1c9640033245a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1e9803d57adb2d02e7880b8bd607248edcf60a2f1987d2a43c12bf42ceae62a0"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c9ed0f6e703bc246c9f9728c26948f4d7671e3b79ff42e0e44a455be57b3e5fd"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "69b22dacd824d71438a318fe052ea47e0e1b21fa1ce018e582f0466025fceac2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "356ec74426ac56b9f1072243bbee635fa9b799c815cf1d613e37ad40161d3f4e"
+    sha256 cellar: :any_skip_relocation, ventura:       "a64ba998422c590b865e0a4f22f1b907b5696e6c1d7559f07b0329252a83d6c0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5e75d81775dc5b7bd16cbb6fdc414db5a9693dc8eaa5cffc0802c086d33c6fe3"
   end
 
   depends_on "rust" => :build

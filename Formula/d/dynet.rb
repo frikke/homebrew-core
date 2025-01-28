@@ -1,14 +1,17 @@
 class Dynet < Formula
   desc "Dynamic Neural Network Toolkit"
   homepage "https://github.com/clab/dynet"
-  url "https://github.com/clab/dynet/archive/2.1.2.tar.gz"
+  url "https://github.com/clab/dynet/archive/refs/tags/2.1.2.tar.gz"
   sha256 "014505dc3da2001db54f4b8f3a7a6e7a1bb9f33a18b6081b2a4044e082dab9c8"
   license "Apache-2.0"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "13425cf394c191250670db43c3090541143f76d156e06a11f2cba7294333926e"
+    sha256 cellar: :any,                 arm64_sonoma:   "f64ed80ea96d473dd96800bdd9928eaa1b4fbe56cef809daf8d5241d3fb936e7"
     sha256 cellar: :any,                 arm64_ventura:  "326d11401b0db3d2294c46c7f3835cf497954f61fd14f8b6508461ef7ec6d8cf"
     sha256 cellar: :any,                 arm64_monterey: "5344a9cc883ddbea6def01dc950bed7aca9fe06ba67d52d10349ef46af17879b"
     sha256 cellar: :any,                 arm64_big_sur:  "812e42a82c70b8c049582c897d8d6d645c7892cb29fe742bc4c857f6d915cb44"
+    sha256 cellar: :any,                 sonoma:         "98c5c6da074e6b0e7eed5c60d8365945bb78b5e752e13f13ac345c08d2cb3acc"
     sha256 cellar: :any,                 ventura:        "88af1a5787e4b2d6919b16a94c72041009f72f2e0c58b03e11410206aa7b3eab"
     sha256 cellar: :any,                 monterey:       "ad0cf700f000d6b03ad08ec1074508eb01f442019f6e1c59fe7a83325bb84add"
     sha256 cellar: :any,                 big_sur:        "8bd7104e80fd7166539f40cf30f4c67ac643f096920582ec6702f81b06ff6910"
@@ -24,17 +27,19 @@ class Dynet < Formula
   conflicts_with "freeling", because: "freeling ships its own copy of dynet"
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args,
-             "-DEIGEN3_INCLUDE_DIR=#{Formula["eigen"].opt_include}/eigen3"
-      system "make"
-      system "make", "install"
-    end
+    args = %W[
+      -DEIGEN3_INCLUDE_DIR=#{Formula["eigen"].opt_include}/eigen3
+    ]
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
     pkgshare.install "examples"
   end
 
   test do
     cp pkgshare/"examples/xor/train_xor.cc", testpath
+
     system ENV.cxx, "-std=c++11", "train_xor.cc", "-I#{include}",
                     "-L#{lib}", "-ldynet", "-o", "train_xor"
     assert_match "memory allocation done", shell_output("./train_xor 2>&1")

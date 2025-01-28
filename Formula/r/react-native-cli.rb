@@ -1,5 +1,3 @@
-require "language/node"
-
 class ReactNativeCli < Formula
   desc "Tools for creating native apps for Android and iOS"
   homepage "https://facebook.github.io/react-native/"
@@ -8,14 +6,14 @@ class ReactNativeCli < Formula
   license "BSD-3-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "bd0fcb144d7edefcc27c70aeb12e143c1f5fd5a2d63a8cf22dab475885db0ab6"
+    rebuild 4
+    sha256 cellar: :any_skip_relocation, all: "405acef03b37460580b26bc0184b0891653cb58f130b25bcf1f454c0968a8e70"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 

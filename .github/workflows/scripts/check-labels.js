@@ -1,4 +1,6 @@
-module.exports = async ({github, context, core}, formulae_detect) => {
+module.exports = async ({github, context, core}, formulae_detect, dependent_testing) => {
+    const deps_suffix = dependent_testing ? '-deps' : ''
+
     const { data: { labels: labels } } = await github.rest.pulls.get({
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -22,19 +24,19 @@ module.exports = async ({github, context, core}, formulae_detect) => {
       return
     }
 
-    var linux_runner = 'ubuntu-22.04'
-    if (label_names.includes('CI-linux-self-hosted')) {
+    var linux_runner = 'ubuntu-latest'
+    if (label_names.includes(`CI-linux-self-hosted${deps_suffix}`)) {
       linux_runner = 'linux-self-hosted-1'
-    } else if (label_names.includes('CI-linux-large-runner')) {
+    } else if (label_names.includes(`CI-linux-large-runner${deps_suffix}`)) {
       linux_runner = 'homebrew-large-bottle-build'
     }
     core.setOutput('linux-runner', linux_runner)
 
-    if (label_names.includes('CI-no-fail-fast')) {
-      console.log('CI-no-fail-fast label found. Continuing tests despite failing matrix builds.')
+    if (label_names.includes(`CI-no-fail-fast${deps_suffix}`)) {
+      console.log(`CI-no-fail-fast${deps_suffix} label found. Continuing tests despite failing matrix builds.`)
       core.setOutput('fail-fast', false)
     } else {
-      console.log('No CI-no-fail-fast label found. Stopping tests on first failing matrix build.')
+      console.log(`No CI-no-fail-fast${deps_suffix} label found. Stopping tests on first failing matrix build.`)
       core.setOutput('fail-fast', true)
     }
 
@@ -49,63 +51,33 @@ module.exports = async ({github, context, core}, formulae_detect) => {
       core.setOutput('test-dependents', true)
     }
 
-    const maximum_long_pr_count = 2
-    if (label_names.includes('CI-long-timeout')) {
-      const labelCountQuery = `query($owner:String!, $name:String!, $label:String!) {
-        repository(owner:$owner, name:$name) {
-          pullRequests(last: 100, states: OPEN, labels: [$label]) {
-            totalCount
-          }
-        }
-      }`;
-      var long_pr_count;
-      try {
-        const response = await github.graphql(
-          labelCountQuery, {
-            owner: context.repo.owner,
-            name: context.repo.repo,
-            label: 'CI-long-timeout'
-          }
-        )
-        long_pr_count = response.repository.pullRequests.totalCount
-      } catch (error) {
-        // The GitHub API query errored, so fail open and assume 0 long PRs.
-        long_pr_count = 0
-        core.warning('CI-long-timeout label count query failed. Assuming no long PRs.')
+    if (dependent_testing) {
+      if (label_names.includes('long dependent tests')) {
+        console.log('"long dependent tests" label found. Setting long GitHub Actions timeout.')
+        core.setOutput('long-timeout', true)
+      } else {
+        console.log('No "long dependent tests" label found. Setting short GitHub Actions timeout.')
+        core.setOutput('long-timeout', false)
       }
-      if (long_pr_count > maximum_long_pr_count) {
-        core.setFailed(`Too many pull requests (${long_pr_count}) with the long-timeout label!`)
-        core.error(`Only ${maximum_long_pr_count} pull requests at a time can use this label.`)
-        core.error('Remove the long-timeout label from this or other PRs (once their CI has completed).')
-      }
-      console.log('CI-long-timeout label found. Setting long GitHub Actions timeout.')
-      core.setOutput('timeout-minutes', 4320)
     } else {
-      console.log('No CI-long-timeout label found. Setting short GitHub Actions timeout.')
-      core.setOutput('timeout-minutes', 90)
-
       if (label_names.includes('long build')) {
-        core.setFailed('PR requires the CI-long-timeout label but it is not set!')
-        core.error('If the longer timeout is not required, remove the "long build" label.')
-        core.error('Otherwise, add the "CI-long-timeout" label.')
-        core.error(`No more than ${maximum_long_pr_count} PRs at a time may use "CI-long-timeout".`)
+        console.log('"long build" label found. Setting long GitHub Actions timeout.')
+        core.setOutput('long-timeout', true)
+      } else {
+        console.log('No "long build" label found. Setting short GitHub Actions timeout.')
+        core.setOutput('long-timeout', false)
       }
     }
 
     const test_bot_formulae_args = ["--only-formulae", "--junit", "--only-json-tab", "--skip-dependents"]
-    test_bot_formulae_args.push(`--testing-formulae="${formulae_detect.testing_formulae}"`)
-    test_bot_formulae_args.push(`--added-formulae="${formulae_detect.added_formulae}"`)
-    test_bot_formulae_args.push(`--deleted-formulae="${formulae_detect.deleted_formulae}"`)
-
     const test_bot_dependents_args = ["--only-formulae-dependents", "--junit"]
-    test_bot_dependents_args.push(`--testing-formulae="${formulae_detect.testing_formulae}"`)
 
-    if (label_names.includes('CI-test-bot-fail-fast')) {
-      console.log('CI-test-bot-fail-fast label found. Passing --fail-fast to brew test-bot.')
+    if (label_names.includes(`CI-test-bot-fail-fast${deps_suffix}`)) {
+      console.log(`CI-test-bot-fail-fast${deps_suffix} label found. Passing --fail-fast to brew test-bot.`)
       test_bot_formulae_args.push('--fail-fast')
       test_bot_dependents_args.push('--fail-fast')
     } else {
-      console.log('No CI-test-bot-fail-fast label found. Not passing --fail-fast to brew test-bot.')
+      console.log(`No CI-test-bot-fail-fast${deps_suffix} label found. Not passing --fail-fast to brew test-bot.`)
     }
 
     if (label_names.includes('CI-build-dependents-from-source')) {
@@ -127,6 +99,41 @@ module.exports = async ({github, context, core}, formulae_detect) => {
       test_bot_formulae_args.push('--skip-livecheck')
     } else {
       console.log('No CI-skip-livecheck label found. Not passing --skip-livecheck to brew test-bot.')
+    }
+
+    if (label_names.includes('CI-version-downgrade')) {
+      console.log('CI-version-downgrade label found. Passing --skip-stable-version-audit to brew test-bot.')
+      test_bot_formulae_args.push('--skip-stable-version-audit')
+    } else {
+      console.log('No CI-version-downgrade label found. Not passing --skip-stable-version-audit to brew test-bot.')
+    }
+
+    if (label_names.includes('CI-checksum-change-confirmed')) {
+      console.log('CI-checksum-change-confirmed label found. Passing --skip-checksum-only-audit to brew test-bot.')
+      test_bot_formulae_args.push('--skip-checksum-only-audit')
+    } else {
+      console.log('No CI-checksum-change-confirmed label found. Not passing --skip-checksum-only-audit to brew test-bot.')
+    }
+
+    if (label_names.includes('CI-skip-revision-audit')) {
+      console.log('CI-skip-revision-audit label found. Passing --skip-revision-audit to brew test-bot.')
+      test_bot_formulae_args.push('--skip-revision-audit')
+    } else {
+      console.log('No CI-skip-revision-audit label found. Not passing --skip-revision-audit to brew test-bot.')
+    }
+
+    if (label_names.includes('CI-skip-new-formulae')) {
+      console.log('CI-skip-new-formulae label found. Passing --skip-new to brew test-bot.')
+      test_bot_formulae_args.push('--skip-new')
+    } else {
+      console.log('No CI-skip-new-formulae label found. Not passing --skip-new to brew test-bot.')
+    }
+
+    if (label_names.includes('CI-skip-new-formulae-strict')) {
+      console.log('CI-skip-new-formulae-strict label found. Passing --skip-new-strict to brew test-bot.')
+      test_bot_formulae_args.push('--skip-new-strict')
+    } else {
+      console.log('No CI-skip-new-formulae-strict label found. Not passing --skip-new-strict to brew test-bot.')
     }
 
     core.setOutput('test-bot-formulae-args', test_bot_formulae_args.join(" "))

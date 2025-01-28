@@ -1,23 +1,21 @@
 class Abyss < Formula
   desc "Genome sequence assembler for short reads"
   homepage "https://www.bcgsc.ca/resources/software/abyss"
-  url "https://github.com/bcgsc/abyss/releases/download/2.3.7/abyss-2.3.7.tar.gz"
-  sha256 "ba37780e79ec3aa359b6003e383caef13479a87f4d0022af01b86398f9ffca1f"
+  url "https://github.com/bcgsc/abyss/releases/download/2.3.10/abyss-2.3.10.tar.gz"
+  sha256 "bbe42e00d1ebb53ec6afaad07779baaaee994aa5c65b9a38cf4ad2011bb93c65"
   license all_of: ["GPL-3.0-only", "LGPL-2.1-or-later", "MIT", "BSD-3-Clause"]
 
   livecheck do
     url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
-
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "1ba7dce6f3cec234f9fab6d19711739ec64539124e034bbedc501dd8b6dacf48"
-    sha256 cellar: :any,                 arm64_monterey: "2f8447dfaa29be848ed9cc343b2a10b6c4de902a3d1443907a8e2189a9ef894c"
-    sha256 cellar: :any,                 arm64_big_sur:  "130faddf4d47b9296578726e486ec5ac8308b48f4d7b69ffe0aac4199bc61648"
-    sha256 cellar: :any,                 ventura:        "6ff3e90c05d2bf5e91a1df6891634942f93439e76f2af2c5946eee010fac065d"
-    sha256 cellar: :any,                 monterey:       "0c42a5f6d2c6206c06c6131dd65c293741016f44623da7fcb382dce478af0ec6"
-    sha256 cellar: :any,                 big_sur:        "f98e11643c56066529c0c0d9cd93f063442e57536d42790e1fc0f0313b96cbcf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "03715ef6459270e07f02d151223f14441bfbf8021e560cfec0ed239886c9654d"
+    sha256 cellar: :any,                 arm64_sequoia: "c4c97608ca2bb86304b77b4fddd3abee125f25971ba51495e95e6658b1ad5d1a"
+    sha256 cellar: :any,                 arm64_sonoma:  "f4bdcdb91f2004e514df06e02f91d6341cb8d3f3ce32a9acf3958d37f1983f80"
+    sha256 cellar: :any,                 arm64_ventura: "22819d8dfedb879c1f0742ec3f07e9090d99385b533bfc54158beddbe1eefadc"
+    sha256 cellar: :any,                 sonoma:        "6bd97e0afea52bf21f3c0f01d10b2643c22c4aed6bf3e36cece3545d6ad6e9d1"
+    sha256 cellar: :any,                 ventura:       "d81fe789736077b682ba6cbc7c62d89333ee560a7c2c02a0b3e936810e3cac1a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7cb253b94acc90a0619ef05ba23a178f9a28e8ee0395ffea66abbeb13500726f"
   end
 
   head do
@@ -33,59 +31,52 @@ class Abyss < Formula
   depends_on "google-sparsehash" => :build
   depends_on "meson" => :build # For btllib
   depends_on "ninja" => :build # For btllib
-  depends_on "python@3.11" => :build # For btllib
+  depends_on "python@3.13" => :build # For btllib
   depends_on "gcc"
   depends_on "open-mpi"
 
   uses_from_macos "sqlite"
 
-  fails_with gcc: "5"
   fails_with :clang # no OpenMP support
 
   resource "btllib" do
-    url "https://github.com/bcgsc/btllib/releases/download/v1.6.0/btllib-1.6.0.tar.gz"
-    sha256 "4a122c1047785dc865b8c94063714667f8ca43b8a881754eebd96dbb44fd1c3f"
-
-    # Fixes 'uint' was not declared in this scope
-    # Remove in next release
-    patch do
-      url "https://github.com/bcgsc/btllib/commit/43adf3d2671cc1ab780d23666e038055edb9d669.patch?full_index=1"
-      sha256 "47e0f70501c8f5d543eb2a956a226f0a1a51816123a9b2061a081fb92c7b3f0c"
-    end
-  end
-
-  resource "homebrew-testdata" do
-    url "https://www.bcgsc.ca/sites/default/files/bioinformatics/software/abyss/releases/1.3.4/test-data.tar.gz"
-    sha256 "28f8592203daf2d7c3b90887f9344ea54fda39451464a306ef0226224e5f4f0e"
+    url "https://github.com/bcgsc/btllib/releases/download/v1.7.3/btllib-1.7.3.tar.gz"
+    sha256 "31e7124e1cda9eea6f27b654258a7f8d3dea83c828f0b2e8e847faf1c5296aa3"
   end
 
   def install
-    ENV.delete("HOMEBREW_SDKROOT") if MacOS.version >= :mojave && MacOS::CLT.installed?
+    python3 = "python3.13"
 
     (buildpath/"btllib").install resource("btllib")
     cd "btllib" do
+      inreplace "compile", '"python3-config"', "\"#{python3}-config\""
       system "./compile"
     end
 
     system "./autogen.sh" if build.head?
-    system "./configure", *std_configure_args,
+    system "./configure", "--disable-silent-rules",
                           "--enable-maxk=128",
                           "--with-boost=#{Formula["boost"].include}",
                           "--with-btllib=#{buildpath}/btllib/install",
                           "--with-mpi=#{Formula["open-mpi"].prefix}",
                           "--with-sparsehash=#{Formula["google-sparsehash"].prefix}",
-                          "--disable-silent-rules"
+                          *std_configure_args
     system "make", "install"
   end
 
   test do
+    resource "homebrew-testdata" do
+      url "https://www.bcgsc.ca/sites/default/files/bioinformatics/software/abyss/releases/1.3.4/test-data.tar.gz"
+      sha256 "28f8592203daf2d7c3b90887f9344ea54fda39451464a306ef0226224e5f4f0e"
+    end
+
     testpath.install resource("homebrew-testdata")
     if which("column")
-      system "#{bin}/abyss-pe", "B=2G", "k=25", "name=ts", "in=reads1.fastq reads2.fastq"
+      system bin/"abyss-pe", "B=2G", "k=25", "name=ts", "in=reads1.fastq reads2.fastq"
     else
       # Fix error: abyss-tabtomd: column: not found
-      system "#{bin}/abyss-pe", "B=2G", "unitigs", "scaffolds", "k=25", "name=ts", "in=reads1.fastq reads2.fastq"
+      system bin/"abyss-pe", "B=2G", "unitigs", "scaffolds", "k=25", "name=ts", "in=reads1.fastq reads2.fastq"
     end
-    system "#{bin}/abyss-fac", "ts-unitigs.fa"
+    system bin/"abyss-fac", "ts-unitigs.fa"
   end
 end

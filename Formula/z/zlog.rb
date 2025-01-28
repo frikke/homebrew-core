@@ -1,21 +1,19 @@
 class Zlog < Formula
   desc "High-performance C logging library"
   homepage "https://github.com/HardySimpson/zlog"
-  url "https://github.com/HardySimpson/zlog/archive/1.2.16.tar.gz"
-  sha256 "742401902f2134eb272c49631fe5c38d7aeb9a2ad56fa3ec3d15219b371ba655"
-  license "LGPL-2.1-only"
+  url "https://github.com/HardySimpson/zlog/archive/refs/tags/1.2.18.tar.gz"
+  sha256 "3977dc8ea0069139816ec4025b320d9a7fc2035398775ea91429e83cb0d1ce4e"
+  license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "ea24c60b2039bcb5d8ce89c073801d8c4fb4b97d827896653c868aa06ac52f38"
-    sha256 cellar: :any,                 arm64_ventura:  "b1c7b07083c3667fb8f32eba4437d2f3f7c872a184476968963b902a8a850aac"
-    sha256 cellar: :any,                 arm64_monterey: "16588f7d867f7426696693b19ee0221ff7483c2d7a34a856e3acb32c46c8ea41"
-    sha256 cellar: :any,                 arm64_big_sur:  "04ed8b2ebcbbf23a3e6ad76b8d80914f939e6fc6cadfd297b91c3d4d1d29b8b0"
-    sha256 cellar: :any,                 sonoma:         "9e4179318cbdd948c5e7019358269e14014e1dcf91a277704d8b7ac3eb889ac9"
-    sha256 cellar: :any,                 ventura:        "f76ab42f65f676cd34a153fcac5c8a543edce5dd6bc462700dc23f0e99000b68"
-    sha256 cellar: :any,                 monterey:       "19cf707f5b5720aefa8f7cbb851a032a9a16900b7b17685530aa59081cbb0ee5"
-    sha256 cellar: :any,                 big_sur:        "f1384547bacef98381ae766dc90efc690a6a2a87dca0763a0572a3288ad68aee"
-    sha256 cellar: :any,                 catalina:       "62f3fbab6a72eb27a201c1c31cdb2cf8d4170053fdbfbe27130452026d01da69"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "204935c1271f0c1cca1543ba6e71f7b1fcfcb611b97c6b32057c452abc1c2478"
+    sha256 cellar: :any,                 arm64_sequoia:  "048b4b3e71147569f94ac5a81fcaabe259d313f81bc0634617737fbb3c38e98e"
+    sha256 cellar: :any,                 arm64_sonoma:   "37e945fe1dd889750af896e816c0790db9b18f3a534772cac3d2be22e720b637"
+    sha256 cellar: :any,                 arm64_ventura:  "5553716576ac0457c4fb359f1f5a68304ee9801b7741a29d14d20ef7d2f45791"
+    sha256 cellar: :any,                 arm64_monterey: "d88d92564bd205190476a208b4bf684f20e6f4c8390c050a42a4e8acf31cc0b1"
+    sha256 cellar: :any,                 sonoma:         "fd76e9b11c931478c0106c32c4f67feb6f5c1ddfd10cdf985278ececff977aa6"
+    sha256 cellar: :any,                 ventura:        "3a641c10f7447de85a8b04d1c283aa0b9804efd9feb73115b68afd2cd06f13cf"
+    sha256 cellar: :any,                 monterey:       "84cded237749c8ffb59d04d0426765cf86f42beefe415e54fb6ad99508c7f247"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "868ff2416cf589e55963163d173f2b30515350a114b0dc70183f6b0183c62191"
   end
 
   def install
@@ -24,13 +22,13 @@ class Zlog < Formula
   end
 
   test do
-    (testpath/"zlog.conf").write <<~EOS
+    (testpath/"zlog.conf").write <<~INI
       [formats]
       simple = "%m%n"
       [rules]
       my_cat.DEBUG    >stdout; simple
-    EOS
-    (testpath/"test.c").write <<~EOS
+    INI
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <zlog.h>
       int main() {
@@ -55,7 +53,7 @@ class Zlog < Formula
 
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lzlog", "-pthread", "-o", "test"
     assert_equal "hello, zlog!\n", shell_output("./test")
   end

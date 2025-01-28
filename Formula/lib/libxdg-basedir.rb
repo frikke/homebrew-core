@@ -1,11 +1,12 @@
 class LibxdgBasedir < Formula
   desc "C implementation of the XDG Base Directory specifications"
   homepage "https://github.com/devnev/libxdg-basedir"
-  url "https://github.com/devnev/libxdg-basedir/archive/libxdg-basedir-1.2.3.tar.gz"
+  url "https://github.com/devnev/libxdg-basedir/archive/refs/tags/libxdg-basedir-1.2.3.tar.gz"
   sha256 "ff30c60161f7043df4dcc6e7cdea8e064e382aa06c73dcc3d1885c7d2c77451d"
   license "MIT"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "830d1609d4a60b66a7de159c17476bd63834bfae62aafb38a37c7c6aac24575f"
     sha256 cellar: :any,                 arm64_sonoma:   "6fb0160f5b6cd2579d154b9a97c459aef54ca27470db7d8fe9dded2e2f208a2e"
     sha256 cellar: :any,                 arm64_ventura:  "63e6eff0ad399d3054cd01b23563674d726fd502cdf0ae468e489427015e9b79"
     sha256 cellar: :any,                 arm64_monterey: "e7aa730f8ebf8aed39fb649f132fe70611b658d3a2d5162bbc073f193c7050b9"
@@ -30,7 +31,7 @@ class LibxdgBasedir < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <basedir.h>
       int main() {
         xdgHandle handle;
@@ -38,7 +39,7 @@ class LibxdgBasedir < Formula
         xdgWipeHandle(&handle);
         return 0;
       }
-    EOS
+    CPP
     system ENV.cc, "test.cpp", "-L#{lib}", "-lxdg-basedir", "-o", "test"
     system "./test"
   end

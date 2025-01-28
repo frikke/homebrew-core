@@ -1,18 +1,17 @@
 class Psalm < Formula
   desc "PHP Static Analysis Tool"
   homepage "https://psalm.dev"
-  url "https://github.com/vimeo/psalm/releases/download/5.13.1/psalm.phar"
-  sha256 "90c34be3831ad00dd1058c4b50697a917bcea6967c14ab761136f665aaac3ac6"
+  url "https://github.com/vimeo/psalm/releases/download/6.0.0/psalm.phar"
+  sha256 "ba24a93743e90c9f41099c87cd1e19817f6cc93dec98e5f7258ca16da554d231"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d07c1f4b179f5e94e02abe2e01bd1312b6359160a836c1142bea57f78b027f48"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d07c1f4b179f5e94e02abe2e01bd1312b6359160a836c1142bea57f78b027f48"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d07c1f4b179f5e94e02abe2e01bd1312b6359160a836c1142bea57f78b027f48"
-    sha256 cellar: :any_skip_relocation, ventura:        "77b36603304bf2336bb0741a915ce6af7fde2724663c9f8b66ed880a30234d78"
-    sha256 cellar: :any_skip_relocation, monterey:       "77b36603304bf2336bb0741a915ce6af7fde2724663c9f8b66ed880a30234d78"
-    sha256 cellar: :any_skip_relocation, big_sur:        "77b36603304bf2336bb0741a915ce6af7fde2724663c9f8b66ed880a30234d78"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d07c1f4b179f5e94e02abe2e01bd1312b6359160a836c1142bea57f78b027f48"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "435306651b07260a672cf755e3e65c819289d2a2ffd501b31008f67aefb278d1"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "435306651b07260a672cf755e3e65c819289d2a2ffd501b31008f67aefb278d1"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "435306651b07260a672cf755e3e65c819289d2a2ffd501b31008f67aefb278d1"
+    sha256 cellar: :any_skip_relocation, sonoma:        "1eb1a3a6210662fdfd0ebdbdebb03d2f9f1ba1ebfdb4b2b36f51c5cdd2408232"
+    sha256 cellar: :any_skip_relocation, ventura:       "1eb1a3a6210662fdfd0ebdbdebb03d2f9f1ba1ebfdb4b2b36f51c5cdd2408232"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "435306651b07260a672cf755e3e65c819289d2a2ffd501b31008f67aefb278d1"
   end
 
   depends_on "composer" => :test
@@ -26,11 +25,16 @@ class Psalm < Formula
   end
 
   def install
-    bin.install "psalm.phar" => "psalm"
+    libexec.install "psalm.phar" => "psalm"
+
+    (bin/"psalm").write <<~EOS
+      #!#{Formula["php"].opt_bin}/php
+      <?php require '#{libexec}/psalm';
+    EOS
   end
 
   test do
-    (testpath/"composer.json").write <<~EOS
+    (testpath/"composer.json").write <<~JSON
       {
         "name": "homebrew/psalm-test",
         "description": "Testing if Psalm has been installed properly.",
@@ -46,9 +50,9 @@ class Psalm < Formula
         },
         "minimum-stability": "stable"
       }
-    EOS
+    JSON
 
-    (testpath/"src/Email.php").write <<~EOS
+    (testpath/"src/Email.php").write <<~PHP
       <?php
       declare(strict_types=1);
 
@@ -90,13 +94,12 @@ class Psalm < Formula
           }
         }
       }
-    EOS
+    PHP
 
     system "composer", "install"
 
     assert_match "Config file created successfully. Please re-run psalm.",
                  shell_output("#{bin}/psalm --init")
-    assert_match "No errors found!",
-                 shell_output("#{bin}/psalm")
+    system bin/"psalm", "--no-progress"
   end
 end

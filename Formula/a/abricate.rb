@@ -1,20 +1,19 @@
 class Abricate < Formula
   desc "Find antimicrobial resistance and virulence genes in contigs"
   homepage "https://github.com/tseemann/abricate"
-  url "https://github.com/tseemann/abricate/archive/v1.0.1.tar.gz"
+  url "https://github.com/tseemann/abricate/archive/refs/tags/v1.0.1.tar.gz"
   sha256 "5edc6b45a0ff73dcb4f1489a64cb3385d065a6f29185406197379522226a5d20"
   license "GPL-2.0-only"
-  revision 1
+  revision 3
   head "https://github.com/tseemann/abricate.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "fda2b58bf152b001521cacd1dd46f3aa4ea0aab81ef8287e374d2a9fdca74979"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "20bfb72d3f3e5888db151b87faa3b19a570496c164e4a88d1b1a826ef460fe23"
-    sha256 cellar: :any_skip_relocation, ventura:       "17c58b1ad438f67604a57d942865f23c0ffdf78dba3e4147c1db163cf9db249b"
-    sha256 cellar: :any_skip_relocation, monterey:      "9af68aea3abc83447b1399866d25687869d443750e737a87ec17cec44af506c3"
-    sha256 cellar: :any_skip_relocation, big_sur:       "d0a18cc2245bd70d282b95749bdb7e20b018d1f4ab972e43ac14d465a12a98cf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "308ec7b38b1aeb25a26ead0df73dfac165dd5e72024ae117c4d9dbec51d96e51"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2e7f6393112a6a35dce42b72269577f9a625cb161185fc24075afc326e057ad7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "35e1dff52eb0bf1df021f9fa7cfe0e1a09df089e6bfc4af6c87e07a0f52db655"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "a1019399ae72e1e4b793e287b92c2b000b6680f44c60faa2aa63e61683fae70c"
+    sha256 cellar: :any_skip_relocation, sonoma:        "f72cb3d2b9f6d42fe8ff2ff6c72d9dab66d5e7a5f867ae384ae06f2477c8e53c"
+    sha256 cellar: :any_skip_relocation, ventura:       "e64a514eafd58745186e9302e4a5fa0d9da4eb9e686ff15ec3fa53c29b9b3a3b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7ccff5939400556b14677e73e48b33f8794781a62ed6df468bef9d240ecaffb4"
   end
 
   depends_on "bioperl"
@@ -165,7 +164,7 @@ class Abricate < Formula
   end
 
   def post_install
-    system "#{bin}/abricate", "--setupdb"
+    system bin/"abricate", "--setupdb"
   end
 
   test do

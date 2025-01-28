@@ -5,20 +5,25 @@ class Dump1090Mutability < Formula
   version "1.15_20180310-4a16df3-dfsg"
   sha256 "778f389508eccbce6c90d7f56cd01568fad2aaa5618cb5e7c41640a2473905a6"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 3
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "264596f4b4085ca767c42e98ceb6f12897b91e961e6bac9e7b834df858391726"
-    sha256 cellar: :any,                 arm64_monterey: "47002545c1e0305470816a74c5bdc9d98127ad82a87de30e3f7c366155a3b010"
-    sha256 cellar: :any,                 arm64_big_sur:  "a7f37b0cc23e3fadcb4e69c80a6284c18e332954b1e46503e4aae57583658134"
-    sha256 cellar: :any,                 ventura:        "05efbb740c3b713a085e32dfa0ac941f99bb8c18e4bd8e0f7b37f95cd2b42cbd"
-    sha256 cellar: :any,                 monterey:       "57309c2c362d501df09fc6f6f5a021b00a8ca623f20affe69825e9fd1782e5ea"
-    sha256 cellar: :any,                 big_sur:        "1fc00f125fcd58e210f4e4e080ae0966f1c93746558fbed23f37c6238584a21f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "91b264594df660ffeac7430f48dd75d40bc92d7797c1bee0528172d08fd8e410"
+    sha256 cellar: :any,                 arm64_sequoia:  "efa32621a9a3d6334c711608e079d435f6af49eb4879442ab499cde1b6d3699d"
+    sha256 cellar: :any,                 arm64_sonoma:   "e58f730410669a3d0cebde197feec0c661b6b868518f6bd503f8474fd507c180"
+    sha256 cellar: :any,                 arm64_ventura:  "578b30fb22f49021afbf7828f9a470f2a51872afe33c20f66f4529c300420484"
+    sha256 cellar: :any,                 arm64_monterey: "d7dd9f68dbcc3c0f08e1cb87d09ea24a2f16172196c8d9f82bf57416319333b8"
+    sha256 cellar: :any,                 sonoma:         "8d910c212fa188391204d5e4c7d5cb9c41fba1712164f13e05538636734c2676"
+    sha256 cellar: :any,                 ventura:        "137e2d13e0e5aab68484b897699777c56be1c4c9f5093c057c7d0856ba70a342"
+    sha256 cellar: :any,                 monterey:       "8a474349c0344e7eb93212ca5e0f4a60059d1e1ec9f782171213af120a3e7ee8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6e554a1e935e5eb47e04660041e611ef0a947ab2c8241bc3a25346363ee06ce8"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "librtlsdr"
+
+  on_macos do
+    depends_on "libusb"
+  end
 
   def install
     # Work around failure from GCC 10+ using default of `-fno-common`

@@ -6,11 +6,12 @@ class Websocketpp < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ce9d34ff864848f173c705dc4eb64b5aaed63fae251ed3e9a4588c46de35e7de"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "782e6a1f87776d26f0aa59cecb2413a4e1b69291cfe5feadb07614138280ef11"
   end
 
   depends_on "cmake" => :build
-  depends_on "boost"
+  depends_on "asio"
 
   def install
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args
@@ -19,8 +20,9 @@ class Websocketpp < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <stdio.h>
+      #define ASIO_STANDALONE
       #include <websocketpp/config/asio_no_tls_client.hpp>
       #include <websocketpp/client.hpp>
       typedef websocketpp::client<websocketpp::config::asio_client> client;
@@ -35,9 +37,8 @@ class Websocketpp < Formula
           return 1;
         }
       }
-    EOS
-    system ENV.cxx, "test.cpp", "-std=c++11", "-L#{Formula["boost"].opt_lib}",
-                    "-lboost_random", "-pthread", "-o", "test"
+    CPP
+    system ENV.cxx, "test.cpp", "-std=c++11", "-pthread", "-o", "test"
     system "./test"
   end
 end

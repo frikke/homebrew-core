@@ -1,12 +1,13 @@
 class Libfixposix < Formula
   desc "Thin wrapper over POSIX syscalls"
   homepage "https://github.com/sionescu/libfixposix"
-  url "https://github.com/sionescu/libfixposix/archive/v0.5.1.tar.gz"
+  url "https://github.com/sionescu/libfixposix/archive/refs/tags/v0.5.1.tar.gz"
   sha256 "5d9d3d321d4c7302040389c43f966a70d180abb58d1d7df370f39e0d402d50d4"
   license "BSL-1.0"
   head "https://github.com/sionescu/libfixposix.git", branch: "master"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "23db0bbb66f78f226e8f1c3391e6f098be1410f1e914367ef4efbf2322870e16"
     sha256 cellar: :any,                 arm64_sonoma:   "17e8781690ca305f8a30593f08d99358d99b1e8963e713aeb18a2c06d8e0a7e9"
     sha256 cellar: :any,                 arm64_ventura:  "fa1e934fadfdcf752a4cadf5c48158c2c07640b513963bb7430f155a3f807205"
     sha256 cellar: :any,                 arm64_monterey: "c970ea63811367c2464438b9b67621a2b268e60a2b836bbddaeee987c2d09719"
@@ -22,18 +23,16 @@ class Libfixposix < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   def install
-    system "autoreconf", "-fvi"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"mxstemp.c").write <<~EOS
+    (testpath/"mxstemp.c").write <<~C
       #include <stdio.h>
 
       #include <lfp.h>
@@ -54,7 +53,7 @@ class Libfixposix < Formula
 
           return 0;
       }
-    EOS
+    C
     system ENV.cc, "mxstemp.c", lib/shared_library("libfixposix"), "-o", "mxstemp"
     system "./mxstemp"
   end

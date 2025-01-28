@@ -1,8 +1,10 @@
 class Grokj2k < Formula
   desc "JPEG 2000 Library"
   homepage "https://github.com/GrokImageCompression/grok"
-  url "https://github.com/GrokImageCompression/grok/archive/refs/tags/v10.0.8.tar.gz"
-  sha256 "3ca531ed3fc8841b285fb41776c9640a2c4d7d980b24942470aab399e2764542"
+  # pull from git tag to get submodules
+  url "https://github.com/GrokImageCompression/grok.git",
+      tag:      "v14.3.0",
+      revision: "1542410d2ee31c881ef46f491d613d7cea76e75b"
   license "AGPL-3.0-or-later"
   head "https://github.com/GrokImageCompression/grok.git", branch: "master"
 
@@ -12,18 +14,17 @@ class Grokj2k < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "454e5db3da106f4a05d3e910d2a9eddad4d8686da39b6d3960d6fa3e30396040"
-    sha256 cellar: :any,                 arm64_monterey: "ec19f0bd07ad94ead5ff5ae27f67c3a5865cb7ba44675c5ef80625d93c701ea3"
-    sha256 cellar: :any,                 arm64_big_sur:  "b3fc7d488dd1744db86fe4dccae13a73c3864abdef7f9341ab6106372312f42b"
-    sha256 cellar: :any,                 ventura:        "60f638ed5e3b00f3e6e0539adecf6983214f55098da5d07d615625499d7cfa8f"
-    sha256 cellar: :any,                 monterey:       "b30205941ca26a9db98b3e9df4db4cb7bf178bb0b4ee786d41f2f7acb4eab3b7"
-    sha256 cellar: :any,                 big_sur:        "167f3e00b817fb9627fd4016a450d9e1699a26e42d976558b2de4a95e652bf5c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5040474536e4976dd8e4dd6c7a178d5ab40e007a3e93e6eca311938005c89ff7"
+    sha256 cellar: :any,                 arm64_sequoia: "cabdf80b062bd6d4c9feca303d914cfd55a059472db1c377fb06b7f7fb0dc608"
+    sha256 cellar: :any,                 arm64_sonoma:  "c7cc9733e185533df52da8a683438dad8ca8930bd43df11ac737a22c1c8595e9"
+    sha256 cellar: :any,                 arm64_ventura: "e2520c5e92f5fd63c0e7b240bab1a4d1a2ee8a7bb8292e5c9c94e564de81fa8a"
+    sha256 cellar: :any,                 sonoma:        "002121ff77b1e45b4231c757c4ab652a0288021d734b7c0b796292c77d2716f4"
+    sha256 cellar: :any,                 ventura:       "d46acfb58425dea5f9bd6a928b04ab662f0a21e868779db1988953b6bde69917"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4f90e1bf0b372c9ce3534011e2dc1ba6c16e77c5989168286f210835d99522c9"
   end
 
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "exiftool"
   depends_on "jpeg-turbo"
   depends_on "libpng"
@@ -36,6 +37,8 @@ class Grokj2k < Formula
 
   on_macos do
     depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1200
+    depends_on "xz"
+    depends_on "zstd"
   end
 
   fails_with :clang do
@@ -55,18 +58,15 @@ class Grokj2k < Formula
     # Fix: ExifTool Perl module not found
     ENV.prepend_path "PERL5LIB", Formula["exiftool"].opt_libexec/"lib"
 
-    # Ensure we use Homebrew little-cms2
-    %w[liblcms2 libpng libtiff libz].each { |l| (buildpath/"thirdparty"/l).rmtree }
-    inreplace "thirdparty/CMakeLists.txt" do |s|
-      s.gsub! "add_subdirectory(liblcms2)", ""
-      s.gsub! %r{(set\(LCMS_INCLUDE_DIRNAME) \$\{GROK_SOURCE_DIR\}/thirdparty/liblcms2/include},
-              "\\1 #{Formula["little-cms2"].opt_include}"
-    end
+    # Ensure we use Homebrew libraries
+    %w[liblcms2 libpng libtiff libz].each { |l| rm_r(buildpath/"thirdparty"/l) }
 
     perl = DevelopmentTools.locate("perl")
     perl_archlib = Utils.safe_popen_read(perl.to_s, "-MConfig", "-e", "print $Config{archlib}")
     args = %W[
       -DGRK_BUILD_DOC=ON
+      -DGRK_BUILD_JPEG=OFF
+      -DGRK_BUILD_LCMS2=OFF
       -DGRK_BUILD_LIBPNG=OFF
       -DGRK_BUILD_LIBTIFF=OFF
       -DPERL_EXECUTABLE=#{perl}
@@ -83,7 +83,7 @@ class Grokj2k < Formula
       ENV.append "LDFLAGS", "-Wl,-rpath,#{perl_archlib}/CORE"
     end
 
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, *args
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
     include.install_symlink "grok-#{version.major_minor}" => "grok"
@@ -97,7 +97,7 @@ class Grokj2k < Formula
       sha256 "d0b9715d79b10b088333350855f9721e3557b38465b1354b0fa67f230f5679f3"
     end
 
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <grok/grok.h>
 
       int main () {
@@ -110,27 +110,28 @@ class Grokj2k < Formula
         grk_object_unref(&image->obj);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lgrokj2k", "-o", "test"
     system "./test"
 
     # Test Exif metadata retrieval
-    resource("homebrew-test_image").stage do
-      system bin/"grk_compress", "-in_file", "basn6a08.tif",
-                                 "-out_file", "test.jp2", "-out_fmt", "jp2",
-                                 "-transfer_exif_tags"
-      output = shell_output("#{Formula["exiftool"].bin}/exiftool test.jp2")
+    testpath.install resource("homebrew-test_image")
+    system bin/"grk_compress", "--in-file", "basn6a08.tif",
+                               "--out-file", "test.jp2", "--out-fmt", "jp2",
+                               "--transfer-exif-tags"
+    output = shell_output("#{Formula["exiftool"].bin}/exiftool test.jp2")
 
-      [
-        "Exif Byte Order                 : Big-endian (Motorola, MM)",
-        "Orientation                     : Horizontal (normal)",
-        "X Resolution                    : 72",
-        "Y Resolution                    : 72",
-        "Resolution Unit                 : inches",
-        "Y Cb Cr Positioning             : Centered",
-      ].each do |data|
-        assert_match data, output
-      end
+    expected_fields = [
+      "Exif Byte Order                 : Big-endian (Motorola, MM)",
+      "Orientation                     : Horizontal (normal)",
+      "X Resolution                    : 72",
+      "Y Resolution                    : 72",
+      "Resolution Unit                 : inches",
+      "Y Cb Cr Positioning             : Centered",
+    ]
+
+    expected_fields.each do |field|
+      assert_match field, output
     end
   end
 end

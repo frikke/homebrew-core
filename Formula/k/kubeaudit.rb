@@ -1,20 +1,24 @@
 class Kubeaudit < Formula
   desc "Helps audit your Kubernetes clusters against common security controls"
   homepage "https://github.com/Shopify/kubeaudit"
-  url "https://github.com/Shopify/kubeaudit/archive/refs/tags/v0.22.0.tar.gz"
-  sha256 "b65c871afecd8bc31378e545c9a324cbd33f5f917ea34e700b9d5d2cd50e6336"
+  url "https://github.com/Shopify/kubeaudit/archive/refs/tags/v0.22.2.tar.gz"
+  sha256 "90752d42c4d502ab6776af3358ae87a02d2893fc2bb7a0364d6c1fdcd8ff0570"
   license "MIT"
   head "https://github.com/Shopify/kubeaudit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "25182cb3673ecc130a7388569efd87c993c1df18232239769560490321908d2c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "25182cb3673ecc130a7388569efd87c993c1df18232239769560490321908d2c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "25182cb3673ecc130a7388569efd87c993c1df18232239769560490321908d2c"
-    sha256 cellar: :any_skip_relocation, ventura:        "9d575ab322f5b909657aa0d6d26121d1499dbf3848a914db24ddf48634c7e3ad"
-    sha256 cellar: :any_skip_relocation, monterey:       "9d575ab322f5b909657aa0d6d26121d1499dbf3848a914db24ddf48634c7e3ad"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9d575ab322f5b909657aa0d6d26121d1499dbf3848a914db24ddf48634c7e3ad"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a730adb1713ef8a805957e98d94ec67a70e6aaae6873c1b5b69e183725a81813"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "0e3522037f91f1ec9aaff02d095c6c9da7cd4b1b13fa88f7531d7be68f880432"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "009138418c76bbb04d6a36a782c0c5723716f96490d97d97787de7d86862a4a5"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "009138418c76bbb04d6a36a782c0c5723716f96490d97d97787de7d86862a4a5"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "009138418c76bbb04d6a36a782c0c5723716f96490d97d97787de7d86862a4a5"
+    sha256 cellar: :any_skip_relocation, sonoma:         "c1bf1c8cf11944344d9002d983def83ba27189cc5f29f248afcbabb1c2db6750"
+    sha256 cellar: :any_skip_relocation, ventura:        "c1bf1c8cf11944344d9002d983def83ba27189cc5f29f248afcbabb1c2db6750"
+    sha256 cellar: :any_skip_relocation, monterey:       "c1bf1c8cf11944344d9002d983def83ba27189cc5f29f248afcbabb1c2db6750"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "36c94b606075a297fd812aa94fa7c8c95f5cac0dcec866d0f3d6d7c6ec6e8a74"
   end
+
+  # https://github.com/Shopify/kubeaudit/pull/594
+  deprecate! date: "2025-01-10", because: :repo_archived, replacement: "kube-bench"
 
   depends_on "go" => :build
 
@@ -25,7 +29,7 @@ class Kubeaudit < Formula
       -X github.com/Shopify/kubeaudit/cmd.BuildDate=#{time.strftime("%F")}
     ]
 
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd"
+    system "go", "build", *std_go_args(ldflags:), "./cmd"
 
     generate_completions_from_executable(bin/"kubeaudit", "completion")
   end

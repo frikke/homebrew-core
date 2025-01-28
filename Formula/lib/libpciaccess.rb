@@ -1,34 +1,29 @@
 class Libpciaccess < Formula
   desc "Generic PCI access library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/pub/individual/lib/libpciaccess-0.17.tar.gz"
-  sha256 "bf6985a77d2ecb00e2c79da3edfb26b909178ffca3f2e9d14ed0620259ab733b"
+  url "https://www.x.org/pub/individual/lib/libpciaccess-0.18.1.tar.xz"
+  sha256 "4af43444b38adb5545d0ed1c2ce46d9608cc47b31c2387fc5181656765a6fa76"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "6ea67393c5a32066f823858c124136a6b0e296fb033321c7bb073a618c65d2b9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "3433b90a4f960f70e9203327f632387b5ada5017be2500ab8098f9142406a075"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => :build
   depends_on "util-macros" => :build
   depends_on :linux
+  depends_on "zlib"
 
   def install
-    args = %W[
-      --prefix=#{prefix}
-      --sysconfdir=#{etc}
-      --localstatedir=#{var}
-      --disable-dependency-tracking
-      --disable-silent-rules
-    ]
-
-    system "./configure", *args
-    system "make"
-    system "make", "install"
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "pciaccess.h"
       int main(int argc, char* argv[]) {
         int pci_system_init(void);
@@ -37,7 +32,7 @@ class Libpciaccess < Formula
         struct pci_device *dev;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lpciaccess"
   end
 end

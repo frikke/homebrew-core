@@ -1,8 +1,8 @@
 class Corsixth < Formula
   desc "Open source clone of Theme Hospital"
   homepage "https://github.com/CorsixTH/CorsixTH"
-  url "https://github.com/CorsixTH/CorsixTH/archive/v0.67.tar.gz"
-  sha256 "4e88cf1916bf4d7c304b551ddb91fb9194f110bad4663038ca73d31b939d69e3"
+  url "https://github.com/CorsixTH/CorsixTH/archive/refs/tags/v0.68.0.tar.gz"
+  sha256 "54034b8434f5c583178405d2c84477f903fe2b15933b611f42230668e35d632e"
   license "MIT"
   head "https://github.com/CorsixTH/CorsixTH.git", branch: "master"
 
@@ -15,18 +15,16 @@ class Corsixth < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "035e6944e7e1abc531de4c0cb8388926df696d453145e5bf9568b209ad6467e4"
-    sha256 arm64_monterey: "5ae127cb3138c8c4ca20c177b1b3a38ccc47d03d53a7c6d4758b7c75c2bd3e2c"
-    sha256 arm64_big_sur:  "a48d409e22e0b093779f66531d7535f298befa7c2d24699ad82e2f63d954662a"
-    sha256 ventura:        "5fc3aae89e7848b74fe5f6e1198a1dfbbc51a9b4cfe7498081fb40ec4460beb6"
-    sha256 monterey:       "2b262036861f56996d28a71db429143fe6a27fbff344ef6603d71ec683600a9c"
-    sha256 big_sur:        "25aad27558005508dfbb2f866c9757834842e340109589c37cc75ee12d895094"
-    sha256 x86_64_linux:   "2e4a1074b13130f2bfb29406c4f6b3f0d143a86be19337fea0845c634d75839f"
+    sha256 arm64_sequoia: "f870772f5827546ce2d05d7c82f5aa04c35f5d95111a2f8f4291eb02d0eeb518"
+    sha256 arm64_sonoma:  "a998b8cb521a5c46582038f6d8a89ed6e647341c71df2d265af0c2ffc109deda"
+    sha256 arm64_ventura: "f33fb70d41df5fa4908989da6c640125723afee46e595b014fec646b0e22a0d4"
+    sha256 sonoma:        "85a59fbbd11582ee897c97deb738fd4dbf9296cb4ba6ebc31e58dbd5d1362504"
+    sha256 ventura:       "5f80e96e69be652083c55583cd7f5c624df10c076c309af4da609137faead94e"
+    sha256 x86_64_linux:  "c4a8daafab979bc9e0795b94beff96c65f0e88a665559e5990b56f53ab1ae868"
   end
 
   depends_on "cmake" => :build
   depends_on "luarocks" => :build
-  depends_on xcode: :build
   depends_on "ffmpeg"
   depends_on "freetype"
   depends_on "lpeg"
@@ -34,12 +32,14 @@ class Corsixth < Formula
   depends_on "sdl2"
   depends_on "sdl2_mixer"
 
+  uses_from_macos "curl"
+
   on_linux do
     depends_on "mesa"
   end
 
   resource "luafilesystem" do
-    url "https://github.com/keplerproject/luafilesystem/archive/v1_8_0.tar.gz"
+    url "https://github.com/keplerproject/luafilesystem/archive/refs/tags/v1_8_0.tar.gz"
     sha256 "16d17c788b8093f2047325343f5e9b74cccb1ea96001e45914a58bbae8932495"
   end
 

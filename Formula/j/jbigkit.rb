@@ -4,7 +4,7 @@ class Jbigkit < Formula
   url "https://www.cl.cam.ac.uk/~mgk25/jbigkit/download/jbigkit-2.1.tar.gz"
   mirror "https://deb.debian.org/debian/pool/main/j/jbigkit/jbigkit_2.1.orig.tar.gz"
   sha256 "de7106b6bfaf495d6865c7dd7ac6ca1381bd12e0d81405ea81e7f2167263d932"
-  license "GPL-2.0"
+  license "GPL-2.0-or-later"
   head "https://www.cl.cam.ac.uk/~mgk25/git/jbigkit", using: :git, branch: "master"
 
   livecheck do
@@ -13,9 +13,12 @@ class Jbigkit < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "589c8a946d59e05dc1d23a0225efc605234fe4095bed2f5bce170c90b346ab96"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "42da4c2b5a8509fbd035ccb074f3e83eaab33eb9a87916406ad92a4fb40b994b"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "8b66862e0d5f29e5aea07adc1162de3f0cd4c43eeea409d6b5db990b977cf4f6"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "602ec1a2e779e96d08344017bb931518b8c4ae9b367d7d63dbbb6ffefaaf5299"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cda73dea9c469f1ad380c7fe90b75dfe22d1dcc9ba51593ba59493656cf76c94"
+    sha256 cellar: :any_skip_relocation, sonoma:         "5677beabb52b051e5c999c984ddf98bfae65d22c88883d5e36fdc1e3799fe40f"
     sha256 cellar: :any_skip_relocation, ventura:        "e8b8409f08c1507a31e0d016adef4bba4089e05c23c5652977051289a6609c9c"
     sha256 cellar: :any_skip_relocation, monterey:       "ed0440252fa7dc1d13a985498d56037c1bcb0c56fdc7220081ebf7a623524bd6"
     sha256 cellar: :any_skip_relocation, big_sur:        "568ea0a6734dc1da5d50b5261f43753f7cf1089fae9c786e7859a8ec22562144"

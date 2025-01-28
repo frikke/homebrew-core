@@ -1,19 +1,18 @@
 class CyclonedxGomod < Formula
   desc "Creates CycloneDX Software Bill of Materials (SBOM) from Go modules"
   homepage "https://cyclonedx.org/"
-  url "https://github.com/CycloneDX/cyclonedx-gomod/archive/refs/tags/v1.4.1.tar.gz"
-  sha256 "49644b3cb828e8f7a423d731706eb4a2ba9fb3f95e920ac95b08bdb4be0ffc59"
+  url "https://github.com/CycloneDX/cyclonedx-gomod/archive/refs/tags/v1.9.0.tar.gz"
+  sha256 "4490e44e2478a3f8b62e568a530b604ace14bd12d26c0fb41656a24ffec566c7"
   license "Apache-2.0"
   head "https://github.com/CycloneDX/cyclonedx-gomod.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2ead5d1f301ef74d2d135dcc68eba990f228426435a1ea62f14635fc5ad8f19a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2a15b0fd0f579a3bd5d4b074f6563b7c544d366153603540e933da42a1259d3a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d9b410a4258782da414eced117bbd9447122d81a55a9ede3bfa8ff2b4bd1000c"
-    sha256 cellar: :any_skip_relocation, ventura:        "6f711742bd5f671f1d1e8619e9ec9f5f6a9ead5a66e59c98ddf72aab2fe76be9"
-    sha256 cellar: :any_skip_relocation, monterey:       "eccf0d761da89f2048c4e941f3e684bb5e72f61ffde3519ac648c73607e6b60f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9d73db47cd8c6cfacea3bdfc7e84ad2a1c5d13d0652be7da9804929aa6ed56ef"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ba7361b77e42d7e047800e0f31c880b74e8f0e59236469ea1ba3c790eceee316"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "265722bab2f4df44779e227d2a45ee302a98730f803ff0edbc35b4bd5d20f160"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "265722bab2f4df44779e227d2a45ee302a98730f803ff0edbc35b4bd5d20f160"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "265722bab2f4df44779e227d2a45ee302a98730f803ff0edbc35b4bd5d20f160"
+    sha256 cellar: :any_skip_relocation, sonoma:        "f4aa6ed9b23eb79645acb210d928c754478c4b35c1883658e4db783eefaf61b6"
+    sha256 cellar: :any_skip_relocation, ventura:       "f4aa6ed9b23eb79645acb210d928c754478c4b35c1883658e4db783eefaf61b6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f5fd68398150bd54eb229bffe89f2a83af73ab907b17df5f328fbeffd40753c9"
   end
 
   depends_on "go" => [:build, :test]
@@ -23,13 +22,13 @@ class CyclonedxGomod < Formula
   end
 
   test do
-    (testpath/"go.mod").write <<~EOS
+    (testpath/"go.mod").write <<~GOMOD
       module github.com/Homebrew/brew-test
 
       go 1.21
-    EOS
+    GOMOD
 
-    (testpath/"main.go").write <<~EOS
+    (testpath/"main.go").write <<~GO
       package main
 
       import (
@@ -40,7 +39,7 @@ class CyclonedxGomod < Formula
       func main() {
         fmt.Println("testing cyclonedx-gomod")
       }
-    EOS
+    GO
 
     output = shell_output("#{bin}/cyclonedx-gomod mod 2>&1")
     assert_match "failed to determine version of main module", output

@@ -1,27 +1,25 @@
 class Tfel < Formula
   desc "Code generation tool dedicated to material knowledge for numerical mechanics"
   homepage "https://thelfer.github.io/tfel/web/index.html"
-  url "https://github.com/thelfer/tfel/archive/refs/tags/TFEL-4.1.0.tar.gz"
-  sha256 "7505c41da9df5fb3c281651ff29b58a18fd4d91b92f839322f0267269c5f1375"
+  url "https://github.com/thelfer/tfel/archive/refs/tags/TFEL-4.2.2.tar.gz"
+  sha256 "021864ad5b27ffce1915bcacc8f39f3e8a72ce6bd32e80a61ea0998a060180e5"
   license "GPL-1.0-or-later"
   revision 2
   head "https://github.com/thelfer/tfel.git", using: :git, branch: "master"
 
   bottle do
-    sha256 arm64_ventura:  "e7a36c0e5e16ea86948fac8e6dbe5154280e92762d005c502ae67d78c2266752"
-    sha256 arm64_monterey: "e2bacd1722df002e836c893028af2ba0a2889f09809eb494243f6c63f1dd7eb2"
-    sha256 arm64_big_sur:  "14369581648f19f2c106dc318180182b6bae6334e31976cfc21f4ce5c13e8769"
-    sha256 ventura:        "d461a7949788f856112f39cec75dfb45c71e76c194eadf3d58a08d092aa87a57"
-    sha256 monterey:       "a9041744c78a7c6d157979493cf8685b55b2a0ed5ad0e246664c8e67cb53d586"
-    sha256 big_sur:        "bdf5e24ae4870225ac84ffeff3fd3891711b40837dc0c8c0180928f83041ffa7"
-    sha256 x86_64_linux:   "bd95038005351e47768c896557df3e8c95bdc75fe764a3d3badec12af9f01ef9"
+    sha256 arm64_sequoia: "46bf238c2aa38c1ede704b6917f0807ae4a5476185d8f4524c041a3ee759e3f7"
+    sha256 arm64_sonoma:  "b9efab41fc7ff12edad2c817fee8d77e8ddf49e58e4879fd4280672a7adb76b1"
+    sha256 arm64_ventura: "6f40599f35dc778b08c063e53ff873974cc039e260727742ba1a06be381a2697"
+    sha256 sonoma:        "5bae20c8304234ed4d6e32ae2e1d59a6bda2d5131c9fecd1a57f303a5f662104"
+    sha256 ventura:       "d565d5a66446cb42cea96e3d43717843dc467effdd35da20feedd40af1bf92fe"
+    sha256 x86_64_linux:  "f50822c3b76af3fc81d41e238eb5ce256f0588a30bcbb884399231253d977ce3"
   end
 
   depends_on "cmake" => :build
   depends_on "gcc" => :build
   depends_on "boost-python3"
-  depends_on "python@3.11"
-  fails_with gcc: "5"
+  depends_on "python@3.13"
 
   def install
     args = [
@@ -30,7 +28,7 @@ class Tfel < Formula
       "-Denable-website=OFF",
       "-Dlocal-castem-header=ON",
       "-Denable-python=ON",
-      "-Denable-python-bindings=ON",  # requires boost-python
+      "-Denable-python-bindings=ON", # requires boost-python
       "-Denable-numpy-support=OFF",
       "-Denable-fortran=ON",
       "-Denable-cyrano=ON",

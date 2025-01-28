@@ -1,30 +1,32 @@
 class Hyperfine < Formula
   desc "Command-line benchmarking tool"
   homepage "https://github.com/sharkdp/hyperfine"
-  url "https://github.com/sharkdp/hyperfine/archive/v1.17.0.tar.gz"
-  sha256 "3dcd86c12e96ab5808d5c9f3cec0fcc04192a87833ff009063c4a491d5487b58"
+  url "https://github.com/sharkdp/hyperfine/archive/refs/tags/v1.19.0.tar.gz"
+  sha256 "d1c782a54b9ebcdc1dedf8356a25ee11e11099a664a7d9413fdd3742138fa140"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/sharkdp/hyperfine.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4b6b743957c871d24f93af5fa01d4869b33a7af7c080746f35a93c014260e397"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "91247b9f88de70b001653de3e50d38f2630fa5b32423f4fe5a1aae849fd404e9"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1d6f6a979b141926839fc0183433b5f2547d4e385c75363798af97450fdd848c"
-    sha256 cellar: :any_skip_relocation, ventura:        "a6e4913e349dd834e90084abda438b687c374f865508f60a41e80ae187796004"
-    sha256 cellar: :any_skip_relocation, monterey:       "90d6ae718111504bb7b540b852503c3663e498526759debef116fd2ef0b11386"
-    sha256 cellar: :any_skip_relocation, big_sur:        "33431a881d78b8c23fbb261c8debfeafae6b612168677dd6e96efd5221ba972e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c9893f9956c5dc76e24ee7d8771ad9b49972fcc28194f92f88493045b0eec4bf"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "acf0ce7620aa8b6c3e1f1b755d8fb1a89445b4293935c3d5a96ea3f8f193ec22"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "76a4b9596447f7c86d96de9bd7d9312eceee745509f9bea470bc32fafe0b97b9"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "1113b8769a5054fd790e5de5cd95089ef500bcce78694f6263be6f25d521f0c7"
+    sha256 cellar: :any_skip_relocation, sonoma:        "4b79040d510fe182211e539164cfa633858ec983b9ae33d62a8f028a18d01a0e"
+    sha256 cellar: :any_skip_relocation, ventura:       "f738c61291419374ec425df822cef3486cc86504d42d7a995301b13485303b60"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c758dccd2d2f5fbd7f6a2ae6971534ac1cb0c6f0f6e83ff21741798326c98b52"
   end
 
   depends_on "rust" => :build
 
   def install
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
+
     system "cargo", "install", *std_cargo_args
-    man1.install "doc/hyperfine.1"
-    bash_completion.install "hyperfine.bash"
+
+    bash_completion.install "hyperfine.bash" => "hyperfine"
     fish_completion.install "hyperfine.fish"
     zsh_completion.install "_hyperfine"
+    man1.install "doc/hyperfine.1"
   end
 
   test do

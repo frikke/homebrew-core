@@ -1,8 +1,8 @@
 class MysqlClient < Formula
   desc "Open source relational database management system"
-  homepage "https://dev.mysql.com/doc/refman/8.0/en/"
-  url "https://cdn.mysql.com/Downloads/MySQL-8.1/mysql-boost-8.1.0.tar.gz"
-  sha256 "cb19648bc8719b9f6979924bfea806b278bd26b8d67740e5742c6f363f142188"
+  homepage "https://dev.mysql.com/doc/refman/9.2/en/"
+  url "https://cdn.mysql.com/Downloads/MySQL-9.2/mysql-9.2.0.tar.gz"
+  sha256 "a39d11fdf6cf8d1b03b708d537a9132de4b99a9eb4d610293937f0687cd37a12"
   license "GPL-2.0-only" => { with: "Universal-FOSS-exception-1.0" }
 
   livecheck do
@@ -10,39 +10,54 @@ class MysqlClient < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "c1d668fa5ef7c5f19dac7130820f8a2574727a0d910c10c190801412a8b28f73"
-    sha256 arm64_ventura:  "26cc03e4ecbdca77644657c7f16bf1f8cc9053ce3e1795c91b138ce4b988811c"
-    sha256 arm64_monterey: "1b4a8c3636ea4378b2e80fb1b9cf2fabe82db758f67f1cc9a2321022181d7077"
-    sha256 arm64_big_sur:  "5053ade43d5655b3b0021339e8167b599ec7958feed5c93d48334e2914c65777"
-    sha256 sonoma:         "2f309ea23f943e907097c4e3df9ba6be366ad65a3d15c8cc0b8e1d429d3ff3df"
-    sha256 ventura:        "a5eda4da71b0c93b1f36084e7a90de8abc04d57079b27963cc1489cccf6f233c"
-    sha256 monterey:       "1f0746024a167fb1248326e65bc066323d1742d370b6190f3daeb4dfc7616a82"
-    sha256 big_sur:        "400d81112130d6b8dcbe693b84757aeef6c2cab77c882a808545b42dcf44684d"
-    sha256 x86_64_linux:   "f6e9c107c0f14e28d8ea1a7e3de7564a3c2e0bb964bae1b5b3574135df1b484d"
+    sha256 arm64_sequoia: "d7cbacfd9a72ce4175cca92f698bf6d5b0ad876cfe7ad56583da4eb47e711fb8"
+    sha256 arm64_sonoma:  "3518276d4ee3de355b13536159cd12e08806310533dd1f0b0ec0283e8a115b23"
+    sha256 arm64_ventura: "bf42757730352f5e72a9e82aa9f03d57e4489b246c56a26a6eb98a4f374e7ddd"
+    sha256 sonoma:        "d84203856589cfde7c8a240ea663f5867604312857b32c4a012f4f118bd46b68"
+    sha256 ventura:       "4f6d8d1fd35cef9713e9aaa04c363397db6d0956d28a29d0edc3440633ac7daa"
+    sha256 x86_64_linux:  "e701db03a28393941bfe883ad5a7c5f324285cffb16ad19a14a19da669ef54c3"
   end
 
   keg_only "it conflicts with mysql (which contains client libraries)"
 
   depends_on "bison" => :build
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libevent"
   depends_on "libfido2"
   # GCC is not supported either, so exclude for El Capitan.
   depends_on macos: :sierra if DevelopmentTools.clang_build_version < 900
   depends_on "openssl@3"
-  depends_on "zlib" # Zlib 1.2.12+
+  depends_on "zlib" # Zlib 1.2.13+
   depends_on "zstd"
 
   uses_from_macos "libedit"
 
-  fails_with gcc: "5"
+  # std::string_view is not fully compatible with the libc++ shipped
+  # with ventura, so we need to use the LLVM libc++ instead.
+  on_ventura :or_older do
+    depends_on "llvm@18"
+    fails_with :clang
+  end
 
-  # Fix for "Cannot find system zlib libraries" even though they are installed.
-  # https://bugs.mysql.com/bug.php?id=110745
-  patch :DATA
+  on_linux do
+    depends_on "libtirpc" => :build
+    depends_on "krb5"
+  end
+
+  fails_with :gcc do
+    version "9"
+    cause "Requires C++20"
+  end
 
   def install
+    if OS.linux?
+      # Disable ABI checking
+      inreplace "cmake/abi_check.cmake", "RUN_ABI_CHECK 1", "RUN_ABI_CHECK 0"
+    elsif MacOS.version <= :ventura
+      ENV["CC"] = Formula["llvm@18"].opt_bin/"clang"
+      ENV["CXX"] = Formula["llvm@18"].opt_bin/"clang++"
+    end
     # -DINSTALL_* are relative to `CMAKE_INSTALL_PREFIX` (`prefix`)
     args = %W[
       -DFORCE_INSOURCE_BUILD=1
@@ -54,6 +69,7 @@ class MysqlClient < Formula
       -DINSTALL_INFODIR=share/info
       -DINSTALL_MANDIR=share/man
       -DINSTALL_MYSQLSHAREDIR=share/mysql
+      -DWITH_AUTHENTICATION_CLIENT_PLUGINS=yes
       -DWITH_BOOST=boost
       -DWITH_EDITLINE=system
       -DWITH_FIDO=system
@@ -68,37 +84,9 @@ class MysqlClient < Formula
     system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
-
-    # Fix bad linker flags in `mysql_config`.
-    # https://bugs.mysql.com/bug.php?id=111011
-    inreplace bin/"mysql_config", "-lzlib", "-lz"
   end
 
   test do
     assert_match version.to_s, shell_output("#{bin}/mysql --version")
   end
 end
-
-__END__
-diff --git a/cmake/zlib.cmake b/cmake/zlib.cmake
-index 460d87a..36fbd60 100644
---- a/cmake/zlib.cmake
-+++ b/cmake/zlib.cmake
-@@ -50,7 +50,7 @@ FUNCTION(FIND_ZLIB_VERSION ZLIB_INCLUDE_DIR)
-   MESSAGE(STATUS "ZLIB_INCLUDE_DIR ${ZLIB_INCLUDE_DIR}")
- ENDFUNCTION(FIND_ZLIB_VERSION)
-
--FUNCTION(FIND_SYSTEM_ZLIB)
-+MACRO(FIND_SYSTEM_ZLIB)
-   FIND_PACKAGE(ZLIB)
-   IF(ZLIB_FOUND)
-     ADD_LIBRARY(zlib_interface INTERFACE)
-@@ -61,7 +61,7 @@ FUNCTION(FIND_SYSTEM_ZLIB)
-         ${ZLIB_INCLUDE_DIR})
-     ENDIF()
-   ENDIF()
--ENDFUNCTION(FIND_SYSTEM_ZLIB)
-+ENDMACRO(FIND_SYSTEM_ZLIB)
-
- MACRO (RESET_ZLIB_VARIABLES)
-   # Reset whatever FIND_PACKAGE may have left behind.

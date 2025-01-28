@@ -1,8 +1,8 @@
 class TodoTxt < Formula
   desc "Minimal, todo.txt-focused editor"
   homepage "http://todotxt.org/"
-  url "https://github.com/todotxt/todo.txt-cli/releases/download/v2.12.0/todo.txt_cli-2.12.0.tar.gz"
-  sha256 "e6da9b2c8022658c514a0b1613b3eae52f6240bf2b3494a83dae713ea445d13e"
+  url "https://github.com/todotxt/todo.txt-cli/releases/download/v2.13.0/todo.txt_cli-2.13.0.tar.gz"
+  sha256 "d3b925434029aac212213c103fb6573a4f960c74dd467a3efac9bd9afe89d15f"
   license "GPL-3.0-only"
   head "https://github.com/todotxt/todo.txt-cli.git", branch: "master"
 
@@ -12,7 +12,7 @@ class TodoTxt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5396d70e5a225d90e57ab5f159579bb47c062d263c6a94294984314d3e7d011a"
+    sha256 cellar: :any_skip_relocation, all: "aa11eb960775585bbb243b4206daeabb25c7d776e24d57726bb7ad359fd6d290"
   end
 
   def install
@@ -30,7 +30,7 @@ class TodoTxt < Formula
 
   test do
     cp prefix/"todo.cfg", testpath/".todo.cfg"
-    inreplace testpath/".todo.cfg", "export TODO_DIR=$(dirname \"$0\")", "export TODO_DIR=#{testpath}"
+    inreplace testpath/".todo.cfg", "export TODO_DIR=${HOME:-$USERPROFILE}", "export TODO_DIR=#{testpath}"
     system bin/"todo.sh", "add", "Hello World!"
     system bin/"todo.sh", "list"
   end

@@ -1,16 +1,17 @@
 class Ipmiutil < Formula
   desc "IPMI server management utility"
   homepage "https://ipmiutil.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/ipmiutil/ipmiutil-3.1.9.tar.gz"
-  sha256 "c0dacc4ad506538f59ed45373b775748deddddc36e6d3c303f5069a59cacab08"
+  url "https://downloads.sourceforge.net/project/ipmiutil/ipmiutil-3.2.1.tar.gz"
+  sha256 "04811b2e657ff98cd31e44b91a700c9f33c4c9dd93a36c8fc987de1f47c24024"
   license all_of: ["BSD-2-Clause", "BSD-3-Clause", "GPL-2.0-or-later"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "ed89f20a5b615ab13fa8fc8049ecd0b8c0eec598cd3fb319f21df4fda98bc5b9"
-    sha256 cellar: :any_skip_relocation, ventura:       "6f120c16676bddea65c9863cf3cebeccb3ce3ae9098471bf401b86a715826cd4"
-    sha256 cellar: :any_skip_relocation, monterey:      "d4e88aeeb8d6f294103d421999bbb6c5d49941cda1a12866997ae2b45e044846"
-    sha256 cellar: :any_skip_relocation, big_sur:       "ebd7f2895182e420f13eb5e8bb814a01b69b751596ef3c65b0e60df320cba2ea"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "10a444b399b0bd4486654bb914fde8db8140b63feda87fa9804845f099653a0a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b18ce2d2673c32032f3448fee24b12041f9295d308ae2cd8012673e5d493140e"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2d8932e2a1bb40be9409d1e6af6d317b358639854bb8bede8968cae75ddc47ab"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "3352de5466ef543f219504b8ea5cb36ae4b86394230792b3e58a608fb44a5b09"
+    sha256 cellar: :any_skip_relocation, sonoma:        "c0a5db5e377eefc09019ff44dc4acead6bc7d39a5fbc905c69d2ec09f67b34a7"
+    sha256 cellar: :any_skip_relocation, ventura:       "81ce2a5170ab9e89315a1120048f357ae8b7658fce50b53caab7856b30615e11"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e8cb1651c4cb5ff74bbf0de01df94c49af156e8dd92df446a6cc105bf50be73c"
   end
 
   on_macos do
@@ -22,6 +23,9 @@ class Ipmiutil < Formula
   conflicts_with "renameutils", because: "both install `icmd` binaries"
 
   def install
+    # Workaround for newer Clang
+    ENV.append "CC", "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
     # Darwin does not exist only on PowerPC
     if OS.mac?
       inreplace "configure.ac", "test \"$archp\" = \"powerpc\"", "true"
@@ -45,6 +49,6 @@ class Ipmiutil < Formula
   end
 
   test do
-    system "#{bin}/ipmiutil", "delloem", "help"
+    system bin/"ipmiutil", "delloem", "help"
   end
 end

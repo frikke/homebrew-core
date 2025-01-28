@@ -1,35 +1,35 @@
 class Cmctl < Formula
   desc "Command-line tool to manage cert-manager"
   homepage "https://cert-manager.io"
-  url "https://github.com/cert-manager/cert-manager/archive/refs/tags/v1.13.0.tar.gz"
-  sha256 "572801b99ddab89e1fba09d8142c8ba9bb681d2ee1464e57f959ccbb4562d7d5"
+  url "https://github.com/cert-manager/cmctl/archive/refs/tags/v2.1.1.tar.gz"
+  sha256 "37516aca91af7c088e44ae2b64f409d1cb6a1060632eb47792937709f2f33344"
   license "Apache-2.0"
-  head "https://github.com/cert-manager/cert-manager.git", branch: "master"
+  head "https://github.com/cert-manager/cmctl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0e44ea33a5ae4340ab341480e9ffb3743f11233eb91bcfa149bd9d31960e5066"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "60a2604567f74108b54e942415f2b14a4111dbdedf6a65f0801992d5aba3d431"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "67b42d4255b0ff3ec1a6c963ec27dd6b1f0441d546c6f478e50be76b5349efd2"
-    sha256 cellar: :any_skip_relocation, ventura:        "44fe4dff981fb8c133304997e9858a920d7244f7b45045c986b7ddafcf09cd82"
-    sha256 cellar: :any_skip_relocation, monterey:       "98aca5c608ec61c2ead5926256c7905ac736f50d3c1acf51fe9fac4eca9e16b5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3cc2a837ccdd6fa60fb97575bd91b079936ce4b7b88995ffd11abebbb195d6fc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c641cc4112a8c5fc16d9f95cc87cd145261fa82c7d1a279b81ea238e02e93935"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "e80d8aba3bd45760236eec4678d6ee256a54203b7b780c13c50b03d4b7c6c9ee"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "e4d9de73913b6ce4a2d94830423bd1866abe8aa967a81ec14ef1acfe40598fbc"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6b2a1dc6f6b2d64ff7f807c9ddacc31a376a31da23f20b0dd544a8d1db995a20"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "118d77299bc7bdb1f07832c2661b1ad56c938d51a10d4c783749ced6bdc653b3"
+    sha256 cellar: :any_skip_relocation, sonoma:         "5ae5e5e6dcf081f529817b9994611b592a39a1834a9be1017e56f183c50ed6a1"
+    sha256 cellar: :any_skip_relocation, ventura:        "3539ce77f46c4f731801249f371529bb117e383ea7e5681a1104cc1e1c9a790b"
+    sha256 cellar: :any_skip_relocation, monterey:       "98e2d75b18b7047f7baedefb5c77acc15c0de300b557fcbe503fbabe29b0ea86"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eb852ce6bae19d08789eb0ebaaded26e7ed1fd23aab3c51c35208e3d4745845a"
   end
 
   depends_on "go" => :build
 
   def install
+    project = "github.com/cert-manager/cmctl/v2"
     ldflags = %W[
       -s -w
-      -X github.com/cert-manager/cert-manager/cmd/ctl/pkg/build.name=cmctl
-      -X github.com/cert-manager/cert-manager/cmd/ctl/pkg/build/commands.registerCompletion=true
+      -X #{project}/pkg/build.name=cmctl
+      -X #{project}/pkg/build/commands.registerCompletion=true
       -X github.com/cert-manager/cert-manager/pkg/util.AppVersion=v#{version}
       -X github.com/cert-manager/cert-manager/pkg/util.AppGitCommit=#{tap.user}
     ]
 
-    cd "cmd/ctl" do
-      system "go", "build", *std_go_args(ldflags: ldflags)
-    end
+    system "go", "build", *std_go_args(ldflags:)
 
     generate_completions_from_executable(bin/"cmctl", "completion")
   end
@@ -42,7 +42,7 @@ class Cmctl < Formula
     # we find the error about connecting
     assert_match "error: error finding the scope of the object", shell_output("#{bin}/cmctl check api 2>&1", 1)
     # The convert command *can* be tested locally.
-    (testpath/"cert.yaml").write <<~EOF
+    (testpath/"cert.yaml").write <<~YAML
       apiVersion: cert-manager.io/v1beta1
       kind: Certificate
       metadata:
@@ -53,9 +53,9 @@ class Cmctl < Formula
           name: test-issuer
           kind: Issuer
         commonName: example.com
-    EOF
+    YAML
 
-    expected_output = <<~EOF
+    expected_output = <<~YAML
       apiVersion: cert-manager.io/v1
       kind: Certificate
       metadata:
@@ -68,7 +68,7 @@ class Cmctl < Formula
           name: test-issuer
         secretName: test
       status: {}
-    EOF
+    YAML
 
     assert_equal expected_output, shell_output("#{bin}/cmctl convert -f cert.yaml")
   end

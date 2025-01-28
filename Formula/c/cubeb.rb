@@ -1,15 +1,24 @@
 class Cubeb < Formula
   desc "Cross-platform audio library"
-  homepage "https://github.com/kinetiknz/cubeb"
-  url "https://github.com/kinetiknz/cubeb/archive/cubeb-0.2.tar.gz"
-  sha256 "cac10876da4fa3b3d2879e0c658d09e8a258734562198301d99c1e8228e66907"
+  homepage "https://github.com/mozilla/cubeb"
   license "ISC"
-  head "https://github.com/kinetiknz/cubeb.git", branch: "master"
+
+  stable do
+    url "https://github.com/mozilla/cubeb/archive/refs/tags/cubeb-0.2.tar.gz"
+    sha256 "cac10876da4fa3b3d2879e0c658d09e8a258734562198301d99c1e8228e66907"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
 
   bottle do
+    sha256 cellar: :any, arm64_sequoia:  "82458e11a000c10cb1268c1e9118c0d0e447fc40d49bb6e0426288ea87d05e1b"
+    sha256 cellar: :any, arm64_sonoma:   "478c0b66412477519eeb295fe7788436e843af7f98e10df61de6f8a942235772"
     sha256 cellar: :any, arm64_ventura:  "b16ab1b2aea0c4cec3a8015e3ead96e97c59719c655ec87d94ed5b54d81b30f8"
     sha256 cellar: :any, arm64_monterey: "506fb6090f05b4275bde1aff78c0eb1bf72959fbeac5c53018c728863ef1195f"
     sha256 cellar: :any, arm64_big_sur:  "e56366a9d51f95c573e9bcc0a7f8985e4607cf88a9e6a87c0f2193a363c18a93"
+    sha256 cellar: :any, sonoma:         "f209a91dc7b5b2bfbc35abce746a13a921301638b8dfa819845ca21387c4b17b"
     sha256 cellar: :any, ventura:        "0041ddd0e681a15e761608af2f419790b7f367629b45afd420c19ceb94f731b8"
     sha256 cellar: :any, monterey:       "0734f84782c17da435dc805f42c1af96506669ed1337aa8a0a20f486975d771a"
     sha256 cellar: :any, big_sur:        "06c2e45c008f9b2c6068c5ccb4adf3d4d7ca75e4b0b25429af1577391a6b2d8b"
@@ -20,22 +29,36 @@ class Cubeb < Formula
     sha256 cellar: :any, el_capitan:     "f7e738b374bb07e1c420e56dfeb72caa814495b446c71d8158ef98c9b33d3a60"
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  head do
+    url "https://github.com/mozilla/cubeb.git", branch: "master"
+
+    depends_on "cmake" => :build
+  end
+
+  depends_on "pkgconf" => :build
+
+  on_linux do
+    depends_on "pulseaudio"
+  end
 
   def install
-    system "autoreconf", "--install"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
-    system "make", "install"
+    if build.head?
+      system "cmake", "-S", ".", "-B", "build",
+                      "-DBUILD_SHARED_LIBS=ON",
+                      "-DBUILD_TESTS=OFF",
+                      "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                      *std_cmake_args
+      system "cmake", "--build", "build"
+      system "cmake", "--install", "build"
+    else
+      system "autoreconf", "--force", "--install", "--verbose"
+      system "./configure", "--disable-silent-rules", *std_configure_args
+      system "make", "install"
+    end
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <cubeb/cubeb.h>
 
@@ -84,7 +107,7 @@ class Cubeb < Formula
         cubeb_destroy(ctx);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "#{testpath}/test.c", "-L#{lib}", "-lcubeb"
     refute_match(/FAIL:.*/, shell_output("#{testpath}/test"),
                     "Basic sanity test failed.")

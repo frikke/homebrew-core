@@ -7,45 +7,49 @@ class Libplacebo < Formula
   head "https://code.videolan.org/videolan/libplacebo.git", branch: "master"
 
   stable do
-    url "https://code.videolan.org/videolan/libplacebo/-/archive/v6.292.1/libplacebo-v6.292.1.tar.bz2"
-    sha256 "51f0b7b400b35ce5f131a763c0cebb8e46680c17bed58cc9296b20c603f7f65f"
+    url "https://code.videolan.org/videolan/libplacebo/-/archive/v7.349.0/libplacebo-v7.349.0.tar.bz2"
+    sha256 "38c9c75d9c1bb412baf34845d1ca58c41a9804d1d0798091d7a8602a0d7c9aa6"
+
+    resource "fast_float" do
+      url "https://github.com/fastfloat/fast_float/archive/refs/tags/v6.1.1.tar.gz"
+      sha256 "10159a4a58ba95fe9389c3c97fe7de9a543622aa0dcc12dd9356d755e9a94cb4"
+    end
 
     resource "glad2" do
-      url "https://files.pythonhosted.org/packages/8b/b3/191508033476b6a409c070c6166b1c41ebb547cc6136260e9157343e6a2b/glad2-2.0.4.tar.gz"
-      sha256 "ede1639f69f2ba08f1f498a40a707f34a609d24eb2ea0d6c9364689a798cf7d0"
+      url "https://files.pythonhosted.org/packages/15/fc/9235e54b879487f7479f333feddf16ac8c1f198a45ab2e96179b16f17679/glad2-2.0.6.tar.gz"
+      sha256 "08615aed3219ea1c77584bd5961d823bab226f8ac3831d09adf65c6fa877f8ec"
     end
 
     resource "jinja2" do
-      url "https://files.pythonhosted.org/packages/7a/ff/75c28576a1d900e87eb6335b063fab47a8ef3c8b4d88524c4bf78f670cce/Jinja2-3.1.2.tar.gz"
-      sha256 "31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"
+      url "https://files.pythonhosted.org/packages/ed/55/39036716d19cab0747a5020fc7e907f362fbf48c984b14e62127f7e68e5d/jinja2-3.1.4.tar.gz"
+      sha256 "4a3aee7acbbe7303aede8e9648d13b8bf88a429282aa6122a993f0ac800cb369"
     end
 
     resource "markupsafe" do
-      url "https://files.pythonhosted.org/packages/6d/7c/59a3248f411813f8ccba92a55feaac4bf360d29e2ff05ee7d8e1ef2d7dbf/MarkupSafe-2.1.3.tar.gz"
-      sha256 "af598ed32d6ae86f1b747b82783958b1a4ab8f617b06fe68795c7f026abbdcad"
+      url "https://files.pythonhosted.org/packages/87/5b/aae44c6655f3801e81aa3eef09dbbf012431987ba564d7231722f68df02d/MarkupSafe-2.1.5.tar.gz"
+      sha256 "d283d37a890ba4c1ae73ffadf8046435c76e7bc2247bbb63c00bd1a709c6544b"
     end
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "7b8924949ce4f6ea2c8bd8e9c47e5b06c108891c5590d193c7bb8fb2162b3a1d"
-    sha256 cellar: :any,                 arm64_ventura:  "d39fd06d944a02a6a4524999e97002eb089ad206a5efea6d43d19667417e10e4"
-    sha256 cellar: :any,                 arm64_monterey: "fee86a840f4eb479d542ebf23cc2919cebaa038cc655e7bc03cf5a20dba6ee97"
-    sha256 cellar: :any,                 arm64_big_sur:  "f9970f6b25f49516e84f773c326533cd895c1a5cdb09870ffefe442df5cd682f"
-    sha256 cellar: :any,                 sonoma:         "fdccd4f5c326dd6d5b16a5b94369fbbdb5d3f4878a440659b99f46a15bd819ec"
-    sha256 cellar: :any,                 ventura:        "1ece32e31129e380dbb56346ae9498b1e26170b8c184f57f690bf7c0f18656f4"
-    sha256 cellar: :any,                 monterey:       "3de6a1292e3389365d91fa4bd1eebc64a3160d39c270ad59b28999f02a5a1357"
-    sha256 cellar: :any,                 big_sur:        "b269179f597f0c09a6b3b145b26067fd4301ebfc1233f2871e2ee98e296bf0be"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fa0d0c2daaffd9007311137995a02b2d1dc468ef847d51405aa3af865e5ecb09"
+    sha256 cellar: :any, arm64_sequoia:  "3d549716eb833fbc554605706f4e4740f0c1c4e6cf23732326444627ea14a8d5"
+    sha256 cellar: :any, arm64_sonoma:   "72afc163cc9dfc5525ed856094449685f034dfbbd8528f04e448b0447dd44f06"
+    sha256 cellar: :any, arm64_ventura:  "8860b6fd41fdd672a503b4951cb539d8ae11eaf953b64aef8188090f862138ab"
+    sha256 cellar: :any, arm64_monterey: "bfba0779b291723de7012b77cfc04e2d2909764012580e002808658697768ef2"
+    sha256 cellar: :any, sonoma:         "a5f15e9286de87a34619dbd377fd26a83fddb667ff45036fa7aa09ad3ca2a3d3"
+    sha256 cellar: :any, ventura:        "7ee7837caa82be9fa7294eb11f9a34545aad429a2202aaef5b19ba50dc02ea08"
+    sha256 cellar: :any, monterey:       "be243d1baa8e092186e1f6a7d8be0964e243bcb77fe2372dbc3736c3a3f8d910"
+    sha256               x86_64_linux:   "db810576ae7bfb3bc20cf244271d00ab7e24701fe77d2540cf10407b22d6392d"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python@3.13" => :build
   depends_on "vulkan-headers" => :build
 
-  depends_on "glslang"
   depends_on "little-cms2"
-  depends_on "sdl2"
+  depends_on "shaderc"
   depends_on "vulkan-loader"
 
   def install
@@ -63,19 +67,20 @@ class Libplacebo < Formula
 
     system "meson", "setup", "build",
                     "-Dvulkan-registry=#{Formula["vulkan-headers"].share}/vulkan/registry/vk.xml",
+                    "-Dshaderc=enabled", "-Dvulkan=enabled", "-Dlcms=enabled",
                     *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libplacebo/config.h>
       #include <stdlib.h>
       int main() {
         return (pl_version() != NULL) ? 0 : 1;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c", "-I#{include}",
                    "-L#{lib}", "-lplacebo"
     system "./test"

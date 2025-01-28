@@ -1,19 +1,18 @@
 class Gource < Formula
   desc "Version Control Visualization Tool"
   homepage "https://github.com/acaudwell/Gource"
-  url "https://github.com/acaudwell/Gource/releases/download/gource-0.54/gource-0.54.tar.gz"
-  sha256 "1dcbcedf65d2cf4d69fe0b633e54c202926c08b829bcad0b73eaf9e29cd6fae5"
+  url "https://github.com/acaudwell/Gource/releases/download/gource-0.55/gource-0.55.tar.gz"
+  sha256 "c8239212d28b07508d9e477619976802681628fc25eb3e04f6671177013c0142"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 arm64_ventura:  "55bde6411130890bdfd748a794b146b1f51a124d52f696031b5cae73f0348128"
-    sha256 arm64_monterey: "cd48f104b8543646206b889ff287c33ccc9d39a7abf422ecb910d90c7735ff46"
-    sha256 arm64_big_sur:  "3d44bb4efa40c8a38a56ef8353eae092ecbe0be9ba248a3f0eda8f20369c594f"
-    sha256 ventura:        "acfa227bd1a271c427baf0ea8f632f4a3feaf4d5deec4857e45282f0014443bc"
-    sha256 monterey:       "9dac8b441b10030e29c92bb397b7a0063dfeefdf28280bd97b30316d809e8a9f"
-    sha256 big_sur:        "44e965db2b905de18031741315ce5554b048c77510be2611164700dbf6b4601f"
-    sha256 x86_64_linux:   "f8bd7eb81779073d48607fbdbf475eaa4fbe6abcc541da7931c8d8a21031c44e"
+    sha256 arm64_sequoia: "45751a1641fe7d73147fe811f8ac03d01e125dc545524fc9b130ea97714ab275"
+    sha256 arm64_sonoma:  "2081d916c3ce5876f496d23ce8d6b092101aaf2750b4987c593fc52168279f2a"
+    sha256 arm64_ventura: "bb6149e22c1ca5442f9974a1079a75f6ae1def91d9439b60bfe411659b9f9ad7"
+    sha256 sonoma:        "163f2bc4d805804d54538f0b0c5e50ca98c8541bc05f2fae65d845a521da8d8c"
+    sha256 ventura:       "1fc962a7b5587a8ce44f71c98b4966460f2b929d050a3477a3f08b878dc40c8c"
+    sha256 x86_64_linux:  "01eaeab6eaaedd52c2ee0f7f7885e96357f560eb12b6b1029a5e322923128c44"
   end
 
   head do
@@ -25,7 +24,8 @@ class Gource < Formula
   end
 
   depends_on "glm" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
   depends_on "boost"
   depends_on "freetype"
   depends_on "glew"
@@ -34,22 +34,29 @@ class Gource < Formula
   depends_on "sdl2"
   depends_on "sdl2_image"
 
+  on_linux do
+    depends_on "mesa"
+    depends_on "mesa-glu"
+  end
+
   def install
+    ENV.cxx11
+
     # clang on Mt. Lion will try to build against libstdc++,
     # despite -std=gnu++0x
     ENV.libcxx
     ENV.append "LDFLAGS", "-pthread" if OS.linux?
 
-    system "autoreconf", "-f", "-i" if build.head?
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
+    system "./configure", "--disable-silent-rules",
                           "--with-boost=#{Formula["boost"].opt_prefix}",
-                          "--without-x"
+                          "--without-x",
+                          *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/gource", "--help"
+    system bin/"gource", "--help"
   end
 end

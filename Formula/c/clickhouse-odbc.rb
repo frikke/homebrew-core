@@ -1,11 +1,11 @@
 class ClickhouseOdbc < Formula
   desc "Official ODBC driver implementation for accessing ClickHouse as a data source"
-  homepage "https://github.com/ClickHouse/clickhouse-odbc#readme"
-  url "https://github.com/ClickHouse/clickhouse-odbc.git",
-      tag:      "v1.2.1.20220905",
-      revision: "fab6efc57d671155c3a386f49884666b2a02c7b7"
+  homepage "https://github.com/ClickHouse/clickhouse-odbc"
+  # Git modules are all for bundled libraries so can use tarball without them
+  url "https://github.com/ClickHouse/clickhouse-odbc/archive/refs/tags/v1.2.1.20220905.tar.gz"
+  sha256 "ca8666cbc7af9e5d4670cd05c9515152c34543e4f45e2bc8fa94bee90d724f1b"
   license "Apache-2.0"
-  revision 4
+  revision 7
   head "https://github.com/ClickHouse/clickhouse-odbc.git", branch: "master"
 
   livecheck do
@@ -14,43 +14,46 @@ class ClickhouseOdbc < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "6d3da8f25a679d578fc9fbca684018833ad363535bfd3e85a4ddd736f6b32e78"
-    sha256 cellar: :any,                 arm64_big_sur:  "edd276cf440f60a578c73b6bd97f28405b4832794dce0b11e7bed991650e47f7"
-    sha256 cellar: :any,                 monterey:       "f0bb5c75237871886d291229e6ba60ffedb04c3d8a5e2feae411968cf83537c6"
-    sha256 cellar: :any,                 big_sur:        "b8ba8ebeb1a452406829d7c81315c9137a2e583f8699edd6fdc9cc7827cb3463"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0d6e08e8ba3cdeff98402a304e88bc44c416081b13aa0147d9ab9c82e6404982"
+    sha256 cellar: :any,                 arm64_sequoia: "2dede9beae8a3bccb0bb370835ceba0a5621746db5fb07bb1d04d62a180ea621"
+    sha256 cellar: :any,                 arm64_sonoma:  "cebcb25fe92aaa4157a764a170d377b983e5966b01e499eae89f822b7784f5d2"
+    sha256 cellar: :any,                 arm64_ventura: "c3fb8ef17692a36c5119115db53f2f2ddd83f7833ac5e02c87ef628cccc3c984"
+    sha256 cellar: :any,                 sonoma:        "2cc6e5bf96a77fe04b61f9edc073d21aed7b6a24b000acbade86f6b8bee3f8c6"
+    sha256 cellar: :any,                 ventura:       "f8309c8c83b07dfff445dd2c094b7c64ac2e6251d459f0036897d8adffc7096c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2ab019654dc81b5162e4575b3a3118653fe3ea9d9b884b6820599a0df6925b26"
   end
 
-  # https://github.com/facebook/folly/issues/1867
-  deprecate! date:    "2023-06-15",
-             because: "vendors an old version of folly that is incompatible with new versions of libc++"
-
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
-  depends_on "icu4c"
+  depends_on "folly" => :build
+  depends_on "pkgconf" => :build
+  depends_on "icu4c@76"
   depends_on "openssl@3"
   depends_on "poco"
+  depends_on "utf8proc"
 
   on_macos do
     depends_on "libiodbc"
+    depends_on "pcre2"
   end
 
   on_linux do
     depends_on "unixodbc"
   end
 
-  fails_with :gcc do
-    version "6"
+  # build patch for utf8proc, no needed for newer version, as folly got removed per https://github.com/ClickHouse/clickhouse-odbc/pull/456
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/c76519fcbfa664cd37a8901deb76403b1af1bec1/clickhouse-odbc/1.2.1.20220905-Utf8Proc.patch"
+    sha256 "29f3aeaa05609d53b942903868cb52ddcfcb3b35d32e8075d152cd2ca0ff5242"
   end
 
   def install
-    # Remove bundled libraries excluding required bundled `folly` headers
-    %w[googletest nanodbc poco ssl].each { |l| (buildpath/"contrib"/l).rmtree }
+    # Remove bundled libraries
+    %w[folly googletest nanodbc poco ssl].each { |l| rm_r(buildpath/"contrib"/l) }
 
+    icu4c_dep = deps.find { |dep| dep.name.match?(/^icu4c(@\d+)?$/) }
     args = %W[
       -DCH_ODBC_PREFER_BUNDLED_THIRD_PARTIES=OFF
       -DCH_ODBC_THIRD_PARTY_LINK_STATIC=OFF
-      -DICU_ROOT=#{Formula["icu4c"].opt_prefix}
+      -DICU_ROOT=#{icu4c_dep.to_formula.opt_prefix}
       -DOPENSSL_ROOT_DIR=#{Formula["openssl@3"].opt_prefix}
     ]
     args += if OS.mac?
@@ -65,7 +68,7 @@ class ClickhouseOdbc < Formula
   end
 
   test do
-    (testpath/"my.odbcinst.ini").write <<~EOS
+    (testpath/"my.odbcinst.ini").write <<~INI
       [ODBC Drivers]
       ClickHouse ODBC Test Driver A = Installed
       ClickHouse ODBC Test Driver W = Installed
@@ -81,9 +84,9 @@ class ClickhouseOdbc < Formula
       Driver      = #{lib/shared_library("libclickhouseodbcw")}
       Setup       = #{lib/shared_library("libclickhouseodbcw")}
       UsageCount  = 1
-    EOS
+    INI
 
-    (testpath/"my.odbc.ini").write <<~EOS
+    (testpath/"my.odbc.ini").write <<~INI
       [ODBC Data Sources]
       ClickHouse ODBC Test DSN A = ClickHouse ODBC Test Driver A
       ClickHouse ODBC Test DSN W = ClickHouse ODBC Test Driver W
@@ -97,7 +100,7 @@ class ClickhouseOdbc < Formula
       Driver      = ClickHouse ODBC Test Driver W
       Description = DSN for ClickHouse ODBC Test Driver (Unicode)
       Url         = https://default:password@example.com:8443/query?database=default
-    EOS
+    INI
 
     ENV["ODBCSYSINI"] = testpath
     ENV["ODBCINSTINI"] = "my.odbcinst.ini"

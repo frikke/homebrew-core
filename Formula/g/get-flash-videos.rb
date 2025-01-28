@@ -1,20 +1,18 @@
 class GetFlashVideos < Formula
   desc "Download or play videos from various Flash-based websites"
   homepage "https://github.com/monsieurvideo/get-flash-videos"
-  url "https://github.com/monsieurvideo/get-flash-videos/archive/1.25.99.03.tar.gz"
+  url "https://github.com/monsieurvideo/get-flash-videos/archive/refs/tags/1.25.99.03.tar.gz"
   sha256 "37267b41c7b0c240d99ed1f5e7ba04d00f98a8daff82ac9edd2b12c3bca83d73"
   license "Apache-2.0"
-  revision 2
+  revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "6192edd9652dc1015f4f0e74e2121ce04e4367524358655b31d8a61bbc872c1a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "596c60e7d7307363cd9ee6a3a9095f6f82809bb0f58337a768ffaf24d905f91c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cfbe9243f86f096ffce18e6ef7c290f8eff49d705df34bcaeda0dda997f47c09"
-    sha256 cellar: :any_skip_relocation, ventura:        "d819fd643f1b2b9eec73819eb750b8c4121d1f0bc5bb7ec36f37c71e4ebca0e3"
-    sha256 cellar: :any_skip_relocation, monterey:       "937da2dac18101279a26f90ba47bceb2164f7c895601b0088b749524fd6e52f1"
-    sha256 cellar: :any_skip_relocation, big_sur:        "95414e77f9bab04d1e117e85d7c50e44a9fa0f326b59ea5be3abc1e56bcc9b6d"
-    sha256 cellar: :any_skip_relocation, catalina:       "f6d89dd6055381e293e10eeb653688a433d823867335ce9d862283941be9d374"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e52f233bd9df451f7dcbb7297a2c34e63d730aae229fff1ed2c06fd077e2c89f"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4e9585360bd6c0eedbb61d69471027f381bb98b90ec603d27e6054c070ff0bcd"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c98e92953a3439040ea3927924daf3752535f29b6f090d7110f2f4f27cd07aec"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "5250458e7b842b0c47b8a0bf82d080088f1a15991b08b7c4b6b54a1af2694ecd"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b85cf6d7f8b77d4c8e49a4229bb1f65dbd7d5bdf46e278dd6222eb30e002ade1"
+    sha256 cellar: :any_skip_relocation, ventura:       "4b38c8850c54efd5fcec94048eb5e35452647c1f85d2852f49d312ec4e120bd7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fc6d8ca49c01ff7cf2af1d97ff3e287ee30617b40bda0db332f794768cdbdca3"
   end
 
   depends_on "rtmpdump"

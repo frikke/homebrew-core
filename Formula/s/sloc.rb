@@ -1,31 +1,29 @@
-require "language/node"
-
 class Sloc < Formula
   desc "Simple tool to count source lines of code"
-  homepage "https://github.com/flosse/sloc#readme"
-  url "https://registry.npmjs.org/sloc/-/sloc-0.2.1.tgz"
-  sha256 "fb56f1763b7dadfd0566f819665efc0725ba8dfbec13c75da3839edf309596e6"
+  homepage "https://github.com/flosse/sloc"
+  url "https://registry.npmjs.org/sloc/-/sloc-0.3.2.tgz"
+  sha256 "25ac2a41e015a8ee0d0a890221d064ad0288be8ef742c4ec903c84a07e62b347"
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "f2fffe38885f7cebab2d105c1dc8492bdfd9a7b8b02a7ae2cc03ad35f46066f5"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "24e858bb8b1a883aa3bff9443299ab2be4b978dbede386c35047ede3958584c5"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       int main(void) {
         return 0;
       }
-    EOS
+    C
 
     std_output = <<~EOS
       Path,Physical,Source,Comment,Single-line comment,Block comment,Mixed,Empty block comment,Empty,To Do

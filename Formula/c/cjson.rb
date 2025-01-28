@@ -1,21 +1,19 @@
 class Cjson < Formula
   desc "Ultralightweight JSON parser in ANSI C"
   homepage "https://github.com/DaveGamble/cJSON"
-  url "https://github.com/DaveGamble/cJSON/archive/v1.7.16.tar.gz"
-  sha256 "451131a92c55efc5457276807fc0c4c2c2707c9ee96ef90c47d68852d5384c6c"
+  url "https://github.com/DaveGamble/cJSON/archive/refs/tags/v1.7.18.tar.gz"
+  sha256 "3aa806844a03442c00769b83e99970be70fbef03735ff898f4811dd03b9f5ee5"
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "5e917935bb9f6d66e4c080d14d3d3d4a9d77ff6839e0f97c0be18778bd4ed060"
-    sha256 cellar: :any,                 arm64_ventura:  "86ee096088caae2433c9f85afa172a6aef245fdf6ce9fcf9ff352702fe2000a6"
-    sha256 cellar: :any,                 arm64_monterey: "f1b4e9f60327ba7e9eb14560bb79483ac417724c20563079d302dbf2d01ebcc0"
-    sha256 cellar: :any,                 arm64_big_sur:  "679191a14c283a9d5c4169e25845815608b91a5c9a32a656bcb48fd47072d4a5"
-    sha256 cellar: :any,                 sonoma:         "4918ffa1ece97c80450a11c65bbaf2d5ceae0650382183147014f72a544bdc40"
-    sha256 cellar: :any,                 ventura:        "3f08bd5fbd91e65ae011c7de3b9f91d4b853a4238e5a204311f346047c67aece"
-    sha256 cellar: :any,                 monterey:       "945bbf9662147b825b0b40e4859ab4c7125e3735a360bcd063e80e23b1784076"
-    sha256 cellar: :any,                 big_sur:        "67370802349999b8861bdca4607b5e7ac0ddef44d43677e38fa04ddcc2610068"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bcb8cd8c65d5b5930c06e08e8a4908dadfc5371ae19471bbabea68155054c196"
+    sha256 cellar: :any,                 arm64_sequoia:  "369cf21b89c82a4f1834fb3c8a128f5bf970f22bbb13376652448fbde998dad9"
+    sha256 cellar: :any,                 arm64_sonoma:   "6deee0399f8b92240122c7cb8dee5a3f3e7b26f9cec147b9d0baffb3c6a804dc"
+    sha256 cellar: :any,                 arm64_ventura:  "f8cd3c29957ec2a1007c52197f924e7f5262da5809bf928a451b25ea95df5203"
+    sha256 cellar: :any,                 arm64_monterey: "8dbfc2c100bf1710e3cbc477526e3ba5694f0b1162452252932d4c6ed2ea8a9f"
+    sha256 cellar: :any,                 sonoma:         "1b0c17ed9045b0feb0ba140a31ab247876055ac753cd1fe1d55c0e9fc334e332"
+    sha256 cellar: :any,                 ventura:        "d9587b4d465d2fb40c4cfc6a7c843a97fc9f0aef817b036ffd7418b10cbdd6d1"
+    sha256 cellar: :any,                 monterey:       "5173b927f124a5e5f1cdc8c9625e41b91d489f779837e59e245b9fae38b36cc2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9ad376a8e59ceadee7ca6ec2ba000a8d1b5359a38e964afb3ca05fed166294da"
   end
 
   depends_on "cmake" => :build
@@ -32,7 +30,7 @@ class Cjson < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <cjson/cJSON.h>
 
       int main()
@@ -49,7 +47,7 @@ class Cjson < Formula
         cJSON_Delete(json);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lcjson", "-o", "test"
     system "./test"
   end

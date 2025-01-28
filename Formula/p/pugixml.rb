@@ -1,8 +1,8 @@
 class Pugixml < Formula
   desc "Light-weight C++ XML processing library"
   homepage "https://pugixml.org/"
-  url "https://github.com/zeux/pugixml/releases/download/v1.13/pugixml-1.13.tar.gz"
-  sha256 "40c0b3914ec131485640fa57e55bf1136446026b41db91c1bef678186a12abbe"
+  url "https://github.com/zeux/pugixml/releases/download/v1.15/pugixml-1.15.tar.gz"
+  sha256 "655ade57fa703fb421c2eb9a0113b5064bddb145d415dd1f88c79353d90d511a"
   license "MIT"
 
   livecheck do
@@ -11,30 +11,29 @@ class Pugixml < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "a7d16c5861b777b8ed4b8319fff2b5dfc8bc51f74db7ebc5a379474bc1d2d53e"
-    sha256 cellar: :any,                 arm64_ventura:  "8342cbe96ddcb6316547c3e153988ebbe8df9377e3d7e40f596862606231a2f1"
-    sha256 cellar: :any,                 arm64_monterey: "00b008f8d19c4d9f9c2ab610978622cd356958da8ad37dbf7295b6e05e2aae03"
-    sha256 cellar: :any,                 arm64_big_sur:  "40f7fed3e7b4f7ebd33d7909c7db5513ae64b5476329ea598bfaf93f95740e13"
-    sha256 cellar: :any,                 sonoma:         "66ffa889d88dc38e6424032d553c713b028282f8e1edcede90dcb6b266933c7c"
-    sha256 cellar: :any,                 ventura:        "5223925a625c1e3f6a2c8bb229ebae09b95c3c26a3f08132e6c905c416833efd"
-    sha256 cellar: :any,                 monterey:       "c394eed7f1a3076d2e52d8e4cd4adc008f3456cf94234bbea761c32997bf7fdc"
-    sha256 cellar: :any,                 big_sur:        "0267ec889e6b5699a0c98619c3c5d88cbac35b92cf053b9ed9935b134853d441"
-    sha256 cellar: :any,                 catalina:       "1830a4ad92d8991fd85590414f710c11f8ab4a760537f00ad24e6b7623fc7ecc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4d0c2c12331bf2c09d4e96c83bd1fab2cbac2637e2f3aad28f6e33682bf73b33"
+    sha256 cellar: :any,                 arm64_sequoia: "1d3349e3cf6dc0d06fffd2c52c62801b3c804e36cabcb01f46682738bb1485c2"
+    sha256 cellar: :any,                 arm64_sonoma:  "d648b349479d6bd41c0ee2e22fb9108abb33a553c5ab21584564a6a36fac04c6"
+    sha256 cellar: :any,                 arm64_ventura: "e6641fb533ddb45418980698aab6b06a02a3c5e763cae6ab7bb513289e5248d3"
+    sha256 cellar: :any,                 sonoma:        "32cc92f8679e9a6d8b0c45140a19f0ac5c330e470bbca5cddcf494c6511beae6"
+    sha256 cellar: :any,                 ventura:       "fc421bf66929e255b8a433eae74d0f32482ce73dea8b8da850f9f6efd1970a92"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2578c1114075b488ec20a5c627d9616af5a6e5f22d9f99e54d0bb6221a861f77"
   end
 
   depends_on "cmake" => :build
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
-                    "-DBUILD_SHARED_LIBS=ON",
-                    "-DPUGIXML_BUILD_SHARED_AND_STATIC_LIBS=ON"
+    args = %w[
+      -DBUILD_SHARED_LIBS=ON
+      -DPUGIXML_BUILD_SHARED_AND_STATIC_LIBS=ON
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <pugixml.hpp>
       #include <cassert>
       #include <cstring>
@@ -46,14 +45,13 @@ class Pugixml < Formula
         assert(result);
         assert(strcmp(doc.child_value("root"), "Hello world!") == 0);
       }
-    EOS
+    CPP
 
-    (testpath/"test.xml").write <<~EOS
+    (testpath/"test.xml").write <<~XML
       <root>Hello world!</root>
-    EOS
+    XML
 
-    system ENV.cxx, "test.cpp", "-o", "test", "-I#{include}",
-                    "-L#{lib}", "-lpugixml"
+    system ENV.cxx, "test.cpp", "-o", "test", "-I#{include}", "-L#{lib}", "-lpugixml"
     system "./test"
   end
 end

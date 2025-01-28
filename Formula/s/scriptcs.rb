@@ -1,13 +1,14 @@
 class Scriptcs < Formula
   desc "Tools to write and execute C#"
   homepage "https://github.com/scriptcs/scriptcs"
-  url "https://github.com/scriptcs/scriptcs/archive/v0.17.1.tar.gz"
+  url "https://github.com/scriptcs/scriptcs/archive/refs/tags/v0.17.1.tar.gz"
   sha256 "e876118d82f52cbdd9569783ec9278c4ac449055aa628cdcb2d785bf8098a434"
   license "Apache-2.0"
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_monterey: "d25a27968072aa23232a11aceed62f1f8edcbdbe31ac2637cdd5becba69bed6e"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f5187aaee21aced8951a79b8a23c8e9a870ce5e17da5d15837add0aeadb3f5dd"
+    sha256 cellar: :any_skip_relocation, sonoma:         "03ca8a3a21a88d12cafcf11b79527899caa5545056b4d0d77998b137206cc5f6"
     sha256 cellar: :any_skip_relocation, ventura:        "507936c0cd4b26dd49508ebf8725b1d9356a611d958a93da0a024e98632b5484"
     sha256 cellar: :any_skip_relocation, monterey:       "630be0cd09a3dc16e8c7404875adfe89d009ce9a73f6d5dcae9700253a3c110c"
     sha256 cellar: :any_skip_relocation, big_sur:        "9153f24a59a73f78f74915a8e1d8de488ec016deb1aac1825774e19d6420545d"
@@ -19,7 +20,7 @@ class Scriptcs < Formula
   end
 
   # https://github.com/scriptcs/scriptcs/issues/1323
-  deprecate! date: "2023-02-21", because: :unmaintained
+  disable! date: "2024-02-12", because: :unmaintained
 
   depends_on "mono"
 

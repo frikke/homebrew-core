@@ -1,18 +1,17 @@
 class Shadowenv < Formula
   desc "Reversible directory-local environment variable manipulations"
   homepage "https://shopify.github.io/shadowenv/"
-  url "https://github.com/Shopify/shadowenv/archive/2.1.1.tar.gz"
-  sha256 "d9bf043f376b18255d124a9b90eb67d80d2f971bcd49090e84703b61dee03910"
+  url "https://github.com/Shopify/shadowenv/archive/refs/tags/3.0.3.tar.gz"
+  sha256 "ad04e1d5ae88e358f0ee6ec987bd88b7f8c489409fafc6286690aeacb074ddea"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5b057830c9b7314bca810275833a19bf287f77c3fc36ce3dbb2f8f7cc9647e22"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "50d8d4dfcf9e64546e965c942f6a125bcfcb94a42253058b667238ff7c81899c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d8ed9566680168ecd23a35843069d9f50bf7cd0b9902effdd29a923deda9c792"
-    sha256 cellar: :any_skip_relocation, ventura:        "b96c4530ee1f23877cf87877218465d03bf9e52f69d5638b8bbd8ad0d66a2e22"
-    sha256 cellar: :any_skip_relocation, monterey:       "bc2b03d6af4c10ba31381997ffd327489ea47abf064256709ef916036dd04867"
-    sha256 cellar: :any_skip_relocation, big_sur:        "91ae639111876468b02121c8bf16300418c8aa2c87d8378045226dea145cc77a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "375fd1676c290cf6704b90657ab7cd11ecd56b4da72f2505354f8bbe486eedbf"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "93a3aa92e6d4f3d71f2096def300b3d503b06af579212990958fb29a5cf53dac"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "926abc552d85283e6507cd2668bdf5af33ce5d2b0a3515fc14ab3a9250d8c6d3"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "801c925456a0220534c28009729ddb366a5925a61857c3ea053d39d6b44982b9"
+    sha256 cellar: :any_skip_relocation, sonoma:        "a584d3fa65f210eb2ea6dffd8d50b59b6cab767f11b7e97cf9bb2dde03fa2f2e"
+    sha256 cellar: :any_skip_relocation, ventura:       "50f747135333edf3cc9f6252e6e4abc86ee20523c285af87a0d6411b843ae0d1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4209ba91154dc46bc9254f7117cc25f46a7bc9ee0ce160321cc91d3a1bc81380"
   end
 
   depends_on "rust" => :build

@@ -1,44 +1,41 @@
 class Libxmu < Formula
   desc "X.Org: X miscellaneous utility routines library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libXmu-1.1.4.tar.xz"
-  sha256 "210de3ab9c3e9382572c25d17c2518a854ce6e2c62c5f8315deac7579e758244"
+  url "https://www.x.org/archive/individual/lib/libXmu-1.2.1.tar.xz"
+  sha256 "fcb27793248a39e5fcc5b9c4aec40cc0734b3ca76aac3d7d1c264e7f7e14e8b2"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_sonoma:   "328a08931eda06eddf8660bcd54d4f55a9f68821b2db3fc73c425a12222b9fe3"
-    sha256 cellar: :any,                 arm64_ventura:  "48d915487711edb1aa70ed5a9eb26624d831adda4728e59ce2337b07c4ee18a3"
-    sha256 cellar: :any,                 arm64_monterey: "865801c4562cf8ad72721958220699028dcfecb68f6459a7cbcb7bac43839d19"
-    sha256 cellar: :any,                 arm64_big_sur:  "2c878690e28c5bfb3304bf4259d8f0475dbcf36d7077b5377ac1de40178d17e6"
-    sha256 cellar: :any,                 sonoma:         "fb90b4b0da24cac128f1d3661ed05bf9c786c5e42b40cbbe026fa94662828930"
-    sha256 cellar: :any,                 ventura:        "ec9239a99aa12ea41491bc239debd28be6694a33da38178f5a33bf3c6cfd607d"
-    sha256 cellar: :any,                 monterey:       "a392f317ee3058d06fedae373c6cecb877cb133a2ffb641d36bf747dacccb56a"
-    sha256 cellar: :any,                 big_sur:        "e61c1b86464e8a59752950147cf8d3a9eba8f982b7915f36f1ed4b9d1a79c933"
-    sha256 cellar: :any,                 catalina:       "d68bead5ce8b3ba9c3a7620c6e6e8fd78dd0f0fab612ede85a77753d6f412006"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a6d7093b508915146ef2cf2b351da4f98a5a5c8e96f706dd6801de5429968cb1"
+    sha256 cellar: :any,                 arm64_sequoia:  "b44c421e544a4a88eacaec0155108a9ce86a7d6aebf39e735d7d8656b2c7d768"
+    sha256 cellar: :any,                 arm64_sonoma:   "cf78ddb72afdc7e39ad0aa9421ef8c6ef215a588311fff8d7924fb7dfe33d644"
+    sha256 cellar: :any,                 arm64_ventura:  "06a9985ef9c93b62954e604491eda08c17ff0121c4db57e816ecdd0a89fc0b9a"
+    sha256 cellar: :any,                 arm64_monterey: "e95b65aa281742d32783fe3e81a791f83740724c6a67b47196ef8c0c3ead9bc9"
+    sha256 cellar: :any,                 sonoma:         "da9a3c49863a7674bd512cebf16c226be2b23fb576d7d40bee6912df3af5ebcf"
+    sha256 cellar: :any,                 ventura:        "759a61777107ae7f9893f1a3f443be2f5605335cb63f64885b16ade1c1b9a22e"
+    sha256 cellar: :any,                 monterey:       "1cf9194a1441427380e06054903045d3f247a93dc00943b7126db6badd715e93"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1da14c69af817c5faa1fc53dcf66a32a9319c75769562941f7e0ac20dbe2347b"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+  depends_on "libx11"
   depends_on "libxext"
   depends_on "libxt"
 
   def install
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
       --enable-docs=no
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "X11/Xlib.h"
       #include "X11/Xmu/Xmu.h"
 
@@ -46,7 +43,7 @@ class Libxmu < Formula
         XmuArea area;
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lXmu"
     assert_equal 0, $CHILD_STATUS.exitstatus
   end

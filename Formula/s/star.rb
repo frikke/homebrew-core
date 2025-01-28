@@ -1,46 +1,42 @@
 class Star < Formula
   desc "Standard tap archiver"
-  homepage "https://cdrtools.sourceforge.net/private/star.html"
-  url "https://downloads.sourceforge.net/project/s-tar/star-1.5.3.tar.bz2"
-  sha256 "070342833ea83104169bf956aa880bcd088e7af7f5b1f8e3d29853b49b1a4f5b"
+  homepage "https://codeberg.org/schilytools/schilytools"
+  url "https://codeberg.org/schilytools/schilytools/archive/2024-03-21.tar.gz"
+  sha256 "4d66bf35a5bc2927248fac82266b56514fde07c1acda66f25b9c42ccff560a02"
   license "CDDL-1.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2ff2215c3e9ccb9d58eedaa95e868df3e7f04c2ee76dd56390eb1f6db327e276"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "1c741d208f7a080264af2c3431029d3473c6f3c9a3cead02f25a537ed41a7e40"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0c002816e54a4bf9a821386bb231d34f9cc6ac9f9daf1f6d9241f79d9fc568c7"
-    sha256 cellar: :any_skip_relocation, ventura:        "396e08b4d8d8e9a68e6847508aad7a41f76ff96d596c3ceccd541d3d00c82867"
-    sha256 cellar: :any_skip_relocation, monterey:       "6e05507949b924107ed8cdec69938443580b072c41ceafb39a1819fe417a6154"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b35d569dd3653c0ea0d626206d2101e7de401f39c2e046e5c4553e3701fabb25"
-    sha256 cellar: :any_skip_relocation, catalina:       "d97f6a6df5eaf3360e7b4c17a475e5417ce268815c01dfcbc94709377a47f6eb"
-    sha256 cellar: :any_skip_relocation, mojave:         "8d1e4d304f4ac9c281f3b445f31a1268271eebba6a58f098b4f9339be51218b9"
-    sha256 cellar: :any_skip_relocation, high_sierra:    "9f4a24f592647071a2ead26c2dba4d86cb664f71cdf4d280037a94748c92ec0c"
-    sha256 cellar: :any_skip_relocation, sierra:         "ec7a276b68c0dc946d3320e3cd9cf923d0affdbfa72587ecccb2efa3dc7276cc"
-    sha256 cellar: :any_skip_relocation, el_capitan:     "64288e33524b1d1afcc5ae7e6ff5dc1488f1793eba9452e54279054d55e93db3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8afd0b94b5b4cf2580d5bb920ab19b351ab0ef870eb15b9f69f425ab68fff076"
+    sha256 arm64_sequoia:  "e6a35a48d1b10d83a521fba9d7351be44be87017b0b7a1c16d6db72aa3874ee2"
+    sha256 arm64_sonoma:   "4f7d3a2831a685b8ff9881ff5b56fc2402b04c410d6a8b3640d4cb794154165d"
+    sha256 arm64_ventura:  "800616aa187156f940ce52ad810e23b6fe385a633948f3d666372cba6fea9727"
+    sha256 arm64_monterey: "066533943950ef805516fdd1e22b845c02ad7764b924f2922689a27549260cbb"
+    sha256 sonoma:         "e30e6506794c00b9eb288edf39bd4910e8e0a9742793319b96c48dea5f24d81d"
+    sha256 ventura:        "697228bef43eb329599da53d6156a374c008fa508473ebcd79d0dccaec003b82"
+    sha256 monterey:       "3898a6a463bdad06cbbce3792f8ef73909e98ef9f9db4483317e43a846d4175a"
+    sha256 x86_64_linux:   "a132ee6b490220cb5c060736aa796fb70b04227d53f115e605d30bf5d2784f9c"
   end
 
   depends_on "smake" => :build
 
   def install
-    ENV.deparallelize # smake does not like -j
+    deps = %w[libdeflt librmt libfind libschily]
+    deps.each { |dep| system "smake", "-C", dep }
 
-    system "smake", "GMAKE_NOWARN=true", "INS_BASE=#{prefix}", "INS_RBASE=#{prefix}", "install"
+    system "smake", "-C", "star", "INS_BASE=#{prefix}", "INS_RBASE=#{prefix}", "install"
 
     # Remove symlinks that override built-in utilities
-    (bin+"gnutar").unlink
-    (bin+"tar").unlink
-    (man1+"gnutar.1").unlink
-
-    # Remove useless files
-    lib.rmtree
-    include.rmtree
-
-    # Remove conflicting files
-    %w[makefiles makerules].each { |f| (man5/"#{f}.5").unlink }
+    (bin/"gnutar").unlink
+    (bin/"tar").unlink
+    (man1/"gnutar.1").unlink
   end
 
   test do
-    system "#{bin}/star", "--version"
+    system bin/"star", "--version"
+
+    (testpath/"test").write("Hello Homebrew!")
+    system bin/"star", "-c", "-z", "-v", "file=test.tar.gz", "test"
+    rm "test"
+    system bin/"star", "-x", "-z", "file=test.tar.gz"
+    assert_equal "Hello Homebrew!", (testpath/"test").read
   end
 end

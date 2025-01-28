@@ -11,6 +11,7 @@ class Libabw < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "a458a7c83461966a67f75a3cb31fa042af7e20befe3ef21de818ca036a8263e7"
     sha256 cellar: :any,                 arm64_sonoma:   "8ac829af4a67294bc85e6959843282df8944dc88c3d295dca20a1f7914881119"
     sha256 cellar: :any,                 arm64_ventura:  "6ad85dc29ed6262c148bd70631ea06886e1e7fce5d6c8abf66b9486d85e8055b"
     sha256 cellar: :any,                 arm64_monterey: "32cfa5aeedc8f7bff68a474f0bb6cc8d3501b301bb57c3a13c2a3bf535bedada"
@@ -24,7 +25,7 @@ class Libabw < Formula
   end
 
   depends_on "boost" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "librevenge"
 
   uses_from_macos "gperf" => :build
@@ -32,7 +33,7 @@ class Libabw < Formula
   uses_from_macos "zlib"
 
   def install
-    system "./configure", *std_configure_args, "--disable-silent-rules", "--without-docs"
+    system "./configure", "--disable-silent-rules", "--without-docs", *std_configure_args
     system "make", "install"
   end
 
@@ -82,7 +83,7 @@ class Libabw < Formula
       </abiword>
     EOS
 
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <stdio.h>
       #include <string.h>
       #include <librevenge-stream/librevenge-stream.h>
@@ -106,9 +107,9 @@ class Libabw < Formula
         printf("ok\\n");
         return 0;
       }
-    EOS
+    CPP
 
-    assert_equal shell_output("#{bin}/abw2text test.abw"), "This word is bold.\n"
+    assert_equal "This word is bold.\n", shell_output("#{bin}/abw2text test.abw")
 
     args = %W[
       -I#{include/"libabw-0.1"} -I#{Formula["librevenge"].opt_include/"librevenge-0.0"}
@@ -116,6 +117,6 @@ class Libabw < Formula
       -labw-0.1 -lrevenge-stream-0.0 -lrevenge-generators-0.0 -lrevenge-0.0
     ]
     system ENV.cxx, "test.cpp", *args, "-o", "test"
-    assert_equal shell_output(testpath/"test"), "ok\n"
+    assert_equal "ok\n", shell_output(testpath/"test")
   end
 end

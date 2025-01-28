@@ -9,19 +9,25 @@ class Pytouhou < Formula
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sonoma:   "e83c5e161c69cc14081b875a18043a08fa60db38b9a6703d290c5f6d80da95aa"
     sha256 cellar: :any,                 arm64_ventura:  "5529fede19cacc4e69b69985db53991070de184c7a4d50adb7649264b9df7ef3"
     sha256 cellar: :any,                 arm64_monterey: "b7da4dfc02540ed042b90827630e16026eeb6dbf0cc8e66657acf2e768a78776"
     sha256 cellar: :any,                 arm64_big_sur:  "a967c785a6916c4930e9dcbc3418eba15f26242ef1988a9fbdd272059bd45bd9"
+    sha256 cellar: :any,                 sonoma:         "4844e4ee6302412c6814ace3d8429b82ea87adc30f6e0fe5970dcb757e532f57"
     sha256 cellar: :any,                 ventura:        "aaa8b69e4983370a51fd4799b5605e4d073610011170e8332eb674e5b4a6ccf2"
     sha256 cellar: :any,                 monterey:       "6a73d4bdbe1bf13e38d5a3a2ee5edbc6f41399894d28c5260d76ed7e02dbea8c"
     sha256 cellar: :any,                 big_sur:        "68865e9179adfb70ee4b113563e577f09ef0fe1bdbe1fe6f226931fe407e7fda"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "cb8bff86fc2cabba2ebc07150a44d8251dd66dc69168d0ad081c1c1ced81cda8"
   end
 
-  depends_on "pkg-config" => :build
+  # Repo fails to `hg pull` with recent `mercurial`
+  # Repo is 502 erroring and bottles are currently broken
+  disable! date: "2024-10-11", because: :does_not_build
+
+  depends_on "pkgconf" => :build
+  depends_on "cython"
   depends_on "glfw"
   depends_on "gtk+3"
-  depends_on "libcython"
   depends_on "libepoxy"
   depends_on "py3cairo"
   depends_on "pygobject3"
@@ -37,7 +43,7 @@ class Pytouhou < Formula
 
   def install
     python = "python3.11"
-    ENV.prepend_path "PYTHONPATH", Formula["libcython"].opt_libexec/Language::Python.site_packages(python)
+    ENV.prepend_path "PYTHONPATH", Formula["cython"].opt_libexec/Language::Python.site_packages(python)
 
     # hg can't determine revision number (no .hg on the stage)
     inreplace "setup.py", /(version)=.+,$/, "\\1='#{version}',"

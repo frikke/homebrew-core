@@ -6,7 +6,8 @@ class Plog < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ee9e1fc1f2fb038c2432470cd3fda51be3fb90638f48a90f69fea2139053f48d"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "97760bb532e44bf5f1d01856ec41448c1ba1f092b5abacaa5338c9a27be6567a"
   end
 
   depends_on "cmake" => [:build, :test]
@@ -18,16 +19,16 @@ class Plog < Formula
   end
 
   test do
-    (testpath/"CMakeLists.txt").write <<~EOS
+    (testpath/"CMakeLists.txt").write <<~CMAKE
       cmake_minimum_required(VERSION 3.5)
       project(TestPlog)
       find_package(plog REQUIRED)
 
       add_executable(test_plog test.cpp)
       include_directories(${PLOG_INCLUDE_DIRS})
-    EOS
+    CMAKE
 
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <plog/Log.h> // Step1: include the headers
       #include "plog/Initializers/RollingFileInitializer.h"
 
@@ -49,7 +50,7 @@ class Plog < Formula
 
           return 0;
       }
-    EOS
+    CPP
 
     system "cmake", "-S", ".", "-B", "build", "-DCMAKE_BUILD_TYPE=Debug", *std_cmake_args
     system "cmake", "--build", "build", "--target", "test_plog"

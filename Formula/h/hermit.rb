@@ -1,18 +1,17 @@
 class Hermit < Formula
   desc "Manages isolated, self-bootstrapping sets of tools in software projects"
   homepage "https://cashapp.github.io/hermit"
-  url "https://github.com/cashapp/hermit/archive/refs/tags/v0.37.0.tar.gz"
-  sha256 "b04358caa1f6c33cb8d6f2b53541537057ce249489b5349f327323e8f46ae443"
+  url "https://github.com/cashapp/hermit/archive/refs/tags/v0.43.0.tar.gz"
+  sha256 "074423ba79c4784704d84f1e31d80d4666723542a0a4d08d313e0ba7d44ed10a"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0bbb7e20d6f44b14fa8779a73968e4e71acf7da5b59680d609a4c5655ce8e11a"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4ac577b3aa211d420e01ab6f99315d1e8c3c37954f4bdae031a21d37a5bafc92"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5df2f4cde90e3348cb0e717d49cd49dbe859e47ac257a35f352f1f3b1f5c1648"
-    sha256 cellar: :any_skip_relocation, ventura:        "c05532c6f0116035c0cfc0c32cd6548e288285e5a4e25d6c24275fcdf6ad1946"
-    sha256 cellar: :any_skip_relocation, monterey:       "ca5902d555e74350bf82f0599a03510cd65ccc1c7f47e3cda9ab38050aaf04dc"
-    sha256 cellar: :any_skip_relocation, big_sur:        "1d49b6cdb38f7e83a69d5dc730822e8649bd5736e967eeb8d73f1049978fee26"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "381f36b84ddaa6b2a7c42cc8adeea632e8ea208c1f31a2f34fbaeae1e1a394f8"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "66bc204347a73b68331e2a3f3f0669deddc756a7882f0876c7abd6dc22978c34"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "285121b40cb14952ce0db14c3fd16a3377400a6503ebd79eb2057cb2c6eca047"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f95b5aafc0122ad428969a1bb73d367451d6c8f6419603a78d52cfa380cdb76f"
+    sha256 cellar: :any_skip_relocation, sonoma:        "64986f0b15d1ee627f9bbc68f0ee87bc5a97a1b3c8d7740b00e138d19ec68d93"
+    sha256 cellar: :any_skip_relocation, ventura:       "c995db892d4f29d23b3500f46a510c7681f312ecb7fe3e80c4bbd0ba76453d09"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e0806d78091a3b50b3a6e4206423f5a13ed7a2b3ffc9cba214e51d6d5a274455"
   end
 
   depends_on "go" => :build
@@ -23,7 +22,7 @@ class Hermit < Formula
       -X main.version=#{version}
       -X main.channel=stable
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/hermit"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/hermit"
   end
 
   def caveats

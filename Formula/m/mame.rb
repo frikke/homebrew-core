@@ -1,9 +1,9 @@
 class Mame < Formula
   desc "Multiple Arcade Machine Emulator"
   homepage "https://mamedev.org/"
-  url "https://github.com/mamedev/mame/archive/mame0258.tar.gz"
-  version "0.258"
-  sha256 "aca1365f3e1a1c8fe1638206f1c6176da08cbe686586c55355068179c023096b"
+  url "https://github.com/mamedev/mame/archive/refs/tags/mame0273.tar.gz"
+  version "0.273"
+  sha256 "37d73e7772bd78ffffabac69a694323f37fd2215f1b5244e05b872c0154785fd"
   license "GPL-2.0-or-later"
   head "https://github.com/mamedev/mame.git", branch: "master"
 
@@ -19,19 +19,17 @@ class Mame < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c2df1e4bbaf3c543f1eb7d144feda042eef884921ff6bbc4999e32499b05ceda"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c86ac70530295e1582edf3c7662c33ab747f6aec55692b0cc1691963610f92bc"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bd025fe448c45d0c38c65a2129c8d4dcd6c0dcf7176439c599331ba59f7fdb20"
-    sha256 cellar: :any_skip_relocation, ventura:        "89b3dbee853e6f287ddea63d0bc90f199276d40cf00b903bd026be63d788fd2c"
-    sha256 cellar: :any_skip_relocation, monterey:       "051d50e9fa0c472e49b132db26bfe3c88924e4f31cb95deaf5d74b0f3b318aae"
-    sha256 cellar: :any_skip_relocation, big_sur:        "886be7c511aa89583a42f865b57fd240ea33b31c37b2f92e4d60e48eaa2cdaf7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "891128cfb34ab6de83392d056d46b458da5c288d3d88527aa8bc2d168361d039"
+    sha256 cellar: :any,                 arm64_sequoia: "f069aa5cf80067f758b9b1bc63303492bf4f819a90ac812fdae37b626cf9fb8d"
+    sha256 cellar: :any,                 arm64_sonoma:  "52de93bc13f0fad3829641c5aa08cabcb3159de54fa06b2b1bfeaa9454f6378d"
+    sha256 cellar: :any,                 arm64_ventura: "b6f4091433e95808cd882e99e21076196319231188c3cae6dd6081b1279e7bc8"
+    sha256 cellar: :any,                 sonoma:        "913a12b08015d276de7c76b5f6f1c06de9ac3f58f204593bd5c9fd0111be64ed"
+    sha256 cellar: :any,                 ventura:       "ab54c599924c240850011c58428da5a9e566f0c5f0bab51be5cc1beb2429835a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "75a8f89b593eae23b8ace83ee182db3a0d07cfbbc740226b9b3aab0ecdca069f"
   end
 
   depends_on "asio" => :build
   depends_on "glm" => :build
-  depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "pkgconf" => :build
   depends_on "rapidjson" => :build
   depends_on "sphinx-doc" => :build
   depends_on "flac"
@@ -44,31 +42,35 @@ class Mame < Formula
   depends_on "sdl2"
   depends_on "sqlite"
   depends_on "utf8proc"
+  depends_on "zstd"
 
+  uses_from_macos "python" => :build
   uses_from_macos "expat"
   uses_from_macos "zlib"
 
   on_linux do
+    depends_on "fontconfig"
+    depends_on "libx11"
+    depends_on "libxi"
+    depends_on "mesa"
     depends_on "pulseaudio"
-    depends_on "qt@5"
+    depends_on "qt"
     depends_on "sdl2_ttf"
   end
 
-  fails_with gcc: "5"
-  fails_with gcc: "6"
-
   def install
+    ENV["QT_HOME"] = Formula["qt"].opt_prefix if OS.linux?
+
     # Cut sdl2-config's invalid option.
     inreplace "scripts/src/osd/sdl.lua", "--static", ""
 
     # Use bundled lua instead of latest version.
     # https://github.com/mamedev/mame/issues/5349
-    system "make", "PYTHON_EXECUTABLE=#{Formula["python@3.11"].opt_bin}/python3.11",
+    system "make", "PYTHON_EXECUTABLE=#{which("python3")}",
                    "USE_LIBSDL=1",
                    "USE_SYSTEM_LIB_EXPAT=1",
                    "USE_SYSTEM_LIB_ZLIB=1",
                    "USE_SYSTEM_LIB_ASIO=1",
-                   "USE_SYSTEM_LIB_LUA=",
                    "USE_SYSTEM_LIB_FLAC=1",
                    "USE_SYSTEM_LIB_GLM=1",
                    "USE_SYSTEM_LIB_JPEG=1",
@@ -77,7 +79,9 @@ class Mame < Formula
                    "USE_SYSTEM_LIB_PUGIXML=1",
                    "USE_SYSTEM_LIB_RAPIDJSON=1",
                    "USE_SYSTEM_LIB_SQLITE3=1",
-                   "USE_SYSTEM_LIB_UTF8PROC=1"
+                   "USE_SYSTEM_LIB_UTF8PROC=1",
+                   "USE_SYSTEM_LIB_ZSTD=1",
+                   "VERBOSE=1"
     bin.install "mame"
     cd "docs" do
       # We don't convert SVG files into PDF files, don't load the related extensions.
@@ -92,6 +96,6 @@ class Mame < Formula
 
   test do
     assert shell_output("#{bin}/mame -help").start_with? "MAME v#{version}"
-    system "#{bin}/mame", "-validate"
+    system bin/"mame", "-validate"
   end
 end

@@ -12,6 +12,7 @@ class Libdivecomputer < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "2d1fcffb41e208dda7721558578c6c6f212d758b9782449ce1f800d89e05c1cb"
     sha256 cellar: :any,                 arm64_sonoma:   "8dd4c53baa97fba521444635e28477af5651cb22ab242ce6a6cb3725175b7056"
     sha256 cellar: :any,                 arm64_ventura:  "94af44c0b407fae8f45e0d5f5fb86fe92f5464efe57d316eb71526aa68eac264"
     sha256 cellar: :any,                 arm64_monterey: "84b1aab56409e9842deab38dab5dc8a9f7ddd1c7f0ea5ad68b9bcd31733645fb"
@@ -26,17 +27,17 @@ class Libdivecomputer < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libusb"
 
   def install
-    system "autoreconf", "--install" if build.head?
-    system "./configure", "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libdivecomputer/context.h>
       #include <libdivecomputer/descriptor.h>
       #include <libdivecomputer/iterator.h>
@@ -51,7 +52,7 @@ class Libdivecomputer < Formula
         dc_iterator_free(iterator);
         return 0;
       }
-    EOS
+    C
     flags = %W[
       -I#{include}
       -L#{lib}

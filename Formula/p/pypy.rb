@@ -1,10 +1,11 @@
 class Pypy < Formula
   desc "Highly performant implementation of Python 2 in Python"
   homepage "https://pypy.org/"
-  url "https://downloads.python.org/pypy/pypy2.7-v7.3.12-src.tar.bz2"
-  sha256 "dd61d88da274c2ce2cec77667d4a3df9a652bcc50e26f90991d4dd0af66bccf4"
+  url "https://downloads.python.org/pypy/pypy2.7-v7.3.17-src.tar.bz2"
+  sha256 "50e06840f4bbde91448080a4118068a89b8fbcae25ff8da1e2bb1402dc9a0346"
   license "MIT"
-  head "https://foss.heptapod.net/pypy/pypy", using: :hg
+  revision 1
+  head "https://github.com/pypy/pypy.git", branch: "main"
 
   livecheck do
     url "https://downloads.python.org/pypy/"
@@ -12,20 +13,19 @@ class Pypy < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "72d020e6636b793655a7dbf76426943edc64b82c26a12d37249d4dd55785d64b"
-    sha256 cellar: :any,                 arm64_monterey: "44bc02650e5b0c879956e328cb2a0ec61b3076d6d71945fb0edec7dec218266a"
-    sha256 cellar: :any,                 arm64_big_sur:  "02c8c813d93fe2f9d030b1545f65d840bcacaf5b5e00f83ab50830fa9a186015"
-    sha256 cellar: :any,                 ventura:        "3cea00e5b65cc015f85d381dc130de64976f7d98dba2e7f831beecd207b49cf5"
-    sha256 cellar: :any,                 monterey:       "d4394557612b898ab032706d741659769e8ef1fef38b7a25dc874bbfe48ddf6e"
-    sha256 cellar: :any,                 big_sur:        "1df1252d1edf27d93c3e2d022902463150196c08780a51f0dc96c86c6830d09d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "55263b35f3525afeaa7699687863b558f1f3d43ec50ea38455e60f42b3fed6f2"
+    sha256 cellar: :any,                 arm64_sequoia: "fde9ad14a4d4238ffb86ac7678048eb59812d4a80e4806673b5a4aa1920d4c07"
+    sha256 cellar: :any,                 arm64_sonoma:  "a722ce7fead5aa7d217259ac716fe2de88348daacf3f4b6d39c374ebb64b4693"
+    sha256 cellar: :any,                 arm64_ventura: "f91f6d9db8f89df16a513550f0d8bf344da4c05689faab09e675accc8cd3b117"
+    sha256 cellar: :any,                 sonoma:        "26aff7d94b19d7c8a73dfcf547d0ae4933205e70307d7af06eec8374a5908997"
+    sha256 cellar: :any,                 ventura:       "dfc471f6f2dcbedfbad9f928dd2f77d2b7c33e48c954692f3d7e15636302912c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e3ec62e5d6a517ee0fd009759b2931a0c040b18e0693414a5d45a74e4f48f644"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gdbm"
   depends_on "openssl@3"
   depends_on "sqlite"
-  depends_on "tcl-tk"
+  depends_on "tcl-tk@8"
 
   uses_from_macos "bzip2"
   uses_from_macos "expat"
@@ -71,10 +71,27 @@ class Pypy < Formula
   patch :DATA
 
   def install
+    # Work-around for build issue with Xcode 15.3
+    # upstream bug report, https://github.com/pypy/pypy/issues/4931
+    ENV.append_to_cflags "-Wno-incompatible-function-pointer-types" if DevelopmentTools.clang_build_version >= 1500
+
     # The `tcl-tk` library paths are hardcoded and need to be modified for non-/usr/local prefix
+    tcltk = Formula["tcl-tk@8"]
     inreplace "lib_pypy/_tkinter/tklib_build.py" do |s|
-      s.gsub! "/usr/local/opt/tcl-tk/", Formula["tcl-tk"].opt_prefix/""
-      s.gsub! "/include'", "/include/tcl-tk'"
+      s.gsub! "['/usr/local/opt/tcl-tk/include']", "[]"
+      s.gsub! "(homebrew + '/include')", "('#{tcltk.opt_include}/tcl-tk')"
+      s.gsub! "(homebrew + '/opt/tcl-tk/lib')", "('#{tcltk.opt_lib}')"
+    end
+
+    if OS.mac?
+      # Allow python modules to use ctypes.find_library to find homebrew's stuff
+      # even if homebrew is not a /usr/local/lib. Try this with:
+      # `brew install enchant && pip install pyenchant`
+      inreplace "lib-python/2.7/ctypes/macholib/dyld.py" do |f|
+        f.gsub! "DEFAULT_LIBRARY_FALLBACK = [",
+                "DEFAULT_LIBRARY_FALLBACK = [ '#{HOMEBREW_PREFIX}/lib',"
+        f.gsub! "DEFAULT_FRAMEWORK_FALLBACK = [", "DEFAULT_FRAMEWORK_FALLBACK = [ '#{HOMEBREW_PREFIX}/Frameworks',"
+      end
     end
 
     # See https://github.com/Homebrew/homebrew/issues/24364
@@ -119,9 +136,9 @@ class Pypy < Formula
     # Symlink the prefix site-packages into the cellar.
     unless (libexec/"site-packages").symlink?
       # fix the case where libexec/site-packages/site-packages was installed
-      rm_rf libexec/"site-packages/site-packages"
+      rm_r(libexec/"site-packages/site-packages") if (libexec/"site-packages/site-packages").exist?
       mv Dir[libexec/"site-packages/*"], prefix_site_packages
-      rm_rf libexec/"site-packages"
+      rm_r(libexec/"site-packages")
     end
     libexec.install_symlink prefix_site_packages
 

@@ -3,7 +3,7 @@ class Primer3 < Formula
   homepage "https://primer3.sourceforge.net/"
   url "https://downloads.sourceforge.net/project/primer3/primer3/2.4.0/primer3-2.4.0.tar.gz"
   sha256 "6d537640c86e2b4656ae77f75b6ad4478fd0ca43985a56cce531fb9fc0431c47"
-  license "GPL-2.0"
+  license "GPL-2.0-or-later"
 
   livecheck do
     url :stable
@@ -11,9 +11,12 @@ class Primer3 < Formula
   end
 
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "2728876dc573d38b7296d673b6b20276ed1f90bb45c720ab52bcaabfc64b6ecb"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "39ad3540677540e405f8e3d326440293ce1c739b48db1b5cc2fca236dc48241b"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "c19c2ed79dfef6f4b0f70b620180c46c017e462f44c3a3ded6abc42244071e01"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "3651f78cf06ef84f0eaf2d4e9b136cdbf8775439021eab152b7c436e88f2ef65"
     sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fff8629911a86916818473abdca4480363217ee8c371808bf22d87449c02df6c"
+    sha256 cellar: :any_skip_relocation, sonoma:         "df0495ae871aee4d5026c34a39617106f0e7840b8b5e12fd65f44193a1fc8836"
     sha256 cellar: :any_skip_relocation, ventura:        "51b592f2ea33fc4f91abd346e6b4122cf928fd8586321d5ab73f433d05f0040f"
     sha256 cellar: :any_skip_relocation, monterey:       "c188cd7edb1bdaa613ec3307dc3292ccb9aa6deaafe1da6afa1540203a135cc3"
     sha256 cellar: :any_skip_relocation, big_sur:        "ad1892c4c516bd5865fbf63eb5ee843c6c090c2977d762bf029b907bed2c4730"

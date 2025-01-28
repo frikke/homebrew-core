@@ -1,43 +1,49 @@
 class Osmcoastline < Formula
   desc "Extracts coastline data from OpenStreetMap planet file"
   homepage "https://osmcode.org/osmcoastline/"
-  url "https://github.com/osmcode/osmcoastline/archive/v2.4.0.tar.gz"
-  sha256 "2c1a28313ed19d6e2fb1cb01cde8f4f44ece378393993b0059f447c5fce11f50"
+  url "https://github.com/osmcode/osmcoastline/archive/refs/tags/v2.4.1.tar.gz"
+  sha256 "3a76ed8c8481e5499c8fedbba3b6af4f33f73bbbfc4e6154ea50fe48ae7054a9"
   license "GPL-3.0-or-later"
-  revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "bbd332274b375390b84ade56b4fb44cd7a5c0896ebafbf6ef5764944114fd3c9"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "87a0953864bc90e8971ccc8ff258255cebb77d677ddb946d1f4806529573ea1c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "495472ea1b183dfc23f49e2b78d75c77a5afa9a5d45277dac595da44c43c2157"
-    sha256 cellar: :any_skip_relocation, ventura:        "6360a644a0079631b9e6da6540f12973b973c7de6f85f1633f502e122e7fef92"
-    sha256 cellar: :any_skip_relocation, monterey:       "4b616a360a35c5c6dcaa25ec8e9a56b8d95cfdc570f3c3fd30e031e2fbc753db"
-    sha256 cellar: :any_skip_relocation, big_sur:        "8099f8d01ff005e1a43d5f67afcac3f9e2474d4a1d7c56bb8e61110ed7cd4d23"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "44531dd7f1c5cc978fd5b6c5b27871fff3de9106acd525fbf7818556892d1092"
+    sha256 cellar: :any,                 arm64_sequoia: "dc16d9bbd13a4f77009a7bb0c87a2461dbbf0f004a57676da70803435096cb00"
+    sha256 cellar: :any,                 arm64_sonoma:  "c89acfaeebd5e4661327ab2abb42ff5407365f251a052b97b80f3a4fddd266ac"
+    sha256 cellar: :any,                 arm64_ventura: "3c08b87fc5b15d8a778ed08c9d7cb0dcfa5935413e5a85a2a3170024118b3a78"
+    sha256 cellar: :any,                 sonoma:        "9323e20db733822fbeafb7a4042009e82a57f65e94c78855e647c9b0df01bc50"
+    sha256 cellar: :any,                 ventura:       "13ca3a9c33d469ed3a7e261ac9376d732db372f4fc7a20d06533fd3374356559"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "44ab937e69ae5ff226d3528cacbf640b3f486e311d438c02f8e40cd9202a5e18"
   end
 
   depends_on "cmake" => :build
   depends_on "libosmium" => :build
+
+  depends_on "expat"
   depends_on "gdal"
   depends_on "geos"
   depends_on "libspatialite"
   depends_on "lz4"
 
+  uses_from_macos "bzip2"
   uses_from_macos "sqlite"
   uses_from_macos "zlib"
 
-  fails_with gcc: "5"
-
-  # To fix gdal-3.7.0
-  patch do
-    url "https://github.com/osmcode/osmcoastline/commit/67cc33161069f65e315acae952492ab5ee07af15.patch?full_index=1"
-    sha256 "31b89e33b22ccdfe289a5da67480f9791bdd4f410c6a7831f0c1e007c4258e68"
-  end
-
   def install
+    # Work around an Xcode 15 linker issue which causes linkage against LLVM's
+    # libunwind due to it being present in a library search path.
+    if DevelopmentTools.clang_build_version >= 1500
+      recursive_dependencies
+        .select { |d| d.name.match?(/^llvm(@\d+)?$/) }
+        .map { |llvm_dep| llvm_dep.to_formula.opt_lib }
+        .each { |llvm_lib| ENV.remove "HOMEBREW_LIBRARY_PATHS", llvm_lib }
+    end
+
     protozero = Formula["libosmium"].opt_libexec/"include"
-    system "cmake", ".", "-DPROTOZERO_INCLUDE_DIR=#{protozero}", *std_cmake_args
-    system "make", "install"
+    args = %W[
+      -DPROTOZERO_INCLUDE_DIR=#{protozero}
+    ]
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -48,6 +54,6 @@ class Osmcoastline < Formula
       n103 v1 x1.01 y1.04
       w200 v1 Tnatural=coastline Nn100,n101,n102,n103,n100
     EOS
-    system "#{bin}/osmcoastline", "-v", "-o", "output.db", "input.opl"
+    system bin/"osmcoastline", "-v", "-o", "output.db", "input.opl"
   end
 end

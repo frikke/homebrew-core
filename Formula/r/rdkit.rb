@@ -1,8 +1,9 @@
 class Rdkit < Formula
   desc "Open-source chemoinformatics library"
   homepage "https://rdkit.org/"
-  url "https://github.com/rdkit/rdkit/archive/Release_2023_03_3.tar.gz"
-  sha256 "bdbf9a2e6988526bfeb8c56ce3cdfe2998d60ac289078e2215374288185e8c8d"
+  # NOTE: Make sure to update RPATHs if any "@rpath-referenced libraries" show up in `brew linkage`
+  url "https://github.com/rdkit/rdkit/archive/refs/tags/Release_2024_09_4.tar.gz"
+  sha256 "a5e8da75aae7e88f3a50d8577f9027c971187492a93a15085f797fe6fef74ad2"
   license "BSD-3-Clause"
   head "https://github.com/rdkit/rdkit.git", branch: "master"
 
@@ -10,108 +11,136 @@ class Rdkit < Formula
     url :stable
     regex(/^Release[._-](\d+(?:[._]\d+)+)$/i)
     strategy :git do |tags|
-      tags.map { |tag| tag[regex, 1]&.gsub("_", ".") }.compact
+      tags.filter_map { |tag| tag[regex, 1]&.tr("_", ".") }
     end
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "383ebe17c14bf3023596361e3ecd7e4f54fb524272f36534bb25646486110b02"
-    sha256 cellar: :any,                 arm64_monterey: "75f0322669b056176e339afe35f6671036bff8dc383d51c0617f73d03c47ecea"
-    sha256 cellar: :any,                 arm64_big_sur:  "c03485d7734f40bdb6aaaeab8f51cebf29873ff8bfecb4cb6aea46eed8833b92"
-    sha256 cellar: :any,                 ventura:        "ec80e4198e217243914a44a2ed7277b20ddf28c5ec107b586cbf8cec0d6fd4de"
-    sha256 cellar: :any,                 monterey:       "d9d14942d89d63233b2fc8c24ab9665daa95e56b3742d28e79c34aa93e5af040"
-    sha256 cellar: :any,                 big_sur:        "da23a449bc3e380992b3af17259f854298d7e433f97983e3f515652987df862e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "592445694917cce54595d34be738d5b3c6b44f551d64f943cddc1142412e739f"
+    sha256 cellar: :any,                 arm64_sequoia: "c8f48f4b31a3376c13d8739b9dd52e5954d4b8a8bad18b5ea0783a8ef1d3587e"
+    sha256 cellar: :any,                 arm64_sonoma:  "8164206a12dbef541b5642f2427dd91be62c931dec2987740bde9516abdef16f"
+    sha256 cellar: :any,                 arm64_ventura: "7983d7fde5a0428f59ab746589067c12e58a22c11cdcc8f984905443b1a802bf"
+    sha256 cellar: :any,                 sonoma:        "fae97a066928949c14794288f909ac1469dac9d89c128a48130ad1ddf27fa342"
+    sha256 cellar: :any,                 ventura:       "41f1289dcc6d89321afcc273fd7d78a28ac23e84614c5059d9de1f93d63a8535"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "19a5b8696d46459c9955b2014f41b82b30bf86240512d945324b8f5caab00869"
   end
 
+  depends_on "catch2" => :build
   depends_on "cmake" => :build
-  depends_on "swig" => :build
+  depends_on "pkgconf" => :build
+  depends_on "postgresql@14" => [:build, :test]
+  depends_on "postgresql@17" => [:build, :test]
   depends_on "boost"
   depends_on "boost-python3"
+  depends_on "cairo"
+  depends_on "coordgen"
   depends_on "eigen"
   depends_on "freetype"
+  depends_on "inchi"
+  depends_on "maeparser"
   depends_on "numpy"
-  depends_on "postgresql@15"
   depends_on "py3cairo"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
-  def python
-    deps.map(&:to_formula)
-        .find { |f| f.name.match?(/^python@\d\.\d+$/) }
+  def python3
+    "python3.13"
   end
 
-  # Get Python location
-  def python_executable
-    python.opt_libexec/"bin/python"
-  end
-
-  def postgresql
-    Formula["postgresql@15"]
+  def postgresqls
+    deps.filter_map { |f| f.to_formula if f.name.start_with?("postgresql@") }
+        .sort_by(&:version)
   end
 
   def install
-    ENV.libcxx
-    ENV.append "CFLAGS", "-Wno-parentheses -Wno-logical-op-parentheses -Wno-format"
-    ENV.append "CXXFLAGS", "-Wno-parentheses -Wno-logical-op-parentheses -Wno-format"
-
-    py3ver = Language::Python.major_minor_version python_executable
-    py3prefix = if OS.mac?
-      python.opt_frameworks/"Python.framework/Versions"/py3ver
-    else
-      python.opt_prefix
-    end
-    py3include = py3prefix/"include/python#{py3ver}"
-    site_packages = Language::Python.site_packages(python_executable)
-    numpy_include = Formula["numpy"].opt_prefix/site_packages/"numpy/core/include"
-
-    pg_config = postgresql.opt_bin/"pg_config"
-    postgresql_lib = Utils.safe_popen_read(pg_config, "--pkglibdir").chomp
-    postgresql_include = Utils.safe_popen_read(pg_config, "--includedir-server").chomp
-
-    # set -DMAEPARSER and COORDGEN_FORCE_BUILD=ON to avoid conflicts with some formulae i.e. open-babel
+    python_rpath = rpath(source: lib/Language::Python.site_packages(python3))
+    python_rpaths = [python_rpath, "#{python_rpath}/..", "#{python_rpath}/../.."]
     args = %W[
-      -DCMAKE_INSTALL_RPATH=#{lib}
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+      -DCMAKE_MODULE_LINKER_FLAGS=#{python_rpaths.map { |path| "-Wl,-rpath,#{path}" }.join(" ")}
+      -DCMAKE_REQUIRE_FIND_PACKAGE_coordgen=ON
+      -DCMAKE_REQUIRE_FIND_PACKAGE_maeparser=ON
+      -DCMAKE_REQUIRE_FIND_PACKAGE_Inchi=ON
+      -DINCHI_INCLUDE_DIR=#{Formula["inchi"].opt_include}/inchi
       -DRDK_INSTALL_INTREE=OFF
       -DRDK_BUILD_SWIG_WRAPPERS=OFF
       -DRDK_BUILD_AVALON_SUPPORT=ON
-      -DRDK_BUILD_PGSQL=ON
-      -DRDK_PGSQL_STATIC=ON
-      -DMAEPARSER_FORCE_BUILD=ON
-      -DCOORDGEN_FORCE_BUILD=ON
+      -DRDK_PGSQL_STATIC=OFF
       -DRDK_BUILD_INCHI_SUPPORT=ON
       -DRDK_BUILD_CPP_TESTS=OFF
       -DRDK_INSTALL_STATIC_LIBS=OFF
       -DRDK_BUILD_CAIRO_SUPPORT=ON
       -DRDK_BUILD_YAEHMOP_SUPPORT=ON
       -DRDK_BUILD_FREESASA_SUPPORT=ON
-      -DBoost_NO_BOOST_CMAKE=ON
-      -DPYTHON_INCLUDE_DIR=#{py3include}
-      -DPYTHON_EXECUTABLE=#{python_executable}
-      -DPYTHON_NUMPY_INCLUDE_PATH=#{numpy_include}
-      -DPostgreSQL_LIBRARY=#{postgresql_lib}
-      -DPostgreSQL_INCLUDE_DIR=#{postgresql_include}
+      -DPython3_EXECUTABLE=#{which(python3)}
     ]
-
-    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    if build.bottle? && Hardware::CPU.intel? && (!OS.mac? || !MacOS.version.requires_sse42?)
+      args << "-DRDK_OPTIMIZE_POPCNT=OFF"
+    end
+    system "cmake", "-S", ".", "-B", "build", "-DRDK_BUILD_PGSQL=OFF", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
 
-    (prefix/site_packages/"homebrew-rdkit.pth").write libexec/site_packages
+    inreplace "Code/PgSQL/rdkit/CMakeLists.txt" do |s|
+      # Prevent trying to install into pg_config-defined dirs
+      s.sub! "set(PG_PKGLIBDIR \"${PG_PKGLIBDIR}", "set(PG_PKGLIBDIR \"$ENV{PG_PKGLIBDIR}"
+      s.sub! "set(PG_EXTENSIONDIR \"${PG_SHAREDIR}", "set(PG_EXTENSIONDIR \"$ENV{PG_SHAREDIR}"
+      # Re-use installed libraries when building modules for other PostgreSQL versions
+      s.sub!(/^find_package\(PostgreSQL/, "find_package(Cairo REQUIRED)\nfind_package(rdkit REQUIRED)\n\\0")
+      s.sub! 'set(pgRDKitLibs "${pgRDKitLibs}${pgRDKitLib}', 'set(pgRDKitLibs "${pgRDKitLibs}RDKit::${pgRDKitLib}'
+      s.sub! ";${INCHI_LIBRARIES};", ";"
+      # Add RPATH for PostgreSQL cartridge
+      s.sub! '"-Wl,-dead_strip_dylibs ', "\\0-Wl,-rpath,#{loader_path}/.. "
+    end
+    ENV["DESTDIR"] = "/" # to force creation of non-standard PostgreSQL directories
+
+    postgresqls.each do |postgresql|
+      ENV["PG_PKGLIBDIR"] = lib/postgresql.name
+      ENV["PG_SHAREDIR"] = share/postgresql.name
+      builddir = "build_pg#{postgresql.version.major}"
+
+      system "cmake", "-S", ".", "-B", builddir,
+                      "-DRDK_BUILD_PGSQL=ON",
+                      "-DPostgreSQL_ROOT=#{postgresql.opt_prefix}",
+                      "-DPostgreSQL_ADDITIONAL_VERSIONS=#{postgresql.version.major}",
+                      *args, *std_cmake_args
+      system "cmake", "--build", "#{builddir}/Code/PgSQL/rdkit"
+      system "cmake", "--install", builddir, "--component", "pgsql"
+    end
   end
 
   def caveats
     <<~EOS
-      You may need to add RDBASE to your environment variables.
-      For Bash, put something like this in your $HOME/.bashrc:
-        export RDBASE=#{opt_share}/RDKit
+      You may need to add RDBASE to your environment variables, e.g.
+        #{Utils::Shell.export_value("RDBASE", "#{opt_share}/RDKit")}
     EOS
   end
 
   test do
-    system python_executable, "-c", "import rdkit"
-    (testpath/"test.py").write <<~EOS
-      from rdkit import Chem ; print(Chem.MolToSmiles(Chem.MolFromSmiles('C1=CC=CN=C1')))
-    EOS
-    assert_match "c1ccncc1", shell_output("#{python_executable} test.py 2>&1")
+    # Test Python module
+    (testpath/"test.py").write <<~PYTHON
+      from rdkit import Chem
+      print(Chem.MolToSmiles(Chem.MolFromSmiles('C1=CC=CN=C1')))
+    PYTHON
+    assert_equal "c1ccncc1", shell_output("#{python3} test.py 2>&1").chomp
+
+    # Test PostgreSQL extension
+    ENV["LC_ALL"] = "C"
+    postgresqls.each do |postgresql|
+      pg_ctl = postgresql.opt_bin/"pg_ctl"
+      psql = postgresql.opt_bin/"psql"
+      port = free_port
+
+      datadir = testpath/postgresql.name
+      system pg_ctl, "initdb", "-D", datadir
+      (datadir/"postgresql.conf").write <<~EOS, mode: "a+"
+
+        port = #{port}
+      EOS
+      system pg_ctl, "start", "-D", datadir, "-l", testpath/"log-#{postgresql.name}"
+      begin
+        system psql, "-p", port.to_s, "-c", "CREATE EXTENSION \"rdkit\";", "postgres"
+      ensure
+        system pg_ctl, "stop", "-D", datadir
+      end
+    end
   end
 end

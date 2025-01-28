@@ -1,9 +1,9 @@
 class Icon < Formula
   desc "General-purpose programming language"
   homepage "https://www.cs.arizona.edu/icon/"
-  url "https://github.com/gtownsend/icon/archive/v9.5.23a.tar.gz"
-  version "9.5.23a"
-  sha256 "0c2e8b70a19e476c7a5a4aaaa46160f2f6197d14d6f8e01e164b6a3fff8c210a"
+  url "https://github.com/gtownsend/icon/archive/refs/tags/v9.5.24b.tar.gz"
+  version "9.5.24b"
+  sha256 "85d695ab34d62f86d5b08f5bde91200026c1fc5a67f33f47c498f96e72543c62"
   license :public_domain
 
   livecheck do
@@ -12,13 +12,12 @@ class Icon < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "96ab681e8b11b84c91341c9e26a9e62bd06d46628a34ae82feb6667d60558a5e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "46c07df0ca96d6e542ca60a408033a6a2028452bab870ea9d2d2d8c491e13548"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "45f71cd63309a5a437ee540298cd1a4e4cfa0fd29b053f92adea1629a3aac410"
-    sha256 cellar: :any_skip_relocation, ventura:        "44bea37decf07d99d970287f3f5362e3d7fec53bb789369b66dd9217ff454a8a"
-    sha256 cellar: :any_skip_relocation, monterey:       "ce826fdbdec5d74f7d874f1a751744be35f0cbd0d2bdd7aca2407fed819bb2aa"
-    sha256 cellar: :any_skip_relocation, big_sur:        "27fb48cd05938d4c0952659d66768e9828126dc83c839ee795c3f446263c033f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "71876d0cb174f898273ea8bce7de8bf6a3078dafa5394c1bab9c3b8912663d43"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a20d67451650cdfea1f41e28644395e799c8cb02de9e9dc452d5ceffee1a6833"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ecc07e8c403f9de87e9be35a1e130633b38dcfb081c427b11db3a72c14d457f7"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "ce83ff988cba709e562c1f9eb10b83b213dac39c0fbf5f35a0c604e5d946b395"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b0b3a9d4c3edecb4a85b91b50b434c0d2e1340ca56fd363255ad21e7e3d67566"
+    sha256 cellar: :any_skip_relocation, ventura:       "305fba963c8ec8927afab6c2418cc27833fe06dd384549d2c84dfc6f68e556fc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dd4a8c1440be1ac2b3dee44a515b8b0b9a173081242f1afa024a82bb03fa88f5"
   end
 
   def install

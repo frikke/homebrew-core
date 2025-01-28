@@ -4,17 +4,13 @@ class Packer < Formula
   # NOTE: Do not bump to 1.10.0 as license changed to BUSL-1.1
   # https://github.com/hashicorp/packer/pull/12568
   # https://github.com/hashicorp/packer/pull/12575
-  url "https://github.com/hashicorp/packer/archive/v1.9.4.tar.gz"
+  url "https://github.com/hashicorp/packer/archive/refs/tags/v1.9.4.tar.gz"
   sha256 "c07db8375190668571077784f4a650514d6ef879ae45cb4c3c1717ad8308c47e"
   license "MPL-2.0"
   head "https://github.com/hashicorp/packer.git", branch: "main"
 
-  livecheck do
-    url "https://releases.hashicorp.com/packer/"
-    regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["' >]}i)
-  end
-
   bottle do
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d67db7e0fdf90d1d7531d79c42383ded2451fe88b6c3da67342a3b29e2cda2f8"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:   "a88ef4032fc80f0347ece6d35b91a41ebed9aed3ed04af63d1dd03e809d324aa"
     sha256 cellar: :any_skip_relocation, arm64_ventura:  "e14a06bebe83306fa56aade8483619adaf96fd85fb1a00ee7b6369b55b631995"
     sha256 cellar: :any_skip_relocation, arm64_monterey: "05ab86d40ff440b8ccc078834079db25b5c1b68503e43cd6a04770dd73a6630c"
@@ -25,6 +21,9 @@ class Packer < Formula
     sha256 cellar: :any_skip_relocation, big_sur:        "0300b120685c80a97e1d4059e9fca8005dfeb45313d5499935bd782bb592288c"
     sha256 cellar: :any_skip_relocation, x86_64_linux:   "dd24e327731cd263982ff7b0b47e6c9d4ac253c7b3da82ad79d15f182abed659"
   end
+
+  # https://www.hashicorp.com/blog/hashicorp-adopts-business-source-license
+  disable! date: "2024-09-27", because: "will change its license to BUSL on the next release"
 
   depends_on "go" => :build
 
@@ -37,9 +36,19 @@ class Packer < Formula
     zsh_completion.install "contrib/zsh-completion/_packer"
   end
 
+  def caveats
+    <<~EOS
+      We will not accept any new packer releases in homebrew/core (with the BUSL license).
+      The next release will change to a non-open-source license:
+      https://www.hashicorp.com/blog/hashicorp-adopts-business-source-license
+      See our documentation for acceptable licences:
+        https://docs.brew.sh/License-Guidelines
+    EOS
+  end
+
   test do
     minimal = testpath/"minimal.json"
-    minimal.write <<~EOS
+    minimal.write <<~JSON
       {
         "builders": [{
           "type": "amazon-ebs",
@@ -57,7 +66,7 @@ class Packer < Formula
           ]
         }]
       }
-    EOS
-    system "#{bin}/packer", "validate", "-syntax-only", minimal
+    JSON
+    system bin/"packer", "validate", "-syntax-only", minimal
   end
 end

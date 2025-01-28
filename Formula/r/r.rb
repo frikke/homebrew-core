@@ -1,9 +1,10 @@
 class R < Formula
   desc "Software environment for statistical computing"
   homepage "https://www.r-project.org/"
-  url "https://cran.r-project.org/src/base/R-4/R-4.3.1.tar.gz"
-  sha256 "8dd0bf24f1023c6f618c3b317383d291b4a494f40d73b983ac22ffea99e4ba99"
+  url "https://cran.r-project.org/src/base/R-4/R-4.4.2.tar.gz"
+  sha256 "1578cd603e8d866b58743e49d8bf99c569e81079b6a60cf33cdf7bdffeb817ec"
   license "GPL-2.0-or-later"
+  revision 2
 
   livecheck do
     url "https://cran.rstudio.com/banner.shtml"
@@ -11,34 +12,49 @@ class R < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "0999a611bd86ed0aab4dc647463346ff6e7c1916389368969f90028c59a40513"
-    sha256 arm64_ventura:  "03572aa09e9d6e8ed06dde44121aae8fe6a28940c3c62d9e054ab17e688de796"
-    sha256 arm64_monterey: "38f64327801c7477652fdcb0e5d2d2445aa64702e6f88385a8326ee74da98185"
-    sha256 arm64_big_sur:  "b3400b4a83c742dc67a830ff89da9ca69a78a95b232d6adbd873ed8ce1e0dcab"
-    sha256 ventura:        "371c52d60ab6b05a465117bb46caf5a30d215fbb06dec5102a52b3c87cdaf02c"
-    sha256 monterey:       "29874a13f3db112cf2522b143b8bacf062df7faebfc0823b70a31840cc56536f"
-    sha256 big_sur:        "542e95192e5357723d75072f67700d48ee139f7bcaf58fea769e4ea158cd313e"
-    sha256 x86_64_linux:   "84e5cc4ff05da320cc75260a8c38f8171822a410261c1b6ef51b92b80d1513dd"
+    sha256 arm64_sequoia: "f1d78b921640ef5812a8bd94937853dd01f0a21da2d69d18a20f627101ed9bcb"
+    sha256 arm64_sonoma:  "953086cec342bd7cc121c0c59f7dddf1c666905d719eadf1d77aefc76f57dbde"
+    sha256 arm64_ventura: "5b394ab291177353357bfcc2d5d7ab4097b23ddc50f9346bd3ef94659a75f09d"
+    sha256 sonoma:        "e575dff30a4305b5a9a1e9e510c3583ce51d991281fdb48c5138f582e7c82055"
+    sha256 ventura:       "40f8186e96f4fd507f7b8d653a5d891dc488fa950e987c651feafa3ff81fb025"
+    sha256 x86_64_linux:  "6a984c21e657a33571022f0254219c0f220c225a9d39379f5e3240eedcd71188"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "cairo"
   depends_on "gcc" # for gfortran
   depends_on "gettext"
   depends_on "jpeg-turbo"
   depends_on "libpng"
+  depends_on "libxext"
   depends_on "openblas"
   depends_on "pcre2"
   depends_on "readline"
-  depends_on "tcl-tk"
+  depends_on "tcl-tk@8"
   depends_on "xz"
 
+  uses_from_macos "bzip2"
   uses_from_macos "curl"
-  uses_from_macos "icu4c"
   uses_from_macos "libffi", since: :catalina
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "fontconfig"
+    depends_on "freetype"
+    depends_on "libx11"
+    depends_on "libxau"
+    depends_on "libxcb"
+    depends_on "libxdmcp"
+    depends_on "libxrender"
+    depends_on "pixman"
+  end
 
   on_linux do
+    depends_on "glib"
+    depends_on "harfbuzz"
+    depends_on "icu4c@76"
     depends_on "libice"
+    depends_on "libsm"
     depends_on "libtirpc"
     depends_on "libx11"
     depends_on "libxt"
@@ -61,8 +77,8 @@ class R < Formula
     args = [
       "--prefix=#{prefix}",
       "--enable-memory-profiling",
-      "--with-tcl-config=#{Formula["tcl-tk"].opt_lib}/tclConfig.sh",
-      "--with-tk-config=#{Formula["tcl-tk"].opt_lib}/tkConfig.sh",
+      "--with-tcl-config=#{Formula["tcl-tk@8"].opt_lib}/tclConfig.sh",
+      "--with-tk-config=#{Formula["tcl-tk@8"].opt_lib}/tkConfig.sh",
       "--with-blas=-L#{Formula["openblas"].opt_lib} -lopenblas",
       "--enable-R-shlib",
       "--disable-java",
@@ -102,11 +118,9 @@ class R < Formula
       system "make", "install"
     end
 
-    cd "src/nmath/standalone" do
-      system "make"
-      ENV.deparallelize do
-        system "make", "install"
-      end
+    system "make", "-C", "src/nmath/standalone"
+    ENV.deparallelize do
+      system "make", "-C", "src/nmath/standalone", "install"
     end
 
     r_home = lib/"R"
@@ -122,10 +136,9 @@ class R < Formula
     lib.install_symlink Dir[r_home/"lib/*"]
 
     # avoid triggering mandatory rebuilds of r when gcc is upgraded
-    check_replace = OS.mac?
     inreplace lib/"R/etc/Makeconf", Formula["gcc"].prefix.realpath,
                                     Formula["gcc"].opt_prefix,
-                                    check_replace
+                                    audit_result: OS.mac?
   end
 
   def post_install

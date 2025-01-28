@@ -1,8 +1,8 @@
 class Dropbear < Formula
   desc "Small SSH server/client for POSIX-based system"
   homepage "https://matt.ucc.asn.au/dropbear/dropbear.html"
-  url "https://matt.ucc.asn.au/dropbear/releases/dropbear-2022.83.tar.bz2"
-  sha256 "bc5a121ffbc94b5171ad5ebe01be42746d50aa797c9549a4639894a16749443b"
+  url "https://matt.ucc.asn.au/dropbear/releases/dropbear-2024.86.tar.bz2"
+  sha256 "e78936dffc395f2e0db099321d6be659190966b99712b55c530dd0a1822e0a5e"
   license "MIT"
 
   livecheck do
@@ -11,14 +11,12 @@ class Dropbear < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "dcec1a39e5a5e4690a070e3398328890065cdd2d62b879fe0c1998f33a8a2f51"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2453eaa6d3db311eb4c1fbfbbc015b9092d41d480fb202de62db2a9b629304e4"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b8bb3270365893e046581536ca68247bc076db996792d6e12276076043dc353b"
-    sha256 cellar: :any_skip_relocation, ventura:        "3ccd7deee49ca74c101c186ba01eb2bfbcfc0584b73beabb937bf1b95fd367d3"
-    sha256 cellar: :any_skip_relocation, monterey:       "e2fb94f5c26f62ba93143a24ede11996f1c6ed95b471012284f8c03feb764a45"
-    sha256 cellar: :any_skip_relocation, big_sur:        "156af560dbd95b6265fc5eea98d8f8c543c3273033ee92f99bff4d0128cb01d4"
-    sha256 cellar: :any_skip_relocation, catalina:       "7aab9e4151373680365e78a39474493b6a381bc8a24ad55a6c232018fe4644f8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "936ac3ad8df5dae23a2ad663ceceeaa67c9b68862dab3d92d8d13235bf0d080a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3e29395a023ddb759271d39c25e8d617ba5c4289e58fea0209b7271566c4c2e4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "017e16888e6f0d05adbade2eee8ac8fa380ed4d47cf3dbb14a139f8274e98bdb"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "86fb52679bb14e9b71bccc1e1fa720bbd66d30d8c8799f21cf4ab2ab978687a9"
+    sha256 cellar: :any_skip_relocation, sonoma:        "001918a57d55adfc29571bb1344a5fd4872e2b05ba0b1bb2ee640c40ecb48c81"
+    sha256 cellar: :any_skip_relocation, ventura:       "2f9dd80d129c81a4169499b49e5492e9f20ecd783cc39a02b6ef1e4d2f0c75d4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e27cd4a21c7a4f699ca726bb5d8b5220acb47258e86eca69e5580ea7d0501d6d"
   end
 
   head do
@@ -53,8 +51,8 @@ class Dropbear < Formula
 
   test do
     testfile = testpath/"testec521"
-    system "#{bin}/dbclient", "-h"
-    system "#{bin}/dropbearkey", "-t", "ecdsa", "-f", testfile, "-s", "521"
+    system bin/"dbclient", "-h"
+    system bin/"dropbearkey", "-t", "ecdsa", "-f", testfile, "-s", "521"
     assert_predicate testfile, :exist?
   end
 end

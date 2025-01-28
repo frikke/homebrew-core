@@ -1,12 +1,12 @@
 class MariadbConnectorC < Formula
   desc "MariaDB database connector for C applications"
   homepage "https://mariadb.org/download/?tab=connector&prod=connector-c"
-  url "https://archive.mariadb.org/connector-c-3.3.5/mariadb-connector-c-3.3.5-src.tar.gz"
-  mirror "https://fossies.org/linux/misc/mariadb-connector-c-3.3.5-src.tar.gz/"
-  sha256 "ca72eb26f6db2befa77e48ff966f71bcd3cb44b33bd8bbb810b65e6d011c1e5c"
+  # TODO: Remove backward compatibility library symlinks on breaking version bump
+  url "https://archive.mariadb.org/connector-c-3.4.3/mariadb-connector-c-3.4.3-src.tar.gz"
+  mirror "https://fossies.org/linux/misc/mariadb-connector-c-3.4.3-src.tar.gz/"
+  sha256 "a9033833a88ca74789bd6db565965382c982d06aae1c086097fa9c3e7c7d1eaf"
   license "LGPL-2.1-or-later"
-  revision 1
-  head "https://github.com/mariadb-corporation/mariadb-connector-c.git", branch: "3.3"
+  head "https://github.com/mariadb-corporation/mariadb-connector-c.git", branch: "3.4"
 
   # The REST API may omit the newest major/minor versions unless the
   # `olderReleases` parameter is set to `true`.
@@ -24,36 +24,56 @@ class MariadbConnectorC < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "7932a4f074df7dd50077a4b4aa1d819cc19fdf64c1f7a383ab99268c29318b10"
-    sha256 arm64_monterey: "f4409ff5557b12c7e1eade9fbd5d89379a4303a7d214bd2ea02ac1e92a881b2b"
-    sha256 arm64_big_sur:  "bb5f15c4577c75378afd14255e51db5f58e231650c6866c48f7d2cfd5d925bf7"
-    sha256 ventura:        "dc5a037a2d19e855997614eb1fa9201ba2a91c96a6225f0da3ffbd12ca7a8703"
-    sha256 monterey:       "b3534cdba8a3c6703fe7c8aa4dc2968889501708e5b87efa9f0a7c3a93620d5c"
-    sha256 big_sur:        "d7acccd5f728af488f6a788bc736f7952e8e564a88e0943b6856365df1e5034b"
-    sha256 x86_64_linux:   "2131d46f59bf30bf4f75ca1b4b11c2ba88eff7cd4c9e5e6a3beb2e9854af1c3e"
+    sha256 arm64_sequoia: "462f8b1b844ffd11a6848b3db96c9a91eb6d70b0293055375e83f29a2ae58c28"
+    sha256 arm64_sonoma:  "cc5818a3b76aad42d8c8bb2353b1defc925f8fbf77aa9ca8da2fa4481a3b64f7"
+    sha256 arm64_ventura: "c14286f2fad6a45db22b155b50311151628ab0c4626bf29222d3c8827dd72fca"
+    sha256 sonoma:        "3b308c690e20b19c4bed0ffccfb4f5c9b75970ed631e445a664ab146bf7ac86b"
+    sha256 ventura:       "9dd3822cccaefd5770675bf267f65ff6791b2869259bc98ad25f7633d55045af"
+    sha256 x86_64_linux:  "9aa82a00506a9aad0a0bae6054d2eef6ec377eacfb8b0ff6f3416e66a6dac277"
   end
+
+  keg_only "it conflicts with mariadb"
 
   depends_on "cmake" => :build
   depends_on "openssl@3"
+  depends_on "zstd"
 
   uses_from_macos "curl"
+  uses_from_macos "krb5"
   uses_from_macos "zlib"
 
-  conflicts_with "mariadb", because: "both install `mariadb_config`"
-
   def install
-    args = std_cmake_args
-    args << "-DWITH_OPENSSL=On"
-    args << "-DWITH_EXTERNAL_ZLIB=On"
-    args << "-DOPENSSL_INCLUDE_DIR=#{Formula["openssl@3"].opt_include}"
-    args << "-DINSTALL_MANDIR=#{share}"
-    args << "-DCOMPILATION_COMMENT=Homebrew"
+    rm_r "external"
 
-    system "cmake", ".", *args
-    system "make", "install"
+    # -DINSTALL_* are relative to prefix
+    args = %w[
+      -DINSTALL_LIBDIR=lib
+      -DINSTALL_MANDIR=share/man
+      -DWITH_EXTERNAL_ZLIB=ON
+      -DWITH_MYSQLCOMPAT=ON
+      -DWITH_UNIT_TESTS=OFF
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
+    # Add mysql_config symlink for compatibility which simplifies building
+    # some dependents. This is done in the full `mariadb` installation[^1]
+    # but not in the standalone `mariadb-connector-c`.
+    #
+    # [^1]: https://github.com/MariaDB/server/blob/main/cmake/symlinks.cmake
+    bin.install_symlink "mariadb_config" => "mysql_config"
+
+    # Temporary symlinks for backwards compatibility.
+    # TODO: Remove in future version update.
+    (lib/"mariadb").install_symlink lib.glob(shared_library("*"))
+
+    # TODO: Automatically compress manpages in brew
+    Utils::Gzip.compress(*man3.glob("*.3"))
   end
 
   test do
-    system "#{bin}/mariadb_config", "--cflags"
+    system bin/"mariadb_config", "--cflags"
   end
 end

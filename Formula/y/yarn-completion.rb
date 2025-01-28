@@ -1,12 +1,13 @@
 class YarnCompletion < Formula
   desc "Bash completion for Yarn"
   homepage "https://github.com/dsifford/yarn-completion"
-  url "https://github.com/dsifford/yarn-completion/archive/v0.17.0.tar.gz"
+  url "https://github.com/dsifford/yarn-completion/archive/refs/tags/v0.17.0.tar.gz"
   sha256 "cc9d86bd8d4c662833424f86f1f86cfa0516c0835874768d9cf84aaf79fb8b21"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "63d3cb7b4f3862462ef6097c56dfcae3a7a906f84747000856353279ea8ebebc"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "e743fe4680eb970207cd4a05ec2f2482f1c3baf96ae04827b75bffb29afd78be"
   end
 
   depends_on "bash"

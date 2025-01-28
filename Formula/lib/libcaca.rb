@@ -15,6 +15,7 @@ class Libcaca < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "5352a2e3f1f3e752955b499071b1b38521b7dcce378f51c8c20d5a6a3c9a57b7"
     sha256 cellar: :any,                 arm64_sonoma:   "b61b6d0e7c9d1d7faf96997ce20a046aa71915c3a1132fb5a8f32cbdccd5e6ce"
     sha256 cellar: :any,                 arm64_ventura:  "27d36a5457f9d98cf925cb402e9abb784c0d3453c8036fe74ebdeae04b7a9063"
     sha256 cellar: :any,                 arm64_monterey: "b29bc6f1dd407411eab8689bfe190574b9fdc487d00dbdc7636e9483de867e56"
@@ -35,15 +36,13 @@ class Libcaca < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "imlib2"
 
   def install
     system "./bootstrap" if build.head?
 
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
+    args = %w[
       --disable-cocoa
       --disable-csharp
       --disable-doc
@@ -54,7 +53,7 @@ class Libcaca < Formula
       --disable-x11
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     ENV.deparallelize # Or install can fail making the same folder at the same time
     system "make", "install"

@@ -2,8 +2,8 @@ class Kubeseal < Formula
   desc "Kubernetes controller and tool for one-way encrypted Secrets"
   homepage "https://github.com/bitnami-labs/sealed-secrets"
   url "https://github.com/bitnami-labs/sealed-secrets.git",
-      tag:      "v0.24.0",
-      revision: "3344ac6b6403320c46d0c3b26124a3c27f296c3c"
+      tag:      "v0.28.0",
+      revision: "6b1b331a2cd3a58569ce4d819a7cabc59c0a3e50"
   license "Apache-2.0"
 
   livecheck do
@@ -12,13 +12,12 @@ class Kubeseal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d8ccc46ff11e89518baa250420d97556df669b55a486582fa403daa03f1f046c"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ba4375f4165d9f9d302bdba98740f1814212bda9b47d9867ad391a94c918adae"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9c4aec057cc3f5d401319b6eafd77843288646afd6e1a6b43a18bda6c1a3236d"
-    sha256 cellar: :any_skip_relocation, ventura:        "d1c04bb8fae2f24ca2d04138fc3b4b63de28bc752b3334324b91d5bc3500811c"
-    sha256 cellar: :any_skip_relocation, monterey:       "e4c642972875536744ff3b043416c6e461c969c3f15898a0b876458a62bf6d07"
-    sha256 cellar: :any_skip_relocation, big_sur:        "cdab6e281e359a5c46ef040a8b30af6faebe95ac07bd76c920f234375d6639e5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1905e88a8250cac876fd9e977475c05756c766e8af8af20494cdfdb874d0fb4a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "df5039a3130b7cea2adf75c3a913c0746eb7a14c29c46dfb34f52a4851989279"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "be661f962bdf6ce1f73d92b9e46f1218e7e1fe29dedb66e6bda2a150f572fa59"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f7c772550ed15268303705716d17f58df7097aee181939b2feeb39c571cca4fb"
+    sha256 cellar: :any_skip_relocation, sonoma:        "d8995e7f06980a97e9d30ed2c1322749c9dee7633d48b5ff22a438249230eaef"
+    sha256 cellar: :any_skip_relocation, ventura:       "1fe421dab74c282ceaf4c4db173eb9647072f0da4c13c7c82a2689537e69bfc7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3fc791690631c17d90d5104a945bb7261246f8d154519e604df761ce8f6b9ea5"
   end
 
   depends_on "go" => :build

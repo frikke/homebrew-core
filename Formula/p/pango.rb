@@ -1,27 +1,32 @@
 class Pango < Formula
   desc "Framework for layout and rendering of i18n text"
-  homepage "https://pango.gnome.org"
-  url "https://download.gnome.org/sources/pango/1.50/pango-1.50.14.tar.xz"
-  sha256 "1d67f205bfc318c27a29cfdfb6828568df566795df0cb51d2189cde7f2d581e8"
+  homepage "https://www.gtk.org/docs/architecture/pango"
+  url "https://download.gnome.org/sources/pango/1.56/pango-1.56.1.tar.xz"
+  sha256 "426be66460c98b8378573e7f6b0b2ab450f6bb6d2ec7cecc33ae81178f246480"
   license "LGPL-2.0-or-later"
   head "https://gitlab.gnome.org/GNOME/pango.git", branch: "main"
 
+  # Pango doesn't follow GNOME's "even-numbered minor is stable" version
+  # scheme but they do appear to use 90+ minor/patch versions, which may
+  # indicate unstable versions (e.g., 1.90, etc.).
+  livecheck do
+    url "https://download.gnome.org/sources/pango/cache.json"
+    regex(/pango[._-]v?(\d+(?:(?!\.9\d)\.\d+)+)\.t/i)
+  end
+
   bottle do
-    sha256 cellar: :any, arm64_sonoma:   "9b6f5297f98f443484ad7b2693d5c4151a062745b5cc5adb01abbf4e963ecaa4"
-    sha256 cellar: :any, arm64_ventura:  "36b5b69c52886ea5c6599bc35bf22eb942cc44b2bcbe2ea0bd2340d72fe1d832"
-    sha256 cellar: :any, arm64_monterey: "0aaa4549f79b4fcd445fcfa409a516e5d1058b41853a056b191c43ad3388d959"
-    sha256 cellar: :any, arm64_big_sur:  "34d3bddaee4e322f64cb8a65763702d0037dd65f100772665b71a0ac108708d0"
-    sha256 cellar: :any, sonoma:         "cc63add51202ca917e90f0c0164688bea9f8df2cb9c8c3f8af18d8de40fdf347"
-    sha256 cellar: :any, ventura:        "eae13498d195f5407514f88c3681981e4cf8b1b3099af13ce771be9934929ead"
-    sha256 cellar: :any, monterey:       "34449966361af6e0ec7808fc48ea6b6368fb56c9873b332c77740a9ed4d0fdc1"
-    sha256 cellar: :any, big_sur:        "8058dda295f5bd9a7fa01124a22b850285363fc9ab65e644bb037ad621475eb3"
-    sha256               x86_64_linux:   "c0e091a6c225b78ca16eef4dd0d955a13996c44896a6ee5d182aef5944f59cc8"
+    sha256 cellar: :any, arm64_sequoia: "48507210c600d918ab097c8be972714d2d221ec7d57590aa01a7543dd73ff96d"
+    sha256 cellar: :any, arm64_sonoma:  "10d30603c08a15d21c900460daed6d3393c7b3f11a1efcfaa95dfbc045023f30"
+    sha256 cellar: :any, arm64_ventura: "4cfd2e2270153041accfa3058a3775be97269cd8c25714108ef31bd1713ffd3a"
+    sha256 cellar: :any, sonoma:        "b8f0e79a0f83ea4217c6cf8c99cc1162e4c1b53e35ef07e0716f1046e05b2e2a"
+    sha256 cellar: :any, ventura:       "092ccfa014c748aa3b6c29fbbe55ab05b59615ad169fafd52339533b06adb2e5"
+    sha256               x86_64_linux:  "afb0dbe85b9754c5daddb614add5e0092dbfec27a3e0fc88ab1cb71a6623ed23"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => [:build, :test]
   depends_on "cairo"
   depends_on "fontconfig"
   depends_on "freetype"
@@ -30,19 +35,22 @@ class Pango < Formula
   depends_on "harfbuzz"
 
   def install
-    system "meson", *std_meson_args, "build",
-                    "-Ddefault_library=both",
-                    "-Dintrospection=enabled",
-                    "-Dfontconfig=enabled",
-                    "-Dcairo=enabled",
-                    "-Dfreetype=enabled"
-    system "meson", "compile", "-C", "build", "-v"
+    args = %w[
+      -Ddefault_library=both
+      -Dintrospection=enabled
+      -Dfontconfig=enabled
+      -Dcairo=enabled
+      -Dfreetype=enabled
+    ]
+
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
   end
 
   test do
     system bin/"pango-view", "--version"
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <pango/pangocairo.h>
 
       int main(int argc, char *argv[]) {
@@ -54,38 +62,9 @@ class Pango < Formula
         g_free(families);
         return 0;
       }
-    EOS
-    cairo = Formula["cairo"]
-    fontconfig = Formula["fontconfig"]
-    freetype = Formula["freetype"]
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    harfbuzz = Formula["harfbuzz"]
-    libpng = Formula["libpng"]
-    pixman = Formula["pixman"]
-    flags = %W[
-      -I#{cairo.opt_include}/cairo
-      -I#{fontconfig.opt_include}
-      -I#{freetype.opt_include}/freetype2
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{harfbuzz.opt_include}/harfbuzz
-      -I#{include}/pango-1.0
-      -I#{libpng.opt_include}/libpng16
-      -I#{pixman.opt_include}/pixman-1
-      -D_REENTRANT
-      -L#{cairo.opt_lib}
-      -L#{gettext.opt_lib}
-      -L#{glib.opt_lib}
-      -L#{lib}
-      -lcairo
-      -lglib-2.0
-      -lgobject-2.0
-      -lpango-1.0
-      -lpangocairo-1.0
-    ]
-    flags << "-lintl" if OS.mac?
+    C
+
+    flags = shell_output("pkgconf --cflags --libs pangocairo").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

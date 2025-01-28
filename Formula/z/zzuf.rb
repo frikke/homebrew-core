@@ -6,9 +6,12 @@ class Zzuf < Formula
   license "WTFPL"
 
   bottle do
+    sha256                               arm64_sequoia:  "6ccb5e6621aa95f4cb62afebe5f4c3aee322b8d207a10d3cbdc16bb073c09aa5"
+    sha256                               arm64_sonoma:   "6fce95c82da3ed7282dfbc55f4b276910b78fa5d76b2d5e66ad9b43607828fcf"
     sha256                               arm64_ventura:  "16fc98439ca072e8cf19c129649eff99e63e0cece1c1455e97f04ce7cb4dfd73"
     sha256                               arm64_monterey: "8cf189e969a94737e6729be772df9f64759b7c33580cee51d571b31365dbddf2"
     sha256                               arm64_big_sur:  "7ff801dd276cdd8f830d07d01c97a83207ed8ac77c6023ff21b29a2ec536637b"
+    sha256                               sonoma:         "e6a2bcac4710033bd155592753c6d4446a3771c70a9cdaa86f34a33f968db122"
     sha256                               ventura:        "397eb044876f87b27787679b9a8f965da0aca9251386aa2a6dbbd1b5ef8cd3c9"
     sha256                               monterey:       "2cfa284477cd1e81ac3b248a20f25812083fe7b592a997ecbefee7663cedab91"
     sha256                               big_sur:        "284b235c4c744d7be86fbe6175a8d67a743a429c8021437182a31e6184105437"
@@ -23,16 +26,20 @@ class Zzuf < Formula
   head do
     url "https://github.com/samhocevar/zzuf.git", branch: "master"
 
-    depends_on "autoconf"   => :build
-    depends_on "automake"   => :build
-    depends_on "libtool"    => :build
-    depends_on "pkg-config" => :build
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+    depends_on "pkgconf" => :build
   end
 
   def install
     system "./bootstrap" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+    ENV.append_to_cflags "-Wno-int-conversion" if DevelopmentTools.clang_build_version >= 1500
+
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 

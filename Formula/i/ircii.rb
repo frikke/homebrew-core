@@ -1,9 +1,9 @@
 class Ircii < Formula
   desc "IRC and ICB client"
-  homepage "http://www.eterna.com.au/ircii/"
-  url "https://ircii.warped.com/ircii-20210314.tar.bz2"
-  mirror "https://deb.debian.org/debian/pool/main/i/ircii/ircii_20210314.orig.tar.bz2"
-  sha256 "866f2b847daed3d70859f208f7cb0f20b58c0933b2159f7ff92a68c518d393a9"
+  homepage "http://www.eterna23.net/ircii/"
+  url "https://ircii.warped.com/ircii-20240918.tar.bz2"
+  mirror "https://deb.debian.org/debian/pool/main/i/ircii/ircii_20240918.orig.tar.bz2"
+  sha256 "f4b9b380ba5143261a3ef219abfdef749c44ce4f669908da60bc3997af649ca9"
   license all_of: [
     "BSD-3-Clause",
     "BSD-2-Clause",
@@ -18,15 +18,12 @@ class Ircii < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 arm64_ventura:  "dc7d4b485e4f00ec1fb9750f38110b452bcc9ee777aebc51521bb32b031d3690"
-    sha256 arm64_monterey: "e1a64a64f9aab81c8fce589945912aa0c459daff48e65f455a181d0391539b23"
-    sha256 arm64_big_sur:  "9daf37b4ec3ed1b47c8ce24d9acffb0a0781f648f97220c09c6100310819344b"
-    sha256 ventura:        "17de357ffa8090c0928c6af8e0a1ade72b43c187552bbc3acb82cf98ebf5d65e"
-    sha256 monterey:       "bb15fc3ed62c9a10c8555a53cf3ea89d9025a8ed13ba972f9fd78ce7449998cc"
-    sha256 big_sur:        "4d2671014e366e382805580bba8c328f20b52a5838701f08619f030f43f58ae1"
-    sha256 catalina:       "b621da055243edbf54884b186c1250ef4ab80655e7647aa837d07e523e8e5c1a"
-    sha256 x86_64_linux:   "2c88482345ab4bb6ec095d529259fe14768c6cc7b7918883bf94a3e07b62d700"
+    sha256 arm64_sequoia: "8e8fe508af0773e346c196d3ded29a2529e736ae175942b407321556e7ee3d85"
+    sha256 arm64_sonoma:  "250efa55d481e553454206dd459b55e825a16f93003e4e96ccb26c9b132c3568"
+    sha256 arm64_ventura: "9bba80a660397068c42e2f12d7940ced34bdb253451435ee8f51b6993230bda5"
+    sha256 sonoma:        "e9db1fd59f8b31c281a121f1821628780a85e990042cfb8c4ac674ee1b50433b"
+    sha256 ventura:       "b3cfde024333fbc46af44fcf09500d7a27369a12eac24f604ba404aca862ca18"
+    sha256 x86_64_linux:  "7680b15d1879970be38ec1c55f3e2c99a0381c0cddddf43fd4c66e567340427a"
   end
 
   depends_on "openssl@3"

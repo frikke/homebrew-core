@@ -1,58 +1,62 @@
 class Putty < Formula
   desc "Implementation of Telnet and SSH"
   homepage "https://www.chiark.greenend.org.uk/~sgtatham/putty/"
-  url "https://the.earth.li/~sgtatham/putty/0.79/putty-0.79.tar.gz"
-  sha256 "428cc8666fbb938ebf4ac9276341980dcd70de395b33164496cf7995ef0ef0d8"
+  url "https://the.earth.li/~sgtatham/putty/0.82/putty-0.82.tar.gz"
+  sha256 "195621638bb6b33784b4e96cdc296f332991b5244968dc623521c3703097b5d9"
   license "MIT"
   head "https://git.tartarus.org/simon/putty.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ea44fd2f1e5e45aeb12d4c1b1538ca7fb4c41524d05c6e0999070f5ff40fed98"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "6fae9d89bbf462789f4146ea555e6384174fcb1d99cbeb3f66c6786299cb374c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d55a3b006c5854daf0ff821293458660fc298f9d72e7f7f0065fac637f7b19c1"
-    sha256 cellar: :any_skip_relocation, ventura:        "aaae6300920f3da24bf2713ad8be57ae3f12b585d4b3f0499c3226a97c039455"
-    sha256 cellar: :any_skip_relocation, monterey:       "470befc911fc9d3fb454efe342418fa6ed1dca736a498de0ae909a3faab0a79f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b35b6e0ca90d4aa5fea2e473e3c2f17be6f16b3edcc2cb1e037bc8c240bd2b7b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "782be1588c0add9ea780c3bf09106584bbef7402d0bc9aa449da3e25bb0b67f4"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia: "1f04c4696642d5238b62e185b9295284d5314bd1fe04468830330961aefe37ca"
+    sha256 cellar: :any,                 arm64_sonoma:  "24503de6b2218e6f97f9bf379eddda08db9ef130c6e745c755b228b8a9c38f68"
+    sha256 cellar: :any,                 arm64_ventura: "d3aebac833117e0ce39ab879d99ef707117af4167a230d896cf12be62520b358"
+    sha256 cellar: :any,                 sonoma:        "c0db739c9cd658dffcf7f94989de0843f9502a4fbac9c09a376ca53151fe39ed"
+    sha256 cellar: :any,                 ventura:       "b92fa9eed52a94f950dc138244837eb6429adf50e756a94b2f96f40abd69f30a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1676a17a56fdf1e36b7500e4e422d95f3b069a4753e0f28b2a12203841b1a60f"
   end
 
   depends_on "cmake" => :build
   depends_on "halibut" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
+  depends_on "cairo"
+  depends_on "gdk-pixbuf"
+  depends_on "glib"
+  depends_on "gtk+3"
+  depends_on "pango"
 
   uses_from_macos "perl" => :build
-  uses_from_macos "expect" => :test
+
+  on_linux do
+    depends_on "libx11"
+  end
 
   conflicts_with "pssh", because: "both install `pscp` binaries"
 
   def install
-    build_version = build.head? ? "svn-#{version}" : version
+    args = ["-DPUTTY_GTK_VERSION=3"]
+    args << "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-dead_strip_dylibs" if OS.mac? # to reduce overlinking
 
-    args = std_cmake_args + %W[
-      -DRELEASE=#{build_version}
-      -DPUTTY_GTK_VERSION=NONE
-    ]
-
-    system "cmake", "-S", ".", "-B", "build", *args
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"command.sh").write <<~EOS
-      #!/usr/bin/env expect
-      set timeout -1
-      spawn #{bin}/puttygen -t rsa -b 4096 -q -o test.key
-      expect -exact "Enter passphrase to save key: "
-      send -- "Homebrew\n"
-      expect -exact "\r
-      Re-enter passphrase to verify: "
-      send -- "Homebrew\n"
-      expect eof
-    EOS
-    chmod 0755, testpath/"command.sh"
+    require "expect"
+    require "pty"
 
-    system "./command.sh"
-    assert_predicate testpath/"test.key", :exist?
+    PTY.spawn(bin/"puttygen", "-t", "rsa", "-b", "4096", "-q", "-o", "test.key") do |r, w, _pid|
+      r.expect "Enter passphrase to save key: "
+      w.write "Homebrew\n"
+      r.expect "Re-enter passphrase to verify: "
+      w.write "Homebrew\n"
+      r.read
+    rescue Errno::EIO
+      # GNU/Linux raises EIO when read is done on closed pty
+    end
+
+    assert_path_exists testpath/"test.key"
   end
 end

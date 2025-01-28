@@ -1,7 +1,6 @@
 class Pgtune < Formula
   desc "Tuning wizard for postgresql.conf"
-  # Original web server flaky, let's leave it to the archive.org copy
-  homepage "https://web.archive.org/web/20190717075914/pgfoundry.org/projects/pgtune"
+  homepage "https://github.com/gregs1104/pgtune"
   url "https://ftp.postgresql.org/pub/projects/pgFoundry/pgtune/pgtune/0.9.3/pgtune-0.9.3.tar.gz"
   mirror "https://mirrorservice.org/sites/ftp.postgresql.org/projects/pgFoundry/pgtune/pgtune/0.9.3/pgtune-0.9.3.tar.gz"
   sha256 "31ac5774766dd9793d8d2d3681d1edb45760897c8eda3afc48b8d59350dee0ea"
@@ -10,14 +9,12 @@ class Pgtune < Formula
   # 0.9.3 does not have settings for PostgreSQL 9.x, but the trunk does
   head "https://github.com/gregs1104/pgtune.git", branch: "master"
 
-  livecheck do
-    url "https://ftp.postgresql.org/pub/projects/pgFoundry/pgtune/pgtune/"
-    regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
-  end
-
   bottle do
     sha256 cellar: :any_skip_relocation, all: "99d46ab0880d22bb3a19faf759bde25d51dd0e4c5c1890d6bf0e253a9042e09f"
   end
+
+  # pgtune is for postgresql 8.x and 9.x, and is no longer maintained.
+  deprecate! date: "2024-08-03", because: :unmaintained
 
   def install
     # By default, pgtune searches for settings in the directory

@@ -1,19 +1,18 @@
 class CloudSqlProxy < Formula
   desc "Utility for connecting securely to your Cloud SQL instances"
   homepage "https://github.com/GoogleCloudPlatform/cloud-sql-proxy"
-  url "https://github.com/GoogleCloudPlatform/cloud-sql-proxy/archive/v2.6.1.tar.gz"
-  sha256 "b5c4fd1decb2d4091f0ae118e2df8387cbee7ea166047be12c4183fbeecf0c46"
+  url "https://github.com/GoogleCloudPlatform/cloud-sql-proxy/archive/refs/tags/v2.14.3.tar.gz"
+  sha256 "367540bf7d4c57d788af4c73d96fbee158d954fae30d7f1ec5a28c321341a2e2"
   license "Apache-2.0"
   head "https://github.com/GoogleCloudPlatform/cloud-sql-proxy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7d23b8b8ee145421f570998498500e1ab1bd7add2512a44bc52659445c598e05"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "867afe144e884f8d75d6969508e044ba1a0596b859f7a1301c2694ab67144512"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fd1f47b604b0421bf4552d071c4951485dc0493ffc3746b47765818a2818c90a"
-    sha256 cellar: :any_skip_relocation, ventura:        "abac4212b3097d7c0d750dc98de4bf8dd569bf519cf8e653870fd8e1f9389889"
-    sha256 cellar: :any_skip_relocation, monterey:       "35971a874eb9b9c1daac93c2839a8bab4e05acc82b8fb506ccebac7cc5600f09"
-    sha256 cellar: :any_skip_relocation, big_sur:        "1d32852876e6434659f91aa603b4cc24a510e38c7b80788165fb892a07e95227"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a7c7df8ad9e89374d3cafe761f2bbe5ccad8cfaba0d53241a3b2a6efad12d6c5"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3626b38bf9f29ec23a7ead381201c83733683b7f1ed940e7dc69a53d37717910"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3626b38bf9f29ec23a7ead381201c83733683b7f1ed940e7dc69a53d37717910"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "3626b38bf9f29ec23a7ead381201c83733683b7f1ed940e7dc69a53d37717910"
+    sha256 cellar: :any_skip_relocation, sonoma:        "46d5845cbe31ceda40cf055c83faee0f8df0309fc664249949a74d84829064d0"
+    sha256 cellar: :any_skip_relocation, ventura:       "46d5845cbe31ceda40cf055c83faee0f8df0309fc664249949a74d84829064d0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ae368af2b5875600477332bbc8813a77e7f987fac5adc3f6612709a277d84f21"
   end
 
   depends_on "go" => :build

@@ -1,18 +1,9 @@
 class GtkMacIntegration < Formula
   desc "Integrates GTK macOS applications with the Mac desktop"
-  homepage "https://wiki.gnome.org/Projects/GTK+/OSX/Integration"
+  homepage "https://www.gtk.org/docs/installations/macos"
+  url "https://download.gnome.org/sources/gtk-mac-integration/3.0/gtk-mac-integration-3.0.2.tar.xz"
+  sha256 "42f29e002365467eac10f4ba78435d4be785a947424d9890112c8c8d5e21be25"
   license "LGPL-2.1-only"
-
-  stable do
-    url "https://download.gnome.org/sources/gtk-mac-integration/3.0/gtk-mac-integration-3.0.1.tar.xz"
-    sha256 "f19e35bc4534963127bbe629b9b3ccb9677ef012fc7f8e97fd5e890873ceb22d"
-
-    # Fix -flat_namespace being used on Big Sur and later.
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
-      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
-    end
-  end
 
   # We use a common regex because gtk-mac-integration doesn't use GNOME's
   # "even-numbered minor is stable" version scheme.
@@ -22,15 +13,11 @@ class GtkMacIntegration < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_sonoma:   "85cd5c0a85e3e5dd6eb25fc472ff8bca8904dfe6e2d5c008cf94707979780b50"
-    sha256 arm64_ventura:  "9074e95f28068dc78a191df93877127a01cf4670bb9ccdfe9146e54a0ff7c0d9"
-    sha256 arm64_monterey: "26d230d66f0a6900e8590fbfa6a6d77fee9b1d42db18a48b457ede3c9fab8485"
-    sha256 arm64_big_sur:  "7151adc39408f9e6b22706c623c2d16f444612e767c6eaba59b0c40f87a0d05d"
-    sha256 sonoma:         "25c3fecf35f2b447f160fd4b8e5e1434c816a04d2fd6c3a5cc0c3d0163deafe9"
-    sha256 ventura:        "3f91d9bc293e808976fee70d4dcaa622a0fdb7b14592679f9b8947c13a741e5b"
-    sha256 monterey:       "802ed17bc9f4420482938c98e2ddcfdcd7b08f77dc56e99d06f1116ac06c974b"
-    sha256 big_sur:        "2cf4342b7faedc47562f7b5a1dc6215b9255833e7bb71e23d6bcddd01deac89d"
+    sha256 arm64_sequoia: "7ca343892d71cdb55caf11b1998168507845c155857f0064b5e5847352a8a233"
+    sha256 arm64_sonoma:  "cf8e1ad3215498c4682d30479c1850a89e1fcf478d9b69004da3dd7105afff75"
+    sha256 arm64_ventura: "03dbfce85532960db4084577e2e3ad7d7b6f82975dc3edaf3d96435a83a79526"
+    sha256 sonoma:        "ce981b3727a5b425b31d44a918d2a44bb49c159214b0e13bd5968c1c653438d1"
+    sha256 ventura:       "38d4c1f561c9062c4a6cbd38e282c42ae7fd7a07612c3f3417038c101a3cc715"
   end
 
   head do
@@ -43,32 +30,39 @@ class GtkMacIntegration < Formula
   end
 
   depends_on "gobject-introspection" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
+  depends_on "at-spi2-core"
+  depends_on "cairo"
+  depends_on "gdk-pixbuf"
   depends_on "gettext"
+  depends_on "glib"
   depends_on "gtk+3"
+  depends_on "harfbuzz"
   depends_on :macos
+  depends_on "pango"
 
   def install
     configure = build.head? ? "./autogen.sh" : "./configure"
-    system configure, *std_configure_args,
-                      "--disable-silent-rules",
+
+    system configure, "--disable-silent-rules",
                       "--without-gtk2",
                       "--with-gtk3",
                       "--enable-introspection=yes",
-                      "--enable-python=no"
+                      "--enable-python=no",
+                      *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gtkosxapplication.h>
 
       int main(int argc, char *argv[]) {
         gchar *bundle = gtkosx_application_get_bundle_path();
         return 0;
       }
-    EOS
-    flags = shell_output("pkg-config --cflags --libs gtk-mac-integration-gtk3").chomp.split
+    C
+    flags = shell_output("pkgconf --cflags --libs gtk-mac-integration-gtk3").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

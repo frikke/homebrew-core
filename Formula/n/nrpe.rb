@@ -1,17 +1,16 @@
 class Nrpe < Formula
   desc "Nagios remote plugin executor"
   homepage "https://www.nagios.org/"
-  url "https://github.com/NagiosEnterprises/nrpe/releases/download/nrpe-4.1.0/nrpe-4.1.0.tar.gz"
-  sha256 "a1f14aa8aaf935b576cc55ab5d77b7cb9c920d7702aff44c9d18c4c841ef8ecc"
-  license "GPL-2.0"
+  url "https://github.com/NagiosEnterprises/nrpe/releases/download/nrpe-4.1.3/nrpe-4.1.3.tar.gz"
+  sha256 "5a86dfde6b9732681abcd6ea618984f69781c294b8862a45dfc18afaca99a27a"
+  license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_ventura:  "1fc4928fdac6257f935fac1840c39f68a70e9634cc1bf9a6087011ea1804698c"
-    sha256 cellar: :any, arm64_monterey: "c8ce52dc60241ee1e361db1085c8b341c2b72dbf946932efcada9e221add88dd"
-    sha256 cellar: :any, arm64_big_sur:  "09b54c81df11d937d138916c8eaa5cd22795cd003f9ffa59f47927668af0b93d"
-    sha256 cellar: :any, ventura:        "7a52a2a6506171a6ed4c859899cfde0614fdff521002d97098f3844e99d1f7b9"
-    sha256 cellar: :any, monterey:       "83bca8ddf7e379b010c390cfd7a0bb42ff9b0d08ae09f9c81af4a44c769737dc"
-    sha256 cellar: :any, big_sur:        "af5068970374e0d732400f3de3f6013215fbe95aea879109a399c5724df059f5"
+    sha256 cellar: :any, arm64_sequoia: "4849e7eb841d00b2f10f7dd81c088226e6aebb683f5c29e64d72dc6bfb327f84"
+    sha256 cellar: :any, arm64_sonoma:  "bc97d9570dfb3d1204feda1817e62fcebbf43898c3cbd00ee1592b1296654d8c"
+    sha256 cellar: :any, arm64_ventura: "6c5566eca3996b993eb04867452d5a10b2ecb3a12e325916ff70256a7af8178e"
+    sha256 cellar: :any, sonoma:        "e429d8acb7ba6187fc9118a86d36e891e79169353e3b736dd514604c8d2f5ff9"
+    sha256 cellar: :any, ventura:       "05cd704766c25bd45a0b73ad8869dc747ba70565445a10ff1af9538d0b4cdf10"
   end
 
   depends_on "nagios-plugins"
@@ -53,10 +52,9 @@ class Nrpe < Formula
   end
 
   test do
-    pid = fork do
-      exec "#{bin}/nrpe", "-n", "-c", "#{etc}/nrpe.cfg", "-d"
-    end
+    pid = spawn bin/"nrpe", "-n", "-c", "#{etc}/nrpe.cfg", "-d"
     sleep 2
+    sleep 10 if Hardware::CPU.intel?
 
     begin
       output = shell_output("netstat -an")

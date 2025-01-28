@@ -1,8 +1,8 @@
 class Entr < Formula
   desc "Run arbitrary commands when files change"
   homepage "https://eradman.com/entrproject/"
-  url "https://eradman.com/entrproject/code/entr-5.4.tar.gz"
-  sha256 "491dded2cc3f1dcd8d26f496a4c7b3a996b91c7ab20883ca375037a398221f9e"
+  url "https://eradman.com/entrproject/code/entr-5.6.tar.gz"
+  sha256 "0222b8df928d3b5a3b5194d63e7de098533e04190d9d9a154b926c6c1f9dd14e"
   license "ISC"
   head "https://github.com/eradman/entr.git", branch: "master"
 
@@ -12,19 +12,20 @@ class Entr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ec80e77f2f052b7aaae63b79c80497ac5cd3bdcc4de21281abd3cfbb829e45e9"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "bc21dd7b56ba1f0a1ffc4bbddb2353c398205d0cfc225a93f7673cd73a439f22"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ff084ab8ee4c0df0016185292b55736a307a917e087044533e7b242aff939c4c"
-    sha256 cellar: :any_skip_relocation, ventura:        "76cbfd833ca280553b8ed5c078e81f41f3c43e9296f66ce3b8c01870de21c307"
-    sha256 cellar: :any_skip_relocation, monterey:       "5f4f2a76e68ad38b7ffa667e21775a4c460fabf930861abb8cd5c463b8575dbd"
-    sha256 cellar: :any_skip_relocation, big_sur:        "950ab77d1b5d5bf2b85acae7ed46491e588fe538af0bf1dde369b4f9332739ac"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2e517cacc6f4600412ca201306e6a1240a5261ac159160f0101b3f9b68398722"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d802f80cb83d3fe1cd1acb2b8e0083afa683cbe2f584a82394eb962e11608440"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d878b113e680a4cbab1f35939b63ec51fb8fedf06ae7dc8662610077184cf622"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c6e970b963f6409076ea40fd51487b354edaf83febd21ad4849989abd4399eaa"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "eb0d171f6dbe8fe018b51605dd51e32f63ae9da0cbabba079fbaf3a011bc6207"
+    sha256 cellar: :any_skip_relocation, sonoma:         "061556e2b532a2c5d142faf24886377d216bb05757639d4356dab486180891d5"
+    sha256 cellar: :any_skip_relocation, ventura:        "7c640c28c176df49179ac2ab3c1de08c1d194bc49dee50b0b4b905231fb956ed"
+    sha256 cellar: :any_skip_relocation, monterey:       "79e1e4af44349c50e37777a6ba3c3ef9bce47e5488fab2f103d0108cc662b045"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "26cba6bdd62572059e3f2b4422b9960fe412d7012491fcbad13803c7a8dfbe89"
   end
 
   def install
     ENV["PREFIX"] = prefix
     ENV["MANPREFIX"] = man
-    system "./configure"
+    system "./configure", *std_configure_args
     system "make"
     system "make", "install"
   end
@@ -35,6 +36,7 @@ class Entr < Formula
       sleep 0.5
       touch testpath/"test.2"
     end
-    assert_equal "New File", pipe_output("#{bin}/entr -n -p -d echo 'New File'", testpath).strip
+
+    assert_equal "New File", pipe_output("#{bin}/entr -n -p -d echo 'New File'", testpath.to_s).strip
   end
 end

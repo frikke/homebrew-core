@@ -1,37 +1,38 @@
 class PythonBuild < Formula
+  include Language::Python::Virtualenv
+
   desc "Simple, correct PEP 517 build frontend"
   homepage "https://github.com/pypa/build"
-  url "https://files.pythonhosted.org/packages/98/e3/83a89a9d338317f05a68c86a2bbc9af61235bc55a0c6a749d37598fb2af1/build-1.0.3.tar.gz"
-  sha256 "538aab1b64f9828977f84bc63ae570b060a8ed1be419e7870b8b4fc5e6ea553b"
+  url "https://files.pythonhosted.org/packages/7d/46/aeab111f8e06793e4f0e421fcad593d547fb8313b50990f31681ee2fb1ad/build-1.2.2.post1.tar.gz"
+  sha256 "b36993e92ca9375a219c99e606a122ff365a760a2d4bba0caa09bd5278b608b7"
   license "MIT"
   head "https://github.com/pypa/build.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "7c4512e1e2f776b4a52bc0ff82eb0a2e007bb21d138f006384b8d09121036e40"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "afb0b6f875502b63973fc2c1e9472325d0ab85fa086c93eeabe3e04e31256e7f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7a8dfa82d61e33c41cd97fa79527da7142b806dcc36bf76cb0033bd0bbeba972"
-    sha256 cellar: :any_skip_relocation, ventura:        "99587306f8f7d1e4dabf607bce0a6d48b177bc33135810d7df106e4577eeedd9"
-    sha256 cellar: :any_skip_relocation, monterey:       "d978baa3b892b6425e71841db57f5586fc63dfeed2177653d8dd5d94c636217f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "fd968afca06466a3991b2e56e75652e25431bc09025b9ca110d1cb149b4fb357"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9e19231a63ff23949df207588ac1255722be55c7c2b75e268f127f10fcfe0a3d"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "f23085e3fdd3df2e26645ead412a79b3ff824d7c2621c6c185548a88595c8caa"
   end
 
-  depends_on "python-flit-core" => :build
-  depends_on "python-packaging"
-  depends_on "python-pyproject-hooks"
-  depends_on "python@3.11"
+  depends_on "python@3.13"
 
-  def python3
-    which("python3.11")
+  resource "packaging" do
+    url "https://files.pythonhosted.org/packages/51/65/50db4dda066951078f0a96cf12f4b9ada6e4b811516bf0262c0f4f7064d4/packaging-24.1.tar.gz"
+    sha256 "026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002"
+  end
+
+  resource "pyproject-hooks" do
+    url "https://files.pythonhosted.org/packages/e7/82/28175b2414effca1cdac8dc99f76d660e7a4fb0ceefa4b4ab8f5f6742925/pyproject_hooks-1.2.0.tar.gz"
+    sha256 "1e859bd5c40fae9448642dd871adf459e5e2084186e8d2c2a79a824c970da1f8"
   end
 
   def install
-    system python3, "-m", "pip", "install", *std_pip_args, "."
+    virtualenv_install_with_resources
+
+    # Ensure uniform bottles by replacing a `/usr/local` reference in a comment.
+    inreplace libexec/"lib/python3.13/site-packages/build/env.py", "/usr/local", HOMEBREW_PREFIX
   end
 
   test do
-    system python3, "-c", "import build"
-
     stable.stage do
       system bin/"pyproject-build"
       assert_predicate Pathname.pwd/"dist/build-#{stable.version}.tar.gz", :exist?

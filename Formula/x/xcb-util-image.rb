@@ -6,6 +6,7 @@ class XcbUtilImage < Formula
   license "X11"
 
   bottle do
+    sha256 cellar: :any,                 arm64_sequoia:  "e7ebd7a81c36003239f80b1fdd67650d6eee527482e2f2f70edc14b631f77224"
     sha256 cellar: :any,                 arm64_sonoma:   "237ce9305294166d1dbd5348b95e75c577511c7b4e69d0203905c86ff5b1ed48"
     sha256 cellar: :any,                 arm64_ventura:  "29c75ea3f0424141fefe9b962c4e8a0ce362c23ef650a905e5118e6833040a85"
     sha256 cellar: :any,                 arm64_monterey: "a4e026015349c95cc815a4875b5b9aa1149888e0f8f3d1bd7075de107e09f524"
@@ -26,17 +27,16 @@ class XcbUtilImage < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "libxcb"
   depends_on "xcb-util"
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
+    system "./configure", "--disable-silent-rules",
                           "--localstatedir=#{var}",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules"
+                          "--sysconfdir=#{etc}",
+                          *std_configure_args
     system "make"
     system "make", "install"
   end

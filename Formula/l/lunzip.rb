@@ -1,8 +1,8 @@
 class Lunzip < Formula
   desc "Decompressor for lzip files"
   homepage "https://www.nongnu.org/lzip/lunzip.html"
-  url "https://download-mirror.savannah.gnu.org/releases/lzip/lunzip/lunzip-1.13.tar.gz"
-  sha256 "3c7d8320b947d2eb3c6081caf9b6c91b12debecb089ee544407cd14c8e517894"
+  url "https://download-mirror.savannah.gnu.org/releases/lzip/lunzip/lunzip-1.15.tar.gz"
+  sha256 "fdb930b87672a238a54c4b86d63df1c86038ff577d512adbc8e2c754c046d8f2"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,14 +11,12 @@ class Lunzip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d6462f46ff95d636d96c050ffdaf20f0262d59b318cdbac85fb624ad61793af8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ec4ca457cb4a253c5d55639b78d161eb3d7bc5049b255d2bce7f05944b84553a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "02f528b366f19bdff196bc9a6b56bb04391269eed41b5bee551b47bd7697f88e"
-    sha256 cellar: :any_skip_relocation, ventura:        "0ec7bd681206ccfa57d4a5aa6b2866fe68c9644d6bb1f0bd76f35dfcd5ea1df5"
-    sha256 cellar: :any_skip_relocation, monterey:       "4fe478003ec28e042575db9a551c673a97f73a4aeda30cb58e6a3f7158100a03"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b147bdc3ce46250190565ac18843bfc7013e01e1556187653ef40fee5a072e5d"
-    sha256 cellar: :any_skip_relocation, catalina:       "bf47470a86fb1b9e345dd77d4dfea86a636bc13f18b2e12baf95590d38fa125d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f713d18ae891d3b1b3dbb1731a5b0b42ad5b72b0d16e6a3b4936c098b619bab4"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d2485e72af992bc5c7b2cdb9be3383c1aeb9bde5f07f35e17964d8ba962ee5f9"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1f3c9cc0617cdea5815738623129348ae40566793c31c1d9d2788f43f32eb5a6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f061dbeb231b41011d5c925239ec0679c7456eb9242bab6155c55553930bd7b8"
+    sha256 cellar: :any_skip_relocation, sonoma:        "71198791087ef6380858c64097848d8f9d8860e65fd6fbab3fa1c45e018f39b4"
+    sha256 cellar: :any_skip_relocation, ventura:       "1a41f6efcd7b83a0ee333075ab595c66eabd0e7228ee2fdd3629d34e1d474d74"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "33207f9159131abd7656dc1f657bca8a18b90853a83f32506fa82996296d265a"
   end
 
   depends_on "lzip" => :test

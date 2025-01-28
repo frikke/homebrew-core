@@ -1,9 +1,9 @@
 class Kafka < Formula
   desc "Open-source distributed event streaming platform"
   homepage "https://kafka.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=kafka/3.5.1/kafka_2.13-3.5.1.tgz"
-  mirror "https://archive.apache.org/dist/kafka/3.5.1/kafka_2.13-3.5.1.tgz"
-  sha256 "f7b74d544023f2c0ec52a179de59975cb64e34ea03650d829328b407b560e4da"
+  url "https://www.apache.org/dyn/closer.lua?path=kafka/3.9.0/kafka_2.13-3.9.0.tgz"
+  mirror "https://archive.apache.org/dist/kafka/3.9.0/kafka_2.13-3.9.0.tgz"
+  sha256 "abc44402ddf103e38f19b0e4b44e65da9a831ba9e58fd7725041b1aa168ee8d1"
   license "Apache-2.0"
 
   livecheck do
@@ -12,13 +12,12 @@ class Kafka < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ed0a3c868fe8ab3a415821898ac729d2f8a34f91d56539c0ebe62f634c484271"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ed0a3c868fe8ab3a415821898ac729d2f8a34f91d56539c0ebe62f634c484271"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ed0a3c868fe8ab3a415821898ac729d2f8a34f91d56539c0ebe62f634c484271"
-    sha256 cellar: :any_skip_relocation, ventura:        "d4f7e9ac5f162373207479e747655d132e135f8401e42595467a46408e42c247"
-    sha256 cellar: :any_skip_relocation, monterey:       "d4f7e9ac5f162373207479e747655d132e135f8401e42595467a46408e42c247"
-    sha256 cellar: :any_skip_relocation, big_sur:        "d4f7e9ac5f162373207479e747655d132e135f8401e42595467a46408e42c247"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ed0a3c868fe8ab3a415821898ac729d2f8a34f91d56539c0ebe62f634c484271"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0d5693294afbccfda699c56b8a15c6fcc71bdc357dff246b9bf24b23862fcef8"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0d5693294afbccfda699c56b8a15c6fcc71bdc357dff246b9bf24b23862fcef8"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "0d5693294afbccfda699c56b8a15c6fcc71bdc357dff246b9bf24b23862fcef8"
+    sha256 cellar: :any_skip_relocation, sonoma:        "5fe61e9a6222ad4275cdc96c03776d660bca0aed2c7816f90fbea90777db38c4"
+    sha256 cellar: :any_skip_relocation, ventura:       "5fe61e9a6222ad4275cdc96c03776d660bca0aed2c7816f90fbea90777db38c4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0d5693294afbccfda699c56b8a15c6fcc71bdc357dff246b9bf24b23862fcef8"
   end
 
   depends_on "openjdk"
@@ -42,7 +41,7 @@ class Kafka < Formula
       "dataDir=/tmp/zookeeper", "dataDir=#{data}/zookeeper"
 
     # remove Windows scripts
-    rm_rf "bin/windows"
+    rm_r("bin/windows")
 
     libexec.install "libs"
 
@@ -112,8 +111,8 @@ class Kafka < Formula
       system "#{bin}/kafka-topics --bootstrap-server localhost:#{kafka_port} --delete --topic test " \
              ">> #{testpath}/kafka/demo.out 2>/dev/null"
     ensure
-      system "#{bin}/kafka-server-stop"
-      system "#{bin}/zookeeper-server-stop"
+      system bin/"kafka-server-stop"
+      system bin/"zookeeper-server-stop"
       sleep 10
     end
 

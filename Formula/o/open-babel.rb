@@ -1,50 +1,84 @@
 class OpenBabel < Formula
   desc "Chemical toolbox"
-  homepage "https://openbabel.org"
-  url "https://github.com/openbabel/openbabel/archive/openbabel-3-1-1.tar.gz"
-  version "3.1.1"
-  sha256 "c97023ac6300d26176c97d4ef39957f06e68848d64f1a04b0b284ccff2744f02"
+  homepage "https://github.com/openbabel/openbabel"
   license "GPL-2.0-only"
   revision 2
   head "https://github.com/openbabel/openbabel.git", branch: "master"
 
+  stable do
+    url "https://github.com/openbabel/openbabel/releases/download/openbabel-3-1-1/openbabel-3.1.1-source.tar.bz2"
+    sha256 "a6ec8381d59ea32a4b241c8b1fbd799acb52be94ab64cdbd72506fb4e2270e68"
+
+    # Backport support for configuring PYTHON_INSTDIR to avoid Setuptools
+    patch do
+      url "https://github.com/openbabel/openbabel/commit/f7910915c904a18ac1bdc209b2dc9deeb92f7db3.patch?full_index=1"
+      sha256 "f100bb9bffb82b318624933ddc0027eeee8546bf4d6deda5067ecbd1ebd138ea"
+    end
+  end
+
   bottle do
-    rebuild 1
-    sha256                               arm64_ventura:  "9f5f17dab6ecc4ef0a26c15d34fa3a07e15690459ac36372b0cb9e6a7a9d3173"
-    sha256                               arm64_monterey: "b8c4d0d18ffe49772d39f86e9a204262c3e32fef92aa29b38b76d36b61e0cade"
-    sha256                               arm64_big_sur:  "89817f17e6d1b7fa33a3a7c9321c2fe529f546fa6cbf59c014de0cf2ca279736"
-    sha256                               ventura:        "c8baf6ace5ea1d8700dc74642ebaf1f6a33fe172fcc8e016490688c4c4c66908"
-    sha256                               monterey:       "d7a93ad5a24deefcbd87ebcc094a9fe41024e938f54428f2d148da057e3dd7c3"
-    sha256                               big_sur:        "f4e76d3d62eabd132f5d177c62bd0c6ecc65bdb89b37d06661f66903d1726eb8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "18b1935653e40d9044045217cfeb9476cfb529763887a063ee6b81db8b3b9b3b"
+    rebuild 4
+    sha256 arm64_sequoia: "6e65ad2651937d58c9c4c023948ef066fb47d80c1add72a46478dc068a3b8889"
+    sha256 arm64_sonoma:  "4dae715c5d682d7dbc2629f8942de25888cb0a17ecf7097d0e4b0b5293f6a599"
+    sha256 arm64_ventura: "74af59afb37e1a715f5993d8f2003c2a4b9cfcd8c0d25706658318ca8e0bfe4b"
+    sha256 sonoma:        "e5e91a303d0090db9fe25ea23850d11967f37f4bc97a242c98e3309d35323d58"
+    sha256 ventura:       "0a1482bfbb03ce95e687277d86aa7c1bac4dd1b4f9daeeebb5e7197196877c8e"
+    sha256 x86_64_linux:  "e9f6607712d55e1397a70b5e5242664ad606f8a0b990deb36161f3f11ddaa1af"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "rapidjson" => :build
   depends_on "swig" => :build
+
   depends_on "cairo"
   depends_on "eigen"
-  depends_on "python@3.11"
+  depends_on "inchi"
+  depends_on "python@3.13"
 
   uses_from_macos "libxml2"
+  uses_from_macos "zlib"
 
   def python3
-    "python3.11"
+    "python3.13"
   end
+
+  conflicts_with "surelog", because: "both install `roundtrip` binaries"
 
   def install
     system "cmake", "-S", ".", "-B", "build",
+                    "-DINCHI_INCLUDE_DIR=#{Formula["inchi"].opt_include}/inchi",
+                    "-DOPENBABEL_USE_SYSTEM_INCHI=ON",
                     "-DRUN_SWIG=ON",
                     "-DPYTHON_BINDINGS=ON",
                     "-DPYTHON_EXECUTABLE=#{which(python3)}",
+                    "-DPYTHON_INSTDIR=#{prefix/Language::Python.site_packages(python3)}",
                     *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
-    system bin/"obabel", "-:'C1=CC=CC=C1Br'", "-omol"
+    assert_match <<~EOS, shell_output("#{bin}/obabel -:'C1=CC=CC=C1Br' -omol")
+
+        7  7  0  0  0  0  0  0  0  0999 V2000
+          0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+          0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+          0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+          0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+          0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+          0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+          0.0000    0.0000    0.0000 Br  0  0  0  0  0  0  0  0  0  0  0  0
+        1  6  1  0  0  0  0
+        1  2  2  0  0  0  0
+        2  3  1  0  0  0  0
+        3  4  2  0  0  0  0
+        4  5  1  0  0  0  0
+        5  6  2  0  0  0  0
+        6  7  1  0  0  0  0
+      M  END
+    EOS
+
     system python3, "-c", "from openbabel import openbabel"
   end
 end

@@ -3,12 +3,17 @@ class Freedink < Formula
   homepage "https://www.gnu.org/software/freedink/"
   url "https://ftp.gnu.org/gnu/freedink/freedink-109.6.tar.gz"
   sha256 "5e0b35ac8f46d7bb87e656efd5f9c7c2ac1a6c519a908fc5b581e52657981002"
+  license "GPL-3.0-or-later"
   revision 1
 
   bottle do
     rebuild 1
+    sha256 arm64_sequoia:  "791eb877668eacf35dbc1e12754a2fc5c40f5804107367fc7f0cc2da76f0974e"
+    sha256 arm64_sonoma:   "78a162584ff38dcffdf1485d08a0e29a556f0eada9831fefef6f7dc14755d222"
+    sha256 arm64_ventura:  "c3ac13edb0efd994c52954b8a4512c0254f6fbe0874f4bae8416949dc18f2026"
     sha256 arm64_monterey: "3c0d3f2a3362647f774125622db2f836a1f209a5bccfe66a8a7901e357d9434f"
     sha256 arm64_big_sur:  "3d3c10351e92122890d83f912bafe794fa40a673783fa5d99b1bdfcdcd53f0cb"
+    sha256 sonoma:         "ae2e232491d307434f8ae51a6f7f373a14da5a08947af29a873988065921b974"
     sha256 ventura:        "cbfd6fd918bcb0af203b66b15c89233bccf573d32448b1fd22fe4b0165fc4fb8"
     sha256 monterey:       "da402e74ba8344d49ec9a0a2c93ab37aa1d3430cb33baf3d995ee3c55489710b"
     sha256 big_sur:        "fd45feffffd96dc600cda4e725619b326ec6a84e96c5844c156aca90fb2390b1"
@@ -19,7 +24,7 @@ class Freedink < Formula
   end
 
   depends_on "glm" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "check"
   depends_on "cxxtest"
   depends_on "fontconfig"
@@ -47,12 +52,10 @@ class Freedink < Formula
     # cannot initialize a variable of type 'char *' with an rvalue of type 'const char *'
     inreplace "src/gfx_fonts.cpp", "char *familyname", "const char *familyname"
     inreplace "src/gfx_fonts.cpp", "char *stylename", "const char *stylename"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
 
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
+
     resource("freedink-data").stage do
       inreplace "Makefile", "xargs -0r", "xargs -0"
       system "make", "install", "PREFIX=#{prefix}"
@@ -61,6 +64,6 @@ class Freedink < Formula
 
   test do
     assert_match "GNU FreeDink 109.6", shell_output("#{bin}/freedink -vwis")
-    assert FileTest.exists?("#{share}/dink/dink/Dink.dat")
+    assert_path_exists share/"dink/dink/Dink.dat"
   end
 end

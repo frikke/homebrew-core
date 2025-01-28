@@ -1,9 +1,9 @@
 class Mpich < Formula
   desc "Implementation of the MPI Message Passing Interface standard"
   homepage "https://www.mpich.org/"
-  url "https://www.mpich.org/static/downloads/4.1.2/mpich-4.1.2.tar.gz"
-  mirror "https://fossies.org/linux/misc/mpich-4.1.2.tar.gz"
-  sha256 "3492e98adab62b597ef0d292fb2459b6123bc80070a8aa0a30be6962075a12f0"
+  url "https://www.mpich.org/static/downloads/4.2.3/mpich-4.2.3.tar.gz"
+  mirror "https://fossies.org/linux/misc/mpich-4.2.3.tar.gz"
+  sha256 "7a019180c51d1738ad9c5d8d452314de65e828ee240bcb2d1f80de9a65be88a8"
   license "mpich2"
 
   livecheck do
@@ -12,13 +12,12 @@ class Mpich < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "94e8c25c5a1e3cc52e879fd2c0424cffbbfebcfca385b05e7533b0eb8c00f377"
-    sha256 cellar: :any,                 arm64_monterey: "f9d1f4b8265e752100f68ec24a1aa43b2059db11e4076ec1bc002c55a653e5f2"
-    sha256 cellar: :any,                 arm64_big_sur:  "ef3cccd0f4d28077063514870b2eecab742735a4a90948c429c334ae646d2dd0"
-    sha256 cellar: :any,                 ventura:        "2256a222b91ab3951fc62b5166006b2c29d31165a762417cffdaf8c1718833be"
-    sha256 cellar: :any,                 monterey:       "54dacf4a4cc94dd66d44573b677313f8b59ba69526c95dc40be560155b45100a"
-    sha256 cellar: :any,                 big_sur:        "a5017cd76fd00791965426990a8a817a0de034c9c4ecf29f718e3b93fe5b8668"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6e8f6700fbc550d259fd8cbbffbd2a70a532bfa3076b762abb72f18bc9d90f6a"
+    sha256 cellar: :any,                 arm64_sequoia: "9999a7768396e26c431ea2ee5c6d932c18b7eeafeb1edcc6f5888883da31a023"
+    sha256 cellar: :any,                 arm64_sonoma:  "47535f48baff287082ef638a658581ccc1357487b443e10ad6b95cb2ed80ea92"
+    sha256 cellar: :any,                 arm64_ventura: "e113986f6d405e7946e82d7144531928f5749cc1cc38956008e5886798f8cb70"
+    sha256 cellar: :any,                 sonoma:        "1365e23104468d8daf332af40b7058753e5175bd9b3062008de2ec32bd2d9630"
+    sha256 cellar: :any,                 ventura:       "6722b6e95c2555466571a0363c853f53a52df540287c23c958643afe8d2427a8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4e13df43ac6c4139f4970f37039ccaa7ea12d67c5f0084d173d8fba52aca7acf"
   end
 
   head do
@@ -55,22 +54,18 @@ class Mpich < Formula
 
     args = %W[
       --disable-dependency-tracking
+      --disable-silent-rules
       --enable-fast=all,O3
       --enable-g=dbg
       --enable-romio
       --enable-shared
+      --with-hwloc=#{Formula["hwloc"].opt_prefix}
       --with-pm=hydra
-      F77=gfortran
-      FC=gfortran
-      FCFLAGS=-fallow-argument-mismatch
-      --disable-silent-rules
       --prefix=#{prefix}
       --mandir=#{man}
+      F77=gfortran
+      FC=gfortran
     ]
-
-    # Flag for compatibility with GCC 10
-    # https://lists.mpich.org/pipermail/discuss/2020-January/005863.html
-    args << "FFLAGS=-fallow-argument-mismatch"
 
     if OS.linux?
       # Use libfabric https://lists.mpich.org/pipermail/discuss/2021-January/006092.html
@@ -85,7 +80,7 @@ class Mpich < Formula
   end
 
   test do
-    (testpath/"hello.c").write <<~EOS
+    (testpath/"hello.c").write <<~C
       #include <mpi.h>
       #include <stdio.h>
 
@@ -101,12 +96,12 @@ class Mpich < Formula
         MPI_Finalize();
         return 0;
       }
-    EOS
-    system "#{bin}/mpicc", "hello.c", "-o", "hello"
+    C
+    system bin/"mpicc", "hello.c", "-o", "hello"
     system "./hello"
-    system "#{bin}/mpirun", "-np", "4", "./hello"
+    system bin/"mpirun", "-np", "4", "./hello"
 
-    (testpath/"hellof.f90").write <<~EOS
+    (testpath/"hellof.f90").write <<~FORTRAN
       program hello
       include 'mpif.h'
       integer rank, size, ierror, tag, status(MPI_STATUS_SIZE)
@@ -116,9 +111,9 @@ class Mpich < Formula
       print*, 'node', rank, ': Hello Fortran world'
       call MPI_FINALIZE(ierror)
       end
-    EOS
-    system "#{bin}/mpif90", "hellof.f90", "-o", "hellof"
+    FORTRAN
+    system bin/"mpif90", "hellof.f90", "-o", "hellof"
     system "./hellof"
-    system "#{bin}/mpirun", "-np", "4", "./hellof"
+    system bin/"mpirun", "-np", "4", "./hellof"
   end
 end

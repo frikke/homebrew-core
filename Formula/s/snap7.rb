@@ -3,13 +3,17 @@ class Snap7 < Formula
   homepage "https://snap7.sourceforge.net/"
   url "https://downloads.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z"
   sha256 "1f4270cde8684957770a10a1d311c226e670d9589c69841a9012e818f7b9f80e"
+  license "LGPL-3.0-or-later"
   revision 1
 
   bottle do
     rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "0251dac8097c7643fbbf1003e422e44773bc86d6c356a8497b2a07bfa163fbdf"
+    sha256 cellar: :any,                 arm64_sonoma:   "62a3c97124e8c82bd49a94b9c1273eb8745ccf6e1a9e179bfed9bbc6e117e43a"
     sha256 cellar: :any,                 arm64_ventura:  "e3169f10899c5bbc65ca3982e7ad9ddb27ebaff7577f9f9c8c0c74be8fb0f271"
     sha256 cellar: :any,                 arm64_monterey: "3ec8ebc46f5b20dafc71b4a2f3c55e0323df337d7fd01e959e2f98c439fe0afa"
     sha256 cellar: :any,                 arm64_big_sur:  "7d60b716e639ad9c24153b94a474dab5d11ad5889e492846ea87235d7abd9e18"
+    sha256 cellar: :any,                 sonoma:         "7e71f373d8a05c5d5da25b25873add858ea0231d83fd0981d2f86ebe5171be8d"
     sha256 cellar: :any,                 ventura:        "839e29976a348f6196df376d1f4c13ee808a8aacd3ff9d64369c6b7a3c390385"
     sha256 cellar: :any,                 monterey:       "0e80fc31c025dc39b1b551adb4328023a0b9f99643d8e246ab644529b9b7e3e1"
     sha256 cellar: :any,                 big_sur:        "52d04e1646b47ba15e5877e8c24b8f2d0267a51d8b7b07ee47330ecd2c44d95a"
@@ -31,7 +35,7 @@ class Snap7 < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "snap7.h"
       int main()
       {
@@ -39,7 +43,7 @@ class Snap7 < Formula
         Cli_Destroy(&Client);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c", "-L#{lib}", "-lsnap7"
     system "./test"
   end

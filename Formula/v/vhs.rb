@@ -1,19 +1,18 @@
 class Vhs < Formula
   desc "Your CLI home video recorder"
   homepage "https://github.com/charmbracelet/vhs"
-  url "https://github.com/charmbracelet/vhs/archive/v0.6.0.tar.gz"
-  sha256 "bf41f264730f18b5146c2269d82b5b69757470799a2cce6099e420b5f3ec7fa3"
+  url "https://github.com/charmbracelet/vhs/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "e8538a9019ddfa633ef7e0a6eb417b87fed0555d51b67dc59cb53493e179e20b"
   license "MIT"
   head "https://github.com/charmbracelet/vhs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "87adc926741c2cede54d4b6a453862407cd3cde38d93648832090a8a11a963c2"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "87adc926741c2cede54d4b6a453862407cd3cde38d93648832090a8a11a963c2"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "87adc926741c2cede54d4b6a453862407cd3cde38d93648832090a8a11a963c2"
-    sha256 cellar: :any_skip_relocation, ventura:        "191b7b279c041b06d8367b16da08aba9640080dbf6b2c0f0cf0a8838bb179b8e"
-    sha256 cellar: :any_skip_relocation, monterey:       "191b7b279c041b06d8367b16da08aba9640080dbf6b2c0f0cf0a8838bb179b8e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "191b7b279c041b06d8367b16da08aba9640080dbf6b2c0f0cf0a8838bb179b8e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c032bb97af62d82f7103e8aee68e6d5cc9e7a9f0c13b89dd7021498342fdf52b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f2a2174756cce0799fda2f31c004d1e8193b85e56ed799ecaaaceb841e3ef02b"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f2a2174756cce0799fda2f31c004d1e8193b85e56ed799ecaaaceb841e3ef02b"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "f2a2174756cce0799fda2f31c004d1e8193b85e56ed799ecaaaceb841e3ef02b"
+    sha256 cellar: :any_skip_relocation, sonoma:        "195b57240e893ad37f6fc86d13c78d5ea4d99ff34213ce3ada8e6d66f63a0cb8"
+    sha256 cellar: :any_skip_relocation, ventura:       "195b57240e893ad37f6fc86d13c78d5ea4d99ff34213ce3ada8e6d66f63a0cb8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d203d016045b4a304efbe5a1b9f21dbfce2bcd0fb2fb3e91cd694ac7c37d863d"
   end
 
   depends_on "go" => :build
@@ -29,14 +28,14 @@ class Vhs < Formula
   end
 
   test do
-    (testpath/"test.tape").write <<-TAPE
-    Output test.gif
-    Type "Foo Bar"
-    Enter
-    Sleep 1s
+    (testpath/"test.tape").write <<~TAPE
+      Output test.gif
+      Type "Foo Bar"
+      Enter
+      Sleep 1s
     TAPE
 
-    system "#{bin}/vhs", "validate", "test.tape"
+    system bin/"vhs", "validate", "test.tape"
 
     assert_match version.to_s, shell_output("#{bin}/vhs --version")
   end

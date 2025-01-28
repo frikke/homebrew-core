@@ -2,21 +2,18 @@ class Minikube < Formula
   desc "Run a Kubernetes cluster locally"
   homepage "https://minikube.sigs.k8s.io/"
   url "https://github.com/kubernetes/minikube.git",
-      tag:      "v1.31.2",
-      revision: "fd7ecd9c4599bef9f04c0986c4a0187f98a4396e"
+      tag:      "v1.35.0",
+      revision: "dd5d320e41b5451cdf3c01891bc4e13d189586ed"
   license "Apache-2.0"
   head "https://github.com/kubernetes/minikube.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "4132eb40453ba2fe36f55d95317f1e9af77c1cab819c6a3370cece89d3da6f2e"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "3bcecf8591a42a0b48549b23f82c9ea52656b492c91c2616d6a679cb2298ef7e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "118b3b28b0f358cb432e05faaa689fedfae49b77c80dd6aa557ab87fbad2e58e"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1eeb2229664c4d98787a0221245f41c729af9613b0456de4c1f62f04514fef57"
-    sha256 cellar: :any_skip_relocation, sonoma:         "5721d8f7cc97486e5aa115268221fb8ca8919f4710c8d5047a380b6414e7b87e"
-    sha256 cellar: :any_skip_relocation, ventura:        "b48d6b05f50bb6932e82281293e9399aec4680cd5759f0f512918cd1bc13ed8d"
-    sha256 cellar: :any_skip_relocation, monterey:       "36e2470f3ac22319dfdc649d989b9ee0f5bc8bc80f141175baaf40db5f245c8c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "cae04bbd5001f5bbf2816182709c8122d11f01766d5796bacc4df740063769bf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "df804daebf62248fdc3ded276246d39805f8f80caef08b713172d734e64bdc7e"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7892fe64bf008ddcbb54b27bca16d162ba2ac2d6aae8c5a80459e4dc063fd6f7"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5736711e2375732dfb96adf43e10c4f19be2462114311508e3b7c7ef94ea190d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "9a374a4d807f2fdaf2656cc1ece11ba93d8b339741450aa073aec5838a2da9bf"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3b4fdb423c0a9a216cc41eb9330550b5e23b6e4c069df40b2635fe99a2a4d1a9"
+    sha256 cellar: :any_skip_relocation, ventura:       "1f8d986fcb54cc99a5a78d056b96d16ce7760e5dc930710d113a7f5a187e2aa4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "542f520e0e71d3e4910333b69ac14fe80fa22d566743b0a9f910bb640002e56a"
   end
 
   depends_on "go" => :build
@@ -34,11 +31,11 @@ class Minikube < Formula
     output = shell_output("#{bin}/minikube version")
     assert_match "version: v#{version}", output
 
-    (testpath/".minikube/config/config.json").write <<~EOS
+    (testpath/".minikube/config/config.json").write <<~JSON
       {
         "vm-driver": "virtualbox"
       }
-    EOS
+    JSON
     output = shell_output("#{bin}/minikube config view")
     assert_match "vm-driver: virtualbox", output
   end

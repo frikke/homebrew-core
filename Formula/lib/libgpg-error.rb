@@ -1,8 +1,8 @@
 class LibgpgError < Formula
   desc "Common error values for all GnuPG components"
   homepage "https://www.gnupg.org/related_software/libgpg-error/"
-  url "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.47.tar.bz2"
-  sha256 "9e3c670966b96ecc746c28c2c419541e3bcb787d1a73930f5e5f5e1bcbbb9bdb"
+  url "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.51.tar.bz2"
+  sha256 "be0f1b2db6b93eed55369cdf79f19f72750c8c7c39fc20b577e724545427e6b2"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,20 +11,20 @@ class LibgpgError < Formula
   end
 
   bottle do
-    sha256 arm64_sonoma:   "cc9affb619675e392885d29c117a08f4f761176b23507156474620566810dd6c"
-    sha256 arm64_ventura:  "89880157c066b02269207fb97fefc861f396c5787cad47089ef34c4a459ed282"
-    sha256 arm64_monterey: "aeffa4d66556e265070446531d84cbe6a953b66ea53c34f6d89637db22635790"
-    sha256 arm64_big_sur:  "1899eb9ba164578b36e85e97753ab4c09cbef831d0fa8f14e568530bc7a202e6"
-    sha256 sonoma:         "bd833dc2e4864adf415010b6b57894e46931beff8bb5c280fa8fb23fa0311b9f"
-    sha256 ventura:        "478d7c81b9bec50008638f93444ce1421b6ebbff07c23118587415ecfdabd79d"
-    sha256 monterey:       "be6a020de8279043f0fd123f32bc2681da17db2edac2bba50ca6c5565842877e"
-    sha256 big_sur:        "1bac110b0742324c549c26a76bc5b0f7702fd26dd3f72de773d356911184f7e9"
-    sha256 x86_64_linux:   "c108c343e2fefc5fd01043e153aacd26a32396984eb6ed4b68702116efba5994"
+    sha256 arm64_sequoia: "7db996510272893e4db9cd536e65e7fa6d0f20c4dbef13c55e95a3ebab67d103"
+    sha256 arm64_sonoma:  "92893cbf03a9de9c16bc05f67e2bb6ab257ad2108aa61bdf1cea6178ac2dcac7"
+    sha256 arm64_ventura: "88f92f8777d3dbe2e163ea5736727b804a843ed707fcf270991a853943df686a"
+    sha256 sonoma:        "cb513c9b9bc05125027e8dee2b2f6ae5a7288ca27ee28aed032086f6f1a9629a"
+    sha256 ventura:       "a184d3d66348ce9885b39561a7c6f98bdaae83791400c018f2634720889cd10d"
+    sha256 x86_64_linux:  "9b65876e4b4b45e6111dd0047e8a3ebb46df26a42d75fc2af41e91beca83ee7d"
   end
 
   on_macos do
     depends_on "gettext"
   end
+
+  # Declare environ - upstream bug https://dev.gnupg.org/T7169
+  patch :DATA
 
   def install
     # NOTE: gpg-error-config is deprecated upstream, so we should remove this at some point.
@@ -43,3 +43,19 @@ class LibgpgError < Formula
     system bin/"gpgrt-config", "--libs"
   end
 end
+
+__END__
+--- a/src/spawn-posix.c
++++ b/src/spawn-posix.c
+@@ -57,7 +57,10 @@
+ 
+ #include "gpgrt-int.h"
+ 
++/* (Only glibc's unistd.h declares this iff _GNU_SOURCE is used.)  */
++extern char **environ;
++ 
+ 
+ /* Definition for the gpgrt_spawn_actions_t.  Note that there is a
+  * different one for Windows.  */
+ struct gpgrt_spawn_actions {
+

@@ -1,17 +1,19 @@
 class M1ddc < Formula
   desc "Control external displays (USB-C/DisplayPort Alt Mode) using DDC/CI on M1 Macs"
   homepage "https://github.com/waydabber/m1ddc"
-  url "https://github.com/waydabber/m1ddc/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "884b65910e69915db29182363590d663a1a6d983e13ca5c41a74209058084c44"
+  url "https://github.com/waydabber/m1ddc/archive/refs/tags/v1.2.0.tar.gz"
+  sha256 "d633c06502e650108bb2f581b5db25d2592955fa9a57de7feeae3ed7710c59ca"
   license "MIT"
   head "https://github.com/waydabber/m1ddc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1e81833fe542690bd540109b71b584e72105b9a52a2f39c8f8864d7b682d16db"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "dbb0437173b2133d7312cb91a73dfc0f25946f79ef94ca365025e1f4034c7edb"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "6c98df1f1bf1c0eda16a07f70a9c2dc539762b08bd0fc1801b38dead4dc96373"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "15f255dfd3bffa355ed5cea88646a647a7cd889070a71f8de30e2f77da35f74e"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "fd4b3c88cd24a1992cb6eb8fa0c82edc301ef5831de19416cc5691c758b4b03d"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8d0636faa4400e20f160adba62245a506f7c087c6f047b9c2f03ce1db4f3863f"
   end
 
-  depends_on arch: :arm
+  depends_on arch: :arm64
   depends_on macos: :monterey
   depends_on :macos
 

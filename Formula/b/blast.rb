@@ -1,9 +1,9 @@
 class Blast < Formula
   desc "Basic Local Alignment Search Tool"
   homepage "https://blast.ncbi.nlm.nih.gov/"
-  url "https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.14.1/ncbi-blast-2.14.1+-src.tar.gz"
-  version "2.14.1"
-  sha256 "712c2dbdf0fb13cc1c2d4f4ef5dd1ce4b06c3b57e96dfea8f23e6e99f5b1650e"
+  url "https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.16.0/ncbi-blast-2.16.0+-src.tar.gz"
+  version "2.16.0"
+  sha256 "17c93cf009721023e5aecf5753f9c6a255d157561638b91b3ad7276fd6950c2b"
   license :public_domain
 
   livecheck do
@@ -12,19 +12,21 @@ class Blast < Formula
   end
 
   bottle do
-    sha256 arm64_ventura:  "5ac733bc4b3dd1dad7e31743523fbbda7e373ef046eedb5b63efd3337377278a"
-    sha256 arm64_monterey: "48a21807f138f6f32c8961e3e42d6d95fe28c3ece6b044a99b0261a2f775683b"
-    sha256 arm64_big_sur:  "14c11bab160ab54a32636d20f0e7d7966cd4e555c597e0b45b8b68c253d1fbf4"
-    sha256 ventura:        "a037c5f6b34bfc3a6da7df53040982820f4fa6bc04b40d267029a5609bc70aa0"
-    sha256 monterey:       "e03015a5f73afdd483c0a4b50641a4f536a838813f4eb080a10495b1ac7eb1b6"
-    sha256 big_sur:        "b663ea74f93a8cb23661aab8b831bef3b1c11877bef219057e1361c4e12021ba"
-    sha256 x86_64_linux:   "6a9d61075581b765efc9e632d1f72099a262fdcbac402db9bc6e052745d096a1"
+    sha256 arm64_sequoia:  "b5317b48fe420d58afd074b19f0d36380788ef46a4a75593b9ed1b2cb397de90"
+    sha256 arm64_sonoma:   "8e77abd1cdf1e35d25d701327042d1e33902f968cc34ed36951c6b784fd12f7d"
+    sha256 arm64_ventura:  "7a33345e002e745fe513ee84e81074259e3225e9e45fdec0531feb9af097f76e"
+    sha256 arm64_monterey: "2ea7535bc0267077b6afdd622a1860a50509a1d3c3cb9d91df9b8a3b5fe4de7c"
+    sha256 sonoma:         "c11dfa24a469e44b56cd270a532f8a5e341f02b9a41aa07b112d48054d76d901"
+    sha256 ventura:        "3aa4433e3e7235441f8418f97c9bac09cbb98f569c008922a0d732344fd95017"
+    sha256 monterey:       "946e1a0a2892aea9e93441a147355baa9d3e87626c052f847c7cf37c397e2fb4"
+    sha256 x86_64_linux:   "a9fb9b0ec8fdfe89cf32b175ff180d160134d99e542f0329466cf9f7a545139b"
   end
 
   depends_on "lmdb"
 
   uses_from_macos "cpio" => :build
   uses_from_macos "bzip2"
+  uses_from_macos "sqlite"
   uses_from_macos "zlib"
 
   on_macos do
@@ -32,8 +34,6 @@ class Blast < Formula
   end
 
   conflicts_with "proj", because: "both install a `libproj.a` library"
-
-  fails_with gcc: "5" # C++17
 
   def install
     cd "c++" do
@@ -47,10 +47,10 @@ class Blast < Formula
         --without-debug
         --without-boost
       ]
-      # Allow SSE4.2 on some platforms. The --with-bin-release sets --without-sse42
-      args << "--with-sse42" if Hardware::CPU.intel? && MacOS.version.requires_sse42?
 
       if OS.mac?
+        # Allow SSE4.2 on some platforms. The --with-bin-release sets --without-sse42
+        args << "--with-sse42" if Hardware::CPU.intel? && OS.mac? && MacOS.version.requires_sse42?
         args += ["OPENMP_FLAGS=-Xpreprocessor -fopenmp",
                  "LDFLAGS=-lomp"]
       end

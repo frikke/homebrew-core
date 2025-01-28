@@ -1,18 +1,17 @@
 class Crane < Formula
   desc "Tool for interacting with remote images and registries"
   homepage "https://github.com/google/go-containerregistry"
-  url "https://github.com/google/go-containerregistry/archive/v0.16.1.tar.gz"
-  sha256 "6b8d41175fda7497a90eb89a9b30d8291b418e1f9e524ae094439c9887fb06ac"
+  url "https://github.com/google/go-containerregistry/archive/refs/tags/v0.20.3.tar.gz"
+  sha256 "663f4b808c10315f56a09b7c0a63e314ad79b16a07f950641330899db68c6075"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d6828ee0cb41f068f187165190773acff3186256b0ee2290b2613d9744a6edfb"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d6828ee0cb41f068f187165190773acff3186256b0ee2290b2613d9744a6edfb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d6828ee0cb41f068f187165190773acff3186256b0ee2290b2613d9744a6edfb"
-    sha256 cellar: :any_skip_relocation, ventura:        "b860bc0d7a2d0d77c5b9324ad62d5a0d5976c43799d7c03cff2c02764f465cde"
-    sha256 cellar: :any_skip_relocation, monterey:       "b860bc0d7a2d0d77c5b9324ad62d5a0d5976c43799d7c03cff2c02764f465cde"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b860bc0d7a2d0d77c5b9324ad62d5a0d5976c43799d7c03cff2c02764f465cde"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "58f3bf5d0e0867a13a3bfde7e965113ac54afc72bc1422727b457858ab498909"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b83007cc815313ad6732c19ab1c7c6138063efb31f68d9ad34b7131efc4dd105"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b83007cc815313ad6732c19ab1c7c6138063efb31f68d9ad34b7131efc4dd105"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "b83007cc815313ad6732c19ab1c7c6138063efb31f68d9ad34b7131efc4dd105"
+    sha256 cellar: :any_skip_relocation, sonoma:        "b42df32566b9d2c6770c232f280481f34ad323ddd5e4f414c23f5a87d9675f7f"
+    sha256 cellar: :any_skip_relocation, ventura:       "b42df32566b9d2c6770c232f280481f34ad323ddd5e4f414c23f5a87d9675f7f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "73cf545d4c043bf2f38d693fca210207c02bf2088086473d69c0814a0d835ce8"
   end
 
   depends_on "go" => :build
@@ -23,7 +22,7 @@ class Crane < Formula
       -X github.com/google/go-containerregistry/cmd/crane/cmd.Version=#{version}
     ]
 
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/crane"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/crane"
 
     generate_completions_from_executable(bin/"crane", "completion")
   end

@@ -1,8 +1,8 @@
 class Libzip < Formula
   desc "C library for reading, creating, and modifying zip archives"
   homepage "https://libzip.org/"
-  url "https://libzip.org/download/libzip-1.10.1.tar.xz", using: :homebrew_curl
-  sha256 "dc3c8d5b4c8bbd09626864f6bcf93de701540f761d76b85d7c7d710f4bd90318"
+  url "https://libzip.org/download/libzip-1.11.3.tar.xz", using: :homebrew_curl
+  sha256 "9509d878ba788271c8b5abca9cfde1720f075335686237b7e9a9e7210fe67c1b"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,44 +11,40 @@ class Libzip < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sonoma:   "8ecf154f8c0bab71c0008c6f73eb8cd2df78cfa424d8bdcffc66dc95b3bf7c14"
-    sha256 cellar: :any,                 arm64_ventura:  "cd7bda731a8b2e5d1a3cdf5be6b515718c56d55d16a5b45faa1a91daf9c0ca2b"
-    sha256 cellar: :any,                 arm64_monterey: "a0d8bae54df1068c92ad894eddca0cd7465ecbaa3ef875c07c46bcea764bac71"
-    sha256 cellar: :any,                 arm64_big_sur:  "6549fda9b8f6ac3904b55bc0b8c601ecf15773eb4c97c40091148559d69bfec1"
-    sha256 cellar: :any,                 sonoma:         "f782643b254f58ddf3830272c0221f5d35db84ebd4f3d4ef19894ca0c91648ad"
-    sha256 cellar: :any,                 ventura:        "4fca00c15a69f25064b40b12e37a6f552edd632f77e2947e076745b55aaeffd3"
-    sha256 cellar: :any,                 monterey:       "5fbb0e2a2cd9b17a416d518d324d9eb3eac88626851bad41d9fb144ccebd8757"
-    sha256 cellar: :any,                 big_sur:        "db6453b117d39f0fe310f30e0d92124c453dd1568edd5800fd886bdb2b35e9df"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a5c180236137518d040277c1310e4b7c34337a0d396053e9a2534861453f70bc"
+    sha256 cellar: :any,                 arm64_sequoia: "d047ed69c28d812b43092cdc11a95ebfb10c260294088b10c9e5c4013f8f7729"
+    sha256 cellar: :any,                 arm64_sonoma:  "0eef871bcff5568c941e603285f699b520fb0918876ab15129047b1eae8919c1"
+    sha256 cellar: :any,                 arm64_ventura: "a5f5cad9a74903117c3168e95aed359880001176cec4012caf3347768e4653b4"
+    sha256 cellar: :any,                 sonoma:        "e3a656692093ac165b0c07c830cc053dffc85f916168b584538d02c4c0205692"
+    sha256 cellar: :any,                 ventura:       "6b4c562f07821355fd8c641a42da8fde595ade1c1a26ab76c218e3394e6f318f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2ce5e38e6c13fcce7176c9acd84abdd28d495a1377b1e9b1d622ebdefebe11f7"
   end
 
   depends_on "cmake" => :build
+  depends_on "xz"
   depends_on "zstd"
 
   uses_from_macos "zip" => :test
   uses_from_macos "bzip2"
-  uses_from_macos "xz"
   uses_from_macos "zlib"
 
   on_linux do
     depends_on "openssl@3"
   end
 
-  conflicts_with "libtcod", "minizip-ng",
-    because: "libtcod, libzip and minizip-ng install a `zip.h` header"
+  conflicts_with "libtcod", because: "libtcod and libzip install a `zip.h` header"
 
   def install
-    crypto_args = %w[
+    args = %w[
       -DENABLE_GNUTLS=OFF
       -DENABLE_MBEDTLS=OFF
+      -DBUILD_REGRESS=OFF
+      -DBUILD_EXAMPLES=OFF
     ]
-    crypto_args << "-DENABLE_OPENSSL=OFF" if OS.mac? # Use CommonCrypto instead.
-    system "cmake", ".", *std_cmake_args,
-                         *crypto_args,
-                         "-DBUILD_REGRESS=OFF",
-                         "-DBUILD_EXAMPLES=OFF"
-    system "make", "install"
+    args << "-DENABLE_OPENSSL=OFF" if OS.mac? # Use CommonCrypto instead.
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

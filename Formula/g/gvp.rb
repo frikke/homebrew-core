@@ -1,13 +1,13 @@
 class Gvp < Formula
   desc "Go versioning packager"
   homepage "https://github.com/pote/gvp"
-  url "https://github.com/pote/gvp/archive/v0.3.0.tar.gz"
+  url "https://github.com/pote/gvp/archive/refs/tags/v0.3.0.tar.gz"
   sha256 "e1fccefa76495293350d47d197352a63cae6a014d8d28ebdedb785d4304ee338"
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "edc2b278418b14f3e34504829b05b43db8920d2ddba011653f59688fb9a43068"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "7570737e59ef17b2cde9b25b56a9f148a839924b0e0bc9b9a91e30ee95b6a3e6"
   end
 
   # Upstream fix for "syntax error near unexpected token `;'"

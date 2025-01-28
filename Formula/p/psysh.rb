@@ -1,18 +1,17 @@
 class Psysh < Formula
   desc "Runtime developer console, interactive debugger and REPL for PHP"
   homepage "https://psysh.org/"
-  url "https://github.com/bobthecow/psysh/releases/download/v0.11.21/psysh-v0.11.21.tar.gz"
-  sha256 "b6e82d64ea94def2e82b6da8773c6ce848c3165ae398108ca66df6a369625639"
+  url "https://github.com/bobthecow/psysh/releases/download/v0.12.7/psysh-v0.12.7.tar.gz"
+  sha256 "aad77c3b69e39289b8a3309aedab4b5ee3f8bfbbd157a2b93d42845621c72f2b"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5ed5e7d0a0c3ac047e6d61c8353b3992345ceaf7ce8d4d8a56eea9bb684d62cd"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5ed5e7d0a0c3ac047e6d61c8353b3992345ceaf7ce8d4d8a56eea9bb684d62cd"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5ed5e7d0a0c3ac047e6d61c8353b3992345ceaf7ce8d4d8a56eea9bb684d62cd"
-    sha256 cellar: :any_skip_relocation, ventura:        "7e9b57fb83866794e576ef188e0a377753319ddef7622d3571bed01272e3788c"
-    sha256 cellar: :any_skip_relocation, monterey:       "7e9b57fb83866794e576ef188e0a377753319ddef7622d3571bed01272e3788c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "7e9b57fb83866794e576ef188e0a377753319ddef7622d3571bed01272e3788c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5ed5e7d0a0c3ac047e6d61c8353b3992345ceaf7ce8d4d8a56eea9bb684d62cd"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e70b694cadb6a27f0b212b696f211f9c6d705b34026e63cdbd15eab718765a79"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e70b694cadb6a27f0b212b696f211f9c6d705b34026e63cdbd15eab718765a79"
+    sha256 cellar: :any_skip_relocation, arm64_ventura: "e70b694cadb6a27f0b212b696f211f9c6d705b34026e63cdbd15eab718765a79"
+    sha256 cellar: :any_skip_relocation, sonoma:        "65da1df593e4e9044b5cfd4215d2bd21c2b4024d639dee7e49a612756b556c2f"
+    sha256 cellar: :any_skip_relocation, ventura:       "65da1df593e4e9044b5cfd4215d2bd21c2b4024d639dee7e49a612756b556c2f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e70b694cadb6a27f0b212b696f211f9c6d705b34026e63cdbd15eab718765a79"
   end
 
   depends_on "php"
@@ -24,9 +23,9 @@ class Psysh < Formula
   test do
     assert_match version.to_s, shell_output("#{bin}/psysh --version")
 
-    (testpath/"src/hello.php").write <<~EOS
+    (testpath/"src/hello.php").write <<~PHP
       <?php echo 'hello brew';
-    EOS
+    PHP
 
     assert_match "hello brew", shell_output("#{bin}/psysh -n src/hello.php")
   end

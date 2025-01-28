@@ -1,10 +1,10 @@
 class Cryptopp < Formula
   desc "Free C++ class library of cryptographic schemes"
   homepage "https://cryptopp.com/"
-  url "https://cryptopp.com/cryptopp880.zip"
-  mirror "https://github.com/weidai11/cryptopp/releases/download/CRYPTOPP_8_8_0/cryptopp880.zip"
-  version "8.8.0"
-  sha256 "ace1c7b010a409eba5e86c4fd5a8845c43a6ac39bb6110e64ca5d7fea08583f4"
+  url "https://cryptopp.com/cryptopp890.zip"
+  mirror "https://github.com/weidai11/cryptopp/releases/download/CRYPTOPP_8_9_0/cryptopp890.zip"
+  version "8.9.0"
+  sha256 "4cc0ccc324625b80b695fcd3dee63a66f1a460d3e51b71640cdbfc4cd1a3779c"
   license all_of: [:public_domain, "BSL-1.0"]
   head "https://github.com/weidai11/cryptopp.git", branch: "master"
 
@@ -17,18 +17,20 @@ class Cryptopp < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_ventura:  "7d03053c9802c0533b277549f9a4173ca985ac065076d5ec1846673400665177"
-    sha256 cellar: :any,                 arm64_monterey: "2e3fa5188ca17a91484735723c37272f56c26f14f71d8328b3d10ebab5ca14d8"
-    sha256 cellar: :any,                 arm64_big_sur:  "a6d82bdb7e7fb9422abfb954c2008c014c819552304b3a3dfa944ca5a73b8eaa"
-    sha256 cellar: :any,                 ventura:        "67ef7d471cc2702a3d113167ab62073dd413f408f1461e11fd18c25347293f04"
-    sha256 cellar: :any,                 monterey:       "013ce1ca4a1a3ccbe379794214bf9b9a433e77d4a6f85870acfdaa258e1d5ec1"
-    sha256 cellar: :any,                 big_sur:        "5be44e1e27595782ceac99eb8a36c43b567d9eb8db2116e5702aaaecfe9073f9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ebdd057a75c85f69868a0d64b3da7b0f4514856f889ec959ff67408e2c3431e1"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_sequoia:  "d6cdbe84008d6489b21fed34813dbc6b349c90c52cc7573f7bf5b670b3290d3c"
+    sha256 cellar: :any,                 arm64_sonoma:   "272e8028bcdf871a7c35d6590af87d3520aa9d1c053d2d5253dec85656c1b19d"
+    sha256 cellar: :any,                 arm64_ventura:  "d4a8d3ba690a9762d7fdd84a048b8e73ca14a44c52ee82d40b309799c5603890"
+    sha256 cellar: :any,                 arm64_monterey: "44322c46519ccadfb08e746e54b71a7183ae5daa348a04f2a0c8399f13409f59"
+    sha256 cellar: :any,                 sonoma:         "d9b7900ca928fd39e568a259e6f1f4e093d5ae7e33debbd0f94c6e6d7e8578ad"
+    sha256 cellar: :any,                 ventura:        "9703073429f04a5b3e2e0f1ae3adb4419ecc87c520471d4f19ba45b1fd45c68e"
+    sha256 cellar: :any,                 monterey:       "a8fbbbb8ab93c348d4d6258a7d2423843bb1a04a465ac1eac85df26e46eb9788"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d6404ced52f843fd29dc3a495ff3706c4040641597ae50e1cd58e19e1d915777"
   end
 
   def install
     ENV.cxx11
-    system "make", "all", "libcryptopp.pc"
+    system "make", "all", "libcryptopp.pc", "PREFIX=#{prefix}"
     system "make", "test"
     system "make", "install-lib", "PREFIX=#{prefix}"
   end
@@ -36,7 +38,7 @@ class Cryptopp < Formula
   test do
     # Test program modified from:
     #   https://www.cryptopp.com/wiki/Advanced_Encryption_Standard
-    (testpath/"test.cc").write <<~EOS
+    (testpath/"test.cc").write <<~CPP
       #ifdef NDEBUG
       #undef NDEBUG
       #endif
@@ -87,7 +89,7 @@ class Cryptopp < Formula
         assert(plain == recovered);
         return 0;
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "test.cc", "-I#{include}", "-L#{lib}",
                     "-lcryptopp", "-o", "test"
     system "./test"

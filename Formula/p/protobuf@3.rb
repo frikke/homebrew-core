@@ -6,22 +6,23 @@ class ProtobufAT3 < Formula
   license "BSD-3-Clause"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_sonoma:   "c050a7aea5205a7870fead5488375b58b1da52bc50df942c4be9fc8238d81617"
-    sha256 cellar: :any,                 arm64_ventura:  "4518b3647024046c1eb5edf36926d38db8fbc7a70f938717b0e9e65d3d272c33"
-    sha256 cellar: :any,                 arm64_monterey: "142d9bc74234f930a6c2ed06ac1bef4d0aa55f8edfa8440b26c087c75796050a"
-    sha256 cellar: :any,                 arm64_big_sur:  "07a27ece3eb3274cafab5f8cb325a2934945595e0dd766b90921b3860252cc4e"
-    sha256 cellar: :any,                 sonoma:         "124fa3fec2a8991fac4f08abe9dfc4e201d74d6a6386271f827532a558473f16"
-    sha256 cellar: :any,                 ventura:        "067e3b9caec56ae7a1f2a7d161656ae25f9dbffff618fb7c79fa4f3fa0ab694a"
-    sha256 cellar: :any,                 monterey:       "1e46152ab22fccdaa11f553dd9f19447789c59059c5823fc1ac5197081dd62a5"
-    sha256 cellar: :any,                 big_sur:        "15b0be2f0afdbed151c1df25ffd28c32fb5c762c15b5b13ca4a42ded0f8bf5ba"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ea79553ddaa109699ce023c377bfe819ffed3c1fbf29d139a26bd01acdb1e74e"
+    rebuild 4
+    sha256 cellar: :any,                 arm64_sequoia:  "b6215fe7415a0af6a030e42af7cfce3c08b31ca8e29ed0f262989fc7ea38b12f"
+    sha256 cellar: :any,                 arm64_sonoma:   "38970c2fb478351045c2c3be21876d4604f83e1ef8d0fab54b38f63a8f43a496"
+    sha256 cellar: :any,                 arm64_ventura:  "fc53172db0444cca706a5d2d0283bed72e86536dba717da02822691cde488fb5"
+    sha256 cellar: :any,                 arm64_monterey: "6412e052fbeb376013fd0be287332b6bba9d0a1698ca17df4a43c9eaecce468d"
+    sha256 cellar: :any,                 sonoma:         "4b52807c8afcdcc00fc8828e747aa9032c0e5a3b00c0674fa0bb71a67cf43985"
+    sha256 cellar: :any,                 ventura:        "7dff34237d218a0b9620c28a3a6f28a9fde7a25878f090d99ad1a63439a0c322"
+    sha256 cellar: :any,                 monterey:       "6570ec6cd341a8404b54513ed64da009c73e1ef0aac41a077aba4a14ca2a91ba"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9a0ee63ac3e8f01bd14213820b91d73c6b964982d186f12648063688b3860073"
   end
 
   keg_only :versioned_formula
 
-  depends_on "python@3.10" => [:build, :test]
+  disable! date: "2025-07-01", because: :versioned_formula
+
   depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.12" => [:build, :test]
 
   uses_from_macos "zlib"
 
@@ -45,7 +46,7 @@ class ProtobufAT3 < Formula
     ENV.cxx11
 
     system "./autogen.sh" if build.head?
-    system "./configure", *std_configure_args, "--with-zlib", "--with-pic"
+    system "./configure", "--with-zlib", "--with-pic", *std_configure_args
     system "make"
     system "make", "install"
 
@@ -56,15 +57,15 @@ class ProtobufAT3 < Formula
     ENV.append_to_cflags "-I#{include}"
     ENV.append_to_cflags "-L#{lib}"
 
-    cd "python" do
-      pythons.each do |python|
-        system python, *Language::Python.setup_install_args(prefix, python), "--cpp_implementation"
-      end
+    pip_args = ["--config-settings=--build-option=--cpp_implementation"]
+    pythons.each do |python|
+      build_isolation = Language::Python.major_minor_version(python) >= "3.12"
+      system python, "-m", "pip", "install", *pip_args, *std_pip_args(build_isolation:), "./python"
     end
   end
 
   test do
-    testdata = <<~EOS
+    testdata = <<~PROTO
       syntax = "proto3";
       package test;
       message TestCase {
@@ -73,7 +74,7 @@ class ProtobufAT3 < Formula
       message Test {
         repeated TestCase case = 1;
       }
-    EOS
+    PROTO
     (testpath/"test.proto").write testdata
     system bin/"protoc", "test.proto", "--cpp_out=."
 
